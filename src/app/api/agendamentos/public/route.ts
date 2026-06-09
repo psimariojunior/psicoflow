@@ -6,7 +6,7 @@ import { scheduleReminders } from "@/lib/notifications"
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    const { name, email, phone, startTime, psychologistId } = data
+    const { name, email, phone, startTime, psychologistId, modality } = data
 
     if (!name?.trim()) {
       return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 })
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         startTime: startDate,
         endTime: endDate,
         status: "SCHEDULED",
-        modality: "online",
+        modality: modality === "presential" ? "presential" : "online",
         patientId: patient.id,
         psychologistId: psychologistIdFinal,
       },

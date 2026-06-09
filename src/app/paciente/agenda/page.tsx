@@ -48,6 +48,7 @@ export default function AgendaPacientePage() {
   const [availableDays, setAvailableDays] = useState<AvailableDay[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
+  const [selectedModality, setSelectedModality] = useState<string>("online")
   const [bookingLoading, setBookingLoading] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
@@ -96,6 +97,7 @@ export default function AgendaPacientePage() {
           email: patient?.email || undefined,
           phone: patient?.phone || undefined,
           startTime: selectedSlot.startTime,
+          modality: selectedModality,
         }),
       })
 
@@ -117,7 +119,7 @@ export default function AgendaPacientePage() {
     } finally {
       setBookingLoading(false)
     }
-  }, [selectedSlot, token, patient])
+  }, [selectedSlot, token, patient, selectedModality])
 
   const upcoming = appointments.filter((a) => new Date(a.startTime) > new Date() && a.status !== "CANCELLED")
   const past = appointments.filter((a) => new Date(a.startTime) <= new Date() || a.status === "CANCELLED")
@@ -342,6 +344,34 @@ export default function AgendaPacientePage() {
                 <h2 className="text-xl font-bold text-white">{formatDateBR(selectedDate)}</h2>
                 <p className="text-gray-300 text-lg">às {selectedSlot.time}</p>
               </div>
+              <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50 mb-6">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Modalidade</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => setSelectedModality("online")}
+                    className={`rounded-xl py-4 px-4 text-sm font-medium transition-all ring-1 text-left ${
+                      selectedModality === "online"
+                        ? "bg-emerald-500/15 ring-emerald-500/30 text-emerald-300"
+                        : "bg-slate-700/50 ring-slate-600/50 text-gray-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    <Video className="h-5 w-5 mb-1.5" />
+                    <p className="font-medium">Online</p>
+                    <p className="text-xs mt-0.5 opacity-70">Videochamada</p>
+                  </button>
+                  <button onClick={() => setSelectedModality("presential")}
+                    className={`rounded-xl py-4 px-4 text-sm font-medium transition-all ring-1 text-left ${
+                      selectedModality === "presential"
+                        ? "bg-emerald-500/15 ring-emerald-500/30 text-emerald-300"
+                        : "bg-slate-700/50 ring-slate-600/50 text-gray-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    <Calendar className="h-5 w-5 mb-1.5" />
+                    <p className="font-medium">Presencial</p>
+                    <p className="text-xs mt-0.5 opacity-70">No consultório</p>
+                  </button>
+                </div>
+              </div>
+
               <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50 mb-6">
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Confirmar agendamento</h3>
                 <div className="space-y-3">
