@@ -48,11 +48,42 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 ### Vercel deployment
 - Git repo: `https://github.com/psimariojunior/psicoflow`
 - Production URL: `https://psicoflow-iota.vercel.app`
-- Build command: `prisma db push --accept-data-loss && next build` (definido em `vercel.json`)
+- Build command: `prisma db push --accept-data-loss && next build` (vercel.json)
 - `POSTGRES_PRISMA_URL` env (non-pooled) for DDL via prisma db push
-- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL
-- Middleware allows unauthenticated access to `/sala-virtual/entrar` and `/api/livekit/*`
+- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL, WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+- Middleware allows unauthenticated access to `/sala-virtual/entrar`, `/api/livekit/*`, and `/api/cron/*`
 - **SSO Protection**: foi desativado no projeto Vercel (impedia acesso do paciente sem login Vercel)
+
+## Recentes (2026-06-10) — Lembretes Automáticos
+
+### O que foi implementado
+- **Email**: `sendEmail()` genérico + template HTML de lembrete de consulta em `src/lib/email.ts`; reusa SMTP Outlook já configurado
+- **WhatsApp**: Cliente Meta Cloud API em `src/lib/whatsapp.ts`; envia template `lembrete_consulta` com nome/data/hora
+- **Engine de notificações** (`src/lib/notifications.ts`):
+  - `scheduleReminders()` — cria notificações PENDING para 24h e 1h antes da consulta
+  - `cancelPendingReminders()` — cancela pendentes ao cancelar consulta
+  - `dispatchNotification()` — envia email ou WhatsApp e marca SENT/FAILED
+  - `processPendingNotifications()` — processa todos PENDING com scheduledAt <= agora
+- **Cron**: `/api/cron/lembretes` (GET + POST) — público, para ser chamado por cron-job.org a cada 30min
+- **Integração na agenda**:
+  - `POST /api/agendamentos` → agenda reminders automaticamente na criação
+  - `PUT /api/agendamentos/[id]` → agenda ao confirmar, cancela ao cancelar/deletar
+  - `DELETE /api/agendamentos/[id]` → cancela pendentes
+- **Botão "Enviar Lembrete"**: no diálogo de detalhes da consulta (disparo imediato)
+- **`POST /api/notificacoes`**: dispara imediatamente quando `sendAt` não é informado
+- **Schema Prisma**: Notification ganhou campos `scheduledAt` (DateTime?), `appointmentId` (FK para Appointment), e relação `appointment`
+
+### Para fazer o WhatsApp funcionar
+1. Criar template `lembrete_consulta` no WhatsApp Manager (Meta Business)
+2. Gerar token permanente no Graph API Explorer
+3. Adicionar `WHATSAPP_API_TOKEN` e `WHATSAPP_PHONE_NUMBER_ID` nas env vars do Vercel
+
+### Para o cron automático
+1. Criar conta em https://cron-job.org
+2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes` a cada 30 min
+
+### Setup Details
+Ver `LEMBRETES_SETUP.md` na raiz do projeto.
 
 ## Relevant Files
 - `src/app/(public)/sala-virtual/entrar/page.tsx` — patient flow (welcome → prejoin → call)
