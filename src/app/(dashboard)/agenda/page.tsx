@@ -127,18 +127,18 @@ export default function AgendaPage() {
   }, [fetchAppointments])
 
   const handleSendReminder = useCallback(async (appt: Appt) => {
-    try {
-      const channels = []
-      if (appt.patientEmail) channels.push("EMAIL")
-      if (appt.patientPhone) channels.push("WHATSAPP")
-      if (channels.length === 0) {
-        toast.error("Paciente não tem email nem WhatsApp cadastrados")
-        return
-      }
-      const date = `${appt.startTime}`
-      const sent: string[] = []
-      const failed: string[] = []
-      for (const channel of channels) {
+    const channels = []
+    if (appt.patientEmail) channels.push("EMAIL")
+    if (appt.patientPhone) channels.push("WHATSAPP")
+    if (channels.length === 0) {
+      toast.error("Paciente não tem email nem WhatsApp cadastrados")
+      return
+    }
+    const date = `${appt.startTime}`
+    const sent: string[] = []
+    const failed: string[] = []
+    for (const channel of channels) {
+      try {
         const res = await fetch("/api/notificacoes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -152,17 +152,20 @@ export default function AgendaPage() {
         if (res.ok) {
           sent.push(channel === "EMAIL" ? "Email" : "WhatsApp")
         } else {
+          const body = await res.text()
+          console.error(`[lembrete] ${channel} failed:`, res.status, body)
           failed.push(channel === "EMAIL" ? "Email" : "WhatsApp")
         }
+      } catch (err) {
+        console.error(`[lembrete] ${channel} error:`, err)
+        failed.push(channel === "EMAIL" ? "Email" : "WhatsApp")
       }
-      if (sent.length > 0) {
-        toast.success(`Lembrete enviado por ${sent.join(" e ")}`)
-      }
-      if (failed.length > 0) {
-        toast.error(`Falha ao enviar por ${failed.join(" e ")}`)
-      }
-    } catch {
-      toast.error("Erro ao enviar lembrete")
+    }
+    if (sent.length > 0) {
+      toast.success(`Lembrete enviado por ${sent.join(" e ")}`)
+    }
+    if (failed.length > 0) {
+      toast.error(`Falha ao enviar por ${failed.join(" e ")}`)
     }
   }, [])
 
