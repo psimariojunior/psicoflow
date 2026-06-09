@@ -29,16 +29,16 @@ export async function POST(request: Request) {
       data: { token, expires, userId: user.id },
     })
 
-    const sent = await sendPasswordResetEmail(email, token)
+    const err = await sendPasswordResetEmail(email, token)
 
-    if (!sent) {
-      logger.warn("Password reset token generated but email not sent (SMTP not configured)", { email })
+    if (err) {
+      logger.warn("Password reset token generated but email not sent", { email, error: err })
     }
 
     return NextResponse.json({
-      message: sent
-        ? "Email de recuperação enviado"
-        : "Link gerado. Configure o SMTP no .env.local para enviar emails.",
+      message: err
+        ? "Link gerado. Configure o envio de emails para enviar."
+        : "Email de recuperação enviado",
     })
   } catch (error) {
     logger.error("Forgot password error", { error: String(error) })
