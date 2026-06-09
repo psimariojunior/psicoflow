@@ -55,7 +55,18 @@ export async function cancelPendingReminders(appointmentId: string): Promise<voi
   logger.info("Pending reminders cancelled", { appointmentId })
 }
 
-export async function dispatchNotification(notificationId: string): Promise<void> {
+async function getPatientContact(patientId: string | null) {
+  if (!patientId) return null
+  return prisma.patient.findUnique({
+    where: { id: patientId },
+    select: { name: true, email: true, phone: true },
+  })
+}
+
+export async function dispatchNotification(
+  notificationId: string,
+  overrides?: { psychologistName?: string; patientName?: string; patientEmail?: string; patientPhone?: string }
+): Promise<void> {
   const notification = await prisma.notification.findUnique({
     where: { id: notificationId },
     include: {
@@ -64,7 +75,7 @@ export async function dispatchNotification(notificationId: string): Promise<void
           startTime: true,
           type: true,
           modality: true,
-          psychologist: { select: { id: true, name: true } },
+          psychologist: { select: { name: true } },
           patient: { select: { name: true, email: true, phone: true } },
         },
       },
@@ -77,38 +88,60 @@ export async function dispatchNotification(notificationId: string): Promise<void
   }
 
   const appt = notification.appointment
-  if (!appt) {
-    logger.warn("Notification has no linked appointment", { notificationId })
-    return
+  let patientName = "Paciente"
+  let patientEmail: string | null = null
+  let patientPhone: string | null = null
+  let psyName = "Psicólogo"
+  let dateStr = ""
+  let timeStr = ""
+  let type = "Atendimento"
+  let modality = "presential"
+
+  if (appt) {
+    patientName = appt.patient.name
+    patientEmail = appt.patient.email
+    patientPhone = appt.patient.phone
+    psyName = appt.psychologist.name
+    const start = appt.startTime
+    dateStr = start.toLocaleDateString("pt-BR")
+    timeStr = start.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    type = appt.type || "Atendimento"
+    modality = appt.modality || "presential"
+  } else if (notification.patientId) {
+    const patient = await getPatientContact(notification.patientId)
+    if (patient) {
+      patientName = patient.name
+      patientEmail = patient.email
+      patientPhone = patient.phone
+    }
   }
 
-  let success = false
-  const start = appt.startTime
-  const dateStr = start.toLocaleDateString("pt-BR")
-  const timeStr = start.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+  if (overrides?.psychologistName) psyName = overrides.psychologistName
+  if (overrides?.patientName) patientName = overrides.patientName
+  if (overrides?.patientEmail) patientEmail = overrides.patientEmail
+  if (overrides?.patientPhone) patientPhone = overrides.patientPhone
 
-  if (notification.channel === "EMAIL" && appt.patient.email) {
+  let success = false
+
+  if (notification.channel === "EMAIL" && patientEmail) {
     success = await sendAppointmentReminderEmail(
-      appt.patient.email,
-      appt.patient.name,
-      appt.psychologist.name,
-      dateStr,
-      timeStr,
-      appt.type || "Atendimento",
-      appt.modality || "presential"
+      patientEmail,
+      patientName,
+      psyName,
+      dateStr || "(data a confirmar)",
+      timeStr || "(horário a confirmar)",
+      type,
+      modality
     )
-  } else if (notification.channel === "WHATSAPP" && appt.patient.phone) {
+  } else if (notification.channel === "WHATSAPP" && patientPhone) {
     success = await sendAppointmentReminderWhatsApp(
-      appt.patient.phone,
-      appt.patient.name,
-      dateStr,
-      timeStr
+      patientPhone,
+      patientName,
+      dateStr || "(data a confirmar)",
+      timeStr || "(horário a confirmar)"
     )
   } else {
-    logger.warn("Cannot dispatch notification: missing contact or channel", {
-      notificationId,
-      channel: notification.channel,
-    })
+    logger.warn("Cannot dispatch notification", { notificationId, channel: notification.channel, hasEmail: !!patientEmail, hasPhone: !!patientPhone })
   }
 
   await prisma.notification.update({
@@ -131,17 +164,7 @@ export async function processPendingNotifications(): Promise<{ sent: number; fai
         status: { not: "CANCELLED" },
       },
     },
-    include: {
-      appointment: {
-        select: {
-          startTime: true,
-          type: true,
-          modality: true,
-          psychologist: { select: { name: true } },
-          patient: { select: { name: true, email: true, phone: true } },
-        },
-      },
-    },
+    select: { id: true },
   })
 
   let sent = 0

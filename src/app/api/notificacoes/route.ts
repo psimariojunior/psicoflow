@@ -65,7 +65,9 @@ export async function POST(request: Request) {
     })
 
     if (!sendAt) {
-      dispatchNotification(notification.id).catch((err) =>
+      dispatchNotification(notification.id, {
+        psychologistName: (session.user as { name?: string }).name || "Psicólogo",
+      }).catch((err) =>
         logger.error("Failed to dispatch immediate notification", { id: notification.id, error: String(err) })
       )
     }
