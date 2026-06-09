@@ -22,6 +22,10 @@ export async function GET() {
     healthy = false
   }
 
+  const ef = process.env.EMAIL_FROM || ""
+  checks.emailFrom = ef.includes("onboarding") ? "sandbox" : ef ? "custom" : "not set"
+  checks.resendKey = process.env.RESEND_API_KEY ? "set" : "not set"
+
   return NextResponse.json(
     {
       status: healthy ? "healthy" : "unhealthy",
