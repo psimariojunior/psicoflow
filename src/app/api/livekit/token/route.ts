@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { AccessToken } from "livekit-server-sdk"
+import { prisma } from "@/lib/prisma"
 
 export async function GET(request: Request) {
   try {
@@ -11,6 +12,11 @@ export async function GET(request: Request) {
 
     if (!room) {
       return NextResponse.json({ error: "Room name required" }, { status: 400 })
+    }
+
+    const closed = await prisma.closedRoom.findUnique({ where: { roomName: room } })
+    if (closed) {
+      return NextResponse.json({ error: "Esta sala foi encerrada e não está mais disponível." }, { status: 410 })
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY
