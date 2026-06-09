@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { logger } from "@/lib/logger"
 import { sendReminderNow } from "@/lib/notifications"
 
 export async function GET() {
@@ -52,7 +51,7 @@ export async function POST(request: Request) {
     const psychologistId = (session.user as { id: string }).id
     const psychologistName = (session.user as { name?: string }).name || "Psicólogo"
 
-    console.log("[POST /api/notificacoes] request", { title, channel, patientId, appointmentDate, appointmentTime, patientEmail, patientPhone, patientName })
+    console.log("[POST /api/notificacoes] request", { title, channel, patientId, appointmentDate, appointmentTime, patientEmail, patientPhone, patientName, psychologistName })
 
     const notification = await prisma.notification.create({
       data: {
@@ -66,23 +65,26 @@ export async function POST(request: Request) {
       },
     })
 
-    const success = await sendReminderNow(patientId, channel, psychologistName, appointmentDate || "", appointmentTime || "", {
+    const result = await sendReminderNow(patientId, channel, psychologistName, appointmentDate || "", appointmentTime || "", {
       email: patientEmail,
       phone: patientPhone,
       name: patientName,
     })
 
+    const errorMessage = result.ok ? null : (result.error || "Falha no envio")
+
     await prisma.notification.update({
       where: { id: notification.id },
       data: {
-        status: success ? "SENT" : "FAILED",
-        sentAt: success ? new Date() : null,
-        errorMessage: success ? null : "Falha no envio",
+        status: result.ok ? "SENT" : "FAILED",
+        sentAt: result.ok ? new Date() : null,
+        errorMessage,
       },
     })
 
-    if (!success) {
-      return NextResponse.json({ error: "Falha no envio - paciente sem contato cadastrado" }, { status: 500 })
+    if (!result.ok) {
+      console.error("[POST /api/notificacoes] send failed", { channel, patientId, error: result.error })
+      return NextResponse.json({ error: errorMessage }, { status: 500 })
     }
 
     return NextResponse.json({ ...notification, status: "SENT" }, { status: 201 })

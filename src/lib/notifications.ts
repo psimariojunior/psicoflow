@@ -10,67 +10,63 @@ export async function sendReminderNow(
   appointmentDate?: string,
   appointmentTime?: string,
   overrides?: { email?: string | null; phone?: string | null; name?: string }
-): Promise<boolean> {
+): Promise<{ ok: boolean; error?: string }> {
   const patient = await prisma.patient.findUnique({
     where: { id: patientId },
     select: { name: true, email: true, phone: true },
   })
   if (!patient) {
-    console.error("[sendReminderNow] patient not found", { patientId })
-    return false
+    const msg = `Paciente não encontrado (${patientId})`
+    console.error("[sendReminderNow]", msg)
+    return { ok: false, error: msg }
   }
 
-  const patientEmail = overrides?.email !== undefined ? overrides.email : patient.email
-  const patientPhone = overrides?.phone !== undefined ? overrides.phone : patient.phone
+  const patientEmail = overrides?.email ? overrides.email : patient.email
+  const patientPhone = overrides?.phone ? overrides.phone : patient.phone
   const patientName = overrides?.name || patient.name
 
-  console.log("[sendReminderNow] lookup result", {
-    patientId,
-    channel,
-    patientName,
+  console.log("[sendReminderNow] request", {
+    patientId, channel, patientName,
     dbEmail: patient.email,
-    usedEmail: patientEmail,
+    overrideEmail: overrides?.email,
+    patientEmail,
     dbPhone: patient.phone,
-    usedPhone: patientPhone,
+    overridePhone: overrides?.phone,
+    patientPhone,
   })
 
-  let success = false
-
   if (channel === "EMAIL") {
-    if (patientEmail) {
-      success = await sendAppointmentReminderEmail(
-        patientEmail,
-        patientName,
-        psychologistName,
-        appointmentDate || "",
-        appointmentTime || "",
-        "Atendimento",
-        "presential"
-      )
-    } else {
-      console.error("[sendReminderNow] EMAIL channel selected but patient has no email", { patientId, patientName })
+    if (!patientEmail) {
+      const msg = "Paciente não tem e-mail cadastrado"
+      console.error("[sendReminderNow]", msg, { patientId, patientName })
+      return { ok: false, error: msg }
     }
-  } else if (channel === "WHATSAPP") {
+    const ok = await sendAppointmentReminderEmail(
+      patientEmail, patientName, psychologistName,
+      appointmentDate || "", appointmentTime || "", "Atendimento", "presential"
+    )
+    console.log("[sendReminderNow] EMAIL result", { patientId, ok })
+    return ok ? { ok: true } : { ok: false, error: "Falha ao enviar e-mail" }
+  }
+
+  if (channel === "WHATSAPP") {
     const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID
     const waToken = process.env.WHATSAPP_API_TOKEN
     if (!waPhoneId || !waToken) {
-      console.log("[sendReminderNow] WHATSAPP not configured, skipping silently")
-      return true
+      console.log("[sendReminderNow] WHATSAPP not configured, skipping")
+      return { ok: true }
     }
-    if (patientPhone) {
-      success = await sendAppointmentReminderWhatsApp(
-        patientPhone,
-        patientName,
-        appointmentDate || "",
-        appointmentTime || ""
-      )
-    } else {
-      console.error("[sendReminderNow] WHATSAPP channel selected but patient has no phone", { patientId, patientName })
+    if (!patientPhone) {
+      const msg = "Paciente não tem WhatsApp cadastrado"
+      console.error("[sendReminderNow]", msg, { patientId, patientName })
+      return { ok: false, error: msg }
     }
+    const ok = await sendAppointmentReminderWhatsApp(patientPhone, patientName, appointmentDate || "", appointmentTime || "")
+    console.log("[sendReminderNow] WHATSAPP result", { patientId, ok })
+    return ok ? { ok: true } : { ok: false, error: "Falha ao enviar WhatsApp" }
   }
 
-  console.log("[sendReminderNow] result", { patientId, channel, success })
-  return success
+  return { ok: false, error: `Canal desconhecido: ${channel}` }
 }
 
 export async function dispatchNotification(
