@@ -48,9 +48,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const { title, message, channel, patientId, appointmentDate, appointmentTime } = await request.json()
+    const { title, message, channel, patientId, appointmentDate, appointmentTime, patientEmail, patientPhone, patientName } = await request.json()
     const psychologistId = (session.user as { id: string }).id
     const psychologistName = (session.user as { name?: string }).name || "Psicólogo"
+
+    console.log("[POST /api/notificacoes] request", { title, channel, patientId, appointmentDate, appointmentTime, patientEmail, patientPhone, patientName })
 
     const notification = await prisma.notification.create({
       data: {
@@ -64,7 +66,11 @@ export async function POST(request: Request) {
       },
     })
 
-    const success = await sendReminderNow(patientId, channel, psychologistName, appointmentDate || "", appointmentTime || "")
+    const success = await sendReminderNow(patientId, channel, psychologistName, appointmentDate || "", appointmentTime || "", {
+      email: patientEmail,
+      phone: patientPhone,
+      name: patientName,
+    })
 
     await prisma.notification.update({
       where: { id: notification.id },
@@ -76,7 +82,7 @@ export async function POST(request: Request) {
     })
 
     if (!success) {
-      return NextResponse.json({ error: "Falha no envio" }, { status: 500 })
+      return NextResponse.json({ error: "Falha no envio - paciente sem contato cadastrado" }, { status: 500 })
     }
 
     return NextResponse.json({ ...notification, status: "SENT" }, { status: 201 })

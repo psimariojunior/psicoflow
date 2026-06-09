@@ -148,6 +148,9 @@ export default function AgendaPage() {
             message: `Lembrete: consulta de ${appt.patientName}`,
             channel,
             patientId: appt.patientId,
+            patientEmail: appt.patientEmail,
+            patientPhone: appt.patientPhone,
+            patientName: appt.patientName,
             appointmentDate,
             appointmentTime,
           }),
@@ -168,7 +171,8 @@ export default function AgendaPage() {
       toast.success(`Lembrete enviado por ${sent.join(" e ")}`)
     }
     if (failed.length > 0) {
-      toast.error(`Falha ao enviar por ${failed.join(" e ")}`)
+      const msg = failed.join(" e ")
+      toast.error(`Falha ao enviar por ${msg}${failed.includes("WhatsApp") && !failed.includes("Email") ? " (WhatsApp não configurado)" : ""}`)
     }
   }, [selectedDate])
 
