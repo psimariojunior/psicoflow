@@ -75,8 +75,8 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-green-400" />
       </div>
     )
   }
@@ -95,7 +95,22 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <PatientAuthContext.Provider value={{ patient, token, login, logout, loading }}>
-      {children}
+      <div className="min-h-screen bg-slate-950">
+        {patient && (
+          <header className="border-b border-slate-800 bg-slate-900">
+            <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+              <span className="text-white font-semibold text-sm">PsicoFlow</span>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-300 text-sm">{patient.name}</span>
+                <button onClick={logout} className="text-xs text-gray-400 hover:text-white transition-colors">
+                  Sair
+                </button>
+              </div>
+            </div>
+          </header>
+        )}
+        {children}
+      </div>
     </PatientAuthContext.Provider>
   )
 }

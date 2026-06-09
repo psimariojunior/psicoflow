@@ -139,7 +139,7 @@ export default function AgendaPacientePage() {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
               Bem-vindo, {patient?.name?.split(" ")[0]}!
             </h1>
-            <p className="text-white/50 text-lg max-w-md mx-auto">
+            <p className="text-gray-300 text-lg max-w-md mx-auto leading-relaxed">
               Sua jornada de autocuidado começa aqui. Agende sua primeira consulta em poucos cliques.
             </p>
           </div>
@@ -151,10 +151,10 @@ export default function AgendaPacientePage() {
                 { icon: Video, label: "Online", desc: "De qualquer lugar" },
                 { icon: Heart, label: "Acolhimento", desc: "Profissional dedicado" },
               ].map(({ icon: Icon, label, desc }) => (
-                <div key={label} className="bg-white/[0.04] rounded-2xl p-4 text-center ring-1 ring-white/[0.06]">
-                  <Icon className="h-6 w-6 text-emerald-400/70 mx-auto mb-2" />
-                  <p className="text-sm text-white/70 font-medium">{label}</p>
-                  <p className="text-xs text-white/30 mt-0.5">{desc}</p>
+                <div key={label} className="bg-slate-800/50 rounded-2xl p-4 text-center ring-1 ring-slate-700/50">
+                  <Icon className="h-6 w-6 text-emerald-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-200 font-medium">{label}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
                 </div>
               ))}
             </div>
@@ -171,7 +171,7 @@ export default function AgendaPacientePage() {
             </button>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-white/20">
+              <p className="text-xs text-gray-500">
                 Consultas online com duração de 40 minutos
               </p>
             </div>
@@ -184,7 +184,7 @@ export default function AgendaPacientePage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Minha Agenda</h1>
-              <p className="text-white/50 text-sm mt-1">Olá, {patient?.name?.split(" ")[0]}</p>
+              <p className="text-gray-300 text-sm mt-1">Olá, {patient?.name?.split(" ")[0]}</p>
             </div>
             <Button onClick={handleStartBooking} className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
               <Calendar className="h-4 w-4 mr-2" />
@@ -200,22 +200,22 @@ export default function AgendaPacientePage() {
             <>
               {upcoming.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">Próximas consultas</h2>
+                  <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Próximas consultas</h2>
                   <div className="space-y-3">
                     {upcoming.map((a) => (
-                      <div key={a.id} className="bg-white/5 hover:bg-white/[0.07] rounded-xl p-4 ring-1 ring-white/10 transition-all">
+                      <div key={a.id} className="bg-slate-800/50 hover:bg-slate-800 rounded-xl p-4 ring-1 ring-slate-700/50 transition-all">
                         <div className="flex items-center gap-3">
                           <div className="h-12 w-12 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
                             <Calendar className="h-6 w-6 text-emerald-400" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium">{formatDateBR(a.startTime)}</p>
-                            <p className="text-white/50 text-sm">
+                            <p className="text-gray-300 text-sm">
                               <Clock className="h-3.5 w-3.5 inline mr-1" />
                               {formatTime(a.startTime)} — {formatTime(a.endTime)}
                             </p>
                           </div>
-                          <div className="text-xs text-emerald-400/60 bg-emerald-500/10 px-3 py-1 rounded-full">
+                          <div className="text-xs text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-full">
                             {a.modality === "online" ? "Online" : "Presencial"}
                           </div>
                         </div>
@@ -227,17 +227,17 @@ export default function AgendaPacientePage() {
 
               {past.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">Histórico</h2>
+                  <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Histórico</h2>
                   <div className="space-y-2">
                     {past.slice(0, 5).map((a) => (
-                      <div key={a.id} className="bg-white/[0.03] rounded-xl p-3 ring-1 ring-white/5">
+                      <div key={a.id} className="bg-slate-800/30 rounded-xl p-3 ring-1 ring-slate-700/30">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
-                            <Clock className="h-5 w-5 text-white/20" />
+                          <div className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
+                            <Clock className="h-5 w-5 text-gray-400" />
                           </div>
                           <div>
-                            <p className="text-white/40 text-sm">{formatDateBR(a.startTime)} — {formatTime(a.startTime)}</p>
-                            <p className="text-white/20 text-xs">{a.status === "CANCELLED" ? "Cancelada" : "Realizada"}</p>
+                            <p className="text-gray-300 text-sm">{formatDateBR(a.startTime)} — {formatTime(a.startTime)}</p>
+                            <p className="text-gray-500 text-xs">{a.status === "CANCELLED" ? "Cancelada" : "Realizada"}</p>
                           </div>
                         </div>
                       </div>
@@ -254,26 +254,26 @@ export default function AgendaPacientePage() {
         <div className="max-w-2xl mx-auto px-4 py-8">
           {!selectedDate ? (
             <>
-              <button onClick={() => setShowBooking(false)} className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm mb-6 transition-all">
+              <button onClick={() => setShowBooking(false)} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </button>
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-white">Agendar consulta</h1>
-                <p className="text-white/50 text-sm mt-1">Escolha o melhor dia para você</p>
+                <p className="text-gray-300 text-sm mt-1">Escolha o melhor dia para você</p>
               </div>
-              <div className="bg-white/5 rounded-2xl p-6 ring-1 ring-white/10">
+              <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50">
                 <div className="flex items-center justify-between mb-6">
-                  <button onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1) } else { setCurrentMonth(currentMonth - 1) } }} className="p-2 text-white/40 hover:text-white/70 rounded-xl hover:bg-white/5 transition-all">
+                  <button onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1) } else { setCurrentMonth(currentMonth - 1) } }} className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-700/50 transition-all">
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <h2 className="text-lg font-semibold text-white">{MONTH_NAMES[currentMonth]} {currentYear}</h2>
-                  <button onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear(currentYear + 1) } else { setCurrentMonth(currentMonth + 1) } }} className="p-2 text-white/40 hover:text-white/70 rounded-xl hover:bg-white/5 transition-all">
+                  <button onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear(currentYear + 1) } else { setCurrentMonth(currentMonth + 1) } }} className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-700/50 transition-all">
                     <ChevronRight className="h-5 w-5" />
                   </button>
                 </div>
                 <div className="grid grid-cols-7 gap-1 mb-2">
                   {DAY_NAMES_SHORT.map((d) => (
-                    <div key={d} className="text-center text-xs text-white/40 font-medium py-2">{d}</div>
+                    <div key={d} className="text-center text-xs text-gray-400 font-medium py-2">{d}</div>
                   ))}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
@@ -288,7 +288,7 @@ export default function AgendaPacientePage() {
                         className={`aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all ${
                           isAvail
                             ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 cursor-pointer"
-                            : "text-white/20 cursor-not-allowed"
+                            : "text-gray-600 cursor-not-allowed"
                         } ${isToday ? "ring-1 ring-emerald-500/40" : ""}`}
                       >
                         {day}
@@ -300,17 +300,17 @@ export default function AgendaPacientePage() {
             </>
           ) : !selectedSlot ? (
             <>
-              <button onClick={() => setSelectedDate(null)} className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm mb-6 transition-all">
+              <button onClick={() => setSelectedDate(null)} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </button>
-              <div className="bg-white/5 rounded-2xl p-6 ring-1 ring-white/10">
+              <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="h-12 w-12 rounded-xl bg-emerald-500/15 flex items-center justify-center">
                     <Calendar className="h-6 w-6 text-emerald-400" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-white">{formatDateBR(selectedDate)}</h2>
-                    <p className="text-white/40 text-sm">
+                    <p className="text-gray-400 text-sm">
                       {["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][new Date(selectedDate).getDay()]}
                     </p>
                   </div>
@@ -319,20 +319,20 @@ export default function AgendaPacientePage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {selectedDay.slots.map((s) => (
                       <button key={s.time} onClick={() => setSelectedSlot(s)}
-                        className="bg-white/5 hover:bg-emerald-500/15 text-white/80 hover:text-emerald-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-white/10 hover:ring-emerald-500/30"
+                        className="bg-slate-700/50 hover:bg-emerald-500/15 text-gray-200 hover:text-emerald-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-slate-600/50 hover:ring-emerald-500/30"
                       >
                         <Clock className="h-4 w-4 inline mr-1.5" />{s.time}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-white/40 py-8">Nenhum horário disponível neste dia</p>
+                  <p className="text-center text-gray-500 py-8">Nenhum horário disponível neste dia</p>
                 )}
               </div>
             </>
           ) : (
             <>
-              <button onClick={() => setSelectedSlot(null)} className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm mb-6 transition-all">
+              <button onClick={() => setSelectedSlot(null)} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </button>
               <div className="text-center mb-6">
@@ -340,22 +340,22 @@ export default function AgendaPacientePage() {
                   <Calendar className="h-8 w-8 text-emerald-400" />
                 </div>
                 <h2 className="text-xl font-bold text-white">{formatDateBR(selectedDate)}</h2>
-                <p className="text-white/50 text-lg">às {selectedSlot.time}</p>
+                <p className="text-gray-300 text-lg">às {selectedSlot.time}</p>
               </div>
-              <div className="bg-white/5 rounded-2xl p-6 ring-1 ring-white/10 mb-6">
-                <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">Confirmar agendamento</h3>
+              <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50 mb-6">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Confirmar agendamento</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <div className="h-8 w-8 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0">
                       <span className="text-emerald-400 text-xs font-bold">{patient?.name?.charAt(0).toUpperCase()}</span>
                     </div>
-                    <span className="text-white/80">{patient?.name}</span>
+                    <span className="text-gray-200">{patient?.name}</span>
                   </div>
                   {patient?.email && (
-                    <p className="text-white/50 text-sm ml-11">{patient.email}</p>
+                    <p className="text-gray-300 text-sm ml-11">{patient.email}</p>
                   )}
                   {patient?.phone && (
-                    <p className="text-white/50 text-sm ml-11">{patient.phone}</p>
+                    <p className="text-gray-300 text-sm ml-11">{patient.phone}</p>
                   )}
                 </div>
               </div>
