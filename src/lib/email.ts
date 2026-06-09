@@ -1,33 +1,33 @@
 export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
-  const apiKey = process.env.BREVO_API_KEY
+  const apiKey = process.env.SENDGRID_API_KEY
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || "psi_mariojunior@hotmail.com"
   const fromName = "PsicoFlow"
-  const fromEmail = process.env.BREVO_FROM_EMAIL || "psi_mariojunior@hotmail.com"
 
   console.log("[sendEmail] starting", { to, subject, hasApiKey: !!apiKey, fromEmail })
 
   if (!apiKey) {
-    return "BREVO_API_KEY não configurada nas variáveis de ambiente"
+    return "SENDGRID_API_KEY não configurada nas variáveis de ambiente"
   }
 
   try {
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
-        "api-key": apiKey,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        sender: { email: fromEmail, name: fromName },
-        to: [{ email: to }],
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: fromEmail, name: fromName },
         subject,
-        htmlContent: html,
+        content: [{ type: "text/html", value: html }],
       }),
     })
 
     if (!res.ok) {
       const body = await res.text()
-      console.error("[sendEmail] Brevo API error", { status: res.status, body })
-      return `Brevo: ${body}`
+      console.error("[sendEmail] SendGrid API error", { status: res.status, body })
+      return `SendGrid: ${body}`
     }
 
     console.log("[sendEmail] success", { to, subject })
