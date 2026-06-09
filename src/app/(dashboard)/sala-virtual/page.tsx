@@ -51,6 +51,7 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
             connect={true}
             video={true}
             audio={true}
+            onDisconnected={() => setToken(null)}
             style={{ height: "100%" }}
           >
             <VideoConference />
