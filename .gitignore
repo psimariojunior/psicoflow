@@ -8,6 +8,8 @@ dist/
 .env*.local
 .env.production
 .env.development
+.env.vercel
+.env.prod
 *.log
 .DS_Store
 coverage/
