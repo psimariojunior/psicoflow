@@ -64,10 +64,6 @@ export async function GET(request: NextRequest) {
 
       if (daySlots.length > 0) {
         const dateStr = currentDate.toISOString().split("T")[0]
-        const dayStart = new Date(currentDate)
-        dayStart.setHours(0, 0, 0, 0)
-        const dayEnd = new Date(currentDate)
-        dayEnd.setHours(23, 59, 59, 999)
 
         const timeSlots: { time: string; startTime: string; endTime: string }[] = []
 
@@ -80,14 +76,11 @@ export async function GET(request: NextRequest) {
 
           while (currentMinutes + APPOINTMENT_DURATION <= endMinutes) {
             const slotStart = new Date(currentDate)
-            slotStart.setHours(
-              Math.floor(currentMinutes / 60),
-              currentMinutes % 60,
-              0,
-              0
-            )
+            const h = Math.floor(currentMinutes / 60)
+            const m = currentMinutes % 60
+            slotStart.setUTCHours(h + 3, m, 0, 0)
             const slotEnd = new Date(slotStart)
-            slotEnd.setMinutes(slotEnd.getMinutes() + APPOINTMENT_DURATION)
+            slotEnd.setUTCMinutes(slotEnd.getUTCMinutes() + APPOINTMENT_DURATION)
 
             const slotStartTs = slotStart.getTime()
             const slotEndTs = slotEnd.getTime()

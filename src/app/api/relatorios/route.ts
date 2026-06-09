@@ -13,8 +13,9 @@ export async function GET(request: NextRequest) {
 
     const psychologistId = (session.user as { id: string }).id
     const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const startOfYear = new Date(now.getFullYear(), 0, 1)
+    const brtNow = new Date(now.getTime() - 3 * 3600000)
+    const startOfMonth = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), 1))
+    const startOfYear = new Date(Date.UTC(brtNow.getUTCFullYear(), 0, 1))
 
     const searchParams = request.nextUrl.searchParams
     const year = parseInt(searchParams.get("year") || String(now.getFullYear()))
