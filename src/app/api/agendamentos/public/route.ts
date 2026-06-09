@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const endDate = new Date(startDate)
-    endDate.setMinutes(endDate.getMinutes() + 50)
+    endDate.setMinutes(endDate.getMinutes() + 40)
 
     const conflict = await prisma.appointment.findFirst({
       where: {

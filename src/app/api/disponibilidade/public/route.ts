@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       end: new Date(a.endTime).getTime(),
     }))
 
-    const APPOINTMENT_DURATION = 50
+    const APPOINTMENT_DURATION = 40
     const availableDays: {
       date: string
       dayOfWeek: number
