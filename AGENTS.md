@@ -25,13 +25,6 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 - **Fix**: `handleConnect` explicitly stops preview stream (`streamRef.current?.getTracks().forEach(t => t.stop())`) before `setToken()`, freeing camera for LiveKit
 - **Secondary fix**: preview `getUserMedia` failure no longer sets `cameraOn=false` — LiveKitRoom still requests `video={cameraOn}` (toast only)
 
-### Pre-join camera preview design
-- Welcome → "Continuar" → `setStep("prejoin")` → effect calls `startCamera()` via `getUserMedia`
-- Direct URL (`?room=...`) → starts in prejoin, effect calls `getUserMedia` (may fail without gesture; toast shown)
-- Toggle buttons enable/disable tracks on the preview stream
-- "Entrar na Sala" → stops preview stream, fetches token, mounts LiveKitRoom
-- Camera preview uses `videoRef` always in DOM (hidden by CSS until stream ready)
-
 ### UX Improvements (2026-06-08)
 - **In-call**: room name badge (top-left, translucent), "Sair" button (top-right, destructive)
 - **Aguardando psicólogo**: overlay with spinner when no remote participant present; checks at connect time via `onConnected` (room.remoteParticipants.size) + tracks join/leave
@@ -54,10 +47,11 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 ### Vercel deployment
 - Git repo: `https://github.com/psimariojunior/psicoflow`
 - Production URL: `https://psicoflow-iota.vercel.app`
-- Build command: `prisma db push --accept-data-loss && next build`
+- Build command: `prisma db push --accept-data-loss && next build` (definido em `vercel.json`)
 - `POSTGRES_PRISMA_URL` env (non-pooled) for DDL via prisma db push
 - Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL
 - Middleware allows unauthenticated access to `/sala-virtual/entrar` and `/api/livekit/*`
+- **SSO Protection**: foi desativado no projeto Vercel (impedia acesso do paciente sem login Vercel)
 
 ## Relevant Files
 - `src/app/(public)/sala-virtual/entrar/page.tsx` — patient flow (welcome → prejoin → call)
