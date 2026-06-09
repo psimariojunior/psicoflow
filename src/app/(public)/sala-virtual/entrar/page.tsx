@@ -15,7 +15,6 @@ function EntrarSalaForm() {
   const [step, setStep] = useState(roomParam ? "prejoin" : "welcome")
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
-  const [connected, setConnected] = useState(false)
   const [cameraOn, setCameraOn] = useState(true)
   const [micOn, setMicOn] = useState(true)
   const [patientName, setPatientName] = useState("")
@@ -51,7 +50,6 @@ function EntrarSalaForm() {
       }
       const data = await res.json()
       setToken(data.token)
-      setConnected(true)
     } catch (e) {
       alert(e instanceof Error ? e.message : "Erro ao conectar")
     } finally {
@@ -72,7 +70,7 @@ function EntrarSalaForm() {
           connect={true}
           video={cameraOn}
           audio={micOn}
-          onDisconnected={() => { setToken(null); setConnected(false); setStep("welcome") }}
+          onDisconnected={() => { setToken(null); setStep("welcome") }}
           style={{ height: "100%" }}
         >
           <VideoConference />
