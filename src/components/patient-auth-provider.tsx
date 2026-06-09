@@ -2,7 +2,8 @@
 
 import { useEffect, useState, createContext, useContext, ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import { Loader2, BookHeart, CalendarDays } from "lucide-react"
 
 export interface PatientData {
   id: string
@@ -101,7 +102,21 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <span className="text-white font-semibold text-sm">PsicoFlow</span>
               <div className="flex items-center gap-4">
-                <span className="text-gray-300 text-sm">{patient.name}</span>
+                <nav className="flex items-center gap-1">
+                <Link href="/paciente/agenda" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente/agenda" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  Agenda
+                </Link>
+                <Link href="/paciente/diario" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente/diario" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <BookHeart className="h-3.5 w-3.5" />
+                  Diário
+                </Link>
+              </nav>
+              <span className="text-gray-300 text-sm">{patient.name}</span>
                 <button onClick={logout} className="text-xs text-gray-400 hover:text-white transition-colors">
                   Sair
                 </button>
