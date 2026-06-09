@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
     if (isPatient) {
       identity = `paciente-${room}-${Date.now()}`
-      name = "Paciente"
+      name = searchParams.get("name") || "Paciente"
     } else {
       const session = await getServerSession(authOptions)
       if (!session?.user) {
