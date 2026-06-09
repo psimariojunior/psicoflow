@@ -9,6 +9,7 @@ import { getInitials, formatDate, calculateAge } from "@/lib/utils"
 import { Plus, Mail, Phone, MoreHorizontal, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
+import toast from "react-hot-toast"
 
 interface Patient {
   id: string
@@ -26,11 +27,17 @@ export default function PatientsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/pacientes")
+    const controller = new AbortController()
+    fetch("/api/pacientes", { signal: controller.signal })
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then((data) => setPatients(data.patients || []))
-      .catch(() => setPatients([]))
+      .catch((err) => {
+        if (err?.name === "AbortError") return
+        toast.error("Erro ao carregar pacientes")
+        setPatients([])
+      })
       .finally(() => setLoading(false))
+    return () => controller.abort()
   }, [])
 
   const columns: ColumnDef<Patient>[] = [
@@ -47,7 +54,7 @@ export default function PatientsPage() {
           <div>
             <p className="font-medium">{row.original.name}</p>
             <p className="text-xs text-muted-foreground">
-              {calculateAge(row.original.dateOfBirth)} anos • {row.original.gender || ""}
+              {row.original.dateOfBirth ? `${calculateAge(row.original.dateOfBirth)} anos` : "-"} • {row.original.gender || ""}
             </p>
           </div>
         </Link>
@@ -57,14 +64,14 @@ export default function PatientsPage() {
       accessorKey: "email",
       header: "Contato",
       cell: ({ row }) => (
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 text-sm">
-            <Mail className="h-3 w-3 text-muted-foreground" />
-            <span>{row.original.email || "-"}</span>
+        <div className="max-w-[200px] space-y-1">
+          <div className="flex items-center gap-1 text-sm truncate">
+            <Mail className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="truncate">{row.original.email || "-"}</span>
           </div>
-          <div className="flex items-center gap-1 text-sm">
-            <Phone className="h-3 w-3 text-muted-foreground" />
-            <span>{row.original.phone || "-"}</span>
+          <div className="flex items-center gap-1 text-sm truncate">
+            <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="truncate">{row.original.phone || "-"}</span>
           </div>
         </div>
       ),
@@ -83,9 +90,11 @@ export default function PatientsPage() {
     },
     {
       id: "actions",
-      cell: () => (
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-4 w-4" />
+      cell: ({ row }) => (
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={`/pacientes/${row.original.id}`}>
+            <MoreHorizontal className="h-4 w-4" />
+          </Link>
         </Button>
       ),
     },
