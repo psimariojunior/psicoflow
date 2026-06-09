@@ -8,35 +8,68 @@ export async function sendReminderNow(
   channel: string,
   psychologistName: string,
   appointmentDate?: string,
-  appointmentTime?: string
+  appointmentTime?: string,
+  overrides?: { email?: string | null; phone?: string | null; name?: string }
 ): Promise<boolean> {
   const patient = await prisma.patient.findUnique({
     where: { id: patientId },
     select: { name: true, email: true, phone: true },
   })
-  if (!patient) return false
+  if (!patient) {
+    console.error("[sendReminderNow] patient not found", { patientId })
+    return false
+  }
+
+  const patientEmail = overrides?.email !== undefined ? overrides.email : patient.email
+  const patientPhone = overrides?.phone !== undefined ? overrides.phone : patient.phone
+  const patientName = overrides?.name || patient.name
+
+  console.log("[sendReminderNow] lookup result", {
+    patientId,
+    channel,
+    patientName,
+    dbEmail: patient.email,
+    usedEmail: patientEmail,
+    dbPhone: patient.phone,
+    usedPhone: patientPhone,
+  })
 
   let success = false
 
-  if (channel === "EMAIL" && patient.email) {
-    success = await sendAppointmentReminderEmail(
-      patient.email,
-      patient.name,
-      psychologistName,
-      appointmentDate || "",
-      appointmentTime || "",
-      "Atendimento",
-      "presential"
-    )
-  } else if (channel === "WHATSAPP" && patient.phone) {
-    success = await sendAppointmentReminderWhatsApp(
-      patient.phone,
-      patient.name,
-      appointmentDate || "",
-      appointmentTime || ""
-    )
+  if (channel === "EMAIL") {
+    if (patientEmail) {
+      success = await sendAppointmentReminderEmail(
+        patientEmail,
+        patientName,
+        psychologistName,
+        appointmentDate || "",
+        appointmentTime || "",
+        "Atendimento",
+        "presential"
+      )
+    } else {
+      console.error("[sendReminderNow] EMAIL channel selected but patient has no email", { patientId, patientName })
+    }
+  } else if (channel === "WHATSAPP") {
+    const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID
+    const waToken = process.env.WHATSAPP_API_TOKEN
+    if (!waPhoneId || !waToken) {
+      console.log("[sendReminderNow] WHATSAPP not configured, skipping silently")
+      return true
+    }
+    if (patientPhone) {
+      success = await sendAppointmentReminderWhatsApp(
+        patientPhone,
+        patientName,
+        appointmentDate || "",
+        appointmentTime || ""
+      )
+    } else {
+      console.error("[sendReminderNow] WHATSAPP channel selected but patient has no phone", { patientId, patientName })
+    }
   }
 
+  console.log("[sendReminderNow] result", { patientId, channel, success })
   return success
 }
 
