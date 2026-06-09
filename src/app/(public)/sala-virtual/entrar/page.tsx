@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, VideoConference } from "@livekit/components-react"
+import type { Room } from "livekit-client"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 
 function EntrarSalaForm() {
@@ -19,20 +20,21 @@ function EntrarSalaForm() {
   const [cameraOn, setCameraOn] = useState(true)
   const [micOn, setMicOn] = useState(true)
   const [patientName, setPatientName] = useState("")
+  const [psychologistPresent, setPsychologistPresent] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
 
   const handleConnect = useCallback(async () => {
     setConnecting(true)
+    const nameParam = patientName.trim() ? `&name=${encodeURIComponent(patientName.trim())}` : ""
     try {
-      const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(roomInput)}&patient=true`)
+      const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(roomInput)}&patient=true${nameParam}`)
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error || "Erro ao conectar")
       }
       const data = await res.json()
-      // Stop preview stream so LiveKit can use the camera
       streamRef.current?.getTracks().forEach((t) => t.stop())
       streamRef.current = null
       setToken(data.token)
@@ -40,7 +42,7 @@ function EntrarSalaForm() {
       toast.error(e instanceof Error ? e.message : "Erro ao conectar")
       setConnecting(false)
     }
-  }, [roomInput])
+  }, [roomInput, patientName])
 
   const startCamera = useCallback(() => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -53,11 +55,6 @@ function EntrarSalaForm() {
       .catch(() => {
         toast.error("Permita acesso à câmera e microfone nas configurações do navegador")
       })
-  }, [])
-
-  const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop())
-    streamRef.current = null
   }, [])
 
   const toggleCamera = () => setCameraOn((c) => {
@@ -76,6 +73,18 @@ function EntrarSalaForm() {
     return next
   })
 
+  const handleDisconnected = useCallback(() => {
+    setToken(null)
+    setStep("ended")
+    setPsychologistPresent(false)
+  }, [])
+
+  const handleLeaveCall = useCallback(() => {
+    setToken(null)
+    setStep("ended")
+    setPsychologistPresent(false)
+  }, [])
+
   useEffect(() => {
     if (step === "prejoin" && !streamRef.current) {
       startCamera()
@@ -85,14 +94,38 @@ function EntrarSalaForm() {
 
   if (token) {
     return (
-      <div className="h-screen">
+      <div className="h-screen relative bg-black">
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur">
+          <Camera className="h-3.5 w-3.5 text-emerald-400" />
+          {roomInput}
+        </div>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleLeaveCall}
+          className="absolute top-4 right-4 z-10"
+        >
+          <LogOut className="mr-2 h-4 w-4" /> Sair
+        </Button>
+        {!psychologistPresent && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70">
+            <div className="text-center text-white">
+              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+              <h3 className="text-xl font-bold mb-1">Aguardando psicólogo</h3>
+              <p className="text-sm text-white/60">O profissional será notificado da sua presença.</p>
+            </div>
+          </div>
+        )}
         <LiveKitRoom
           token={token}
           serverUrl={livekitUrl}
           connect={true}
           video={cameraOn}
           audio={micOn}
-          onDisconnected={() => { setToken(null); setStep("welcome") }}
+          onDisconnected={handleDisconnected}
+          onConnected={(room: Room) => setPsychologistPresent(room.remoteParticipants.size > 0)}
+          onParticipantConnected={() => setPsychologistPresent(true)}
+          onParticipantDisconnected={() => setPsychologistPresent(false)}
           style={{ height: "100%" }}
         >
           <VideoConference />
@@ -124,7 +157,7 @@ function EntrarSalaForm() {
                   </Button>
                 </div>
                 {connecting && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
                     <div className="text-center text-white">
                       <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
                       <p className="text-lg font-medium">Conectando à sala...</p>
@@ -159,6 +192,32 @@ function EntrarSalaForm() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === "ended") {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-md text-center">
+            <div className="mb-8">
+              <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white/5 mb-6">
+                <VideoOff className="h-10 w-10 text-white/40" />
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-2">Conexão encerrada</h1>
+              <p className="text-white/60">Obrigado por utilizar o PsicoFlow.</p>
+            </div>
+            <Button
+              className="w-full h-12 text-base"
+              size="lg"
+              onClick={() => { setStep("welcome"); setRoomInput("") }}
+            >
+              <Camera className="mr-2 h-5 w-5" />
+              Entrar em outra sala
+            </Button>
           </div>
         </div>
       </div>
