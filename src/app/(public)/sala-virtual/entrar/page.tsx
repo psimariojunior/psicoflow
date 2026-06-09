@@ -22,11 +22,14 @@ function EntrarSalaForm() {
     setConnecting(true)
     try {
       const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(roomInput)}&patient=true`)
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || "Erro ao conectar")
+      }
       const data = await res.json()
       setToken(data.token)
-    } catch {
-      alert("Erro ao conectar. Verifique o nome da sala.")
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Erro ao conectar")
     } finally {
       setConnecting(false)
     }

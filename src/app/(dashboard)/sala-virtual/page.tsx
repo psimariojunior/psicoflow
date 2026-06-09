@@ -21,11 +21,14 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
     setConnecting(true)
     try {
       const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(roomName)}`)
-      if (!res.ok) throw new Error("Erro ao gerar token")
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || "Erro ao gerar token")
+      }
       const data = await res.json()
       setToken(data.token)
-    } catch {
-      toast.error("Erro ao conectar. Verifique as credenciais do LiveKit.")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao conectar")
     } finally {
       setConnecting(false)
     }

@@ -40,6 +40,7 @@ model User {
   auditLogs         AuditLog[]
   therapyResources  TherapyResource[]
   availabilitySlots AvailabilitySlot[]
+  closedRooms       ClosedRoom[]
   sessionTokens     SessionToken[]
   accounts          Account[]
   nextAuthSessions  NextAuthSession[]
@@ -403,5 +404,13 @@ model SessionToken {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+}
+
+model ClosedRoom {
+  id              String   @id @default(cuid())
+  roomName        String   @unique
+  closedAt        DateTime @default(now())
+  psychologistId  String
+  psychologist    User     @relation(fields: [psychologistId], references: [id])
 }
 
