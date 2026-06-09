@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         patient: {
-          select: { id: true, name: true, phone: true },
+          select: { id: true, name: true, email: true, phone: true },
         },
       },
       orderBy: { startTime: "asc" },
