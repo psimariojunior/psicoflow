@@ -34,17 +34,23 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
   const handleEndRoom = useCallback(async () => {
     setEnding(true)
     try {
-      await fetch("/api/livekit/rooms", {
+      const res = await fetch("/api/livekit/rooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ room: roomName }),
       })
-    } catch {
-      toast.error("Erro ao encerrar sala")
-    } finally {
+      if (!res.ok) {
+        const body = await res.json()
+        throw new Error(body.error || "Erro ao encerrar")
+      }
+      toast.success("Sala encerrada!")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao encerrar sala")
       setEnding(false)
-      setToken(null)
+      return
     }
+    setEnding(false)
+    setToken(null)
   }, [roomName])
 
   const patientLink = `${typeof window !== "undefined" ? window.location.origin : ""}/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`
