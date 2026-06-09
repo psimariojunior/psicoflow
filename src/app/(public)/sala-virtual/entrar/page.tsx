@@ -57,6 +57,11 @@ function EntrarSalaForm() {
       })
   }, [])
 
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+  }, [])
+
   const toggleCamera = () => setCameraOn((c) => {
     const next = !c
     if (streamRef.current) {
@@ -86,11 +91,8 @@ function EntrarSalaForm() {
   }, [])
 
   useEffect(() => {
-    if (step === "prejoin" && !streamRef.current) {
-      startCamera()
-    }
     return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null }
-  }, [step, startCamera])
+  }, [])
 
   if (token) {
     return (
@@ -138,39 +140,54 @@ function EntrarSalaForm() {
     return (
       <div className="flex min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
         <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-md">
             <button
-              onClick={() => setStep("welcome")}
+              onClick={() => { stopCamera(); setStep("welcome") }}
               className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm mb-6 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" /> Voltar
             </button>
 
-            <div className="bg-white/[0.05] backdrop-blur-2xl rounded-3xl p-6 ring-1 ring-white/10 shadow-2xl">
-              <div className="relative rounded-2xl overflow-hidden bg-black aspect-video mb-5 shadow-xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 ring-1 ring-white/10 shadow-2xl backdrop-blur-2xl">
+              <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-800 to-black aspect-video mb-6 shadow-xl ring-1 ring-white/10">
                 <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${streamRef.current ? "block" : "hidden"}`} />
-                <div className={`absolute inset-0 flex items-center justify-center ${streamRef.current ? "hidden" : "flex"}`}>
-                  <div className="text-center">
-                    <div className="mx-auto mb-2 h-14 w-14 rounded-full bg-white/5 flex items-center justify-center">
-                      <Camera className="h-7 w-7 text-white/30" />
-                    </div>
-                    <p className="text-sm text-white/30">Preparando sua câmera...</p>
-                  </div>
-                </div>
 
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-                  <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-11 w-11 shadow-lg ring-1 ring-white/20">
-                    {cameraOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                  </Button>
-                  <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 shadow-lg ring-1 ring-white/20">
-                    {micOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-                  </Button>
-                </div>
+                {!streamRef.current && !connecting && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="h-16 w-16 rounded-2xl bg-white/[0.08] ring-1 ring-white/10 flex items-center justify-center">
+                      <Camera className="h-7 w-7 text-white/40" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white/50 text-sm font-medium">Câmera desativada</p>
+                      <p className="text-white/30 text-xs mt-0.5">Clique abaixo para ativar</p>
+                    </div>
+                    <Button variant="secondary" size="sm" onClick={startCamera} className="rounded-full px-5">
+                      <Camera className="mr-1.5 h-4 w-4" /> Ativar Câmera
+                    </Button>
+                  </div>
+                )}
+
+                {streamRef.current && (
+                  <>
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Câmera ativa
+                    </div>
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
+                      <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-11 w-11 shadow-xl ring-1 ring-white/20">
+                        {cameraOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                      </Button>
+                      <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 shadow-xl ring-1 ring-white/20">
+                        {micOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </>
+                )}
 
                 {connecting && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10 backdrop-blur-sm">
                     <div className="text-center text-white">
-                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-emerald-400" />
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
                       <p className="text-lg font-medium">Conectando à sala...</p>
                     </div>
                   </div>
@@ -178,12 +195,12 @@ function EntrarSalaForm() {
               </div>
 
               <div className="flex items-center gap-2 mb-4">
-                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
-                <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Pronto</span>
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
+                <span className="text-xs text-emerald-400 font-semibold uppercase tracking-widest">Pronto</span>
+                <span className="text-white/20 text-xs ml-auto">Sala {roomInput}</span>
               </div>
 
-              <h2 className="text-xl font-bold text-white mb-1">Sala {roomInput}</h2>
-              <p className="text-sm text-white/50 mb-5 leading-relaxed">Sua sessão é em um ambiente seguro e acolhedor. Fique à vontade.</p>
+              <p className="text-sm text-white/50 mb-5 leading-relaxed">Ambiente seguro e acolhedor para sua sessão.</p>
 
               <div className="space-y-3 mb-5">
                 <Input
@@ -262,7 +279,7 @@ function EntrarSalaForm() {
               <Button
                 className="w-full h-12 text-base"
                 size="lg"
-                onClick={() => { if (roomInput.trim()) { setStep("prejoin") } }}
+                onClick={() => { if (roomInput.trim()) { setStep("prejoin"); startCamera() } }}
                 disabled={!roomInput.trim()}
               >
                 <Camera className="mr-2 h-5 w-5" />
