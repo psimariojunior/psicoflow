@@ -1,34 +1,41 @@
-import { Resend } from "resend"
+import nodemailer from "nodemailer"
 import { logger } from "./logger"
 
+function createTransport() {
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+  const host = process.env.SMTP_HOST || "smtp-mail.outlook.com"
+  const port = parseInt(process.env.SMTP_PORT || "587", 10)
+
+  if (!user || !pass) {
+    logger.warn("SMTP_USER or SMTP_PASS not configured")
+    return null
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  })
+}
+
 export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
-  console.log("[email] RESEND_API_KEY present:", !!apiKey)
-  console.log("[email] EMAIL_FROM:", from)
-  console.log("[email] to:", to, "subject:", subject)
-  if (!apiKey) {
-    logger.warn("RESEND_API_KEY not configured. Email not sent.", { to, subject })
+  const transport = createTransport()
+  if (!transport) {
+    logger.warn("SMTP not configured. Email not sent.", { to, subject })
     return false
   }
+
+  const from = process.env.SMTP_USER
+
   try {
-    const resend = new Resend(apiKey)
-    const result = await resend.emails.send({
-      from,
-      to: [to],
-      subject,
-      html,
-    })
-    console.log("[email] Resend result:", JSON.stringify(result))
-    if (result.error) {
-      logger.error("Resend API error", { to, subject, error: result.error })
-      return false
-    }
-    logger.info("Email sent via Resend", { to, subject, id: result.data?.id })
+    await transport.sendMail({ from, to, subject, html })
+    logger.info("Email sent via SMTP", { to, subject })
     return true
   } catch (err) {
-    console.error("[email] Exception:", err)
-    logger.error("Failed to send email via Resend", { to, subject, error: String(err) })
+    console.error("[email] SMTP Exception:", err)
+    logger.error("Failed to send email via SMTP", { to, subject, error: String(err) })
     return false
   }
 }
