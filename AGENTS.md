@@ -25,12 +25,13 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 - **Fix**: `handleConnect` explicitly stops preview stream (`streamRef.current?.getTracks().forEach(t => t.stop())`) before `setToken()`, freeing camera for LiveKit
 - **Secondary fix**: preview `getUserMedia` failure no longer sets `cameraOn=false` — LiveKitRoom still requests `video={cameraOn}` (toast only)
 
-### UX Improvements (2026-06-08)
+### UX Improvements (2026-06-08 / 2026-06-09)
 - **In-call**: room name badge (top-left, translucent), "Sair" button (top-right, destructive)
-- **Aguardando psicólogo**: overlay with spinner when no remote participant present; checks at connect time via `onConnected` (room.remoteParticipants.size) + tracks join/leave
+- **Aguardando psicólogo**: overlay with spinner when no remote participant present; tracks via `ParticipantWatcher` component using `useRemoteParticipants` hook
 - **Disconnect screen**: "Conexão encerrada" with "Entrar em outra sala" button (instead of jumping to welcome)
 - **Patient name**: passed to token API (`?name=...`) and shown in LiveKit participant list
 - **Token API**: accepts `name` query param from patients (defaults to "Paciente")
+- **TS fix (2026-06-09)**: `@livekit/components-react` v2.9.21 `onConnected` expects `() => void` (no room arg); removed `onParticipantConnected`/`onParticipantDisconnected` props (not in LiveKitRoomProps) → replaced with `ParticipantWatcher` component
 
 ### Pre-join camera preview design
 - Welcome → "Continuar" → `setStep("prejoin")` → effect calls `startCamera()` via `getUserMedia`
