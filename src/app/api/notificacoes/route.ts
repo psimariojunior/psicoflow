@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
-import { dispatchNotification } from "@/lib/notifications"
+import { sendReminderNow } from "@/lib/notifications"
 
 export async function GET() {
   try {
@@ -48,7 +48,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const { title, message, channel, patientId, sendAt } = await request.json()
+    const { title, message, channel, patientId } = await request.json()
+    const psychologistId = (session.user as { id: string }).id
+    const psychologistName = (session.user as { name?: string }).name || "Psicólogo"
 
     const notification = await prisma.notification.create({
       data: {
@@ -57,22 +59,23 @@ export async function POST(request: Request) {
         channel,
         patientId: patientId || null,
         recipientId: patientId || null,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
         status: "PENDING",
-        scheduledAt: sendAt ? new Date(sendAt) : null,
-        createdAt: new Date(),
       },
     })
 
-    if (!sendAt) {
-      dispatchNotification(notification.id, {
-        psychologistName: (session.user as { name?: string }).name || "Psicólogo",
-      }).catch((err) =>
-        logger.error("Failed to dispatch immediate notification", { id: notification.id, error: String(err) })
-      )
-    }
+    const success = await sendReminderNow(patientId, channel, psychologistName)
 
-    return NextResponse.json(notification, { status: 201 })
+    await prisma.notification.update({
+      where: { id: notification.id },
+      data: {
+        status: success ? "SENT" : "FAILED",
+        sentAt: success ? new Date() : null,
+        errorMessage: success ? null : "Falha no envio",
+      },
+    })
+
+    return NextResponse.json({ ...notification, status: success ? "SENT" : "FAILED" }, { status: 201 })
   } catch (error) {
     console.error("Error creating notification:", error)
     return NextResponse.json(
