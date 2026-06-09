@@ -12,6 +12,11 @@ function getLiveKitConfig() {
   return { host, apiKey: apiKey || "", apiSecret: apiSecret || "" }
 }
 
+export async function GET() {
+  const closed = await prisma.closedRoom.findMany({ orderBy: { closedAt: "desc" }, take: 10 })
+  return NextResponse.json({ closed })
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
