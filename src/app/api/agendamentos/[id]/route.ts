@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { scheduleReminders, cancelPendingReminders } from "@/lib/notifications"
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -35,6 +36,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     })
 
+    if (data.status === "CONFIRMED") {
+      scheduleReminders(updated.id, updated.patientId, updated.psychologistId, updated.startTime).catch(
+        (e) => logger.error("scheduleReminders failed", { error: String(e) })
+      )
+    } else if (data.status === "CANCELLED" || data.status === "DELETE") {
+      cancelPendingReminders(updated.id).catch(
+        (e) => logger.error("cancelPendingReminders failed", { error: String(e) })
+      )
+    }
+
     return NextResponse.json(updated)
   } catch (error) {
     logger.error("Error updating appointment", { error: String(error) })
@@ -56,6 +67,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 })
     }
 
+    cancelPendingReminders(params.id).catch(
+      (e) => logger.error("cancelPendingReminders failed", { error: String(e) })
+    )
     await prisma.appointment.delete({ where: { id: params.id } })
     return NextResponse.json({ message: "Agendamento cancelado com sucesso" })
   } catch (error) {

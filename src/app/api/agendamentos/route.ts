@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createAppointmentSchema } from "@/lib/validation"
+import { scheduleReminders } from "@/lib/notifications"
 
 export async function GET(request: NextRequest) {
   try {
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Data/hora fim deve ser após data/hora início" }, { status: 400 })
     }
 
+    const psychologistId = (session.user as { id: string }).id
+
     const appointment = await prisma.appointment.create({
       data: {
         title: data.title || null,
@@ -75,7 +78,7 @@ export async function POST(request: Request) {
         color: data.color || null,
         status: "SCHEDULED",
         patientId: data.patientId,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
       include: {
         patient: {
@@ -83,6 +86,10 @@ export async function POST(request: Request) {
         },
       },
     })
+
+    scheduleReminders(appointment.id, appointment.patientId, psychologistId, appointment.startTime).catch(
+      (e) => logger.error("scheduleReminders failed", { error: String(e) })
+    )
 
     return NextResponse.json(appointment, { status: 201 })
   } catch (error) {

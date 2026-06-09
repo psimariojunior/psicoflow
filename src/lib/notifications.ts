@@ -109,11 +109,51 @@ export async function dispatchNotification(
   })
 }
 
+export async function scheduleReminders(
+  appointmentId: string,
+  patientId: string,
+  psychologistId: string,
+  startTime: Date
+): Promise<void> {
+  const now = new Date()
+
+  const remindAt = [
+    new Date(startTime.getTime() - 24 * 60 * 60 * 1000),
+    new Date(startTime.getTime() - 60 * 60 * 1000),
+  ]
+
+  for (const scheduledAt of remindAt) {
+    if (scheduledAt <= now) continue
+    for (const channel of ["EMAIL", "WHATSAPP"]) {
+      await prisma.notification.create({
+        data: {
+          title: "Lembrete de consulta",
+          message: "Lembrete automático de consulta",
+          channel,
+          status: "PENDING",
+          scheduledAt,
+          patientId,
+          recipientId: patientId,
+          psychologistId,
+          externalId: appointmentId,
+        },
+      })
+    }
+  }
+}
+
+export async function cancelPendingReminders(appointmentId: string): Promise<void> {
+  await prisma.notification.updateMany({
+    where: { externalId: appointmentId, status: "PENDING" },
+    data: { status: "CANCELLED" },
+  })
+}
+
 export async function processPendingNotifications(): Promise<{ sent: number; failed: number }> {
   const pending = await prisma.notification.findMany({
     where: {
       status: "PENDING",
-      createdAt: { lte: new Date() },
+      scheduledAt: { lte: new Date() },
     },
     select: { id: true },
   })
