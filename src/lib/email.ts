@@ -1,14 +1,15 @@
 import { Resend } from "resend"
 
-export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
 
   console.log("[sendEmail] starting", { to, subject, hasApiKey: !!apiKey, from })
 
   if (!apiKey) {
-    console.warn("[sendEmail] RESEND_API_KEY not configured")
-    return false
+    const msg = "RESEND_API_KEY não configurada"
+    console.warn("[sendEmail]", msg)
+    return msg
   }
   try {
     const resend = new Resend(apiKey)
@@ -20,18 +21,20 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
       html,
     })
     if (result.error) {
+      const msg = typeof result.error === "string" ? result.error : result.error.message || "Erro desconhecido da Resend"
       console.error("[sendEmail] Resend API error", result.error)
-      return false
+      return msg
     }
     console.log("[sendEmail] success", { id: result.data?.id, to, subject })
-    return true
+    return null
   } catch (err) {
-    console.error("[sendEmail] exception", String(err))
-    return false
+    const msg = String(err)
+    console.error("[sendEmail] exception", msg)
+    return msg
   }
 }
 
-export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
+export async function sendPasswordResetEmail(email: string, token: string): Promise<string | null> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   const resetUrl = `${appUrl}/reset-password?token=${token}`
   return sendEmail(
@@ -61,7 +64,7 @@ export async function sendAppointmentReminderEmail(
   time: string,
   type: string,
   modality: string
-): Promise<boolean> {
+): Promise<string | null> {
   return sendEmail(
     to,
     "Lembrete de Consulta - PsicoFlow",

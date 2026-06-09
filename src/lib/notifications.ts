@@ -41,12 +41,12 @@ export async function sendReminderNow(
       console.error("[sendReminderNow]", msg, { patientId, patientName })
       return { ok: false, error: msg }
     }
-    const ok = await sendAppointmentReminderEmail(
+    const err = await sendAppointmentReminderEmail(
       patientEmail, patientName, psychologistName,
       appointmentDate || "", appointmentTime || "", "Atendimento", "presential"
     )
-    console.log("[sendReminderNow] EMAIL result", { patientId, ok })
-    return ok ? { ok: true } : { ok: false, error: "Falha ao enviar e-mail" }
+    console.log("[sendReminderNow] EMAIL result", { patientId, err })
+    return err ? { ok: false, error: err } : { ok: true }
   }
 
   if (channel === "WHATSAPP") {
@@ -115,10 +115,10 @@ export async function dispatchNotification(
     }
   }
 
-  let success = false
+  let sendErr: string | null = "Nenhum canal disponível"
 
   if (notification.channel === "EMAIL" && patientEmail) {
-    success = await sendAppointmentReminderEmail(
+    sendErr = await sendAppointmentReminderEmail(
       patientEmail,
       patientName,
       psyName,
@@ -128,13 +128,10 @@ export async function dispatchNotification(
       "presential"
     )
   } else if (notification.channel === "WHATSAPP" && patientPhone) {
-    success = await sendAppointmentReminderWhatsApp(
-      patientPhone,
-      patientName,
-      appointmentDate,
-      appointmentTime
-    )
+    const ok = await sendAppointmentReminderWhatsApp(patientPhone, patientName, appointmentDate, appointmentTime)
+    sendErr = ok ? null : "Falha ao enviar WhatsApp"
   } else {
+    sendErr = `Canal ${notification.channel} sem contato do paciente`
     logger.warn("Cannot dispatch notification", {
       notificationId,
       channel: notification.channel,
@@ -146,9 +143,9 @@ export async function dispatchNotification(
   await prisma.notification.update({
     where: { id: notificationId },
     data: {
-      status: success ? "SENT" : "FAILED",
-      sentAt: success ? new Date() : null,
-      errorMessage: success ? null : "Falha no envio",
+      status: sendErr ? "FAILED" : "SENT",
+      sentAt: sendErr ? null : new Date(),
+      errorMessage: sendErr,
     },
   })
 }
