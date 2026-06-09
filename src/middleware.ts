@@ -40,7 +40,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/cron") || pathname === "/api/health" || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
+        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/cron") || pathname === "/api/health" || pathname === "/api/health/" || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
           return true
         }
         if (pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar")) {
