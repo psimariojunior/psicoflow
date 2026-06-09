@@ -13,3 +13,5 @@ dist/
 coverage/
 .turbo/
 out/
+
+.vercel
