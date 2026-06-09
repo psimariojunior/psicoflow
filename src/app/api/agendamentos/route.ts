@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createAppointmentSchema } from "@/lib/validation"
-import { scheduleReminders } from "@/lib/notifications"
 
 export async function GET(request: NextRequest) {
   try {
@@ -84,11 +83,6 @@ export async function POST(request: Request) {
         },
       },
     })
-
-    scheduleReminders({
-      ...appointment,
-      psychologist: { id: (session.user as { id: string }).id, name: (session.user as { name: string }).name },
-    }).catch((err) => logger.error("Failed to schedule reminders", { appointmentId: appointment.id, error: String(err) }))
 
     return NextResponse.json(appointment, { status: 201 })
   } catch (error) {
