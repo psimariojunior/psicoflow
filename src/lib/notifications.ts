@@ -164,12 +164,13 @@ export async function cancelPendingReminders(appointmentId: string): Promise<voi
   })
 }
 
-export async function processPendingNotifications(): Promise<{ sent: number; failed: number }> {
+export async function processPendingNotifications(force = false): Promise<{ sent: number; failed: number }> {
+  const where: any = { status: "PENDING" }
+  if (!force) {
+    where.scheduledAt = { lte: new Date() }
+  }
   const pending = await prisma.notification.findMany({
-    where: {
-      status: "PENDING",
-      scheduledAt: { lte: new Date() },
-    },
+    where,
     select: { id: true },
   })
 
