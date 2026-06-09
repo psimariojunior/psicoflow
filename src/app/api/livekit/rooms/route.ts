@@ -29,6 +29,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Room name required" }, { status: 400 })
     }
 
+    console.log("POST room", { room, userId: session.user.id })
+
     const { host, apiKey, apiSecret } = getLiveKitConfig()
 
     // Try to delete the room from LiveKit (best effort)
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     // Mark as closed in the database
-    await prisma.closedRoom.upsert({
+    const record = await prisma.closedRoom.upsert({
       where: { roomName: room },
       update: {},
       create: {
@@ -50,6 +52,7 @@ export async function POST(request: Request) {
         psychologistId: session.user.id,
       },
     })
+    console.log("ClosedRoom created:", record)
 
     return NextResponse.json({ success: true })
   } catch (error) {
