@@ -6,13 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, VideoConference } from "@livekit/components-react"
 import "@livekit/components-styles"
-import { Video, Loader2, Link2, Copy } from "lucide-react"
+import { Video, Loader2, Link2, Copy, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function VirtualRoomPage({ params }: { params?: { id: string } }) {
   const [roomName, setRoomName] = useState(params?.id || `sala-${Date.now()}`)
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
+  const [ending, setEnding] = useState(false)
 
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
 
@@ -30,18 +31,38 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
     }
   }, [roomName])
 
+  const handleEndRoom = useCallback(async () => {
+    setEnding(true)
+    try {
+      await fetch("/api/livekit/rooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ room: roomName }),
+      })
+    } catch {
+      toast.error("Erro ao encerrar sala")
+    } finally {
+      setEnding(false)
+      setToken(null)
+    }
+  }, [roomName])
+
   const patientLink = `${typeof window !== "undefined" ? window.location.origin : ""}/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`
 
   if (token) {
     return (
       <div className="h-[calc(100vh-4rem)] flex flex-col">
-        <div className="flex items-center justify-between px-4 py-2 bg-background border-b shrink-0">
-          <span className="text-sm font-medium">Sala: {roomName}</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-background border-b shrink-0">
+          <span className="text-sm font-medium flex-1">Sala: {roomName}</span>
           <Button variant="outline" size="sm" onClick={() => {
             navigator.clipboard.writeText(patientLink)
             toast.success("Link copiado!")
           }}>
-            <Copy className="mr-2 h-4 w-4" /> Copiar Link do Paciente
+            <Copy className="mr-2 h-4 w-4" /> Copiar Link
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleEndRoom} disabled={ending}>
+            {ending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
+            {ending ? "Encerrando..." : "Encerrar Sala"}
           </Button>
         </div>
         <div className="flex-1">
