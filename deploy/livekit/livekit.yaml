@@ -1,0 +1,20 @@
+port: 7880
+bind_addresses:
+  - ""
+
+rtc:
+  port_range_start: 61000
+  port_range_end: 62000
+  use_external_ip: false
+  tcp_port: 7881
+
+keys:
+  API7dde4347f0b9: "a6e59152ca11c7b5eadbb40ed11d17dcf2f1d55b70369da2a2c5ea3a3183f036"
+
+turn:
+  enabled: true
+  udp_port: 3478
+  external_tls: false
+
+logging:
+  level: info

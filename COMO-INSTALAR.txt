@@ -1,0 +1,136 @@
+========================================
+  PSICOFLOW COMPLETO - GUIA DE INSTALAÇÃO
+========================================
+
+Siga estes passos UM POR UM, na ordem.
+
+------------------------------------------------
+PASSO 1: INSTALAR NODE.JS
+------------------------------------------------
+
+1. Abra o Google Chrome ou Edge
+2. Acesse: https://nodejs.org
+3. Clique no botão VERDE "LTS" (versão 20.x.x)
+4. Quando baixar, ABRA o arquivo
+5. Clique em "Next >" várias vezes
+6. Clique em "Install"
+7. Clique em "Finish"
+8. REINICIE o computador
+
+------------------------------------------------
+PASSO 2: ABRIR O TERMINAL
+------------------------------------------------
+
+1. Pressione a tecla Windows do teclado
+2. Digite: PowerShell
+3. Clique com o botão DIREITO em "Windows PowerShell"
+4. Escolha "Executar como administrador"
+5. Clique em "Sim"
+
+------------------------------------------------
+PASSO 3: ACESSAR A PASTA DO PROJETO
+------------------------------------------------
+
+No PowerShell (janela preta), digite EXATAMENTE:
+
+ cd C:\Users\miche\Desktop\PsicoFlow-Completo
+
+E aperte ENTER.
+
+------------------------------------------------
+PASSO 4: INSTALAR AS DEPENDÊNCIAS
+------------------------------------------------
+
+Digite no PowerShell:
+
+ npm install
+
+Aperte ENTER e AGUARDE (pode levar 2-3 minutos).
+Vão aparecer muitas letras na tela, é normal.
+
+------------------------------------------------
+PASSO 5: CRIAR O BANCO DE DADOS
+------------------------------------------------
+
+Digite no PowerShell:
+
+ npx prisma generate
+
+Aperte ENTER. Aguarde.
+
+Depois digite:
+
+ npx prisma db push
+
+Aperte ENTER. Aguarde.
+
+(Deve aparecer "Your database is now in sync")
+
+------------------------------------------------
+PASSO 6: INICIAR O SISTEMA
+------------------------------------------------
+
+Digite no PowerShell:
+
+ npm run dev
+
+Aperte ENTER.
+
+Vai aparecer:
+  ▲ Next.js 14.x
+  - Local: http://localhost:3000
+
+NÃO FECHE ESTA JANELA!
+
+------------------------------------------------
+PASSO 7: ABRIR O SISTEMA
+------------------------------------------------
+
+1. Abra o Google Chrome ou Edge
+2. Na barra de endereços, digite:
+   http://localhost:3000
+3. Aperte ENTER
+
+------------------------------------------------
+PASSO 8: CRIAR SUA CONTA
+------------------------------------------------
+
+1. Clique em "Cadastre-se"
+2. Preencha: Nome, Email, Senha
+3. Clique em "Criar Conta"
+4. Faça login
+
+PRONTO! 🎉
+
+------------------------------------------------
+PARA USAR SEMPRE
+------------------------------------------------
+
+Da próxima vez que ligar o computador:
+
+1. Abra o PowerShell
+2. Digite:
+   cd C:\Users\miche\Desktop\PsicoFlow-Completo
+   npm run dev
+
+3. Abra http://localhost:3000 no navegador
+
+(Sempre precisa estar com o terminal rodando)
+
+------------------------------------------------
+DICAS IMPORTANTES
+------------------------------------------------
+
+• NÃO feche a janela do PowerShell enquanto estiver usando
+• Para PARAR o sistema: aperte CTRL+C no PowerShell
+• Se der erro no passo 4, tente reiniciar o computador e tentar de novo
+• O banco de dados fica na pasta prisma/dev.db
+• Faça backup deste arquivo de vez em quando
+
+------------------------------------------------
+SE DER ERRO:
+------------------------------------------------
+
+Me diga QUAL PASSO deu errado e QUAL MENSAGEM apareceu.
+
+Eu vou te ajudar a resolver! 😊
