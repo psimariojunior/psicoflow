@@ -87,6 +87,8 @@ model Patient {
   name           String
   email          String?
   phone          String?
+  password       String?
+  lastLoginAt    DateTime?
   cpf            String?
   rg             String?
   dateOfBirth    DateTime?
