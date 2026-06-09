@@ -466,15 +466,9 @@ export default function AgendaPage() {
                     <Link href="/sala-virtual"><Video className="mr-1 h-4 w-4" /> Sala Virtual</Link>
                   </Button>
                 )}
-                {selectedAppt.status !== "CANCELLED" && selectedAppt.status !== "COMPLETED" && (
-                  <>
-                    {(selectedAppt.patientEmail || selectedAppt.patientPhone) && (
-                      <Button size="sm" variant="outline" className="border-blue-300 text-blue-600" onClick={() => handleSendReminder(selectedAppt)}>
-                        <Bell className="mr-1 h-4 w-4" /> Enviar Lembrete
-                      </Button>
-                    )}
-                  </>
-                )}
+                <Button size="sm" variant="outline" className="border-blue-300 text-blue-600" onClick={() => handleSendReminder(selectedAppt)}>
+                  <Bell className="mr-1 h-4 w-4" /> Enviar Lembrete
+                </Button>
               </div>
             </div>
           )}
