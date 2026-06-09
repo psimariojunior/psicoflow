@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const { title, message, channel, patientId } = await request.json()
+    const { title, message, channel, patientId, appointmentDate, appointmentTime } = await request.json()
     const psychologistId = (session.user as { id: string }).id
     const psychologistName = (session.user as { name?: string }).name || "Psicólogo"
 
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       },
     })
 
-    const success = await sendReminderNow(patientId, channel, psychologistName)
+    const success = await sendReminderNow(patientId, channel, psychologistName, appointmentDate || "", appointmentTime || "")
 
     await prisma.notification.update({
       where: { id: notification.id },
