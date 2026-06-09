@@ -82,6 +82,18 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 1. Criar conta em https://cron-job.org
 2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes` a cada 30 min
 
+### Lembretes automáticos agendados (2026-06-10)
+- `prisma/schema.prisma`: Notification ganhou campo `scheduledAt` (DateTime?) para agendamento
+- `scheduleReminders()` em `src/lib/notifications.ts`: cria notificações PENDING para 24h e 1h antes da consulta
+- `cancelPendingReminders()` em `src/lib/notifications.ts`: cancela notificações pendentes de uma consulta
+- `processPendingNotifications()` agora filtra por `scheduledAt <= now` em vez de `createdAt`
+- Integrado em:
+  - `POST /api/agendamentos` → agenda ao criar
+  - `PUT /api/agendamentos/[id]` → agenda ao confirmar, cancela ao cancelar
+  - `DELETE /api/agendamentos/[id]` → cancela pendentes
+- `vercel.json`: build command volta a executar `prisma db push --accept-data-loss` para atualizar Neon
+- Cron endpoint (`/api/cron/lembretes`) continua processando a cada 30min
+
 ### Email: migrado de SMTP Outlook para Resend (2026-06-10)
 - **Problema**: Outlook SMTP aceitava conexão mas descartava emails silenciosamente (FROM não coincidia com SMTP AUTH user)
 - **Solução**: Substituído `nodemailer` por `resend` (API HTTP, sem SMTP)
