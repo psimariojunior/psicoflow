@@ -40,12 +40,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex min-h-screen bg-slate-950">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-white mb-1">Entrar</h1>
-            <p className="text-white/50 text-sm">Acesse sua área do paciente</p>
+            <p className="text-gray-300 text-sm">Acesse sua área do paciente</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -54,14 +54,14 @@ export default function LoginPage() {
               placeholder="Seu email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/30 h-12"
+              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
             />
             <Input
               type="password"
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/30 h-12"
+              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
             />
             <Button
               type="submit"
