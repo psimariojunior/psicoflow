@@ -32,10 +32,12 @@ function EntrarSalaForm() {
         throw new Error(body.error || "Erro ao conectar")
       }
       const data = await res.json()
+      // Stop preview stream so LiveKit can use the camera
+      streamRef.current?.getTracks().forEach((t) => t.stop())
+      streamRef.current = null
       setToken(data.token)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao conectar")
-    } finally {
       setConnecting(false)
     }
   }, [roomInput])
@@ -49,8 +51,6 @@ function EntrarSalaForm() {
         }
       })
       .catch(() => {
-        setCameraOn(false)
-        setMicOn(false)
         toast.error("Permita acesso à câmera e microfone nas configurações do navegador")
       })
   }, [])
@@ -77,13 +77,11 @@ function EntrarSalaForm() {
   })
 
   useEffect(() => {
-    if (step === "prejoin") {
+    if (step === "prejoin" && !streamRef.current) {
       startCamera()
-    } else {
-      stopCamera()
     }
-    return stopCamera
-  }, [step, startCamera, stopCamera])
+    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null }
+  }, [step, startCamera])
 
   if (token) {
     return (
@@ -193,7 +191,7 @@ function EntrarSalaForm() {
               <Button
                 className="w-full h-12 text-base"
                 size="lg"
-                onClick={() => { if (roomInput.trim()) { setStep("prejoin"); startCamera() } }}
+                onClick={() => { if (roomInput.trim()) { setStep("prejoin") } }}
                 disabled={!roomInput.trim()}
               >
                 <Camera className="mr-2 h-5 w-5" />
