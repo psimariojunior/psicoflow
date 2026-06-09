@@ -108,10 +108,11 @@ export async function dispatchNotification(
       select: { startTime: true },
     })
     if (appointment) {
+      const tz = "America/Sao_Paulo"
       const d = new Date(appointment.startTime)
       const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      appointmentDate = `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`
-      appointmentTime = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+      appointmentDate = d.toLocaleDateString("pt-BR", { timeZone: tz, day: "numeric", month: "long", year: "numeric" })
+      appointmentTime = d.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
     }
   }
 
