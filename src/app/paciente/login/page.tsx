@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { usePatientAuth } from "../layout"
+import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
 import { Loader2, LogIn } from "lucide-react"
 

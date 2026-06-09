@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { usePatientAuth } from "../layout"
+import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
 import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 
