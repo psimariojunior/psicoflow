@@ -136,13 +136,9 @@ function EntrarSalaForm() {
 
   if (step === "prejoin") {
     return (
-      <div className="relative flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 overflow-hidden">
-        <div className="absolute top-1/3 -right-32 w-[30rem] h-[30rem] rounded-full bg-emerald-500/[0.04] blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] rounded-full bg-blue-500/[0.04] blur-3xl" />
-        <div className="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-violet-500/[0.03] blur-3xl" />
-
-        <div className="relative z-10 flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-5xl">
+      <div className="flex min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg">
             <button
               onClick={() => setStep("welcome")}
               className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm mb-6 transition-colors"
@@ -150,75 +146,62 @@ function EntrarSalaForm() {
               <ArrowLeft className="h-4 w-4" /> Voltar
             </button>
 
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white">Estamos quase lá</h2>
-              <p className="text-white/40 mt-1 text-sm">Ajuste sua câmera e microfone para começar</p>
-            </div>
-
-            <div className="grid md:grid-cols-5 gap-8">
-              <div className="md:col-span-3">
-                <div className="relative rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl ring-1 ring-white/10">
-                  <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${streamRef.current ? "block" : "hidden"}`} />
-                  <div className={`absolute inset-0 flex items-center justify-center ${streamRef.current ? "hidden" : "flex"}`}>
-                    <div className="text-center">
-                      <div className="relative mx-auto mb-3 h-16 w-16">
-                        <div className="absolute inset-0 rounded-full bg-white/5" />
-                        <Camera className="relative h-16 w-16 p-4 text-white/30" />
-                      </div>
-                      <p className="text-sm text-white/30">Preparando sua câmera...</p>
+            <div className="bg-white/[0.05] backdrop-blur-2xl rounded-3xl p-6 ring-1 ring-white/10 shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden bg-black aspect-video mb-5 shadow-xl">
+                <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${streamRef.current ? "block" : "hidden"}`} />
+                <div className={`absolute inset-0 flex items-center justify-center ${streamRef.current ? "hidden" : "flex"}`}>
+                  <div className="text-center">
+                    <div className="mx-auto mb-2 h-14 w-14 rounded-full bg-white/5 flex items-center justify-center">
+                      <Camera className="h-7 w-7 text-white/30" />
                     </div>
+                    <p className="text-sm text-white/30">Preparando sua câmera...</p>
                   </div>
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-                    <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-12 w-12 shadow-lg ring-1 ring-white/20">
-                      {cameraOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-                    </Button>
-                    <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-12 w-12 shadow-lg ring-1 ring-white/20">
-                      {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-                    </Button>
-                  </div>
-                  {connecting && (
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10 backdrop-blur-sm">
-                      <div className="text-center text-white">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-emerald-400" />
-                        <p className="text-lg font-medium">Conectando à sala...</p>
-                      </div>
-                    </div>
-                  )}
                 </div>
+
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
+                  <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-11 w-11 shadow-lg ring-1 ring-white/20">
+                    {cameraOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                  </Button>
+                  <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 shadow-lg ring-1 ring-white/20">
+                    {micOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                  </Button>
+                </div>
+
+                {connecting && (
+                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10 backdrop-blur-sm">
+                    <div className="text-center text-white">
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-emerald-400" />
+                      <p className="text-lg font-medium">Conectando à sala...</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="md:col-span-2 flex flex-col justify-center">
-                <div className="bg-white/[0.07] backdrop-blur-xl rounded-2xl p-7 text-white ring-1 ring-white/10 shadow-xl">
-                  <div className="flex items-center gap-2.5 mb-5">
-                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
-                    <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Pronto para entrar</span>
-                  </div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
+                <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Pronto</span>
+              </div>
 
-                  <h3 className="text-lg font-bold mb-1">Sala {roomInput}</h3>
-                  <p className="text-sm text-white/50 mb-6 leading-relaxed">
-                    Sua sessão é em um ambiente seguro e acolhedor. Fique à vontade.
-                  </p>
+              <h2 className="text-xl font-bold text-white mb-1">Sala {roomInput}</h2>
+              <p className="text-sm text-white/50 mb-5 leading-relaxed">Sua sessão é em um ambiente seguro e acolhedor. Fique à vontade.</p>
 
-                  <div className="space-y-3 mb-6">
-                    <label className="block text-xs text-white/40 font-medium">Como prefere ser chamado?</label>
-                    <Input
-                      placeholder="Seu nome"
-                      value={patientName}
-                      onChange={(e) => setPatientName(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-white/30 h-11"
-                    />
-                  </div>
+              <div className="space-y-3 mb-5">
+                <Input
+                  placeholder="Como prefere ser chamado?"
+                  value={patientName}
+                  onChange={(e) => setPatientName(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/30 h-11"
+                />
+              </div>
 
-                  <Button className="w-full h-12 text-base font-medium bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 border-0" size="lg" onClick={handleConnect} disabled={connecting}>
-                    {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                    {connecting ? "Conectando..." : "Entrar na Sala"}
-                  </Button>
+              <Button className="w-full h-12 text-base font-medium bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 border-0" size="lg" onClick={handleConnect} disabled={connecting}>
+                {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                {connecting ? "Conectando..." : "Entrar na Sala"}
+              </Button>
 
-                  <div className="flex items-center justify-center gap-5 mt-5 text-xs text-white/30">
-                    <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Criptografado</span>
-                    <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5" /> Conexão segura</span>
-                  </div>
-                </div>
+              <div className="flex items-center justify-center gap-5 mt-4 text-xs text-white/30">
+                <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Criptografado</span>
+                <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5" /> Conexão segura</span>
               </div>
             </div>
           </div>
