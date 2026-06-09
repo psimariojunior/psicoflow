@@ -1,31 +1,36 @@
-import { Resend } from "resend"
-
 export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
-  const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
+  const apiKey = process.env.BREVO_API_KEY
+  const fromName = "PsicoFlow"
+  const fromEmail = process.env.BREVO_FROM_EMAIL || "psi_mariojunior@hotmail.com"
 
-  console.log("[sendEmail] starting", { to, subject, hasApiKey: !!apiKey, from })
+  console.log("[sendEmail] starting", { to, subject, hasApiKey: !!apiKey, fromEmail })
 
   if (!apiKey) {
-    const msg = "RESEND_API_KEY não configurada"
-    console.warn("[sendEmail]", msg)
-    return msg
+    return "BREVO_API_KEY não configurada nas variáveis de ambiente"
   }
+
   try {
-    const resend = new Resend(apiKey)
-    console.log("[sendEmail] calling Resend API...")
-    const result = await resend.emails.send({
-      from,
-      to: [to],
-      subject,
-      html,
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: { email: fromEmail, name: fromName },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
     })
-    if (result.error) {
-      const msg = result.error.message || "Erro desconhecido da Resend"
-      console.error("[sendEmail] Resend API error", result.error)
-      return msg
+
+    if (!res.ok) {
+      const body = await res.text()
+      console.error("[sendEmail] Brevo API error", { status: res.status, body })
+      return `Brevo: ${body}`
     }
-    console.log("[sendEmail] success", { id: result.data?.id, to, subject })
+
+    console.log("[sendEmail] success", { to, subject })
     return null
   } catch (err: unknown) {
     const msg = String(err)
