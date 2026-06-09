@@ -50,14 +50,14 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 - Production URL: `https://psicoflow-iota.vercel.app`
 - Build command: `prisma db push --accept-data-loss && next build` (vercel.json)
 - `POSTGRES_PRISMA_URL` env (non-pooled) for DDL via prisma db push
-- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL, WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL, WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID, RESEND_API_KEY, EMAIL_FROM
 - Middleware allows unauthenticated access to `/sala-virtual/entrar`, `/api/livekit/*`, and `/api/cron/*`
 - **SSO Protection**: foi desativado no projeto Vercel (impedia acesso do paciente sem login Vercel)
 
 ## Recentes (2026-06-10) — Lembretes Automáticos
 
 ### O que foi implementado
-- **Email**: `sendEmail()` genérico + template HTML de lembrete de consulta em `src/lib/email.ts`; reusa SMTP Outlook já configurado
+- **Email**: `sendEmail()` genérico + template HTML de lembrete de consulta em `src/lib/email.ts`; via Resend API
 - **WhatsApp**: Cliente Meta Cloud API em `src/lib/whatsapp.ts`; envia template `lembrete_consulta` com nome/data/hora
 - **Engine de notificações** (`src/lib/notifications.ts`):
   - `scheduleReminders()` — cria notificações PENDING para 24h e 1h antes da consulta
@@ -81,6 +81,14 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 ### Para o cron automático
 1. Criar conta em https://cron-job.org
 2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes` a cada 30 min
+
+### Email: migrado de SMTP Outlook para Resend (2026-06-10)
+- **Problema**: Outlook SMTP aceitava conexão mas descartava emails silenciosamente (FROM não coincidia com SMTP AUTH user)
+- **Solução**: Substituído `nodemailer` por `resend` (API HTTP, sem SMTP)
+- `src/lib/email.ts` agora usa `new Resend(process.env.RESEND_API_KEY)`
+- Env vars antigas removidas: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- Env vars novas: `RESEND_API_KEY`, `EMAIL_FROM`
+- Setup: criar conta em https://resend.com, verificar domínio (ou usar `onboarding@resend.dev` para testes), gerar API key
 
 ### Setup Details
 Ver `LEMBRETES_SETUP.md` na raiz do projeto.

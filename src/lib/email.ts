@@ -1,37 +1,29 @@
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
 import { logger } from "./logger"
 
-function getTransporter() {
-  const host = process.env.SMTP_HOST
-  if (!host) return null
-  return nodemailer.createTransport({
-    host,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER || "",
-      pass: process.env.SMTP_PASS || "",
-    },
-  })
-}
+const resend = new Resend(process.env.RESEND_API_KEY || "")
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
-  const transporter = getTransporter()
-  if (!transporter) {
-    logger.warn("SMTP not configured. Email not sent.", { to, subject })
+  const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
+  if (!process.env.RESEND_API_KEY) {
+    logger.warn("RESEND_API_KEY not configured. Email not sent.", { to, subject })
     return false
   }
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || "noreply@psicoflow.com.br",
-      to,
+    const { error } = await resend.emails.send({
+      from,
+      to: [to],
       subject,
       html,
     })
-    logger.info("Email sent", { to, subject })
+    if (error) {
+      logger.error("Resend API error", { to, subject, error })
+      return false
+    }
+    logger.info("Email sent via Resend", { to, subject })
     return true
   } catch (err) {
-    logger.error("Failed to send email", { to, subject, error: String(err) })
+    logger.error("Failed to send email via Resend", { to, subject, error: String(err) })
     return false
   }
 }
@@ -86,8 +78,8 @@ export async function sendAppointmentReminderEmail(
           <tr><td style="padding: 8px 0; color: #666;">Psicólogo(a)</td><td style="padding: 8px 0;"><strong>${psychologistName}</strong></td></tr>
         </table>
         ${modality === "online"
-          ? '<p style="margin-top: 16px; padding: 12px; background: #e0f2fe; border-radius: 6px; font-size: 0.875rem;">📹 A consulta será online. Acesse o link da sala virtual no momento da consulta.</p>'
-          : '<p style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-radius: 6px; font-size: 0.875rem;">🏢 A consulta será presencial. Compareça ao endereço do consultório.</p>'}
+          ? '<p style="margin-top: 16px; padding: 12px; background: #e0f2fe; border-radius: 6px; font-size: 0.875rem;">A consulta ser\u00e1 online. Acesse o link da sala virtual no momento da consulta.</p>'
+          : '<p style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-radius: 6px; font-size: 0.875rem;">A consulta ser\u00e1 presencial. Compare\u00e7a ao endere\u00e7o do consult\u00f3rio.</p>'}
       </div>
       <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
     </div>`
