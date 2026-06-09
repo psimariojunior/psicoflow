@@ -21,13 +21,13 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
       html,
     })
     if (result.error) {
-      const msg = typeof result.error === "string" ? result.error : result.error.message || "Erro desconhecido da Resend"
+      const msg = result.error.message || "Erro desconhecido da Resend"
       console.error("[sendEmail] Resend API error", result.error)
       return msg
     }
     console.log("[sendEmail] success", { id: result.data?.id, to, subject })
     return null
-  } catch (err) {
+  } catch (err: unknown) {
     const msg = String(err)
     console.error("[sendEmail] exception", msg)
     return msg
