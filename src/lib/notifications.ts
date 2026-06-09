@@ -58,6 +58,8 @@ export async function dispatchNotification(
   let patientName = "Paciente"
   let patientEmail: string | null = null
   let patientPhone: string | null = null
+  let appointmentDate = ""
+  let appointmentTime = ""
 
   if (notification.patientId) {
     const patient = await prisma.patient.findUnique({
@@ -71,6 +73,19 @@ export async function dispatchNotification(
     }
   }
 
+  if (notification.externalId) {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: notification.externalId },
+      select: { startTime: true },
+    })
+    if (appointment) {
+      const d = new Date(appointment.startTime)
+      const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+      appointmentDate = `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`
+      appointmentTime = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    }
+  }
+
   let success = false
 
   if (notification.channel === "EMAIL" && patientEmail) {
@@ -78,8 +93,8 @@ export async function dispatchNotification(
       patientEmail,
       patientName,
       psyName,
-      "",
-      "",
+      appointmentDate,
+      appointmentTime,
       "Atendimento",
       "presential"
     )
@@ -87,8 +102,8 @@ export async function dispatchNotification(
     success = await sendAppointmentReminderWhatsApp(
       patientPhone,
       patientName,
-      "",
-      ""
+      appointmentDate,
+      appointmentTime
     )
   } else {
     logger.warn("Cannot dispatch notification", {
