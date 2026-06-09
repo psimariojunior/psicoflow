@@ -1,28 +1,33 @@
 import { Resend } from "resend"
 import { logger } from "./logger"
 
-const resend = new Resend(process.env.RESEND_API_KEY || "")
-
 export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY
   const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
-  if (!process.env.RESEND_API_KEY) {
+  console.log("[email] RESEND_API_KEY present:", !!apiKey)
+  console.log("[email] EMAIL_FROM:", from)
+  console.log("[email] to:", to, "subject:", subject)
+  if (!apiKey) {
     logger.warn("RESEND_API_KEY not configured. Email not sent.", { to, subject })
     return false
   }
   try {
-    const { error } = await resend.emails.send({
+    const resend = new Resend(apiKey)
+    const result = await resend.emails.send({
       from,
       to: [to],
       subject,
       html,
     })
-    if (error) {
-      logger.error("Resend API error", { to, subject, error })
+    console.log("[email] Resend result:", JSON.stringify(result))
+    if (result.error) {
+      logger.error("Resend API error", { to, subject, error: result.error })
       return false
     }
-    logger.info("Email sent via Resend", { to, subject })
+    logger.info("Email sent via Resend", { to, subject, id: result.data?.id })
     return true
   } catch (err) {
+    console.error("[email] Exception:", err)
     logger.error("Failed to send email via Resend", { to, subject, error: String(err) })
     return false
   }
