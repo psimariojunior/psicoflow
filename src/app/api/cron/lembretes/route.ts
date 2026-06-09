@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server"
 import { processPendingNotifications } from "@/lib/notifications"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const result = await processPendingNotifications()
+    const url = new URL(request.url)
+    const force = url.searchParams.get("force") === "true"
+    const result = await processPendingNotifications(force)
     return NextResponse.json({
       ok: true,
       processed: result.sent + result.failed,
