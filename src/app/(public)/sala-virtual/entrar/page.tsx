@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar } from "lucide-react"
 import toast from "react-hot-toast"
 
 function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (hasRemote: boolean) => void }) {
@@ -412,6 +412,17 @@ function EntrarSalaForm() {
                   HD
                 </div>
               </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <p className="text-xs text-white/40 mb-3">Ainda não tem consulta agendada?</p>
+              <a
+                href="/agendar"
+                className="inline-flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+              >
+                <Calendar className="h-4 w-4" />
+                Agende sua consulta
+              </a>
             </div>
           </div>
 
