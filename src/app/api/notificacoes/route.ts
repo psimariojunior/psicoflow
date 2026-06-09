@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { logger } from "@/lib/logger"
+import { dispatchNotification } from "@/lib/notifications"
 
 export async function GET() {
   try {
@@ -57,9 +59,16 @@ export async function POST(request: Request) {
         recipientId: patientId || null,
         psychologistId: (session.user as { id: string }).id,
         status: "PENDING",
-        createdAt: sendAt ? new Date(sendAt) : new Date(),
+        scheduledAt: sendAt ? new Date(sendAt) : null,
+        createdAt: new Date(),
       },
     })
+
+    if (!sendAt) {
+      dispatchNotification(notification.id).catch((err) =>
+        logger.error("Failed to dispatch immediate notification", { id: notification.id, error: String(err) })
+      )
+    }
 
     return NextResponse.json(notification, { status: 201 })
   } catch (error) {

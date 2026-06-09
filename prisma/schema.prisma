@@ -151,6 +151,7 @@ model Appointment {
   patient        Patient  @relation(fields: [patientId], references: [id])
 
   therapySession TherapySession?
+  notifications  Notification[]
 }
 
 model TherapySession {
@@ -266,22 +267,25 @@ model Invoice {
 }
 
 model Notification {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   title           String
   message         String
   channel         String
-  status          String   @default("PENDING")
+  status          String    @default("PENDING")
+  scheduledAt     DateTime?
   sentAt          DateTime?
   readAt          DateTime?
   externalId      String?
   errorMessage    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  psychologist    User      @relation(fields: [psychologistId], references: [id])
   recipientId     String?
   patientId       String?
+  appointmentId   String?
+  appointment     Appointment? @relation(fields: [appointmentId], references: [id])
 }
 
 model Message {
