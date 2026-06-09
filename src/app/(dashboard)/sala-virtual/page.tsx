@@ -54,6 +54,7 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
     }
     setEnding(false)
     setToken(null)
+    setRoomName(`sala-${Date.now()}`)
   }, [roomName])
 
   const patientLink = `${typeof window !== "undefined" ? window.location.origin : ""}/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`
