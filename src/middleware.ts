@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
 
-    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/cron")) {
+    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/agendar") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/disponibilidade/public") && !pathname.startsWith("/api/agendamentos/public") && !pathname.startsWith("/api/cron")) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
 
@@ -40,10 +40,10 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/health") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
+        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/disponibilidade/public") || pathname.startsWith("/api/agendamentos/public") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/health") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
           return true
         }
-        if (pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar")) {
+        if (pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar") || pathname.startsWith("/agendar")) {
           return true
         }
         return !!token
