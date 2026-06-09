@@ -1,0 +1,287 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { DataTable } from "@/components/shared/data-table"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { formatCurrency, formatDate } from "@/lib/utils"
+import { Plus, Download, ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Wallet, CreditCard, Loader2 } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
+import toast from "react-hot-toast"
+
+interface Transaction {
+  id: string
+  date: string
+  description: string
+  category: string
+  amount: number
+  type: "INCOME" | "EXPENSE"
+  status: string
+  patient?: string
+  patientId?: string
+}
+
+export default function FinancialPage() {
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [summary, setSummary] = useState({ totalRevenue: 0, totalExpenses: 0, balance: 0 })
+  const [loading, setLoading] = useState(true)
+  const [showTransactionDialog, setShowTransactionDialog] = useState(false)
+  const [patients, setPatients] = useState<{ id: string; name: string }[]>([])
+  const [txForm, setTxForm] = useState({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
+
+  useEffect(() => {
+    fetch("/api/pacientes?limit=100")
+      .then(r => r.ok ? r.json() : { patients: [] })
+      .then(d => setPatients(d.patients || []))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/financeiro")
+      .then((res) => { if (!res.ok) throw new Error(); return res.json() })
+      .then((data) => {
+        if (data.summary) setSummary(data.summary)
+        const mapped = (data.transactions || []).map((t: { createdAt: string; paymentStatus: string; patient: { name: string } | null }) => ({
+          ...t,
+          date: t.createdAt,
+          status: t.paymentStatus,
+          patient: t.patient?.name || null,
+        }))
+        setTransactions(mapped)
+      })
+      .catch(() => toast.error("Erro ao carregar dados financeiros"))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const incomeColumns: ColumnDef<Transaction>[] = [
+    { accessorKey: "date", header: "Data", cell: ({ row }) => formatDate(row.original.date) },
+    { accessorKey: "description", header: "Descrição" },
+    { accessorKey: "category", header: "Categoria" },
+    {
+      accessorKey: "amount",
+      header: "Valor",
+      cell: ({ row }) => (
+        <span className={row.original.type === "INCOME" ? "text-emerald-600 font-medium" : "text-red-600 font-medium"}>
+          {row.original.type === "INCOME" ? "+ " : "- "}{formatCurrency(row.original.amount)}
+        </span>
+      ),
+    },
+    { accessorKey: "status", header: "Status", cell: ({ row }) => <StatusBadge status={row.original.status} /> },
+  ]
+
+  const totalRevenue = summary.totalRevenue || transactions.filter(t => t.type === "INCOME").reduce((acc, t) => acc + t.amount, 0)
+  const totalExpenses = summary.totalExpenses || transactions.filter(t => t.type === "EXPENSE").reduce((acc, t) => acc + t.amount, 0)
+  const pendingAmount = transactions.filter(t => t.type === "INCOME" && (t.status === "PENDING" || t.status === "OVERDUE")).reduce((acc, t) => acc + t.amount, 0)
+
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Financeiro</h2>
+          <p className="text-muted-foreground">
+            Controle de receitas, despesas e notas fiscais
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
+          </Button>
+          <Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Transação
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader><DialogTitle>Nova Transação</DialogTitle></DialogHeader>
+              <form onSubmit={async (e) => {
+                e.preventDefault()
+                try {
+                  const res = await fetch("/api/financeiro", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
+                  })
+                  if (!res.ok) throw new Error()
+                  toast.success("Transação criada!")
+                  setShowTransactionDialog(false)
+                  setTxForm({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
+                  const data = await fetch("/api/financeiro").then(r => r.json())
+                  if (data.summary) setSummary(data.summary)
+                  const mapped = (data.transactions || []).map((t: { createdAt: string; paymentStatus: string; patient: { name: string } | null }) => ({ ...t, date: t.createdAt, status: t.paymentStatus, patient: t.patient?.name || null }))
+                  setTransactions(mapped)
+                } catch { toast.error("Erro ao criar transação") }
+              }} className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label>Descrição</Label>
+                  <Input required value={txForm.description} onChange={(e) => setTxForm({...txForm, description: e.target.value})} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Tipo</Label>
+                    <Select value={txForm.type} onValueChange={(v) => setTxForm({...txForm, type: v})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INCOME">Receita</SelectItem>
+                        <SelectItem value="EXPENSE">Despesa</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Valor</Label>
+                    <Input type="number" step="0.01" required value={txForm.amount} onChange={(e) => setTxForm({...txForm, amount: e.target.value})} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Categoria</Label>
+                    <Select value={txForm.category} onValueChange={(v) => setTxForm({...txForm, category: v})}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="session">Sessão</SelectItem>
+                        <SelectItem value="package">Pacote</SelectItem>
+                        <SelectItem value="supervision">Supervisão</SelectItem>
+                        <SelectItem value="material">Material</SelectItem>
+                        <SelectItem value="rent">Aluguel</SelectItem>
+                        <SelectItem value="other">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Forma de Pagamento</Label>
+                    <Select value={txForm.paymentMethod} onValueChange={(v) => setTxForm({...txForm, paymentMethod: v})}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PIX">Pix</SelectItem>
+                        <SelectItem value="CREDIT_CARD">Cartão de Crédito</SelectItem>
+                        <SelectItem value="DEBIT_CARD">Cartão de Débito</SelectItem>
+                        <SelectItem value="CASH">Dinheiro</SelectItem>
+                        <SelectItem value="BOLETO">Boleto</SelectItem>
+                        <SelectItem value="TRANSFER">Transferência</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Paciente (opcional)</Label>
+                  <Select value={txForm.patientId} onValueChange={(v) => setTxForm({...txForm, patientId: v})}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={txForm.dueDate} onChange={(e) => setTxForm({...txForm, dueDate: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Observações</Label>
+                  <Textarea value={txForm.notes} onChange={(e) => setTxForm({...txForm, notes: e.target.value})} rows={2} />
+                </div>
+                <Button type="submit">Criar Transação</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                <TrendingUp className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Receitas</p>
+                <p className="text-xl font-bold text-emerald-600">{formatCurrency(totalRevenue)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
+                <TrendingDown className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Despesas</p>
+                <p className="text-xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <Wallet className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Saldo</p>
+                <p className="text-xl font-bold">{formatCurrency(totalRevenue - totalExpenses)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                <CreditCard className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">A Receber</p>
+                <p className="text-xl font-bold text-amber-600">{formatCurrency(pendingAmount)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">Todas</TabsTrigger>
+          <TabsTrigger value="income">Receitas</TabsTrigger>
+          <TabsTrigger value="expenses">Despesas</TabsTrigger>
+          <TabsTrigger value="pending">Pendentes</TabsTrigger>
+          <TabsTrigger value="overdue">Vencidas</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all" className="mt-4">
+          <DataTable columns={incomeColumns} data={transactions} searchKey="description" searchPlaceholder="Buscar transação..." />
+        </TabsContent>
+        <TabsContent value="income" className="mt-4">
+          <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "INCOME")} searchKey="description" />
+        </TabsContent>
+        <TabsContent value="expenses" className="mt-4">
+          <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "EXPENSE")} searchKey="description" />
+        </TabsContent>
+        <TabsContent value="pending" className="mt-4">
+          <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "PENDING")} searchKey="description" />
+        </TabsContent>
+        <TabsContent value="overdue" className="mt-4">
+          <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "OVERDUE")} searchKey="description" />
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}

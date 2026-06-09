@@ -1,0 +1,407 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password      String
+  role          String   @default("PSYCHOLOGIST")
+  phone         String?
+  avatarUrl     String?
+  crp           String?
+  specialty     String?
+  bio           String?
+  emailVerified DateTime?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  patients          Patient[]
+  appointments      Appointment[]    @relation("PsychologistAppointments")
+  medicalRecords    MedicalRecord[]
+  transactions      FinancialTransaction[]
+  notifications     Notification[]
+  therapySessions   TherapySession[]
+  invoices          Invoice[]
+  emotionDiaries    EmotionDiary[]
+  sentMessages      Message[]        @relation("SenderMessages")
+  receivedMessages  Message[]        @relation("ReceiverMessages")
+  permissions       UserPermission?
+  consentLogs       ConsentLog[]
+  auditLogs         AuditLog[]
+  therapyResources  TherapyResource[]
+  availabilitySlots AvailabilitySlot[]
+  sessionTokens     SessionToken[]
+  accounts          Account[]
+  nextAuthSessions  NextAuthSession[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model NextAuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Patient {
+  id             String   @id @default(cuid())
+  name           String
+  email          String?
+  phone          String?
+  cpf            String?
+  rg             String?
+  dateOfBirth    DateTime?
+  gender         String?
+  maritalStatus  String?
+  profession     String?
+  company        String?
+  address        String?
+  neighborhood   String?
+  city           String?
+  state          String?
+  zipCode        String?
+  emergencyContact String?
+  emergencyPhone String?
+  healthInsurance String?
+  insuranceNumber String?
+  referredBy     String?
+  howFound       String?
+  observations   String?
+  active         Boolean  @default(true)
+  photoUrl       String?
+  privacyConsent Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  invoices       Invoice[]
+  emotionDiaries EmotionDiary[]
+  consentLogs    ConsentLog[]
+  therapySessions TherapySession[]
+  attachments    Attachment[]
+  transactions   FinancialTransaction[]
+}
+
+model Appointment {
+  id             String   @id @default(cuid())
+  title          String?
+  startTime      DateTime
+  endTime        DateTime
+  status         String   @default("SCHEDULED")
+  type           String?
+  modality       String?  @default("presential")
+  onlineRoomUrl  String?
+  notes          String?
+  color          String?
+  isRecurring    Boolean  @default(false)
+  recurringRule  String?
+  price          Float?
+  paid           Boolean  @default(false)
+  paymentMethod  String?
+  googleEventId  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation("PsychologistAppointments", fields: [psychologistId], references: [id])
+  patientId      String
+  patient        Patient  @relation(fields: [patientId], references: [id])
+
+  therapySession TherapySession?
+}
+
+model TherapySession {
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  duration      Int?
+  type          String?
+  notes         String?
+  subjective    String?
+  objective     String?
+  assessment    String?
+  plan          String?
+  moodBefore    Int?
+  moodAfter     Int?
+  tags          String?
+  isRemote      Boolean  @default(false)
+  recordingUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  appointmentId String?  @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  psychologistId String
+  psychologist  User     @relation(fields: [psychologistId], references: [id])
+}
+
+model MedicalRecord {
+  id            String   @id @default(cuid())
+  type          String   @default("SESSION_NOTE")
+  title         String
+  content       String
+  isConfidential Boolean @default(false)
+  signature     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  psychologistId String
+  psychologist  User     @relation(fields: [psychologistId], references: [id])
+
+  attachments   Attachment[]
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  name      String
+  type      String
+  url       String
+  size      Int?
+  createdAt DateTime @default(now())
+
+  recordId  String?
+  record    MedicalRecord? @relation(fields: [recordId], references: [id])
+  patientId String?
+  patient   Patient?       @relation(fields: [patientId], references: [id])
+}
+
+model FinancialTransaction {
+  id              String   @id @default(cuid())
+  description     String
+  type            String
+  category        String?
+  amount          Float
+  discount        Float?   @default(0)
+  dueDate         DateTime?
+  paymentDate     DateTime?
+  paymentMethod   String?
+  paymentStatus   String   @default("PENDING")
+  recurring       Boolean  @default(false)
+  recurrenceRule  String?
+  notes           String?
+  receiptUrl      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  psychologistId  String
+  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  patientId       String?
+  patient         Patient? @relation(fields: [patientId], references: [id])
+  invoiceId       String?
+  invoice         Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+model Invoice {
+  id              String   @id @default(cuid())
+  number          String   @unique
+  series          String   @default("1")
+  status          String   @default("PENDING")
+  description     String
+  amount          Float
+  taxAmount       Float?   @default(0)
+  totalAmount     Float
+  issueDate       DateTime @default(now())
+  dueDate         DateTime
+  paidDate        DateTime?
+  paymentMethod   String?
+  notes           String?
+  pdfUrl          String?
+  xmlUrl          String?
+  qrCodeUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  psychologistId  String
+  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  patientId       String
+  patient         Patient  @relation(fields: [patientId], references: [id])
+
+  transactions    FinancialTransaction[]
+}
+
+model Notification {
+  id              String   @id @default(cuid())
+  title           String
+  message         String
+  channel         String
+  status          String   @default("PENDING")
+  sentAt          DateTime?
+  readAt          DateTime?
+  externalId      String?
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  psychologistId  String
+  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  recipientId     String?
+  patientId       String?
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("text")
+  read      Boolean  @default(false)
+  roomId    String?
+  createdAt DateTime @default(now())
+
+  senderId   String
+  sender     User     @relation("SenderMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+}
+
+model EmotionDiary {
+  id           String   @id @default(cuid())
+  date         DateTime @default(now())
+  mood         Int
+  emotions     String?
+  activities   String?
+  notes        String?
+  sleepHours   Float?
+  sleepQuality Int?
+  anxietyLevel Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  psychologistId String
+  psychologist  User     @relation(fields: [psychologistId], references: [id])
+}
+
+model TherapyResource {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        String
+  content     String?
+  url         String?
+  category    String?
+  tags        String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+}
+
+model AvailabilitySlot {
+  id        String   @id @default(cuid())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+}
+
+model UserPermission {
+  id        String   @id @default(cuid())
+  canViewPatients   Boolean @default(true)
+  canEditPatients   Boolean @default(true)
+  canDeletePatients Boolean @default(false)
+  canViewAgenda     Boolean @default(true)
+  canEditAgenda     Boolean @default(true)
+  canViewFinancial  Boolean @default(false)
+  canEditFinancial  Boolean @default(false)
+  canViewRecords    Boolean @default(true)
+  canEditRecords    Boolean @default(false)
+  canSendNotifications Boolean @default(false)
+  canViewReports    Boolean @default(false)
+  canManageUsers    Boolean @default(false)
+  canManageSettings Boolean @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model ConsentLog {
+  id        String   @id @default(cuid())
+  type      String
+  consent   Boolean
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  psychologistId String
+  psychologist  User     @relation(fields: [psychologistId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model SessionToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+

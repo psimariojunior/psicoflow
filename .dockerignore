@@ -1,0 +1,11 @@
+.next
+node_modules
+.git
+.env
+.env.local
+.env.example
+*.md
+backups
+scripts
+deploy/nginx/ssl
+prisma/dev.db
