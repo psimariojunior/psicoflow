@@ -17,3 +17,5 @@ coverage/
 out/
 
 .vercel
+
+backups/

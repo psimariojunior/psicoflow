@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, formatTime } from "@/lib/utils"
-import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play } from "lucide-react"
+import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play, Bell } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
@@ -19,7 +19,10 @@ const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Jul
 
 interface Appt {
   id: string
+  patientId: string
   patientName: string
+  patientEmail: string | null
+  patientPhone: string | null
   startTime: string
   endTime: string
   status: string
@@ -51,9 +54,12 @@ export default function AgendaPage() {
       const res = await fetch(`/api/agendamentos?startDate=${startOfMonth.toISOString()}&endDate=${endOfMonth.toISOString()}`, { signal })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      const mapped = (data || []).map((apt: { id: string; patient: { name: string }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
+      const mapped = (data || []).map((apt: { id: string; patientId: string; patient: { name: string; email: string | null; phone: string | null }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
         id: apt.id,
+        patientId: apt.patientId,
         patientName: apt.patient?.name || "Paciente",
+        patientEmail: apt.patient?.email || null,
+        patientPhone: apt.patient?.phone || null,
         startTime: formatTime(apt.startTime),
         endTime: formatTime(apt.endTime),
         status: apt.status,
@@ -119,6 +125,35 @@ export default function AgendaPage() {
       toast.error("Erro ao atualizar status")
     }
   }, [fetchAppointments])
+
+  const handleSendReminder = useCallback(async (appt: Appt) => {
+    try {
+      const channels = []
+      if (appt.patientEmail) channels.push("EMAIL")
+      if (appt.patientPhone) channels.push("WHATSAPP")
+      if (channels.length === 0) {
+        toast.error("Paciente não tem email nem WhatsApp cadastrados")
+        return
+      }
+      const date = `${appt.startTime}`
+      for (const channel of channels) {
+        const res = await fetch("/api/notificacoes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "Lembrete de consulta",
+            message: `Lembrete: consulta de ${appt.patientName} em ${date}`,
+            channel,
+            patientId: appt.patientId,
+          }),
+        })
+        if (!res.ok) throw new Error()
+      }
+      toast.success(`Lembrete enviado por ${channels.join(" e ")}`)
+    } catch {
+      toast.error("Erro ao enviar lembrete")
+    }
+  }, [])
 
   async function handleNewAppointment(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -430,6 +465,15 @@ export default function AgendaPage() {
                   <Button size="sm" asChild>
                     <Link href="/sala-virtual"><Video className="mr-1 h-4 w-4" /> Sala Virtual</Link>
                   </Button>
+                )}
+                {selectedAppt.status !== "CANCELLED" && selectedAppt.status !== "COMPLETED" && (
+                  <>
+                    {(selectedAppt.patientEmail || selectedAppt.patientPhone) && (
+                      <Button size="sm" variant="outline" className="border-blue-300 text-blue-600" onClick={() => handleSendReminder(selectedAppt)}>
+                        <Bell className="mr-1 h-4 w-4" /> Enviar Lembrete
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
