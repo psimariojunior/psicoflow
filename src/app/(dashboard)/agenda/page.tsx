@@ -183,7 +183,11 @@ export default function AgendaPage() {
     const date = formData.get("date") as string
     const startTime = formData.get("startTime") as string
     const duration = parseInt(formData.get("duration") as string) || 50
-    const startDateTime = new Date(`${date}T${startTime}:00`)
+    const offset = -new Date().getTimezoneOffset()
+    const sign = offset >= 0 ? '+' : '-'
+    const pad = (n: number) => String(Math.abs(Math.floor(n))).padStart(2, '0')
+    const tz = `${sign}${pad(offset / 60)}:${pad(offset % 60)}`
+    const startDateTime = new Date(`${date}T${startTime}:00${tz}`)
     try {
       const res = await fetch("/api/agendamentos", {
         method: "POST",
