@@ -90,6 +90,7 @@ function EntrarSalaForm() {
   const [micOn, setMicOn] = useState(true)
   const [patientName, setPatientName] = useState("")
   const [psychologistPresent, setPsychologistPresent] = useState(false)
+  const [cameraReady, setCameraReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
@@ -106,6 +107,7 @@ function EntrarSalaForm() {
       const data = await res.json()
       streamRef.current?.getTracks().forEach((t) => t.stop())
       streamRef.current = null
+      setCameraReady(false)
       setToken(data.token)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao conectar")
@@ -120,6 +122,7 @@ function EntrarSalaForm() {
         if (videoRef.current) {
           videoRef.current.srcObject = s
         }
+        setCameraReady(true)
       })
       .catch(() => {
         toast.error("Permita acesso à câmera e microfone nas configurações do navegador")
@@ -129,6 +132,7 @@ function EntrarSalaForm() {
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop())
     streamRef.current = null
+    setCameraReady(false)
   }, [])
 
   const toggleCamera = () => setCameraOn((c) => {
@@ -160,7 +164,7 @@ function EntrarSalaForm() {
   }, [])
 
   useEffect(() => {
-    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null }
+    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null; setCameraReady(false) }
   }, [])
 
   if (token) {
@@ -210,9 +214,9 @@ function EntrarSalaForm() {
               <div className="md:col-span-3">
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] ring-1 ring-white/10 shadow-2xl backdrop-blur-xl">
                   <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-800 to-black">
-                    <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${streamRef.current ? "block" : "hidden"}`} />
+                    <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${cameraReady ? "block" : "hidden"}`} />
 
-                    {!streamRef.current && !connecting && (
+                    {!cameraReady && !connecting && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-8">
                         <div className="h-20 w-20 rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.08] flex items-center justify-center">
                           <Camera className="h-9 w-9 text-white/30" />
@@ -227,7 +231,7 @@ function EntrarSalaForm() {
                       </div>
                     )}
 
-                    {streamRef.current && (
+                    {cameraReady && (
                       <div className="absolute inset-0">
                         <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md ring-1 ring-white/10">
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50" />
