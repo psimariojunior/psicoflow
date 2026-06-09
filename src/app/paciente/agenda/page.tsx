@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
-import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight, Sparkles, Shield, Video, Heart } from "lucide-react"
+import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight, Sparkles, Shield, Video, Heart, XCircle } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -50,6 +50,7 @@ export default function AgendaPacientePage() {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [selectedModality, setSelectedModality] = useState<string>("online")
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [cancelling, setCancelling] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
 
@@ -120,6 +121,27 @@ export default function AgendaPacientePage() {
       setBookingLoading(false)
     }
   }, [selectedSlot, token, patient, selectedModality])
+
+  const handleCancel = useCallback(async (appointmentId: string) => {
+    if (!token) return
+    setCancelling(appointmentId)
+    try {
+      const res = await fetch(`/api/pacientes/agendamentos/${appointmentId}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Erro ao cancelar")
+      }
+      toast.success("Consulta cancelada")
+      setAppointments((prev) => prev.map((a) => a.id === appointmentId ? { ...a, status: "CANCELLED" } : a))
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao cancelar")
+    } finally {
+      setCancelling(null)
+    }
+  }, [token])
 
   const upcoming = appointments.filter((a) => new Date(a.startTime) > new Date() && a.status !== "CANCELLED")
   const past = appointments.filter((a) => new Date(a.startTime) <= new Date() || a.status === "CANCELLED")
@@ -220,6 +242,14 @@ export default function AgendaPacientePage() {
                           <div className="text-xs text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-full">
                             {a.modality === "online" ? "Online" : "Presencial"}
                           </div>
+                          <button
+                            onClick={() => handleCancel(a.id)}
+                            disabled={cancelling === a.id}
+                            className="text-gray-500 hover:text-red-400 transition-colors p-1 disabled:opacity-50"
+                            title="Cancelar consulta"
+                          >
+                            {cancelling === a.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-5 w-5" />}
+                          </button>
                         </div>
                       </div>
                     ))}
