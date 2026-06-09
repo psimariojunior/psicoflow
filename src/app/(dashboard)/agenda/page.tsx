@@ -134,7 +134,8 @@ export default function AgendaPage() {
       toast.error("Paciente não tem email nem WhatsApp cadastrados")
       return
     }
-    const date = `${appt.startTime}`
+    const appointmentDate = `${selectedDate.getDate()} de ${months[selectedDate.getMonth()]} de ${selectedDate.getFullYear()}`
+    const appointmentTime = appt.startTime
     const sent: string[] = []
     const failed: string[] = []
     for (const channel of channels) {
@@ -144,9 +145,11 @@ export default function AgendaPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             title: "Lembrete de consulta",
-            message: `Lembrete: consulta de ${appt.patientName} em ${date}`,
+            message: `Lembrete: consulta de ${appt.patientName}`,
             channel,
             patientId: appt.patientId,
+            appointmentDate,
+            appointmentTime,
           }),
         })
         if (res.ok) {
@@ -167,7 +170,7 @@ export default function AgendaPage() {
     if (failed.length > 0) {
       toast.error(`Falha ao enviar por ${failed.join(" e ")}`)
     }
-  }, [])
+  }, [selectedDate])
 
   async function handleNewAppointment(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

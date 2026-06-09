@@ -6,7 +6,9 @@ import { sendAppointmentReminderWhatsApp } from "./whatsapp"
 export async function sendReminderNow(
   patientId: string,
   channel: string,
-  psychologistName: string
+  psychologistName: string,
+  appointmentDate?: string,
+  appointmentTime?: string
 ): Promise<boolean> {
   const patient = await prisma.patient.findUnique({
     where: { id: patientId },
@@ -21,8 +23,8 @@ export async function sendReminderNow(
       patient.email,
       patient.name,
       psychologistName,
-      "",
-      "",
+      appointmentDate || "",
+      appointmentTime || "",
       "Atendimento",
       "presential"
     )
@@ -30,8 +32,8 @@ export async function sendReminderNow(
     success = await sendAppointmentReminderWhatsApp(
       patient.phone,
       patient.name,
-      "",
-      ""
+      appointmentDate || "",
+      appointmentTime || ""
     )
   }
 
