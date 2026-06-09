@@ -9,18 +9,20 @@ import "@livekit/components-styles"
 import { Video, Loader2, Link2, Copy, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 
-export default function VirtualRoomPage({ params }: { params?: { id: string } }) {
-  const [roomName, setRoomName] = useState(params?.id || `sala-${Date.now()}`)
+export default function VirtualRoomPage() {
+  const [roomName, setRoomName] = useState(`sala-${Date.now()}`)
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
 
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL
+
+  const sanitize = (name: string) => name.replace(/[^a-zA-Z0-9_-]/g, "-")
 
   const handleConnect = useCallback(async () => {
     setConnecting(true)
     try {
-      const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(roomName)}`)
+      const res = await fetch(`/api/livekit/token?room=${encodeURIComponent(sanitize(roomName))}`)
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error || "Erro ao gerar token")
@@ -57,7 +59,7 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
     setRoomName(`sala-${Date.now()}`)
   }, [roomName])
 
-  const patientLink = `${typeof window !== "undefined" ? window.location.origin : ""}/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`
+  const patientLink = `${window.location.origin}/sala-virtual/entrar?room=${encodeURIComponent(sanitize(roomName))}`
 
   if (token) {
     return (
@@ -111,8 +113,7 @@ export default function VirtualRoomPage({ params }: { params?: { id: string } })
               <Input value={roomName} onChange={(e) => setRoomName(e.target.value)} className="text-xs mt-1" />
             </div>
             <Button variant="outline" className="w-full" size="sm" onClick={() => {
-              const url = `${window.location.origin}/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`
-              navigator.clipboard.writeText(url)
+              navigator.clipboard.writeText(patientLink)
               toast.success("Link copiado!")
             }}>
               <Link2 className="mr-2 h-4 w-4" /> Copiar Link do Paciente

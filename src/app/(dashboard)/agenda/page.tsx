@@ -1,17 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, formatTime } from "@/lib/utils"
-import { Plus, ChevronLeft, ChevronRight, Calendar, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play } from "lucide-react"
+import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
@@ -45,32 +44,42 @@ export default function AgendaPage() {
   const [selectedAppt, setSelectedAppt] = useState<Appt | null>(null)
   const [showDetail, setShowDetail] = useState(false)
 
-  useEffect(() => {
+  const fetchAppointments = useCallback(async (signal?: AbortSignal) => {
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
     const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59)
-    fetch(`/api/agendamentos?startDate=${startOfMonth.toISOString()}&endDate=${endOfMonth.toISOString()}`)
-      .then((res) => { if (!res.ok) throw new Error(); return res.json() })
-      .then((data) => {
-        const mapped = (data || []).map((apt: { id: string; patient: { name: string }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
-          id: apt.id,
-          patientName: apt.patient?.name || "Paciente",
-          startTime: formatTime(apt.startTime),
-          endTime: formatTime(apt.endTime),
-          status: apt.status,
-          modality: apt.modality,
-          type: apt.type,
-          day: new Date(apt.startTime).getDate(),
-        }))
-        setAppointments(mapped)
-      })
-      .catch(() => setAppointments([]))
-      .finally(() => setLoading(false))
+    try {
+      const res = await fetch(`/api/agendamentos?startDate=${startOfMonth.toISOString()}&endDate=${endOfMonth.toISOString()}`, { signal })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const mapped = (data || []).map((apt: { id: string; patient: { name: string }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
+        id: apt.id,
+        patientName: apt.patient?.name || "Paciente",
+        startTime: formatTime(apt.startTime),
+        endTime: formatTime(apt.endTime),
+        status: apt.status,
+        modality: apt.modality,
+        type: apt.type,
+        day: new Date(apt.startTime).getDate(),
+      }))
+      setAppointments(mapped)
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return
+      toast.error("Erro ao carregar agendamentos")
+      setAppointments([])
+    }
+  }, [currentDate])
 
-    fetch("/api/pacientes?limit=100")
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchAppointments(controller.signal).finally(() => setLoading(false))
+
+    fetch("/api/pacientes?limit=100", { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => setPatients(data.patients || []))
       .catch(() => {})
-  }, [currentDate])
+
+    return () => controller.abort()
+  }, [fetchAppointments])
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
@@ -89,6 +98,27 @@ export default function AgendaPage() {
     appointments.filter((apt) => apt.day === day)
 
   const timeSlots = Array.from({ length: 12 }, (_, i) => `${(i + 7).toString().padStart(2, "0")}:00`)
+
+  const handleUpdateStatus = useCallback(async (id: string, statusOrMethod: string) => {
+    try {
+      if (statusOrMethod === "DELETE") {
+        if (!confirm("Cancelar esta consulta?")) return
+        await fetch(`/api/agendamentos/${id}`, { method: "DELETE" })
+      } else {
+        await fetch(`/api/agendamentos/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: statusOrMethod }),
+        })
+      }
+      toast.success("Status atualizado!")
+      setShowDetail(false)
+      setSelectedAppt(null)
+      fetchAppointments()
+    } catch {
+      toast.error("Erro ao atualizar status")
+    }
+  }, [fetchAppointments])
 
   async function handleNewAppointment(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -115,19 +145,7 @@ export default function AgendaPage() {
       if (!res.ok) throw new Error()
       toast.success("Consulta agendada com sucesso!")
       setShowDialog(false)
-      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-      const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59)
-      const data = await fetch(`/api/agendamentos?startDate=${startOfMonth.toISOString()}&endDate=${endOfMonth.toISOString()}`).then(r => r.json())
-      setAppointments((data || []).map((apt: { id: string; patient: { name: string }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
-        id: apt.id,
-        patientName: apt.patient?.name || "Paciente",
-        startTime: formatTime(apt.startTime),
-        endTime: formatTime(apt.endTime),
-        status: apt.status,
-        modality: apt.modality,
-        type: apt.type,
-        day: new Date(apt.startTime).getDate(),
-      })))
+      fetchAppointments()
     } catch {
       toast.error("Erro ao agendar consulta")
     }
@@ -181,6 +199,12 @@ export default function AgendaPage() {
                   <Input id="date" name="date" type="date" required />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="startTime">Horário</Label>
+                  <Input id="startTime" name="startTime" type="time" required />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="duration">Duração</Label>
                   <Select name="duration" defaultValue="50">
                     <SelectTrigger><SelectValue /></SelectTrigger>
@@ -192,26 +216,16 @@ export default function AgendaPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="startTime">Horário Início</Label>
-                  <Input id="startTime" name="startTime" type="time" required />
+                  <Label htmlFor="modality">Modalidade</Label>
+                  <Select name="modality" defaultValue="presential">
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="presential">Presencial</SelectItem>
+                      <SelectItem value="online">Online</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">Horário Fim</Label>
-                  <Input id="endTime" name="endTime" type="time" required />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="modality">Modalidade</Label>
-                <Select name="modality" defaultValue="presential">
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="presential">Presencial</SelectItem>
-                    <SelectItem value="online">Online</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Tipo</Label>
@@ -226,13 +240,15 @@ export default function AgendaPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Valor</Label>
-                <Input id="price" name="price" type="number" step="0.01" placeholder="0,00" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="notes">Observações</Label>
-                <Textarea id="notes" name="notes" rows={2} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="price">Valor</Label>
+                  <Input id="price" name="price" type="number" step="0.01" placeholder="0,00" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Observações</Label>
+                  <Textarea id="notes" name="notes" rows={2} />
+                </div>
               </div>
               <Button type="submit">Agendar Consulta</Button>
             </form>
@@ -313,9 +329,9 @@ export default function AgendaPage() {
             {formatDate(selectedDate)} — Agenda do Dia
           </h3>
           <div className="space-y-2">
-            {  timeSlots.map((time) => {
+            {timeSlots.map((time) => {
               const slotAppointments = appointments.filter(
-                (apt) => apt.startTime <= time && apt.endTime > time && apt.day === selectedDate.getDate()
+                (apt) => apt.startTime.slice(0, 2) === time.slice(0, 2) && apt.day === selectedDate.getDate()
               )
               return (
                 <div key={time} className="flex gap-4 group">
@@ -393,37 +409,19 @@ export default function AgendaPage() {
                 {selectedAppt.status !== "CANCELLED" && selectedAppt.status !== "COMPLETED" && (
                   <>
                     {selectedAppt.status !== "CONFIRMED" && (
-                      <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-600" onClick={async () => {
-                        await fetch(`/api/agendamentos/${selectedAppt.id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({status: "CONFIRMED"}) })
-                        toast.success("Consulta confirmada!")
-                        setShowDetail(false); setSelectedAppt(null); window.location.reload()
-                      }}>
+                      <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-600" onClick={() => handleUpdateStatus(selectedAppt.id, "CONFIRMED")}>
                         <CheckCircle className="mr-1 h-4 w-4" /> Confirmar
                       </Button>
                     )}
                     {selectedAppt.status !== "IN_PROGRESS" && (
-                      <Button size="sm" variant="outline" className="border-amber-300 text-amber-600" onClick={async () => {
-                        await fetch(`/api/agendamentos/${selectedAppt.id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({status: "IN_PROGRESS"}) })
-                        toast.success("Consulta iniciada!")
-                        setShowDetail(false); setSelectedAppt(null); window.location.reload()
-                      }}>
+                      <Button size="sm" variant="outline" className="border-amber-300 text-amber-600" onClick={() => handleUpdateStatus(selectedAppt.id, "IN_PROGRESS")}>
                         <Play className="mr-1 h-4 w-4" /> Iniciar
                       </Button>
                     )}
-                    <Button size="sm" variant="outline" className="border-gray-300" onClick={async () => {
-                      await fetch(`/api/agendamentos/${selectedAppt.id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({status: "COMPLETED"}) })
-                      toast.success("Consulta concluída!")
-                      setShowDetail(false); setSelectedAppt(null); window.location.reload()
-                    }}>
+                    <Button size="sm" variant="outline" className="border-gray-300" onClick={() => handleUpdateStatus(selectedAppt.id, "COMPLETED")}>
                       <CheckCircle className="mr-1 h-4 w-4" /> Concluir
                     </Button>
-                    <Button size="sm" variant="outline" className="border-red-300 text-red-600" onClick={async () => {
-                      if (confirm("Cancelar esta consulta?")) {
-                        await fetch(`/api/agendamentos/${selectedAppt.id}`, { method: "DELETE" })
-                        toast.success("Consulta cancelada!")
-                        setShowDetail(false); setSelectedAppt(null); window.location.reload()
-                      }
-                    }}>
+                    <Button size="sm" variant="outline" className="border-red-300 text-red-600" onClick={() => handleUpdateStatus(selectedAppt.id, "DELETE")}>
                       <XCircle className="mr-1 h-4 w-4" /> Cancelar
                     </Button>
                   </>

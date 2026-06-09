@@ -5,10 +5,11 @@ import { StatsCards } from "@/components/dashboard/stats-cards"
 import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments"
 import { RecentPatients } from "@/components/dashboard/recent-patients"
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Calendar, UserPlus, FileText, Video, Loader2 } from "lucide-react"
 import Link from "next/link"
+import toast from "react-hot-toast"
 
 const quickActions = [
   { label: "Nova Consulta", href: "/agenda", icon: Calendar, color: "bg-blue-500" },
@@ -27,11 +28,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/dashboard")
+    const controller = new AbortController()
+    fetch("/api/dashboard", { signal: controller.signal })
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then(setData)
-      .catch(() => setData(null))
+      .catch((err) => {
+        if (err?.name === "AbortError") return
+        toast.error("Erro ao carregar dados do dashboard")
+        setData(null)
+      })
       .finally(() => setLoading(false))
+    return () => controller.abort()
   }, [])
 
   if (loading) {
