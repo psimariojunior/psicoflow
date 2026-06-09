@@ -23,16 +23,24 @@ function EntrarSalaForm() {
 
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
 
+  const handleEnterPrejoin = useCallback(async () => {
+    const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }).catch(() => null)
+    if (s) streamRef.current = s
+    setStep("prejoin")
+  }, [])
+
   useEffect(() => {
     if (step === "prejoin") {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then((s) => {
-          streamRef.current = s
-          if (videoRef.current) videoRef.current.srcObject = s
-          s.getVideoTracks().forEach((t) => (t.enabled = cameraOn))
-          s.getAudioTracks().forEach((t) => (t.enabled = micOn))
-        })
-        .catch(() => { setCameraOn(false); setMicOn(false) })
+      if (streamRef.current && videoRef.current) {
+        videoRef.current.srcObject = streamRef.current
+      } else if (!streamRef.current) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then((s) => {
+            streamRef.current = s
+            if (videoRef.current) videoRef.current.srcObject = s
+          })
+          .catch(() => {})
+      }
     }
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -179,7 +187,7 @@ function EntrarSalaForm() {
               <Button
                 className="w-full h-12 text-base"
                 size="lg"
-                onClick={() => roomInput.trim() && setStep("prejoin")}
+                onClick={() => roomInput.trim() && handleEnterPrejoin()}
                 disabled={!roomInput.trim()}
               >
                 Continuar
