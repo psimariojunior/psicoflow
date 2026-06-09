@@ -3,7 +3,7 @@ import { processPendingNotifications } from "@/lib/notifications"
 
 import nodemailer from "nodemailer"
 
-async function testBrevo(): Promise<{ ok: boolean; message: string }> {
+async function testBrevo(): Promise<{ ok: boolean; message: string; code?: string; response?: string }> {
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
   const host = process.env.SMTP_HOST
