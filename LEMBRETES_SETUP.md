@@ -1,90 +1,178 @@
 # Setup — Lembretes Automáticos
 
-## 1. Email (Já funciona)
+## 1. Email — Já funciona
 
-SMTP Outlook já configurado no Vercel:
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
-
-Teste: crie uma consulta na agenda → o sistema agenda lembretes (24h + 1h antes).
+SMTP Outlook já configurado no Vercel. Nada a fazer.
 
 ---
 
-## 2. WhatsApp — Meta Cloud API
+## 2. WhatsApp — Passo a passo completo (~30 min)
 
-### 2.1 Criar conta Meta Business
+### 2.1 Criar Conta Comercial no Meta Business
 
 1. Acesse https://business.facebook.com/overview
-2. Crie uma **Conta Comercial** (se não tiver)
-3. Adicione seu WhatsApp pessoal em **Contas do WhatsApp**
+2. Clique **"Criar conta"**
+3. Nome da conta: **PsicoFlow**
+4. Seu nome: **Mário Júnior**
+5. Email: use o mesmo do Facebook/Instagram
+6. Siga os passos até concluir
 
-### 2.2 Criar template de mensagem
+### 2.2 Conectar WhatsApp pessoal
 
-1. Vá em https://business.facebook.com/wa/manage/message-templates/
-2. Clique **Criar template**
+1. Dentro do Business Manager, vá em **Configurações** (engrenagem no canto superior direito)
+2. Menu lateral: **Contas do WhatsApp**
+3. Clique **"Adicionar conta do WhatsApp"**
+4. Escolha **"Registrar número de telefone existente"**
+5. Digite seu número pessoal com DDD (Ex: 5511999999999)
+6. Você receberá um SMS com código de 6 dígitos — insira
+7. Pronto: o número agora é uma **Conta do WhatsApp Business**
+
+### 2.3 Criar App no Meta Developers
+
+1. Acesse https://developers.facebook.com/apps/
+2. Clique **"Criar aplicativo"** (azul, canto superior direito)
+3. Escolha **"Empresa"** como tipo de app
+4. Nome: **PsicoFlow**
+5. Email de contato: seu email
+6. Clique **"Criar aplicativo"**
+7. Complete o captcha se pedir
+
+### 2.4 Adicionar produto WhatsApp
+
+1. Na página do app, desça até **"Adicionar produtos"**
+2. Encontre **"WhatsApp"** e clique **"Configurar"**
+
+### 2.5 Configurar número e pegar IDs
+
+1. Na página de configuração do WhatsApp, desça até **"Enviar mensagens"**
+2. Em **"Números de telefone"**, clique **"Adicionar número"**
+3. Selecione o mesmo número que você conectou no passo 2.2
+4. Após adicionar, anote:
+   - **Phone Number ID** (número, tipo: `123456789012345`)
+5. Role até **"Permanente"** abaixo de "Tokens de acesso"
+   - Se não aparecer, continue no passo 2.6
+
+### 2.6 Gerar Token de Acesso Permanente
+
+1. Acesse https://developers.facebook.com/tools/accesstoken/
+2. Faça login com a mesma conta
+3. Selecione o app **PsicoFlow**
+4. Clique **"Gerar Token de Acesso"**
+5. Permissões: marque `whatsapp_business_messaging` e `whatsapp_business_management`
+6. Clique **"Gerar"** — copie o token (começa com `EA...`)
+7. Agora vá em https://business.facebook.com/latest/settings/business_users
+8. No menu esquerdo, clique **"Usuários do sistema"**
+9. Clique **"Adicionar"** → **"Usuário do sistema"**
+10. Nome: **PsicoFlowAPI**
+11. Função: **Admin**
+12. Clique **"Criar usuário"**
+13. Na página do usuário, vá em **"Token de acesso"**
+14. Clique **"Gerar token"**
+15. Selecione o app **PsicoFlow**
+16. Permissões: `whats_business_messaging`, `whatsapp_business_management`
+17. Clique **"Gerar"**
+18. **IMPORTANTE**: Copie o token AGORA — depois de fechar não aparece de novo
+
+### 2.7 Criar template de mensagem
+
+1. Acesse https://business.facebook.com/wa/manage/message-templates/
+2. Clique **"Criar template"** (azul, canto superior direito)
 3. Dados:
-   - **Nome**: `lembrete_consulta`
-   - **Idioma**: `Português (Brasil)`
-   - **Categoria**: `Utility`
-4. No corpo da mensagem:
+   - **Nome**: `lembrete_consulta` (exatamente este nome)
+   - **Idioma**: `Português (Brasil) — pt_BR`
+   - **Categoria**: `Utilitário / Utility`
+   - **Tipo**: `Texto / Text`
+4. No campo **Corpo da mensagem**, digite:
    ```
-   Olá {{1}}, lembrete da sua consulta em {{2}} às {{3}}.
+   Olá {{1}}, passando para lembrar da sua consulta agendada no dia {{2}} às {{3}}. Confirme sua presença!
    ```
-5. Adicione um botão (opcional): "Ver detalhes" com link para o site
-6. Envie para aprovação (geralmente leva minutos)
+5. Clique **"Concluir"** e depois **"Enviar para análise"**
+6. A aprovação costuma levar de 5 min a 2 horas
 
-### 2.3 Gerar token de acesso
+### 2.8 Adicionar env vars no Vercel
 
-1. Vá em https://developers.facebook.com/apps/
-2. Crie um **App do tipo "Empresa"**
-3. Adicione o produto **WhatsApp**
-4. Configure o número de telefone:
-   - **Phone Number ID** → anote este ID
-5. Gere um **Token de Acesso Permanente**:
-   - Vá em Ferramentas → **Graph API Explorer**
-   - Selecione o app, permissão `whatsapp_business_messaging`
-   - Gere o token, depois use o `Access Token Tool` para torná-lo permanente
+1. Acesse https://vercel.com/psimariojunior/psicoflow/settings/environment-variables
+2. Adicione duas variáveis (ambas **Production** apenas):
 
-### 2.4 Configurar no Vercel
+| Nome | Valor |
+|------|-------|
+| `WHATSAPP_API_TOKEN` | Token permanente gerado no passo 2.6 |
+| `WHATSAPP_PHONE_NUMBER_ID` | Phone Number ID do passo 2.5 (só números) |
 
-Adicione estas env vars no Vercel (Production):
-
-```
-WHATSAPP_API_TOKEN=<token_permanente>
-WHATSAPP_PHONE_NUMBER_ID=<id_do_numero>
-```
+3. Após adicionar, vá até o deploy mais recente e clique **"Redeploy"**
 
 ---
 
-## 3. Cron Job — Disparo Automático
+## 3. Cron Job — Disparo Automático (5 min)
 
 O Vercel Hobby **não tem cron nativo**. Use cron-job.org (grátis):
 
-1. Crie conta em https://cron-job.org
-2. Clique **Create Cronjob**
-3. Configure:
+1. Acesse https://cron-job.org
+2. Clique **"Sign up"** (canto superior direito)
+3. Email: qualquer um (pode ser o mesmo do projeto)
+4. Senha: escolha uma
+5. Confirme o email (checa spam!)
+6. Clique **"Create Cronjob"**
+7. Configure:
+   - **Title**: `PsicoFlow - Lembretes`
    - **URL**: `https://psicoflow-iota.vercel.app/api/cron/lembretes`
    - **Execution interval**: `Every 30 minutes`
    - **Request Method**: `GET`
-4. Salve
-
-A cada 30 min, a rota verifica notificações pendentes com `scheduledAt <= agora` e dispara.
+8. Role e clique **"Create"**
 
 ---
 
-## 4. Verificar se está funcionando
+## 4. Testar tudo
 
-1. Crie uma consulta na agenda para daqui a 2 horas
-2. Acesse `https://psicoflow-iota.vercel.app/api/cron/lembretes` manualmente (uma vez)
-3. Veja o log no Vercel:
-   - `Dashboard` → `Deployments` → clique no último → `Functions`
-   - Procure `api/cron/lembretes`
-   - Deve mostrar: `Notifications processed: { total: 2, sent: 2, failed: 0 }`
+### 4.1 Testar email (já funciona)
+
+1. Acesse o PsicoFlow → **Agenda**
+2. Crie uma consulta para **daqui a 2 horas**
+3. Abra os detalhes da consulta
+4. Clique **"Enviar Lembrete"**
+5. Deve aparecer toast: *"Lembrete enviado por EMAIL"*
+6. Verifique a caixa de entrada do paciente
+
+### 4.2 Testar WhatsApp (após configurar)
+
+1. Repita os passos acima
+2. Desta vez, deve aparecer: *"Lembrete enviado por EMAIL e WHATSAPP"*
+3. Verifique o WhatsApp do paciente
+
+### 4.3 Testar o cron
+
+1. Depois de criar uma consulta futura, acesse manualmente:
+   https://psicoflow-iota.vercel.app/api/cron/lembretes
+2. Resposta esperada: `{ "ok": true, "processed": 2, "sent": 2, "failed": 0 }`
 
 ---
 
-## 5. Envio manual (botão na agenda)
+## 5. Estrutura de arquivos (só para referência)
 
-Na tela de detalhes da consulta, clique **Enviar Lembrete**:
-- Dispara imediatamente para o email do paciente
-- Se paciente tem WhatsApp cadastrado, também envia por WhatsApp
-- O envio é **síncrono** — você vê toast de sucesso ou erro
+```
+src/lib/email.ts          → sendEmail(), sendAppointmentReminderEmail()
+src/lib/whatsapp.ts       → sendWhatsAppMessage(), sendAppointmentReminderWhatsApp()
+src/lib/notifications.ts  → scheduleReminders(), dispatchNotification(), processPendingNotifications()
+src/app/api/cron/lembretes/route.ts  → GET/POST (chamado pelo cron-job.org)
+```
+
+---
+
+## 6. Troubleshooting
+
+**"Lembrete enviado por EMAIL" mas paciente não recebeu**
+   → Verificar caixa de spam
+   → Outlook pode bloquear por segurança → liberar em https://account.live.com/activity
+
+**"Erro ao enviar lembrete"**
+   → O paciente não tem email nem WhatsApp cadastrado na ficha
+   → Verificar `Pacientes` → editar paciente → email/telefone
+
+**WhatsApp não enviou mesmo com número cadastrado**
+   → Template `lembrete_consulta` ainda não foi aprovado
+   → Verificar status em https://business.facebook.com/wa/manage/message-templates/
+   → Token expirou → gerar novamente
+
+**Token expirou**
+   → O token de usuário do sistema (sistema) não expira
+   → Se usou token de app normal, refazer passo 2.6
