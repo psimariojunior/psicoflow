@@ -1,19 +1,16 @@
 import { NextResponse } from "next/server"
 import { processPendingNotifications } from "@/lib/notifications"
-import { Resend } from "resend"
+import { sendEmail } from "@/lib/email"
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url)
 
-    if (url.searchParams.has("testresend")) {
+    if (url.searchParams.has("testbrevo")) {
       const to = url.searchParams.get("to") || ""
       if (!to) return NextResponse.json({ ok: false, error: "?to=email" })
-      const apiKey = process.env.RESEND_API_KEY
-      const from = process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>"
-      const resend = new Resend(apiKey || "")
-      const result = await resend.emails.send({ from, to: [to], subject: "Teste PsicoFlow", html: "<p>Teste via Resend</p>" })
-      return NextResponse.json({ ok: true, result })
+      const err = await sendEmail(to, "Teste PsicoFlow", "<p>Teste via Brevo</p>")
+      return NextResponse.json({ ok: err === null, error: err })
     }
 
     const force = url.searchParams.get("force") === "true"
