@@ -136,6 +136,8 @@ export default function AgendaPage() {
         return
       }
       const date = `${appt.startTime}`
+      const sent: string[] = []
+      const failed: string[] = []
       for (const channel of channels) {
         const res = await fetch("/api/notificacoes", {
           method: "POST",
@@ -147,9 +149,18 @@ export default function AgendaPage() {
             patientId: appt.patientId,
           }),
         })
-        if (!res.ok) throw new Error()
+        if (res.ok) {
+          sent.push(channel === "EMAIL" ? "Email" : "WhatsApp")
+        } else {
+          failed.push(channel === "EMAIL" ? "Email" : "WhatsApp")
+        }
       }
-      toast.success(`Lembrete enviado por ${channels.join(" e ")}`)
+      if (sent.length > 0) {
+        toast.success(`Lembrete enviado por ${sent.join(" e ")}`)
+      }
+      if (failed.length > 0) {
+        toast.error(`Falha ao enviar por ${failed.join(" e ")}`)
+      }
     } catch {
       toast.error("Erro ao enviar lembrete")
     }
