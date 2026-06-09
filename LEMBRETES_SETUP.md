@@ -1,8 +1,23 @@
 # Setup — Lembretes Automáticos
 
-## 1. Email — Já funciona
+## 1. Email — Resend (grátis, 100 emails/dia)
 
-SMTP Outlook já configurado no Vercel. Nada a fazer.
+### 1.1 Criar conta no Resend
+1. Acesse https://resend.com
+2. Cadastre-se (email + senha ou Google)
+3. Confirme seu email
+4. Vá em **API Keys** → **Add API Key** → copie a chave
+
+### 1.2 Adicionar no Vercel
+1. https://vercel.com/psimariojunior/psicoflow/settings/environment-variables
+2. Adicione:
+   - `RESEND_API_KEY` = chave copiada do Resend
+   - `EMAIL_FROM` = `PsicoFlow <onboarding@resend.dev>` (para testes)
+
+### 1.3 Para enviar para emails reais
+- No Resend, vá em **Domains** → **Add Domain** e adicione seu domínio (ex: `psicoflow.com.br`)
+- Siga as instruções de DNS (registro TXT)
+- Depois de verificado, troque `EMAIL_FROM` para `PsicoFlow <contato@seudominio.com>`
 
 ---
 

@@ -129,12 +129,10 @@ NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="seu-secret-aqui"
 ```
 
-### Email (SMTP)
+### Email (Resend)
 ```env
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="587"
-SMTP_USER="seu-email@gmail.com"
-SMTP_PASS="sua-senha-de-app"
+RESEND_API_KEY="re_xxxxxxxxxxxx"
+EMAIL_FROM="PsicoFlow <onboarding@resend.dev>"
 ```
 
 ## 🌐 **Estrutura do Projeto**
