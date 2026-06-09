@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { usePatientAuth } from "../layout"
 import toast from "react-hot-toast"
-import { Loader2, Calendar, Clock, Video, ChevronLeft, ChevronRight } from "lucide-react"
+import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -13,7 +12,6 @@ interface Appointment {
   endTime: string
   status: string
   modality: string | null
-  onlineRoomUrl: string | null
   psychologist: { name: string }
 }
 
@@ -44,7 +42,6 @@ function formatTime(iso: string): string {
 
 export default function AgendaPacientePage() {
   const { patient, token } = usePatientAuth()
-  const router = useRouter()
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loadingAppts, setLoadingAppts] = useState(true)
   const [showBooking, setShowBooking] = useState(false)
@@ -159,10 +156,6 @@ export default function AgendaPacientePage() {
                         <p className="text-white/50 text-sm mt-1">
                           <Clock className="h-3.5 w-3.5 inline mr-1" />
                           {formatTime(a.startTime)} — {formatTime(a.endTime)}
-                        </p>
-                        <p className="text-white/30 text-xs mt-1">
-                          <Video className="h-3 w-3 inline mr-1" />
-                          {a.modality === "online" ? "Online" : "Presencial"}
                         </p>
                       </div>
                     </div>
