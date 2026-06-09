@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
 
-    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/api/livekit")) {
+    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/debug-email") && !pathname.startsWith("/api/test-email")) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
 
@@ -40,7 +40,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/debug-email") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
+        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/debug-email") || pathname.startsWith("/api/test-email") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
           return true
         }
         if (pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar")) {
