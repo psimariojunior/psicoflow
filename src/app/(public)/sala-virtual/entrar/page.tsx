@@ -1,52 +1,22 @@
 "use client"
 
-import { Suspense, useState, useCallback, useRef, useEffect } from "react"
+import { Suspense, useState, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, VideoConference } from "@livekit/components-react"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi } from "lucide-react"
+import { Video, Loader2, Shield, Wifi } from "lucide-react"
+import toast from "react-hot-toast"
 
 function EntrarSalaForm() {
   const searchParams = useSearchParams()
   const roomParam = searchParams.get("room") || ""
   const [roomInput, setRoomInput] = useState(roomParam)
-  const [step, setStep] = useState(roomParam ? "prejoin" : "welcome")
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
-  const [cameraOn, setCameraOn] = useState(true)
-  const [micOn, setMicOn] = useState(true)
-  const [patientName, setPatientName] = useState("")
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const streamRef = useRef<MediaStream | null>(null)
 
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
-
-  const handleEnterPrejoin = useCallback(async () => {
-    const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }).catch(() => null)
-    if (s) streamRef.current = s
-    setStep("prejoin")
-  }, [])
-
-  useEffect(() => {
-    if (step === "prejoin") {
-      if (streamRef.current && videoRef.current) {
-        videoRef.current.srcObject = streamRef.current
-      } else if (!streamRef.current) {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-          .then((s) => {
-            streamRef.current = s
-            if (videoRef.current) videoRef.current.srcObject = s
-          })
-          .catch(() => {})
-      }
-    }
-    return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop())
-      streamRef.current = null
-    }
-  }, [step])
 
   const handleConnect = useCallback(async () => {
     setConnecting(true)
@@ -59,16 +29,12 @@ function EntrarSalaForm() {
       const data = await res.json()
       setToken(data.token)
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Erro ao conectar")
+      toast.error(e instanceof Error ? e.message : "Erro ao conectar")
     } finally {
       setConnecting(false)
     }
   }, [roomInput])
 
-  const toggleCamera = () => setCameraOn((c) => { streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !c)); return !c })
-  const toggleMic = () => setMicOn((c) => { streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = !c)); return !c })
-
-  // In call
   if (token) {
     return (
       <div className="h-screen">
@@ -76,9 +42,9 @@ function EntrarSalaForm() {
           token={token}
           serverUrl={livekitUrl}
           connect={true}
-          video={cameraOn}
-          audio={micOn}
-          onDisconnected={() => { setToken(null); setStep("welcome") }}
+          video={true}
+          audio={true}
+          onDisconnected={() => { setToken(null); setRoomInput("") }}
           style={{ height: "100%" }}
         >
           <VideoConference />
@@ -87,80 +53,6 @@ function EntrarSalaForm() {
     )
   }
 
-  // Pre-join screen
-  if (step === "prejoin") {
-    return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-4xl">
-            <div className="grid md:grid-cols-5 gap-6">
-              {/* Camera preview */}
-              <div className="md:col-span-3">
-                <div className="relative rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl">
-                  {cameraOn ? (
-                    <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center text-white/50">
-                        <VideoOff className="h-12 w-12 mx-auto mb-2" />
-                        <p className="text-sm">Câmera desligada</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-                    <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-12 w-12 shadow-lg">
-                      {cameraOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-                    </Button>
-                    <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-12 w-12 shadow-lg">
-                      {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-                    </Button>
-                  </div>
-                  {connecting && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                      <div className="text-center text-white">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
-                        <p className="text-lg font-medium">Conectando à sala...</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Sidebar */}
-              <div className="md:col-span-2 flex flex-col justify-center">
-                <div className="bg-white/5 backdrop-blur rounded-2xl p-6 text-white">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-sm text-emerald-400 font-medium">Pronto para entrar</span>
-                  </div>
-                  <h2 className="text-xl font-bold mb-1">Sala: {roomInput}</h2>
-                  <p className="text-sm text-white/60 mb-6">Sua sessão de terapia online está pronta para começar.</p>
-                  <div className="space-y-3 mb-6">
-                    <Input
-                      placeholder="Seu nome (opcional)"
-                      value={patientName}
-                      onChange={(e) => setPatientName(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                    />
-                  </div>
-                  <Button className="w-full h-12 text-base" size="lg" onClick={handleConnect} disabled={connecting}>
-                    {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                    {connecting ? "Conectando..." : "Entrar na Sala"}
-                  </Button>
-                  <div className="flex items-center justify-center gap-4 mt-4 text-xs text-white/40">
-                    <span className="flex items-center gap-1"><Shield className="h-3 w-3" /> Criptografado</span>
-                    <span className="flex items-center gap-1"><Wifi className="h-3 w-3" /> LiveKit Cloud</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Welcome screen
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="flex-1 flex items-center justify-center p-4">
@@ -187,10 +79,11 @@ function EntrarSalaForm() {
               <Button
                 className="w-full h-12 text-base"
                 size="lg"
-                onClick={() => roomInput.trim() && handleEnterPrejoin()}
-                disabled={!roomInput.trim()}
+                onClick={handleConnect}
+                disabled={connecting || !roomInput.trim()}
               >
-                Continuar
+                {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                {connecting ? "Entrando..." : "Entrar na Sala"}
               </Button>
             </div>
 
