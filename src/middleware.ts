@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
 
-    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/api/livekit")) {
+    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/cron")) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
 
