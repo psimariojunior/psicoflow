@@ -83,7 +83,7 @@ export default function VirtualRoomPage() {
             serverUrl={livekitUrl}
             connect={true}
             video={true}
-            audio={true}
+            audio={{ echoCancellation: true, noiseSuppression: true, autoGainControl: true }}
             onDisconnected={() => setToken(null)}
             style={{ height: "100%" }}
           >
