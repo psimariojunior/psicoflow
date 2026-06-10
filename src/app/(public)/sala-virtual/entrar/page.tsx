@@ -176,7 +176,7 @@ function EntrarSalaForm() {
   }, [roomInput, patientName])
 
   const startCamera = useCallback(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
       .then((s) => {
         streamRef.current = s
         if (videoRef.current) {
@@ -230,15 +230,15 @@ function EntrarSalaForm() {
   if (token) {
     return (
       <div className="h-screen relative bg-black">
-        <LiveKitRoom
-          token={token}
-          serverUrl={livekitUrl}
-          connect={true}
-          video={cameraOn}
-          audio={micOn}
-          onDisconnected={handleDisconnected}
-          style={{ height: "100%" }}
-        >
+          <LiveKitRoom
+            token={token}
+            serverUrl={livekitUrl}
+            connect={true}
+            video={cameraOn}
+            audio={micOn ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false}
+            onDisconnected={handleDisconnected}
+            style={{ height: "100%" }}
+          >
           <RoomAudioRenderer volume={1} />
           <AudioSubscriber />
           <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
