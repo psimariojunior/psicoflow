@@ -4,11 +4,71 @@ import { Suspense, useState, useCallback, useRef, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, AudioTrack } from "@livekit/components-react"
+import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, RoomAudioRenderer, useRoomContext } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import "@livekit/components-styles"
 import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar } from "lucide-react"
 import toast from "react-hot-toast"
+
+function AudioSubscriber() {
+  const room = useRoomContext()
+  const [audioCount, setAudioCount] = useState(0)
+
+  useEffect(() => {
+    if (!room) return
+    const subs = new Map<string, HTMLAudioElement>()
+
+    const attach = (pub: any) => {
+      const track = pub.track
+      if (!track || pub.kind !== "audio") return
+      if (subs.has(pub.trackSid)) return
+      console.log("[AudioSubscriber] attaching audio track:", pub.trackSid, track.mediaStreamTrack?.id)
+      const el = new Audio()
+      el.srcObject = new MediaStream([track.mediaStreamTrack])
+      el.autoplay = true
+      el.play().catch(() => {})
+      subs.set(pub.trackSid, el)
+      setAudioCount(subs.size)
+      console.log("[Audio] attached:", pub.trackSid)
+    }
+
+    const detach = (pub: any) => {
+      const el = subs.get(pub.trackSid)
+      if (el) {
+        el.pause()
+        el.srcObject = null
+        subs.delete(pub.trackSid)
+        setAudioCount(subs.size)
+      }
+    }
+
+    const onSub = (track: any, pub: any) => attach(pub)
+    const onUnsub = (track: any, pub: any) => detach(pub)
+
+    room.on("trackSubscribed", onSub)
+    room.on("trackUnsubscribed", onUnsub)
+
+    Array.from(room.remoteParticipants.values()).forEach((p) => {
+      Array.from(p.trackPublications.values()).forEach((pub: any) => {
+        if (pub.kind === "audio" && pub.track && pub.isSubscribed) {
+          attach(pub)
+        }
+      })
+    })
+
+    return () => {
+      room.off("trackSubscribed", onSub)
+      room.off("trackUnsubscribed", onUnsub)
+      Array.from(subs.values()).forEach((el) => {
+        el.pause()
+        el.srcObject = null
+      })
+      subs.clear()
+    }
+  }, [room])
+
+  return <div className="hidden" data-audio-count={audioCount} />
+}
 
 function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (hasRemote: boolean) => void }) {
   const participants = useRemoteParticipants()
@@ -19,8 +79,6 @@ function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (h
 function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const audioTracks = useTracks([Track.Source.Microphone, Track.Source.ScreenShareAudio])
-  const remoteAudioTracks = audioTracks.filter(t => !t.participant.isLocal)
   const localVideoRef = useRef<HTMLVideoElement>(null)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
@@ -44,7 +102,6 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div className="relative h-full w-full bg-black">
-      {remoteAudioTracks.map(t => <AudioTrack key={t.participant.identity + t.source} trackRef={t} />)}
       <div className="absolute inset-0">
         {primaryTrack ? (
           <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
@@ -182,6 +239,8 @@ function EntrarSalaForm() {
           onDisconnected={handleDisconnected}
           style={{ height: "100%" }}
         >
+          <RoomAudioRenderer volume={1} />
+          <AudioSubscriber />
           <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
           <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
         </LiveKitRoom>
