@@ -4,7 +4,7 @@ import { Suspense, useState, useCallback, useRef, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, RoomAudioRenderer } from "@livekit/components-react"
+import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, AudioTrack } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import "@livekit/components-styles"
 import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar } from "lucide-react"
@@ -19,6 +19,8 @@ function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (h
 function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
+  const audioTracks = useTracks([Track.Source.Microphone, Track.Source.ScreenShareAudio])
+  const remoteAudioTracks = audioTracks.filter(t => !t.participant.isLocal)
   const localVideoRef = useRef<HTMLVideoElement>(null)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
@@ -42,6 +44,7 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div className="relative h-full w-full bg-black">
+      {remoteAudioTracks.map(t => <AudioTrack key={t.participant.identity + t.source} trackRef={t} />)}
       <div className="absolute inset-0">
         {primaryTrack ? (
           <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
@@ -179,7 +182,6 @@ function EntrarSalaForm() {
           onDisconnected={handleDisconnected}
           style={{ height: "100%" }}
         >
-          <RoomAudioRenderer />
           <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
           <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
         </LiveKitRoom>
