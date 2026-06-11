@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
 import { Track } from "livekit-client"
-import { Video, VideoOff, Loader2, Link2, Copy, LogOut } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function VirtualRoomPage() {
@@ -156,12 +156,15 @@ export default function VirtualRoomPage() {
 function PsychologistInCall() {
   const remoteParticipants = useRemoteParticipants()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const { localParticipant, isCameraEnabled, cameraTrack } = useLocalParticipant()
+  const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
   const localVideoRef = useRef<HTMLVideoElement>(null)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
   const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
   const primaryTrack = screenTrack || remoteVideoTrack
+
+  const toggleCam = useCallback(() => localParticipant?.setCameraEnabled(!isCameraEnabled), [isCameraEnabled, localParticipant])
+  const toggleMic = useCallback(() => localParticipant?.setMicrophoneEnabled(!isMicrophoneEnabled), [isMicrophoneEnabled, localParticipant])
 
   useEffect(() => {
     if (localVideoRef.current && cameraTrack?.track) {
@@ -172,36 +175,40 @@ function PsychologistInCall() {
 
   return (
     <div className="relative w-full h-full bg-black">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full gap-px">
-        <div className="relative min-h-0">
-          {primaryTrack ? (
-            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
-              <div className="text-center text-white px-6">
-                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
-                <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
-              </div>
+      <div className="absolute inset-0">
+        {primaryTrack ? (
+          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+            <div className="text-center text-white px-6">
+              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
+              <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
             </div>
-          )}
-        </div>
-
-        <div className="relative min-h-0 bg-slate-900">
-          {isCameraEnabled && cameraTrack ? (
-            <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <div className="text-center">
-                <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">Câmera desligada</p>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-xs text-white/50 bg-black/50 px-3 py-1.5 rounded-full">
+      <div className={`absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900 transition-opacity ${isCameraEnabled && cameraTrack ? 'opacity-100' : 'opacity-60'}`}>
+        {isCameraEnabled && cameraTrack ? (
+          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full">
+            <VideoOff className="h-6 w-6 text-gray-500" />
+          </div>
+        )}
+      </div>
+
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 md:gap-4 bg-black/60 backdrop-blur-lg rounded-full px-4 md:px-6 py-3 ring-1 ring-white/10">
+        <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
+          {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+        </Button>
+        <Button size="icon" variant={isMicrophoneEnabled ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
+          {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      <div className="absolute top-4 left-4 z-20 text-xs text-white/50 bg-black/50 px-3 py-1.5 rounded-full">
         {remoteParticipants.length > 0 ? "Paciente conectado" : "Aguardando paciente..."}
       </div>
     </div>
