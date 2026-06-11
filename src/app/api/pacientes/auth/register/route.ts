@@ -6,7 +6,8 @@ import { signPatientToken } from "@/lib/patient-auth"
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone, password } = await request.json()
+    const body = await request.json()
+    const { name, email, phone, password, cpf, rg, dateOfBirth, gender, maritalStatus, profession, company, address, neighborhood, city, state, zipCode, emergencyContact, emergencyPhone, healthInsurance, insuranceNumber, referredBy, howFound, observations } = body
 
     if (!name?.trim() || !email?.trim() || !password?.trim()) {
       return NextResponse.json({ error: "Nome, email e senha são obrigatórios" }, { status: 400 })
@@ -37,15 +38,41 @@ export async function POST(request: NextRequest) {
         email: email.trim(),
         phone: phone?.trim() || null,
         password: hashedPassword,
+        cpf: cpf?.trim() || null,
+        rg: rg?.trim() || null,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        gender: gender || null,
+        maritalStatus: maritalStatus || null,
+        profession: profession?.trim() || null,
+        company: company?.trim() || null,
+        address: address?.trim() || null,
+        neighborhood: neighborhood?.trim() || null,
+        city: city?.trim() || null,
+        state: state || null,
+        zipCode: zipCode?.trim() || null,
+        emergencyContact: emergencyContact?.trim() || null,
+        emergencyPhone: emergencyPhone?.trim() || null,
+        healthInsurance: healthInsurance?.trim() || null,
+        insuranceNumber: insuranceNumber?.trim() || null,
+        referredBy: referredBy?.trim() || null,
+        howFound: howFound?.trim() || null,
+        observations: observations?.trim() || null,
         psychologistId: psychologist.id,
       },
     })
 
     const token = await signPatientToken({ patientId: patient.id, email: patient.email })
 
+    const { password: _, ...patientSafe } = patient
+
     return NextResponse.json({
       token,
-      patient: { id: patient.id, name: patient.name, email: patient.email, phone: patient.phone },
+      patient: {
+        ...patientSafe,
+        dateOfBirth: patient.dateOfBirth?.toISOString() ?? null,
+        createdAt: patient.createdAt.toISOString(),
+        updatedAt: patient.updatedAt.toISOString(),
+      },
     })
   } catch (error) {
     logger.error("Error registering patient", { error: String(error) })

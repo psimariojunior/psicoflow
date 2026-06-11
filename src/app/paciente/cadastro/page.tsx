@@ -4,22 +4,53 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
-import { Loader2, UserPlus } from "lucide-react"
+import { Loader2, UserPlus, ChevronLeft, ChevronRight, Check, ArrowLeft } from "lucide-react"
+
+const BRAZILIAN_STATES = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
 
 export default function CadastroPage() {
+  const [step, setStep] = useState(0)
   const [name, setName] = useState("")
+  const [cpf, setCpf] = useState("")
+  const [dateOfBirth, setDateOfBirth] = useState("")
+  const [gender, setGender] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [zipCode, setZipCode] = useState("")
+  const [address, setAddress] = useState("")
+  const [neighborhood, setNeighborhood] = useState("")
+  const [city, setCity] = useState("")
+  const [state, setState] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { login } = usePatientAuth()
 
+  const isStep1Valid = name.trim().length > 0
+  const isStep2Valid = email.trim().length > 0 && password.length >= 6 && password === confirmPassword
+
+  function canGoNext(): boolean {
+    if (step === 0) return isStep1Valid
+    if (step === 1) return isStep2Valid
+    return true
+  }
+
+  function nextStep() {
+    if (step < 2 && canGoNext()) setStep((s) => s + 1)
+  }
+
+  function prevStep() {
+    if (step > 0) setStep((s) => s - 1)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !email.trim() || !password.trim()) return
+    if (!isStep1Valid || !isStep2Valid) return
 
     setLoading(true)
     try {
@@ -31,6 +62,14 @@ export default function CadastroPage() {
           email: email.trim(),
           phone: phone.trim() || undefined,
           password,
+          cpf: cpf.trim() || undefined,
+          dateOfBirth: dateOfBirth || undefined,
+          gender: gender || undefined,
+          zipCode: zipCode.trim() || undefined,
+          address: address.trim() || undefined,
+          neighborhood: neighborhood.trim() || undefined,
+          city: city.trim() || undefined,
+          state: state || undefined,
         }),
       })
 
@@ -49,47 +88,146 @@ export default function CadastroPage() {
   return (
     <div className="flex min-h-screen bg-slate-950">
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-lg">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-white mb-1">Criar conta</h1>
-            <p className="text-gray-300 text-sm">Cadastre-se para agendar consultas</p>
+            <p className="text-gray-400 text-sm">Preencha seus dados para agendar consultas</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Nome completo"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
-            />
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
-            />
-            <Input
-              placeholder="WhatsApp (opcional)"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
-            />
-            <Input
-              type="password"
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
-            />
-            <Button
-              type="submit"
-              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl"
-              disabled={loading || !name.trim() || !email.trim() || !password.trim()}
-            >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserPlus className="h-5 w-5 mr-2" />}
-              {loading ? "Cadastrando..." : "Criar conta"}
-            </Button>
+          <div className="flex items-center justify-center gap-2 mb-8">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  step > i ? "bg-emerald-500 text-white" : step === i ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/50" : "bg-slate-800 text-gray-500"
+                }`}>
+                  {step > i ? <Check className="h-4 w-4" /> : i + 1}
+                </div>
+                {i < 2 && <div className={`w-12 h-0.5 transition-all ${step > i ? "bg-emerald-500" : "bg-slate-700"}`} />}
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {step === 0 && (
+              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-white mb-4">Dados Pessoais</h2>
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-gray-300">Nome completo *</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cpf" className="text-gray-300">CPF</Label>
+                  <Input id="cpf" value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="000.000.000-00" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dateOfBirth" className="text-gray-300">Data de Nascimento</Label>
+                    <Input id="dateOfBirth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12 [color-scheme:dark]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="gender" className="text-gray-300">Gênero</Label>
+                    <Select value={gender} onValueChange={setGender}>
+                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Feminino">Feminino</SelectItem>
+                        <SelectItem value="Masculino">Masculino</SelectItem>
+                        <SelectItem value="Outro">Outro</SelectItem>
+                        <SelectItem value="NaoInformar">Prefiro não informar</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-white mb-4">Contato & Acesso</h2>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-300">Email *</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-gray-300">WhatsApp</Label>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-8888" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-gray-300">Senha *</Label>
+                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-gray-300">Confirmar Senha *</Label>
+                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  </div>
+                </div>
+                {confirmPassword && password !== confirmPassword && (
+                  <p className="text-red-400 text-xs">As senhas não conferem</p>
+                )}
+                {password && password.length < 6 && (
+                  <p className="text-red-400 text-xs">A senha deve ter no mínimo 6 caracteres</p>
+                )}
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-white mb-4">Endereço</h2>
+                <div className="space-y-2">
+                  <Label htmlFor="zipCode" className="text-gray-300">CEP</Label>
+                  <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="00000-000" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address" className="text-gray-300">Endereço</Label>
+                  <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua, número, complemento" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="neighborhood" className="text-gray-300">Bairro</Label>
+                    <Input id="neighborhood" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Bairro" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="text-gray-300">Cidade</Label>
+                    <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Cidade" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state" className="text-gray-300">Estado</Label>
+                  <Select value={state} onValueChange={setState}>
+                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BRAZILIAN_STATES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              {step > 0 ? (
+                <Button type="button" onClick={prevStep} variant="ghost" className="text-gray-400 hover:text-white h-12 px-6">
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Voltar
+                </Button>
+              ) : (
+                <div />
+              )}
+              {step < 2 ? (
+                <Button type="button" onClick={nextStep} disabled={!canGoNext()} className="h-12 px-8 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl disabled:opacity-50">
+                  Próximo <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              ) : (
+                <Button type="submit" disabled={loading} className="h-12 px-8 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl disabled:opacity-50">
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserPlus className="h-5 w-5 mr-2" />}
+                  {loading ? "Cadastrando..." : "Criar conta"}
+                </Button>
+              )}
+            </div>
           </form>
 
           <p className="text-center mt-6">

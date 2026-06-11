@@ -3,13 +3,34 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Loader2, BookHeart, CalendarDays, History } from "lucide-react"
+import { Loader2, BookHeart, CalendarDays, History, User } from "lucide-react"
 
 export interface PatientData {
   id: string
   name: string
   email: string | null
   phone: string | null
+  cpf: string | null
+  rg: string | null
+  dateOfBirth: string | null
+  gender: string | null
+  maritalStatus: string | null
+  profession: string | null
+  company: string | null
+  address: string | null
+  neighborhood: string | null
+  city: string | null
+  state: string | null
+  zipCode: string | null
+  emergencyContact: string | null
+  emergencyPhone: string | null
+  healthInsurance: string | null
+  insuranceNumber: string | null
+  referredBy: string | null
+  howFound: string | null
+  observations: string | null
+  photoUrl: string | null
+  createdAt: string
 }
 
 interface PatientAuthContextType {
@@ -120,6 +141,12 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                 }`}>
                   <History className="h-3.5 w-3.5" />
                   Histórico
+                </Link>
+                <Link href="/paciente/meus-dados" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente/meus-dados" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <User className="h-3.5 w-3.5" />
+                  Meus Dados
                 </Link>
               </nav>
               <span className="text-gray-300 text-sm">{patient.name}</span>
