@@ -118,33 +118,28 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full gap-px">
-        <div className="relative min-h-0">
-          {primaryTrack ? (
-            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
-              <div className="text-center text-white px-6">
-                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
-                <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
-              </div>
+      <div className="absolute inset-0">
+        {primaryTrack ? (
+          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+            <div className="text-center text-white px-6">
+              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
+              <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        <div className="relative min-h-0 bg-slate-900">
-          {isCameraEnabled && cameraTrack ? (
-            <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <div className="text-center">
-                <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">Câmera desligada</p>
-              </div>
-            </div>
-          )}
-        </div>
+      <div className={`absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900 transition-opacity ${isCameraEnabled && cameraTrack ? 'opacity-100' : 'opacity-60'}`}>
+        {isCameraEnabled && cameraTrack ? (
+          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full">
+            <VideoOff className="h-6 w-6 text-gray-500" />
+          </div>
+        )}
       </div>
 
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur">
@@ -152,7 +147,7 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
         {roomName}
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 md:gap-4 bg-black/60 backdrop-blur-lg rounded-full px-4 md:px-6 py-3 ring-1 ring-white/10">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 md:gap-4 bg-black/60 backdrop-blur-lg rounded-full px-4 md:px-6 py-3 ring-1 ring-white/10">
         <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
           {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
         </Button>
