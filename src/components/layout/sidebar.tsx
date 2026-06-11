@@ -22,6 +22,7 @@ import {
   Receipt,
   Menu,
   X,
+  ClipboardList,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -41,6 +42,7 @@ const menuItems = [
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/cobrancas", label: "Cobranças", icon: Receipt },
   { href: "/sala-virtual", label: "Sala Virtual", icon: Video },
+  { href: "/sessoes", label: "Sessões", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
   { href: "/notificacoes", label: "Notificações", icon: Bell },
