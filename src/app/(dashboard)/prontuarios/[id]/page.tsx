@@ -207,8 +207,8 @@ export default function RecordDetailPage({ params }: { params: { id: string } })
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={startEdit}><Edit className="mr-2 h-4 w-4" /> Editar</Button>
-          <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> PDF</Button>
-          <Button variant="outline" size="sm"><Printer className="mr-2 h-4 w-4" /> Imprimir</Button>
+          <Button variant="outline" size="sm" onClick={() => window.print()}><Download className="mr-2 h-4 w-4" /> PDF</Button>
+          <Button variant="outline" size="sm" onClick={() => window.print()}><Printer className="mr-2 h-4 w-4" /> Imprimir</Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive" size="sm"><Trash2 className="mr-2 h-4 w-4" /> Excluir</Button>

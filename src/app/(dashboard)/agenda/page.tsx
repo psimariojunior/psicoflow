@@ -25,6 +25,7 @@ interface Appt {
   patientEmail: string | null
   patientPhone: string | null
   startTime: string
+  startTimeRaw: string
   endTime: string
   status: string
   modality: string | null
@@ -63,6 +64,7 @@ export default function AgendaPage() {
         patientEmail: apt.patient?.email || null,
         patientPhone: apt.patient?.phone || null,
         startTime: formatTime(apt.startTime),
+        startTimeRaw: apt.startTime,
         endTime: formatTime(apt.endTime),
         status: apt.status,
         modality: apt.modality,

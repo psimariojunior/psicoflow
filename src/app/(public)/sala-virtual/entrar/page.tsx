@@ -327,6 +327,12 @@ function EntrarSalaForm() {
   }, [])
 
   useEffect(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission()
+    }
+  }, [])
+
+  useEffect(() => {
     if (psychologistPresent && typeof Notification !== "undefined" && Notification.permission === "granted") {
       new Notification("Psicólogo entrou na sala", { body: "O profissional está disponível para a sessão." })
     }
@@ -470,7 +476,7 @@ function EntrarSalaForm() {
                   {[
                     { icon: Shield, label: "Privacidade", desc: "Criptografia" },
                     { icon: Wifi, label: "Conexão", desc: "Estável" },
-                    { icon: MicOff, label: "Áudio", desc: "Opcional" },
+                    { icon: Mic, label: "Áudio", desc: "Opcional" },
                   ].map(({ icon: Icon, label, desc }) => (
                     <div key={label} className="bg-white/[0.04] rounded-xl p-3 text-center ring-1 ring-white/[0.06]">
                       <Icon className="h-4 w-4 text-emerald-400/70 mx-auto mb-1.5" />
