@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, RoomAudioRenderer, useRoomContext } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar, Maximize2, Minimize2 } from "lucide-react"
 import toast from "react-hot-toast"
 
 function AudioSubscriber() {
@@ -80,6 +80,8 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
   const localVideoRef = useRef<HTMLVideoElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
   const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
@@ -92,6 +94,20 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
     }
   }, [cameraTrack])
 
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener("fullscreenchange", onChange)
+    return () => document.removeEventListener("fullscreenchange", onChange)
+  }, [])
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen()
+    } else {
+      document.exitFullscreen()
+    }
+  }, [])
+
   const toggleCam = useCallback(() => {
     localParticipant?.setCameraEnabled(!isCameraEnabled)
   }, [isCameraEnabled, localParticipant])
@@ -101,7 +117,7 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
   }, [isMicrophoneEnabled, localParticipant])
 
   return (
-    <div className="relative h-full w-full bg-black">
+    <div ref={containerRef} className="relative h-full w-full bg-black">
       <div className="absolute inset-0">
         {primaryTrack ? (
           <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
@@ -131,6 +147,10 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
           {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
         </Button>
         <div className="w-px h-6 bg-white/10" />
+        <Button size="icon" variant="secondary" onClick={toggleFullscreen} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
+          {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+        </Button>
+        <div className="w-px h-6 bg-white/10" />
         <Button variant="destructive" size="icon" onClick={onLeave} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
           <LogOut className="h-5 w-5" />
         </Button>
@@ -151,9 +171,12 @@ function EntrarSalaForm() {
   const [patientName, setPatientName] = useState("")
   const [psychologistPresent, setPsychologistPresent] = useState(false)
   const [cameraReady, setCameraReady] = useState(false)
+  const [hd, setHd] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
+  const hdRef = useRef(hd)
+  hdRef.current = hd
 
   const handleConnect = useCallback(async () => {
     setConnecting(true)
@@ -176,7 +199,10 @@ function EntrarSalaForm() {
   }, [roomInput, patientName])
 
   const startCamera = useCallback(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+    const videoConstraints = hdRef.current
+      ? { width: { ideal: 1280 }, height: { ideal: 720 } }
+      : { width: { ideal: 640 }, height: { ideal: 480 } }
+    navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
       .then((s) => {
         streamRef.current = s
         if (videoRef.current) {
@@ -210,6 +236,26 @@ function EntrarSalaForm() {
     streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = next))
     return next
   })
+
+  const toggleHd = useCallback(() => {
+    setHd((prev) => {
+      const next = !prev
+      streamRef.current?.getTracks().forEach((t) => t.stop())
+      streamRef.current = null
+      setCameraReady(false)
+      const videoConstraints = next
+        ? { width: { ideal: 1280 }, height: { ideal: 720 } }
+        : { width: { ideal: 640 }, height: { ideal: 480 } }
+      navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+        .then((s) => {
+          streamRef.current = s
+          if (videoRef.current) videoRef.current.srcObject = s
+          setCameraReady(true)
+        })
+        .catch(() => toast.error("Erro ao reiniciar câmera"))
+      return next
+    })
+  }, [])
 
   const handleDisconnected = useCallback(() => {
     setToken(null)
@@ -298,6 +344,7 @@ function EntrarSalaForm() {
                         <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md ring-1 ring-white/10">
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50" />
                           Câmera ativa
+                          <span className="ml-2 text-[10px] uppercase tracking-wider opacity-60">{hd ? "HD" : "SD"}</span>
                         </div>
                         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4">
                           <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform">
@@ -305,6 +352,9 @@ function EntrarSalaForm() {
                           </Button>
                           <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform">
                             {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+                          </Button>
+                          <Button size="icon" variant={hd ? "secondary" : "default"} onClick={toggleHd} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform text-xs font-bold">
+                            {hd ? "HD" : "SD"}
                           </Button>
                         </div>
                       </div>
