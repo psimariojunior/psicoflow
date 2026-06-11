@@ -147,15 +147,15 @@ export default function SessionPage() {
     }
   }, [dirty, session, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote])
 
-  useEffect(() => {
-    if (autoSaveRef.current) clearTimeout(autoSaveRef.current)
-    autoSaveRef.current = setTimeout(saveDraft, 3000)
-    return () => { if (autoSaveRef.current) clearTimeout(autoSaveRef.current) }
-  }, [subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote, saveDraft])
-
   function markDirty() {
     if (!dirty) setDirty(true)
+    if (autoSaveRef.current) clearTimeout(autoSaveRef.current)
+    autoSaveRef.current = setTimeout(saveDraft, 3000)
   }
+
+  useEffect(() => {
+    return () => { if (autoSaveRef.current) clearTimeout(autoSaveRef.current) }
+  }, [saveDraft])
 
   async function handleAction(action: string) {
     if (!session) return
@@ -185,6 +185,8 @@ export default function SessionPage() {
         toast.success("Sessão retomada!")
       } else if (action === "end") {
         toast.success("Sessão concluída!")
+      } else if (action === "save") {
+        toast.success("Rascunho salvo!")
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro")

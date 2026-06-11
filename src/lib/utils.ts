@@ -77,8 +77,8 @@ export function maskCep(value: string): string {
   return value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1-$2")
 }
 
-export function calculateAge(dateOfBirth: Date | string | null): number {
-  if (!dateOfBirth) return 0
+export function calculateAge(dateOfBirth: Date | string | null): number | null {
+  if (!dateOfBirth) return null
   const today = new Date()
   const birth = new Date(dateOfBirth)
   let age = today.getFullYear() - birth.getFullYear()

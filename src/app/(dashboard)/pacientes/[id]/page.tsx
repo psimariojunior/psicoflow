@@ -72,7 +72,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {calculateAge(patient.dateOfBirth)} anos {patient.gender ? `• ${patient.gender}` : ""}
+                {patient.dateOfBirth ? `${calculateAge(patient.dateOfBirth)} anos` : "-"} {patient.gender ? `• ${patient.gender}` : ""}
               </p>
             </div>
           </div>

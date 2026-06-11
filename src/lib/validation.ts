@@ -59,7 +59,7 @@ export const createDiaryEntrySchema = z.object({
 
 export const createTransactionSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória"),
-  type: z.enum(["RECEITA", "DESPESA"]),
+  type: z.enum(["INCOME", "EXPENSE"]),
   amount: z.number().positive("Valor deve ser positivo"),
   category: z.string().optional(),
   dueDate: z.string().optional(),
