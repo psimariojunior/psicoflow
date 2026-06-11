@@ -110,26 +110,29 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="absolute inset-0">
-        {primaryTrack ? (
-          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
-            <div className="text-center text-white px-6">
-              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
-              <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full">
+        <div className="relative min-h-0 bg-slate-900">
+          {primaryTrack ? (
+            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+              <div className="text-center text-white px-6">
+                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
+                <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900">
-        {cameraTrack && (
-          <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className={`w-full h-full object-cover scale-x-[-1] ${isCameraEnabled ? 'block' : 'hidden'}`} />
-        )}
-        <div className={`absolute inset-0 flex items-center justify-center ${isCameraEnabled && cameraTrack ? 'hidden' : 'flex'}`}>
-          <VideoOff className="h-6 w-6 text-gray-500" />
+        <div className="relative min-h-0 bg-slate-900">
+          {cameraTrack && isCameraEnabled ? (
+            <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="w-full h-full object-cover scale-x-[-1]" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <VideoOff className="h-8 w-8 text-gray-600" />
+            </div>
+          )}
         </div>
       </div>
 
