@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
 import { Track } from "livekit-client"
-import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function VirtualRoomPage() {
@@ -157,55 +157,96 @@ function PsychologistInCall() {
   const remoteParticipants = useRemoteParticipants()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
+  const [callDuration, setCallDuration] = useState(0)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
   const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
   const primaryTrack = screenTrack || remoteVideoTrack
+  const hasRemote = remoteParticipants.length > 0
+
+  useEffect(() => {
+    const id = setInterval(() => setCallDuration(t => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [])
 
   const toggleCam = useCallback(() => localParticipant?.setCameraEnabled(!isCameraEnabled), [isCameraEnabled, localParticipant])
   const toggleMic = useCallback(() => localParticipant?.setMicrophoneEnabled(!isMicrophoneEnabled), [isMicrophoneEnabled, localParticipant])
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+  }
 
   return (
     <div className="relative w-full h-full bg-black">
       <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
-        <div className="relative min-h-0 bg-slate-900">
+        <div className="relative min-h-0 bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
           {primaryTrack ? (
-            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+            <>
+              <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
+              <div className="absolute bottom-2 left-3 flex items-center gap-2">
+                <span className="bg-white/10 backdrop-blur-md text-white/80 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20">Paciente</span>
+              </div>
+            </>
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-black">
               <div className="text-center text-white px-6">
-                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
-                <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
+                <div className="relative w-16 h-16 mx-auto mb-4">
+                  <div className="absolute inset-0 rounded-full border-2 border-emerald-400/30 animate-ping" />
+                  <div className="absolute inset-2 rounded-full border-2 border-emerald-400/40" />
+                  <div className="absolute inset-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
+                  </div>
+                </div>
+                <h3 className="text-base md:text-lg font-bold mb-1 text-white/90">Aguardando paciente</h3>
+                <p className="text-sm text-white/40">O paciente ainda não entrou na sala</p>
               </div>
             </div>
           )}
         </div>
 
-        <div className="relative min-h-0 bg-slate-900">
+        <div className="relative min-h-0 bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
           {cameraTrack && isCameraEnabled ? (
-            <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="w-full h-full object-cover scale-x-[-1]" />
+            <>
+              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="w-full h-full object-cover scale-x-[-1]" />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
+              <div className="absolute bottom-2 left-3 flex items-center gap-2">
+                <span className="bg-white/10 backdrop-blur-md text-white/80 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20">Você</span>
+              </div>
+            </>
           ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <VideoOff className="h-8 w-8 text-gray-600" />
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-slate-800">
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
+                  <User className="h-6 w-6 text-slate-500" />
+                </div>
+                <p className="text-xs text-slate-500 font-medium">Câmera desligada</p>
+              </div>
             </div>
           )}
         </div>
         </div>
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 md:gap-4 bg-black/60 backdrop-blur-lg rounded-full px-4 md:px-6 py-3 ring-1 ring-white/10">
-        <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-        </Button>
-        <Button size="icon" variant={isMicrophoneEnabled ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-        </Button>
+      <div className="absolute top-4 left-4 z-20 text-xs text-white/50 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+        {hasRemote ? (
+          <span className="flex items-center gap-1.5 text-emerald-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {formatTime(callDuration)}
+          </span>
+        ) : "Aguardando paciente..."}
       </div>
 
-      <div className="absolute top-4 left-4 z-20 text-xs text-white/50 bg-black/50 px-3 py-1.5 rounded-full">
-        {remoteParticipants.length > 0 ? "Paciente conectado" : "Aguardando paciente..."}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 md:gap-3 bg-black/50 backdrop-blur-xl rounded-full px-3 md:px-4 py-2 md:py-2.5 ring-1 ring-white/10 shadow-2xl">
+        <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
+          {isCameraEnabled ? <Video className="h-4 w-4 md:h-5 md:w-5" /> : <VideoOff className="h-4 w-4 md:h-5 md:w-5" />}
+        </Button>
+        <Button size="icon" variant={isMicrophoneEnabled ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
+          {isMicrophoneEnabled ? <Mic className="h-4 w-4 md:h-5 md:w-5" /> : <MicOff className="h-4 w-4 md:h-5 md:w-5" />}
+        </Button>
       </div>
     </div>
   )
