@@ -167,7 +167,8 @@ function PsychologistInCall() {
 
   return (
     <div className="relative w-full h-full bg-black">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full">
+      <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
         <div className="relative min-h-0 bg-slate-900">
           {primaryTrack ? (
             <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
@@ -190,6 +191,7 @@ function PsychologistInCall() {
               <VideoOff className="h-8 w-8 text-gray-600" />
             </div>
           )}
+        </div>
         </div>
       </div>
 
