@@ -182,17 +182,19 @@ function PsychologistInCall() {
     <div className="relative w-full h-full bg-black">
       <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
-        <div className="relative min-h-0 bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
+        <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
           {primaryTrack ? (
             <>
-              <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+              <VideoTrack trackRef={primaryTrack} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
               <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Paciente</span>
+                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">
+                  {hasRemote ? (remoteParticipants[0]?.name || remoteParticipants[0]?.identity || "Paciente") : "Paciente"}
+                </span>
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-slate-900">
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
                   <User className="h-6 w-6 text-slate-500" />
@@ -203,17 +205,17 @@ function PsychologistInCall() {
           )}
         </div>
 
-        <div className="relative min-h-0 bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
+        <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
           {cameraTrack && isCameraEnabled ? (
             <>
-              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="w-full h-full object-cover scale-x-[-1]" />
+              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
               <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você (Psicólogo)</span>
+                <span className="bg-white/20 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/30">Você (Psicólogo)</span>
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-slate-800">
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
               <div className="text-center">
                 <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
                   <User className="h-6 w-6 text-slate-500" />
