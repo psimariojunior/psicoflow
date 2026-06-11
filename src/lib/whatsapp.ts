@@ -30,6 +30,7 @@ export async function sendWhatsAppMessage(
     logger.warn("Invalid WhatsApp number", { to })
     return false
   }
+  const normalized = formattedTo.length <= 11 ? "55" + formattedTo : formattedTo
 
   try {
     const res = await fetch(
@@ -42,7 +43,7 @@ export async function sendWhatsAppMessage(
         },
         body: JSON.stringify({
           messaging_product: "whatsapp",
-          to: formattedTo,
+          to: normalized,
           type: "template",
           template: {
             name: templateName,

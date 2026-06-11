@@ -200,10 +200,24 @@ export default function NotificationsPage() {
                       />
                     </div>
                   )}
-                  <Button type="submit" className="w-full">
-                    <Send className="mr-2 h-4 w-4" />
-                    Enviar Notificação
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button type="submit" className="flex-1">
+                      <Send className="mr-2 h-4 w-4" />
+                      Enviar Notificação
+                    </Button>
+                    <Button type="button" variant="outline" onClick={async () => {
+                      const phone = prompt("WhatsApp do psicólogo (com DDD, ex: 5511999999999):")
+                      if (!phone) return
+                      try {
+                        const res = await fetch(`/api/cron/lembretes?testwhatsapp=true&to=${encodeURIComponent(phone)}`)
+                        const data = await res.json()
+                        toast[data.ok ? "success" : "error"](data.ok ? "WhatsApp funcionando!" : data.error || "Falha")
+                      } catch { toast.error("Erro ao testar WhatsApp") }
+                    }}>
+                      <Send className="mr-2 h-4 w-4" />
+                      Testar WhatsApp
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
