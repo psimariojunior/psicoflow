@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, VideoConference } from "@livekit/components-react"
-import "@livekit/components-styles"
-import { Video, Loader2, Link2, Copy, LogOut } from "lucide-react"
+import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
+import { Track } from "livekit-client"
+import { Video, VideoOff, Loader2, Link2, Copy, LogOut } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function VirtualRoomPage() {
@@ -87,7 +87,7 @@ export default function VirtualRoomPage() {
             onDisconnected={() => setToken(null)}
             style={{ height: "100%" }}
           >
-            <VideoConference />
+            <PsychologistInCall />
           </LiveKitRoom>
         </div>
       </div>
@@ -148,6 +148,59 @@ export default function VirtualRoomPage() {
             <p>Funciona de qualquer rede. Qualidade adaptativa conforme a internet do paciente.</p>
           </CardContent>
         </Card>
+      </div>
+    </div>
+  )
+}
+
+function PsychologistInCall() {
+  const remoteParticipants = useRemoteParticipants()
+  const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
+  const { localParticipant, isCameraEnabled, cameraTrack } = useLocalParticipant()
+  const localVideoRef = useRef<HTMLVideoElement>(null)
+
+  const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
+  const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
+  const primaryTrack = screenTrack || remoteVideoTrack
+
+  useEffect(() => {
+    if (localVideoRef.current && cameraTrack?.track) {
+      const stream = new MediaStream([cameraTrack.track.mediaStreamTrack])
+      localVideoRef.current.srcObject = stream
+    }
+  }, [cameraTrack])
+
+  return (
+    <div className="relative flex flex-col md:flex-row w-full h-full bg-black">
+      <div className="flex-1 relative min-h-0">
+        {primaryTrack ? (
+          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+            <div className="text-center text-white px-6">
+              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
+              <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="relative md:w-72 md:min-w-72 h-48 md:h-full bg-slate-900">
+        {isCameraEnabled && cameraTrack ? (
+          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="text-center">
+              <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500">Câmera desligada</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-xs text-white/50 bg-black/50 px-3 py-1.5 rounded-full">
+        {remoteParticipants.length > 0 ? "Paciente conectado" : "Aguardando paciente..."}
       </div>
     </div>
   )
