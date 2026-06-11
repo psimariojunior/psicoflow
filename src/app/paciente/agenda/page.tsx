@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
 import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight, Sparkles, Shield, Video, Heart, XCircle } from "lucide-react"
@@ -51,6 +53,8 @@ export default function AgendaPacientePage() {
   const [selectedModality, setSelectedModality] = useState<string>("online")
   const [bookingLoading, setBookingLoading] = useState(false)
   const [cancelling, setCancelling] = useState<string | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null)
+  const [cancelReason, setCancelReason] = useState("")
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
 
@@ -122,13 +126,14 @@ export default function AgendaPacientePage() {
     }
   }, [selectedSlot, token, patient, selectedModality])
 
-  const handleCancel = useCallback(async (appointmentId: string) => {
+  const handleCancel = useCallback(async (appointmentId: string, reason: string) => {
     if (!token) return
     setCancelling(appointmentId)
     try {
       const res = await fetch(`/api/pacientes/agendamentos/${appointmentId}`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ cancelReason: reason || null }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -140,6 +145,8 @@ export default function AgendaPacientePage() {
       toast.error(e instanceof Error ? e.message : "Erro ao cancelar")
     } finally {
       setCancelling(null)
+      setCancelTarget(null)
+      setCancelReason("")
     }
   }, [token])
 
@@ -242,14 +249,51 @@ export default function AgendaPacientePage() {
                           <div className="text-xs text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-full">
                             {a.modality === "online" ? "Online" : "Presencial"}
                           </div>
-                          <button
-                            onClick={() => handleCancel(a.id)}
-                            disabled={cancelling === a.id}
-                            className="text-gray-500 hover:text-red-400 transition-colors p-1 disabled:opacity-50"
-                            title="Cancelar consulta"
-                          >
-                            {cancelling === a.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-5 w-5" />}
-                          </button>
+                          <Dialog open={cancelTarget === a.id} onOpenChange={(open) => { if (!open) { setCancelTarget(null); setCancelReason("") } }}>
+                            <DialogTrigger asChild>
+                              <button
+                                onClick={() => setCancelTarget(a.id)}
+                                disabled={cancelling === a.id}
+                                className="text-gray-500 hover:text-red-400 transition-colors p-1 disabled:opacity-50"
+                                title="Cancelar consulta"
+                              >
+                                {cancelling === a.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-5 w-5" />}
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-slate-900 border-slate-700 text-white max-w-sm">
+                              <DialogHeader>
+                                <DialogTitle>Cancelar consulta</DialogTitle>
+                                <DialogDescription className="text-gray-400">
+                                  Tem certeza que deseja cancelar a consulta do dia {formatDateBR(a.startTime)}?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm text-gray-300 block mb-1">Motivo (opcional)</label>
+                                  <Input
+                                    placeholder="Ex: imprevisto, mudança de horário..."
+                                    value={cancelReason}
+                                    onChange={(e) => setCancelReason(e.target.value)}
+                                    className="bg-slate-800 border-slate-600 text-white placeholder:text-gray-500"
+                                  />
+                                </div>
+                                <div className="flex gap-3">
+                                  <DialogClose asChild>
+                                    <Button variant="outline" className="flex-1 border-slate-600 text-gray-300">Voltar</Button>
+                                  </DialogClose>
+                                  <Button
+                                    variant="destructive"
+                                    className="flex-1"
+                                    disabled={cancelling === a.id}
+                                    onClick={() => handleCancel(a.id, cancelReason)}
+                                  >
+                                    {cancelling === a.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                                    Cancelar consulta
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </div>
                     ))}

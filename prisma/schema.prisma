@@ -137,6 +137,7 @@ model Appointment {
   modality       String?  @default("presential")
   onlineRoomUrl  String?
   notes          String?
+  cancelReason   String?
   color          String?
   isRecurring    Boolean  @default(false)
   recurringRule  String?
