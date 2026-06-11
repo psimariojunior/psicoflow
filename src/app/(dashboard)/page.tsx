@@ -5,6 +5,8 @@ import { StatsCards } from "@/components/dashboard/stats-cards"
 import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments"
 import { RecentPatients } from "@/components/dashboard/recent-patients"
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
+import { RevenueChart } from "@/components/dashboard/revenue-chart"
+import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Calendar, UserPlus, FileText, Video, Loader2 } from "lucide-react"
@@ -21,6 +23,7 @@ const quickActions = [
 export default function DashboardPage() {
   const [data, setData] = useState<{
     stats: { totalPatients: number; appointmentsToday: number; monthlyRevenue: number; pendingPayments: number; appointmentChange: number; revenueChange: number }
+    monthlyData: { month: string; appointments: number; receita: number }[]
     appointments: { id: string; patientName: string; startTime: string; status: string; modality: string }[]
     patients: { id: string; name: string; email: string | null; phone: string | null; createdAt: string }[]
     financialSummary: { totalRevenue: number; totalExpenses: number; balance: number; pending: number; overdue: number; received: number; goal: number }
@@ -86,6 +89,11 @@ export default function DashboardPage() {
             </Card>
           </Link>
         ))}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <RevenueChart data={data?.monthlyData || []} />
+        <AppointmentsChart data={data?.monthlyData || []} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

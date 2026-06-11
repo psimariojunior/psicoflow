@@ -35,6 +35,7 @@ export default function FinancialPage() {
   const [showTransactionDialog, setShowTransactionDialog] = useState(false)
   const [patients, setPatients] = useState<{ id: string; name: string }[]>([])
   const [txForm, setTxForm] = useState({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
+  const [dateRange, setDateRange] = useState({ start: "", end: "" })
 
   useEffect(() => {
     fetch("/api/pacientes?limit=100")
@@ -43,8 +44,16 @@ export default function FinancialPage() {
       .catch(() => {})
   }, [])
 
-  useEffect(() => {
-    fetch("/api/financeiro")
+  function loadTransactions(start?: string, end?: string) {
+    setLoading(true)
+    let url = "/api/financeiro"
+    const params = new URLSearchParams()
+    if (start) params.set("startDate", start)
+    if (end) params.set("endDate", end)
+    const qs = params.toString()
+    if (qs) url += "?" + qs
+
+    fetch(url)
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then((data) => {
         if (data.summary) setSummary(data.summary)
@@ -58,7 +67,9 @@ export default function FinancialPage() {
       })
       .catch(() => toast.error("Erro ao carregar dados financeiros"))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { loadTransactions() }, [])
 
   const incomeColumns: ColumnDef<Transaction>[] = [
     { accessorKey: "date", header: "Data", cell: ({ row }) => formatDate(row.original.date) },
@@ -97,8 +108,32 @@ export default function FinancialPage() {
             Controle de receitas, despesas e notas fiscais
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-sm">
+            <Input type="date" value={dateRange.start} onChange={(e) => setDateRange({...dateRange, start: e.target.value})} className="h-9 w-36" />
+            <span className="text-muted-foreground">até</span>
+            <Input type="date" value={dateRange.end} onChange={(e) => setDateRange({...dateRange, end: e.target.value})} className="h-9 w-36" />
+            <Button variant="secondary" size="sm" onClick={() => loadTransactions(dateRange.start, dateRange.end)}>
+              Filtrar
+            </Button>
+            {(dateRange.start || dateRange.end) && (
+              <Button variant="ghost" size="sm" onClick={() => { setDateRange({ start: "", end: "" }); loadTransactions() }}>
+                Limpar
+              </Button>
+            )}
+          </div>
+          <Button variant="outline" onClick={() => {
+            const header = "Data,Descrição,Categoria,Valor,Tipo,Status,Paciente\n"
+            const rows = transactions.map((t) =>
+              `"${formatDate(t.date)}","${t.description}","${t.category}","${t.amount}","${t.type === "INCOME" ? "Receita" : "Despesa"}","${t.status}","${t.patient || ""}"`
+            ).join("\n")
+            const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url; a.download = "financeiro.csv"; a.click()
+            URL.revokeObjectURL(url)
+            toast.success("CSV exportado")
+          }}>
             <Download className="mr-2 h-4 w-4" />
             Exportar
           </Button>

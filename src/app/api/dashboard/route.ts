@@ -14,18 +14,27 @@ export async function GET() {
     const psychologistId = (session.user as { id: string }).id
     const now = new Date()
     const brtNow = new Date(now.getTime() - 3 * 3600000)
-    const startOfMonth = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), 1))
-    const startOfToday = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), brtNow.getUTCDate()))
+    const currentYear = brtNow.getUTCFullYear()
+    const currentMonth = brtNow.getUTCMonth()
+    const startOfMonth = new Date(Date.UTC(currentYear, currentMonth, 1))
+    const startOfLastMonth = new Date(Date.UTC(currentYear, currentMonth - 1, 1))
+    const startOfToday = new Date(Date.UTC(currentYear, currentMonth, brtNow.getUTCDate()))
     const endOfToday = new Date(startOfToday.getTime() + 86400000)
+    const startOfYear = new Date(Date.UTC(currentYear, 0, 1))
+    const lastYear = new Date(Date.UTC(currentYear - 1, 0, 1))
 
     const [
       totalPatients,
       appointmentsToday,
       monthlyIncome,
+      lastMonthIncome,
       pendingPayments,
+      overduePayments,
       recentAppointments,
       recentPatients,
       financialSummary,
+      allAppointments,
+      monthlyRevenueData,
     ] = await Promise.all([
       prisma.patient.count({ where: { psychologistId, active: true } }),
       prisma.appointment.count({
@@ -36,7 +45,15 @@ export async function GET() {
         _sum: { amount: true },
       }),
       prisma.financialTransaction.aggregate({
-        where: { psychologistId, type: "INCOME", paymentStatus: { in: ["PENDING", "OVERDUE"] } },
+        where: { psychologistId, type: "INCOME", paymentStatus: "PAID", paymentDate: { gte: startOfLastMonth, lt: startOfMonth } },
+        _sum: { amount: true },
+      }),
+      prisma.financialTransaction.aggregate({
+        where: { psychologistId, type: "INCOME", paymentStatus: "PENDING" },
+        _sum: { amount: true },
+      }),
+      prisma.financialTransaction.aggregate({
+        where: { psychologistId, type: "INCOME", paymentStatus: "OVERDUE" },
         _sum: { amount: true },
       }),
       prisma.appointment.findMany({
@@ -60,20 +77,67 @@ export async function GET() {
           _sum: { amount: true },
         }),
       ]),
+      prisma.appointment.findMany({
+        where: { psychologistId, startTime: { gte: startOfYear } },
+        select: { startTime: true, status: true },
+      }),
+      prisma.financialTransaction.groupBy({
+        by: ["paymentDate"],
+        where: {
+          psychologistId,
+          type: "INCOME",
+          paymentStatus: "PAID",
+          paymentDate: { gte: startOfYear },
+        },
+        _sum: { amount: true },
+      }),
     ])
 
     const income = financialSummary[0]._sum.amount || 0
     const expense = financialSummary[1]._sum.amount || 0
+    const pending = pendingPayments._sum.amount || 0
+    const overdue = overduePayments._sum.amount || 0
+
+    const currentMonthRevenue = monthlyIncome._sum.amount || 0
+    const prevMonthRevenue = lastMonthIncome._sum.amount || 0
+    const revenueChange = prevMonthRevenue > 0 ? ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100 : 0
+
+    const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+
+    const monthlyAppointments = Array(12).fill(0)
+    for (const apt of allAppointments) {
+      monthlyAppointments[apt.startTime.getMonth()]++
+    }
+
+    const monthlyRevenue: number[] = Array(12).fill(0)
+    for (const tx of monthlyRevenueData) {
+      if (tx.paymentDate) {
+        monthlyRevenue[tx.paymentDate.getMonth()] += tx._sum.amount || 0
+      }
+    }
+
+    const monthlyData = monthNames.map((month, i) => ({
+      month,
+      appointments: monthlyAppointments[i],
+      receita: monthlyRevenue[i],
+    }))
+
+    const lastMonthAppointments = allAppointments.filter(
+      (a) => a.startTime.getMonth() === currentMonth - 1 && a.startTime.getFullYear() === currentYear
+    ).length
+    const thisMonthAppointments = monthlyAppointments[currentMonth]
+    const appointmentChange = lastMonthAppointments > 0 ? ((thisMonthAppointments - lastMonthAppointments) / lastMonthAppointments) * 100 : 0
 
     return NextResponse.json({
       stats: {
         totalPatients,
         appointmentsToday,
-        monthlyRevenue: monthlyIncome._sum.amount || 0,
-        pendingPayments: pendingPayments._sum.amount || 0,
-        appointmentChange: 0,
-        revenueChange: 0,
+        monthlyRevenue: currentMonthRevenue,
+        pendingPayments: pending + overdue,
+        appointmentChange: Math.round(appointmentChange * 10) / 10,
+        revenueChange: Math.round(revenueChange * 10) / 10,
       },
+      monthlyData,
       appointments: recentAppointments.map((apt) => ({
         id: apt.id,
         patientName: apt.patient.name,
@@ -92,8 +156,8 @@ export async function GET() {
         totalRevenue: income,
         totalExpenses: expense,
         balance: income - expense,
-        pending: pendingPayments._sum.amount || 0,
-        overdue: 0,
+        pending,
+        overdue,
         received: income,
         goal: 10000,
       },
