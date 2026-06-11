@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/utils"
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Loader2, Pencil } from "lucide-react"
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Loader2, Pencil, Lock, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 export default function PatientDetailPage({ params }: { params: { id: string } }) {
@@ -127,16 +127,46 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
               ))}
             </TabsContent>
 
-            <TabsContent value="records">
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  <FileText className="mx-auto h-8 w-8 mb-2" />
-                  <p>Prontuários deste paciente</p>
-                  <Button variant="outline" className="mt-4" asChild>
-                    <Link href={`/prontuarios/novo?paciente=${params.id}`}>Criar Prontuário</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+            <TabsContent value="records" className="space-y-4">
+              {(!patient.medicalRecords || patient.medicalRecords.length === 0) ? (
+                <Card>
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    <FileText className="mx-auto h-8 w-8 mb-2" />
+                    <p>Nenhum prontuário encontrado</p>
+                    <p className="text-xs mt-1">Prontuários são criados automaticamente ao encerrar uma sessão</p>
+                    <Button variant="outline" className="mt-4" asChild>
+                      <Link href={`/prontuarios/novo?paciente=${params.id}`}>Criar Prontuário</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                patient.medicalRecords.map((rec: any) => (
+                  <Link key={rec.id} href={`/prontuarios/${rec.id}`}>
+                    <Card className="card-hover">
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <FileText className="h-5 w-5 text-primary shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{rec.title}</p>
+                            <p className="text-xs text-muted-foreground">{formatDate(rec.createdAt)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {rec.isConfidential && <Lock className="h-4 w-4 text-amber-500" />}
+                          <Badge variant="secondary">{
+                            rec.type === "SESSION_NOTE" ? "Nota de Sessão" :
+                            rec.type === "ANAMNESIS" ? "Anamnese" :
+                            rec.type === "EVOLUTION" ? "Evolução" :
+                            rec.type === "DISCHARGE_SUMMARY" ? "Resumo de Alta" :
+                            rec.type === "REPORT" ? "Relatório" : rec.type
+                          }</Badge>
+                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))
+              )}
             </TabsContent>
           </Tabs>
         </div>
