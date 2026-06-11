@@ -103,15 +103,24 @@ export async function DELETE(
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    await prisma.patient.delete({
-      where: {
-        id: params.id,
-        psychologistId: (session.user as { id: string }).id,
-      },
+    const psychologistId = (session.user as { id: string }).id
+
+    const patient = await prisma.patient.findFirst({
+      where: { id: params.id, psychologistId },
     })
+    if (!patient) {
+      return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+    }
+
+    await prisma.$transaction([
+      prisma.medicalRecord.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.therapySession.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.appointment.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.patient.delete({ where: { id: params.id } }),
+    ])
 
     await logAudit(
-      (session.user as { id: string }).id,
+      psychologistId,
       "DELETE",
       "Patient",
       params.id,
