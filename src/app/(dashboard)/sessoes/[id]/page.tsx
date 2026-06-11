@@ -102,8 +102,6 @@ export default function SessionPage() {
         setTags(data.tags || "")
         setSessionType(data.type || "")
         setIsRemote(data.isRemote)
-
-        // Reconstruct elapsed time for IN_PROGRESS sessions
         if (data.status === "IN_PROGRESS" && data.startedAt) {
           const paused = data.pausedSeconds ?? 0
           const sinceStart = Math.floor((Date.now() - new Date(data.startedAt).getTime()) / 1000)
@@ -121,7 +119,6 @@ export default function SessionPage() {
     load()
   }, [params.id, router])
 
-  // Timer tick
   useEffect(() => {
     if (session?.status === "IN_PROGRESS") {
       timerRef.current = setInterval(() => {
@@ -133,7 +130,6 @@ export default function SessionPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [session?.status, session?.startedAt, session?.pausedSeconds])
 
-  // Auto-save draft
   const saveDraft = useCallback(async () => {
     if (!dirty || !session) return
     setSaving(true)
@@ -145,7 +141,7 @@ export default function SessionPage() {
       })
       setDirty(false)
     } catch {
-      // silent auto-save failure
+      // silent
     } finally {
       setSaving(false)
     }
@@ -180,7 +176,6 @@ export default function SessionPage() {
       const updated: SessionData = await res.json()
       setSession(updated)
       setDirty(false)
-
       if (action === "start") {
         setElapsed(0)
         toast.success("Sessão iniciada!")
@@ -201,7 +196,7 @@ export default function SessionPage() {
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -219,7 +214,7 @@ export default function SessionPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
             <Link href="/agenda">
@@ -227,21 +222,20 @@ export default function SessionPage() {
             </Link>
           </Button>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">Sessão Terapêutica</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-bold tracking-tight">Sessão Terapêutica</h2>
+            <p className="text-muted-foreground text-sm">
               {session.appointment ? formatDateTime(session.appointment.startTime) : formatDateTime(session.createdAt)}
             </p>
           </div>
         </div>
 
-        {/* Timer + Controls */}
-        <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-3 px-5 py-2.5 rounded-2xl ring-1 ${
-            isActive ? "bg-emerald-500/10 ring-emerald-500/30" : isPaused ? "bg-amber-500/10 ring-amber-500/30" : isCompleted ? "bg-slate-800 ring-slate-700" : "bg-slate-800 ring-slate-700"
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border ${
+            isActive ? "border-emerald-500/30 bg-emerald-500/10" : isPaused ? "border-amber-500/30 bg-amber-500/10" : "border bg-card"
           }`}>
-            <Clock className={`h-5 w-5 ${isActive ? "text-emerald-400" : isPaused ? "text-amber-400" : "text-gray-400"}`} />
+            <Clock className={`h-5 w-5 ${isActive ? "text-emerald-500" : isPaused ? "text-amber-500" : "text-muted-foreground"}`} />
             <span className={`text-2xl font-mono font-bold tabular-nums ${
-              isActive ? "text-emerald-300" : isPaused ? "text-amber-300" : "text-white"
+              isActive ? "text-emerald-600 dark:text-emerald-400" : isPaused ? "text-amber-600 dark:text-amber-400" : "text-foreground"
             }`}>
               {formatTimer(elapsed)}
             </span>
@@ -249,32 +243,32 @@ export default function SessionPage() {
 
           <div className="flex items-center gap-2">
             {isScheduled && (
-              <Button onClick={() => handleAction("start")} disabled={saving} className="bg-emerald-600 hover:bg-emerald-500 text-white h-11 px-5 rounded-xl">
+              <Button onClick={() => handleAction("start")} disabled={saving}>
                 <Play className="h-4 w-4 mr-1.5" /> Iniciar
               </Button>
             )}
             {isActive && (
               <>
-                <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline" className="border-amber-500/50 text-amber-400 hover:bg-amber-500/10 h-11 px-4 rounded-xl">
+                <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline">
                   <Pause className="h-4 w-4 mr-1.5" /> Pausar
                 </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} className="bg-red-600 hover:bg-red-500 text-white h-11 px-5 rounded-xl">
+                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive">
                   <Square className="h-4 w-4 mr-1.5" /> Encerrar
                 </Button>
               </>
             )}
             {isPaused && (
               <>
-                <Button onClick={() => handleAction("resume")} disabled={saving} className="bg-emerald-600 hover:bg-emerald-500 text-white h-11 px-5 rounded-xl">
+                <Button onClick={() => handleAction("resume")} disabled={saving}>
                   <Play className="h-4 w-4 mr-1.5" /> Retomar
                 </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} className="bg-red-600 hover:bg-red-500 text-white h-11 px-5 rounded-xl">
+                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive">
                   <Square className="h-4 w-4 mr-1.5" /> Encerrar
                 </Button>
               </>
             )}
             {isCompleted && (
-              <div className="flex items-center gap-2 text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
                 <CheckCircle className="h-5 w-5" />
                 <span className="font-medium">Concluída</span>
               </div>
@@ -286,40 +280,40 @@ export default function SessionPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left — Patient Info */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-slate-900/50 rounded-2xl p-5 ring-1 ring-slate-700/50">
+          <div className="bg-card rounded-xl p-5 border">
             <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-12 w-12 ring-2 ring-slate-700">
-                <AvatarFallback className="bg-emerald-500/20 text-emerald-400 text-sm font-bold">
+              <Avatar className="h-12 w-12 ring-2 ring-border">
+                <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
                   {getInitials(patient.name)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-white font-semibold text-lg">{patient.name}</h3>
-                {age && <p className="text-gray-400 text-xs">{age} anos</p>}
+                <h3 className="font-semibold text-lg">{patient.name}</h3>
+                {age && <p className="text-muted-foreground text-xs">{age} anos</p>}
               </div>
             </div>
 
             <div className="space-y-2.5 text-sm">
               {patient.cpf && (
-                <div className="flex items-center gap-2 text-gray-400">
-                  <FileText className="h-3.5 w-3.5 text-gray-500" />
-                  <span>CPF: <span className="text-gray-300">{patient.cpf}</span></span>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>CPF: <span className="text-foreground">{patient.cpf}</span></span>
                 </div>
               )}
               {patient.phone && (
-                <div className="flex items-center gap-2 text-gray-400">
-                  <User className="h-3.5 w-3.5 text-gray-500" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="h-3.5 w-3.5" />
                   <span>{patient.phone}</span>
                 </div>
               )}
               {patient.email && (
-                <div className="text-gray-400 truncate">{patient.email}</div>
+                <div className="text-muted-foreground truncate">{patient.email}</div>
               )}
               {patient.profession && (
-                <div className="text-gray-400">Profissão: <span className="text-gray-300">{patient.profession}</span></div>
+                <div className="text-muted-foreground">Profissão: <span className="text-foreground">{patient.profession}</span></div>
               )}
               {patient.address && (
-                <div className="text-gray-400 text-xs leading-relaxed">
+                <div className="text-muted-foreground text-xs leading-relaxed">
                   {patient.address}
                   {patient.neighborhood && `, ${patient.neighborhood}`}
                   {patient.city && ` - ${patient.city}`}
@@ -327,8 +321,8 @@ export default function SessionPage() {
                 </div>
               )}
               {session.appointment && (
-                <div className={`flex items-center gap-2 text-xs mt-3 pt-3 border-t border-slate-700/50 ${
-                  session.appointment.modality === "online" ? "text-blue-400" : "text-emerald-400"
+                <div className={`flex items-center gap-2 text-xs mt-3 pt-3 border-t ${
+                  session.appointment.modality === "online" ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"
                 }`}>
                   {session.appointment.modality === "online" ? <Video className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
                   <span>{session.appointment.modality === "online" ? "Online" : "Presencial"}</span>
@@ -338,13 +332,13 @@ export default function SessionPage() {
           </div>
 
           {/* Mood */}
-          <div className="bg-slate-900/50 rounded-2xl p-5 ring-1 ring-slate-700/50">
-            <h4 className="text-sm font-semibold text-white mb-3">Avaliação de Humor</h4>
+          <div className="bg-card rounded-xl p-5 border">
+            <h4 className="text-sm font-semibold mb-3">Avaliação de Humor</h4>
             <div className="space-y-3">
               <div>
-                <Label className="text-gray-400 text-xs">Pré-sessão (1-10)</Label>
+                <Label className="text-muted-foreground text-xs">Pré-sessão (1-10)</Label>
                 <Select value={moodBefore} onValueChange={(v) => { setMoodBefore(v); markDirty() }} disabled={!canEdit}>
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-10 mt-1">
+                  <SelectTrigger className="h-10 mt-1">
                     <SelectValue placeholder="--" />
                   </SelectTrigger>
                   <SelectContent>
@@ -355,9 +349,9 @@ export default function SessionPage() {
                 </Select>
               </div>
               <div>
-                <Label className="text-gray-400 text-xs">Pós-sessão (1-10)</Label>
+                <Label className="text-muted-foreground text-xs">Pós-sessão (1-10)</Label>
                 <Select value={moodAfter} onValueChange={(v) => { setMoodAfter(v); markDirty() }} disabled={!canEdit}>
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-10 mt-1">
+                  <SelectTrigger className="h-10 mt-1">
                     <SelectValue placeholder="--" />
                   </SelectTrigger>
                   <SelectContent>
@@ -371,13 +365,13 @@ export default function SessionPage() {
           </div>
 
           {/* Session Info */}
-          <div className="bg-slate-900/50 rounded-2xl p-5 ring-1 ring-slate-700/50">
-            <h4 className="text-sm font-semibold text-white mb-3">Informações da Sessão</h4>
+          <div className="bg-card rounded-xl p-5 border">
+            <h4 className="text-sm font-semibold mb-3">Informações da Sessão</h4>
             <div className="space-y-3">
               <div>
-                <Label className="text-gray-400 text-xs">Tipo</Label>
+                <Label className="text-muted-foreground text-xs">Tipo</Label>
                 <Select value={sessionType} onValueChange={(v) => { setSessionType(v); markDirty() }} disabled={!canEdit}>
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-10 mt-1">
+                  <SelectTrigger className="h-10 mt-1">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
@@ -390,12 +384,12 @@ export default function SessionPage() {
                 </Select>
               </div>
               <div>
-                <Label className="text-gray-400 text-xs">Tags (separadas por vírgula)</Label>
+                <Label className="text-muted-foreground text-xs">Tags (separadas por vírgula)</Label>
                 <Input value={tags} onChange={(e) => { setTags(e.target.value); markDirty() }} placeholder="ansiedade, TCC, autoestima" disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-10 mt-1" />
+                  className="h-10 mt-1" />
               </div>
               {session.appointment && (
-                <div className="flex items-center gap-2 text-xs text-gray-400 mt-3 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-3 pt-3 border-t">
                   <Calendar className="h-3.5 w-3.5" />
                   <span>Agendamento vinculado</span>
                 </div>
@@ -406,80 +400,68 @@ export default function SessionPage() {
 
         {/* Right — SOAP Form */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-slate-900/50 rounded-2xl p-5 ring-1 ring-slate-700/50">
+          <div className="bg-card rounded-xl p-5 border">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <FileText className="h-5 w-5 text-emerald-400" />
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
                 Prontuário SOAP
               </h3>
-              {dirty && <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded-lg">NÃO SALVO</span>}
+              {dirty && <span className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-1 rounded-lg">NÃO SALVO</span>}
             </div>
 
             <div className="space-y-5">
-              {/* Subjective */}
               <div>
-                <Label className="text-gray-300 text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-blue-500/20 text-blue-400 text-xs flex items-center justify-center font-bold">S</span>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs flex items-center justify-center font-bold">S</span>
                   Subjetivo — Relato do paciente
                 </Label>
                 <Textarea value={subjective} onChange={(e) => { setSubjective(e.target.value); markDirty() }}
                   placeholder="O que o paciente relatou? Queixas, sentimentos, percepções..."
-                  rows={4} disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 resize-none" />
+                  rows={4} disabled={!canEdit} className="resize-none" />
               </div>
 
-              {/* Objective */}
               <div>
-                <Label className="text-gray-300 text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-green-500/20 text-green-400 text-xs flex items-center justify-center font-bold">O</span>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded bg-green-500/20 text-green-600 dark:text-green-400 text-xs flex items-center justify-center font-bold">O</span>
                   Objetivo — Observações do psicólogo
                 </Label>
                 <Textarea value={objective} onChange={(e) => { setObjective(e.target.value); markDirty() }}
                   placeholder="O que você observou? Comportamento, aparência, interação..."
-                  rows={4} disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 resize-none" />
+                  rows={4} disabled={!canEdit} className="resize-none" />
               </div>
 
-              {/* Assessment */}
               <div>
-                <Label className="text-gray-300 text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-400 text-xs flex items-center justify-center font-bold">A</span>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs flex items-center justify-center font-bold">A</span>
                   Avaliação — Análise clínica
                 </Label>
                 <Textarea value={assessment} onChange={(e) => { setAssessment(e.target.value); markDirty() }}
                   placeholder="Sua análise clínica: diagnóstico, progresso, insights..."
-                  rows={4} disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 resize-none" />
+                  rows={4} disabled={!canEdit} className="resize-none" />
               </div>
 
-              {/* Plan */}
               <div>
-                <Label className="text-gray-300 text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-purple-500/20 text-purple-400 text-xs flex items-center justify-center font-bold">P</span>
+                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs flex items-center justify-center font-bold">P</span>
                   Plano — Próximos passos
                 </Label>
                 <Textarea value={plan} onChange={(e) => { setPlan(e.target.value); markDirty() }}
                   placeholder="Plano terapêutico: intervenções, tarefas, encaminhamentos..."
-                  rows={4} disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 resize-none" />
+                  rows={4} disabled={!canEdit} className="resize-none" />
               </div>
 
-              {/* Notes */}
               <div>
-                <Label className="text-gray-300 text-sm font-medium mb-1.5">Observações Gerais</Label>
+                <Label className="text-sm font-medium mb-1.5">Observações Gerais</Label>
                 <Textarea value={notes} onChange={(e) => { setNotes(e.target.value); markDirty() }}
                   placeholder="Informações adicionais relevantes..."
-                  rows={3} disabled={!canEdit}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 resize-none" />
+                  rows={3} disabled={!canEdit} className="resize-none" />
               </div>
             </div>
           </div>
 
-          {/* Save button */}
           {canEdit && (
             <div className="flex justify-end">
-              <Button onClick={() => handleAction("save")} disabled={saving || !dirty}
-                className="bg-slate-700 hover:bg-slate-600 text-white h-11 px-6 rounded-xl">
+              <Button onClick={() => handleAction("save")} disabled={saving || !dirty} variant="secondary">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                 Salvar Rascunho
               </Button>

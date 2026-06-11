@@ -55,12 +55,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const now = new Date()
 
+    const updateAndFetch = async (data: any) => {
+      await prisma.therapySession.update({ where: { id: params.id }, data })
+      return getSessionById(params.id, psychologistId)
+    }
+
     if (action === "start") {
-      const updated = await prisma.therapySession.update({
-        where: { id: params.id },
-        data: { status: "IN_PROGRESS", startedAt: now },
-        include: { patient: { select: { id: true, name: true } } },
-      })
+      const updated = await updateAndFetch({ status: "IN_PROGRESS", startedAt: now })
       await prisma.appointment.updateMany({
         where: { id: existing.appointmentId ?? "", psychologistId },
         data: { status: "IN_PROGRESS" },
@@ -74,11 +75,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }
       const elapsed = existing.startedAt ? Math.floor((now.getTime() - existing.startedAt.getTime()) / 1000) : 0
       const totalPaused = (existing.pausedSeconds ?? 0) + elapsed
-      const updated = await prisma.therapySession.update({
-        where: { id: params.id },
-        data: { status: "PAUSED", pausedSeconds: totalPaused, duration: totalPaused },
-        include: { patient: { select: { id: true, name: true } } },
-      })
+      const updated = await updateAndFetch({ status: "PAUSED", pausedSeconds: totalPaused, duration: totalPaused })
       return NextResponse.json(updated)
     }
 
@@ -86,11 +83,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       if (existing.status !== "PAUSED") {
         return NextResponse.json({ error: "Sessão não está pausada" }, { status: 400 })
       }
-      const updated = await prisma.therapySession.update({
-        where: { id: params.id },
-        data: { status: "IN_PROGRESS", startedAt: now },
-        include: { patient: { select: { id: true, name: true } } },
-      })
+      const updated = await updateAndFetch({ status: "IN_PROGRESS", startedAt: now })
       return NextResponse.json(updated)
     }
 
@@ -99,30 +92,25 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         return NextResponse.json({ error: "Sessão não está ativa" }, { status: 400 })
       }
 
-      // Calculate total elapsed time
       let totalSeconds = existing.pausedSeconds ?? 0
       if (existing.status === "IN_PROGRESS" && existing.startedAt) {
         totalSeconds += Math.floor((now.getTime() - existing.startedAt.getTime()) / 1000)
       }
 
-      const updated = await prisma.therapySession.update({
-        where: { id: params.id },
-        data: {
-          status: "COMPLETED",
-          endedAt: now,
-          duration: totalSeconds,
-          subjective: subjective ?? existing.subjective,
-          objective: objective ?? existing.objective,
-          assessment: assessment ?? existing.assessment,
-          plan: plan ?? existing.plan,
-          notes: notes ?? existing.notes,
-          moodBefore: moodBefore !== undefined ? moodBefore : existing.moodBefore,
-          moodAfter: moodAfter !== undefined ? moodAfter : existing.moodAfter,
-          tags: tags ?? existing.tags,
-          type: type ?? existing.type,
-          isRemote: isRemote ?? existing.isRemote,
-        },
-        include: { patient: { select: { id: true, name: true } } },
+      const updated = await updateAndFetch({
+        status: "COMPLETED",
+        endedAt: now,
+        duration: totalSeconds,
+        subjective: subjective ?? existing.subjective,
+        objective: objective ?? existing.objective,
+        assessment: assessment ?? existing.assessment,
+        plan: plan ?? existing.plan,
+        notes: notes ?? existing.notes,
+        moodBefore: moodBefore !== undefined ? moodBefore : existing.moodBefore,
+        moodAfter: moodAfter !== undefined ? moodAfter : existing.moodAfter,
+        tags: tags ?? existing.tags,
+        type: type ?? existing.type,
+        isRemote: isRemote ?? existing.isRemote,
       })
 
       await prisma.appointment.updateMany({
@@ -130,25 +118,42 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         data: { status: "COMPLETED" },
       })
 
+      const sessionDate = existing.startedAt ?? existing.createdAt
+      const dateStr = sessionDate.toLocaleDateString("pt-BR")
+      const sections: string[] = []
+      if (subjective?.trim()) sections.push("**Subjetivo:**\n" + subjective)
+      if (objective?.trim()) sections.push("**Objetivo:**\n" + objective)
+      if (assessment?.trim()) sections.push("**Avaliação:**\n" + assessment)
+      if (plan?.trim()) sections.push("**Plano:**\n" + plan)
+      if (notes?.trim()) sections.push("**Observações:**\n" + notes)
+      const content = sections.join("\n\n") || "Sessão realizada sem anotações."
+
+      const title = `Sessão ${dateStr}` + (tags?.trim() ? ` — ${tags}` : "")
+
+      await prisma.medicalRecord.create({
+        data: {
+          type: "SESSION_NOTE",
+          title,
+          content,
+          patientId: existing.patientId,
+          psychologistId,
+        },
+      })
+
       return NextResponse.json(updated)
     }
 
-    // Draft save (no action) - update all provided fields
-    const updated = await prisma.therapySession.update({
-      where: { id: params.id },
-      data: {
-        subjective: subjective !== undefined ? subjective : existing.subjective,
-        objective: objective !== undefined ? objective : existing.objective,
-        assessment: assessment !== undefined ? assessment : existing.assessment,
-        plan: plan !== undefined ? plan : existing.plan,
-        notes: notes !== undefined ? notes : existing.notes,
-        moodBefore: moodBefore !== undefined ? moodBefore : existing.moodBefore,
-        moodAfter: moodAfter !== undefined ? moodAfter : existing.moodAfter,
-        tags: tags !== undefined ? tags : existing.tags,
-        type: type ?? existing.type,
-        isRemote: isRemote ?? existing.isRemote,
-      },
-      include: { patient: { select: { id: true, name: true } } },
+    const updated = await updateAndFetch({
+      subjective: subjective !== undefined ? subjective : existing.subjective,
+      objective: objective !== undefined ? objective : existing.objective,
+      assessment: assessment !== undefined ? assessment : existing.assessment,
+      plan: plan !== undefined ? plan : existing.plan,
+      notes: notes !== undefined ? notes : existing.notes,
+      moodBefore: moodBefore !== undefined ? moodBefore : existing.moodBefore,
+      moodAfter: moodAfter !== undefined ? moodAfter : existing.moodAfter,
+      tags: tags !== undefined ? tags : existing.tags,
+      type: type ?? existing.type,
+      isRemote: isRemote ?? existing.isRemote,
     })
 
     return NextResponse.json(updated)
