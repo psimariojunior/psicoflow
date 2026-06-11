@@ -88,9 +88,15 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
   const primaryTrack = screenTrack || remoteVideoTrack
 
   useEffect(() => {
-    if (localVideoRef.current && cameraTrack?.track) {
+    if (!localVideoRef.current) return
+    if (cameraTrack?.track) {
       const stream = new MediaStream([cameraTrack.track.mediaStreamTrack])
       localVideoRef.current.srcObject = stream
+    } else {
+      localVideoRef.current.srcObject = null
+    }
+    return () => {
+      if (localVideoRef.current) localVideoRef.current.srcObject = null
     }
   }, [cameraTrack])
 
@@ -132,14 +138,11 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
         )}
       </div>
 
-      <div className={`absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900 transition-opacity ${isCameraEnabled && cameraTrack ? 'opacity-100' : 'opacity-60'}`}>
-        {isCameraEnabled && cameraTrack ? (
-          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full">
-            <VideoOff className="h-6 w-6 text-gray-500" />
-          </div>
-        )}
+      <div className="absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900">
+        <video ref={localVideoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${isCameraEnabled && cameraTrack ? 'block' : 'hidden'}`} />
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isCameraEnabled && cameraTrack ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <VideoOff className="h-6 w-6 text-gray-500" />
+        </div>
       </div>
 
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur">
