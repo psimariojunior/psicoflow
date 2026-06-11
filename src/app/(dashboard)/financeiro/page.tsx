@@ -123,16 +123,19 @@ export default function FinancialPage() {
             )}
           </div>
           <Button variant="outline" onClick={() => {
-            const header = "Data,Descrição,Categoria,Valor,Tipo,Status,Paciente\n"
-            const rows = transactions.map((t) =>
-              `"${formatDate(t.date)}","${t.description}","${t.category}","${t.amount}","${t.type === "INCOME" ? "Receita" : "Despesa"}","${t.status}","${t.patient || ""}"`
-            ).join("\n")
-            const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" })
-            const url = URL.createObjectURL(blob)
-            const a = document.createElement("a")
-            a.href = url; a.download = "financeiro.csv"; a.click()
-            URL.revokeObjectURL(url)
-            toast.success("CSV exportado")
+            try {
+              const esc = (v: any) => { if (v === null || v === undefined) return '""'; return '"' + String(v).replace(/"/g, '""') + '"' }
+              const header = "Data;Descrição;Categoria;Valor;Tipo;Status;Paciente\n"
+              const rows = transactions.map((t) =>
+                [esc(formatDate(t.date)), esc(t.description), esc(t.category), esc(t.amount), esc(t.type === "INCOME" ? "Receita" : "Despesa"), esc(t.status), esc(t.patient)].join(";")
+              ).join("\n")
+              const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement("a")
+              a.href = url; a.download = "financeiro.csv"; a.click()
+              URL.revokeObjectURL(url)
+              toast.success("CSV exportado")
+            } catch { toast.error("Erro ao exportar CSV") }
           }}>
             <Download className="mr-2 h-4 w-4" />
             Exportar
