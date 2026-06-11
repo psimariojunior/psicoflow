@@ -158,17 +158,24 @@ model Appointment {
 
 model TherapySession {
   id            String   @id @default(cuid())
+  status        String   @default("SCHEDULED")
   date          DateTime @default(now())
+  startedAt     DateTime?
+  endedAt       DateTime?
   duration      Int?
-  type          String?
-  notes         String?
+  pausedSeconds Int?     @default(0)
+
+  // SOAP clinical notes
   subjective    String?
   objective     String?
   assessment    String?
   plan          String?
+
+  type          String?
+  notes         String?
+  tags          String?
   moodBefore    Int?
   moodAfter     Int?
-  tags          String?
   isRemote      Boolean  @default(false)
   recordingUrl  String?
   createdAt     DateTime @default(now())

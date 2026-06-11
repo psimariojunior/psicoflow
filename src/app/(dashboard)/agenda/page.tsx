@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, formatTime } from "@/lib/utils"
-import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play, Bell } from "lucide-react"
+import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play, Bell, ClipboardEdit } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 
 const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
@@ -37,6 +38,7 @@ interface PatientOption {
 }
 
 export default function AgendaPage() {
+  const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<"day" | "week" | "month">("day")
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -473,6 +475,23 @@ export default function AgendaPage() {
                         <CheckCircle className="mr-1 h-4 w-4" /> Confirmar
                       </Button>
                     )}
+                    <Button size="sm" variant="outline" className="border-violet-300 text-violet-600" onClick={async () => {
+                      try {
+                        const res = await fetch("/api/sessoes", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ patientId: selectedAppt.patientId, appointmentId: selectedAppt.id, type: selectedAppt.type, isRemote: selectedAppt.modality === "online" }),
+                        })
+                        if (!res.ok) throw new Error()
+                        const sess = await res.json()
+                        setShowDetail(false)
+                        router.push(`/sessoes/${sess.id}`)
+                      } catch {
+                        toast.error("Erro ao iniciar sessão")
+                      }
+                    }}>
+                      <ClipboardEdit className="mr-1 h-4 w-4" /> Iniciar Sessão
+                    </Button>
                     {selectedAppt.status !== "IN_PROGRESS" && (
                       <Button size="sm" variant="outline" className="border-amber-300 text-amber-600" onClick={() => handleUpdateStatus(selectedAppt.id, "IN_PROGRESS")}>
                         <Play className="mr-1 h-4 w-4" /> Iniciar

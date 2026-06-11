@@ -39,14 +39,14 @@ export async function POST(request: Request) {
 
     const therapySession = await prisma.therapySession.create({
       data: {
+        status: "SCHEDULED",
         date: data.date ? new Date(data.date) : new Date(),
-        duration: data.duration ? parseInt(data.duration) : null,
         type: data.type || null,
-        notes: data.notes || null,
         subjective: data.subjective || null,
         objective: data.objective || null,
         assessment: data.assessment || null,
         plan: data.plan || null,
+        notes: data.notes || null,
         moodBefore: data.moodBefore ? parseInt(data.moodBefore) : null,
         moodAfter: data.moodAfter ? parseInt(data.moodAfter) : null,
         tags: data.tags || null,
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         psychologistId: (session.user as { id: string }).id,
       },
       include: {
-        patient: { select: { id: true, name: true } },
+        patient: { select: { id: true, name: true, cpf: true, phone: true, email: true } },
       },
     })
 
