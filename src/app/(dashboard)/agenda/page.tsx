@@ -484,6 +484,11 @@ export default function AgendaPage() {
                         })
                         if (!res.ok) throw new Error()
                         const sess = await res.json()
+                        await fetch(`/api/sessoes/${sess.id}`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ action: "start" }),
+                        })
                         setShowDetail(false)
                         router.push(`/sessoes/${sess.id}`)
                       } catch {
