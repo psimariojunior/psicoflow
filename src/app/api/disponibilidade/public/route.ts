@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     const currentDate = new Date(startDate)
     while (currentDate <= endDate) {
-      const dayOfWeek = currentDate.getDay()
+      const dayOfWeek = currentDate.getUTCDay()
       const daySlots = slots.filter((s) => s.dayOfWeek === dayOfWeek)
 
       if (daySlots.length > 0) {

@@ -387,7 +387,7 @@ export default function AgendaPacientePage() {
                   <div>
                     <h2 className="text-lg font-semibold text-white">{formatDateBR(selectedDate)}</h2>
                     <p className="text-gray-400 text-sm">
-                      {["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][new Date(selectedDate).getDay()]}
+                      {["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][new Date(selectedDate).getUTCDay()]}
                     </p>
                   </div>
                 </div>

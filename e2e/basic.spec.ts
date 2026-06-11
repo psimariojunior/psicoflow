@@ -1,18 +1,18 @@
 import { test, expect } from "@playwright/test"
 
-test("home page shows login option for psychologists", async ({ page }) => {
+test("home page shows login form", async ({ page }) => {
   await page.goto("/")
-  await expect(page.locator("text=Entrar")).toBeVisible()
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible()
 })
 
 test("patient login page loads correctly", async ({ page }) => {
   await page.goto("/paciente/login")
-  await expect(page.locator("text=Entrar como Paciente")).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible()
 })
 
 test("patient registration page loads", async ({ page }) => {
   await page.goto("/paciente/cadastro")
-  await expect(page.locator("text=Criar Conta")).toBeVisible()
+  await expect(page.locator("h1")).toHaveText("Criar conta")
 })
 
 test("virtual room entrance page loads", async ({ page }) => {
@@ -22,5 +22,5 @@ test("virtual room entrance page loads", async ({ page }) => {
 
 test("appointment booking page loads", async ({ page }) => {
   await page.goto("/agendar")
-  await expect(page.locator("text=Agendar Consulta")).toBeVisible()
+  await expect(page.locator("h1")).toContainText("Agende sua consulta")
 })
