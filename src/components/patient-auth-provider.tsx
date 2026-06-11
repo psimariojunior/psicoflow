@@ -3,7 +3,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Loader2, BookHeart, CalendarDays } from "lucide-react"
+import { Loader2, BookHeart, CalendarDays, History } from "lucide-react"
 
 export interface PatientData {
   id: string
@@ -114,6 +114,12 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                 }`}>
                   <BookHeart className="h-3.5 w-3.5" />
                   Diário
+                </Link>
+                <Link href="/paciente/historico" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente/historico" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <History className="h-3.5 w-3.5" />
+                  Histórico
                 </Link>
               </nav>
               <span className="text-gray-300 text-sm">{patient.name}</span>
