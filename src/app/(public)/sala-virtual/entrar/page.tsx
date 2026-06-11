@@ -110,7 +110,8 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full">
+      <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
         <div className="relative min-h-0 bg-slate-900">
           {primaryTrack ? (
             <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
@@ -134,6 +135,7 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
             </div>
           )}
         </div>
+      </div>
       </div>
 
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur">
