@@ -118,21 +118,37 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="absolute inset-0">
-        {primaryTrack ? (
-          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
-            <div className="text-center text-white px-6">
-              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
-              <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
+      {/* Remote + local side by side on desktop, stacked on mobile */}
+      <div className="flex flex-col md:flex-row w-full h-full">
+        {/* Remote video */}
+        <div className="flex-1 relative min-h-0">
+          {primaryTrack ? (
+            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+              <div className="text-center text-white px-6">
+                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando psicólogo</h3>
+                <p className="text-sm text-white/60">Em breve o profissional entrará na sala.</p>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <video ref={localVideoRef} autoPlay muted playsInline className={`absolute top-4 right-4 z-20 w-28 md:w-36 aspect-[3/4] rounded-2xl shadow-2xl ring-2 ring-white/20 object-cover scale-x-[-1] ${isCameraEnabled && cameraTrack ? 'block' : 'hidden'}`} />
+        {/* Local video */}
+        <div className="relative md:w-72 md:min-w-72 h-48 md:h-full bg-slate-900">
+          {isCameraEnabled && cameraTrack ? (
+            <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <div className="text-center">
+                <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                <p className="text-xs text-gray-500">Câmera desligada</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur">
         <Camera className="h-3.5 w-3.5 text-emerald-400" />
