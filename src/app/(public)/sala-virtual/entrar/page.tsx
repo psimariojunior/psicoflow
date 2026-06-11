@@ -79,26 +79,12 @@ function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (h
 function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
   const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const localVideoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
   const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
   const primaryTrack = screenTrack || remoteVideoTrack
-
-  useEffect(() => {
-    if (!localVideoRef.current) return
-    if (cameraTrack?.track) {
-      const stream = new MediaStream([cameraTrack.track.mediaStreamTrack])
-      localVideoRef.current.srcObject = stream
-    } else {
-      localVideoRef.current.srcObject = null
-    }
-    return () => {
-      if (localVideoRef.current) localVideoRef.current.srcObject = null
-    }
-  }, [cameraTrack])
 
   useEffect(() => {
     const onChange = () => setIsFullscreen(!!document.fullscreenElement)
@@ -139,8 +125,10 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
       </div>
 
       <div className="absolute bottom-24 right-4 z-20 w-44 md:w-64 aspect-video rounded-xl shadow-2xl ring-2 ring-white/10 overflow-hidden bg-slate-900">
-        <video ref={localVideoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${isCameraEnabled && cameraTrack ? 'block' : 'hidden'}`} />
-        <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isCameraEnabled && cameraTrack ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        {cameraTrack && (
+          <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className={`w-full h-full object-cover scale-x-[-1] ${isCameraEnabled ? 'block' : 'hidden'}`} />
+        )}
+        <div className={`absolute inset-0 flex items-center justify-center ${isCameraEnabled && cameraTrack ? 'hidden' : 'flex'}`}>
           <VideoOff className="h-6 w-6 text-gray-500" />
         </div>
       </div>
