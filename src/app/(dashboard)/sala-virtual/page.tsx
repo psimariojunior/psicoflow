@@ -188,21 +188,16 @@ function PsychologistInCall() {
               <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
               <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-white/10 backdrop-blur-md text-white/80 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20">Paciente</span>
+                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Paciente</span>
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-black">
-              <div className="text-center text-white px-6">
-                <div className="relative w-16 h-16 mx-auto mb-4">
-                  <div className="absolute inset-0 rounded-full border-2 border-emerald-400/30 animate-ping" />
-                  <div className="absolute inset-2 rounded-full border-2 border-emerald-400/40" />
-                  <div className="absolute inset-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
-                  </div>
+            <div className="flex items-center justify-center w-full h-full bg-slate-900">
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
+                  <User className="h-6 w-6 text-slate-500" />
                 </div>
-                <h3 className="text-base md:text-lg font-bold mb-1 text-white/90">Aguardando paciente</h3>
-                <p className="text-sm text-white/40">O paciente ainda não entrou na sala</p>
+                <p className="text-xs text-slate-500 font-medium">Aguardando paciente...</p>
               </div>
             </div>
           )}
@@ -214,7 +209,7 @@ function PsychologistInCall() {
               <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="w-full h-full object-cover scale-x-[-1]" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
               <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-white/10 backdrop-blur-md text-white/80 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20">Você</span>
+                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você (Psicólogo)</span>
               </div>
             </>
           ) : (
