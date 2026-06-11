@@ -6,9 +6,15 @@ import { StatusBadge } from "@/components/shared/status-badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, calculateAge } from "@/lib/utils"
-import { Plus, Mail, Phone, MoreHorizontal, Loader2 } from "lucide-react"
+import { Plus, Mail, Phone, MoreHorizontal, Loader2, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import toast from "react-hot-toast"
 
 interface Patient {
@@ -25,6 +31,7 @@ interface Patient {
 export default function PatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -91,11 +98,25 @@ export default function PatientsPage() {
     {
       id: "actions",
       cell: ({ row }) => (
-        <Button variant="ghost" size="icon" asChild>
-          <Link href={`/pacientes/${row.original.id}`}>
-            <MoreHorizontal className="h-4 w-4" />
-          </Link>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link href={`/pacientes/${row.original.id}`}>Ver detalhes</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              onClick={() => setDeleteTarget(row.original)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Excluir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     },
   ]
@@ -131,6 +152,34 @@ export default function PatientsPage() {
         searchKey="name"
         searchPlaceholder="Buscar paciente..."
       />
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setDeleteTarget(null)}>
+          <div className="bg-background rounded-xl p-6 w-full max-w-md shadow-2xl border mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold mb-2">Excluir paciente</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              Tem certeza que deseja excluir <strong>{deleteTarget.name}</strong>?
+              Todos os dados associados (consultas, sessões, prontuários) serão removidos permanentemente.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+              <Button variant="destructive" onClick={async () => {
+                try {
+                  const res = await fetch(`/api/pacientes/${deleteTarget.id}`, { method: "DELETE" })
+                  if (!res.ok) throw new Error()
+                  toast.success("Paciente excluído")
+                  setPatients((prev) => prev.filter((p) => p.id !== deleteTarget.id))
+                } catch {
+                  toast.error("Erro ao excluir paciente")
+                }
+                setDeleteTarget(null)
+              }}>
+                <Trash2 className="mr-2 h-4 w-4" /> Excluir
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
