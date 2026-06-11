@@ -118,10 +118,8 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
-      {/* Remote + local side by side on desktop, stacked on mobile */}
-      <div className="flex flex-col md:flex-row w-full h-full">
-        {/* Remote video */}
-        <div className="flex-1 relative min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full gap-px">
+        <div className="relative min-h-0">
           {primaryTrack ? (
             <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
           ) : (
@@ -135,8 +133,7 @@ function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void
           )}
         </div>
 
-        {/* Local video */}
-        <div className="relative md:w-72 md:min-w-72 h-48 md:h-full bg-slate-900">
+        <div className="relative min-h-0 bg-slate-900">
           {isCameraEnabled && cameraTrack ? (
             <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
           ) : (

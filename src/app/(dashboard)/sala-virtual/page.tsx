@@ -171,32 +171,34 @@ function PsychologistInCall() {
   }, [cameraTrack])
 
   return (
-    <div className="relative flex flex-col md:flex-row w-full h-full bg-black">
-      <div className="flex-1 relative min-h-0">
-        {primaryTrack ? (
-          <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
-            <div className="text-center text-white px-6">
-              <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-              <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
-              <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
+    <div className="relative w-full h-full bg-black">
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full gap-px">
+        <div className="relative min-h-0">
+          {primaryTrack ? (
+            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-slate-900 to-black">
+              <div className="text-center text-white px-6">
+                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
+                <h3 className="text-base md:text-lg font-bold mb-1">Aguardando paciente</h3>
+                <p className="text-sm text-white/60">O paciente ainda não entrou na sala.</p>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="relative md:w-72 md:min-w-72 h-48 md:h-full bg-slate-900">
-        {isCameraEnabled && cameraTrack ? (
-          <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full">
-            <div className="text-center">
-              <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500">Câmera desligada</p>
+        <div className="relative min-h-0 bg-slate-900">
+          {isCameraEnabled && cameraTrack ? (
+            <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-contain scale-x-[-1]" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <div className="text-center">
+                <VideoOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                <p className="text-xs text-gray-500">Câmera desligada</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-xs text-white/50 bg-black/50 px-3 py-1.5 rounded-full">
