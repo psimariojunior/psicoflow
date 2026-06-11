@@ -14,7 +14,9 @@ RUN apk add --no-cache openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
-RUN npm run build
+ENV NEXT_PUBLIC_APP_URL=http://localhost:3000
+ENV NEXTAUTH_URL=http://localhost:3000
+RUN npx next build
 
 # Stage 3: Production
 FROM node:20-alpine AS runner
@@ -33,12 +35,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma/config ./node_modules/@prisma/config
-COPY --from=builder /app/node_modules/@prisma/get-platform ./node_modules/@prisma/get-platform
-COPY --from=builder /app/node_modules/@prisma/fetch-engine ./node_modules/@prisma/fetch-engine
-COPY --from=builder /app/node_modules/@prisma/engines ./node_modules/@prisma/engines
-COPY --from=builder /app/node_modules/@prisma/engines-version ./node_modules/@prisma/engines-version
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY deploy/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x entrypoint.sh && chown -R nextjs:nodejs /app
