@@ -43,7 +43,7 @@ export default function SessoesPage() {
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600 dark:text-emerald-400" />
       </div>
     )
   }
@@ -51,13 +51,13 @@ export default function SessoesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-white">Sessões</h2>
-        <p className="text-gray-400 text-sm">Histórico de sessões realizadas</p>
+        <h2 className="text-2xl font-bold tracking-tight">Sessões</h2>
+        <p className="text-muted-foreground text-sm">Histórico de sessões realizadas</p>
       </div>
 
       {sessions.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-gray-400">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <Clock className="h-12 w-12 mb-4 opacity-30" />
             <p className="text-lg font-medium">Nenhuma sessão encontrada</p>
             <p className="text-sm mt-1">As sessões aparecerão aqui quando você iniciar um atendimento</p>
@@ -67,15 +67,15 @@ export default function SessoesPage() {
         <div className="space-y-2">
           {sessions.map((sess) => (
             <Link key={sess.id} href={`/sessoes/${sess.id}`}>
-              <div className="bg-slate-900/50 hover:bg-slate-900/80 rounded-xl p-4 ring-1 ring-slate-700/50 transition-all flex items-center gap-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-emerald-500/20 text-emerald-400 text-xs">
+              <div className="bg-card hover:bg-accent/50 rounded-xl p-4 border transition-all flex items-center gap-4">
+                <Avatar className="h-10 w-10 ring-2 ring-border">
+                  <AvatarFallback className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs">
                     {getInitials(sess.patient.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">{sess.patient.name}</p>
-                  <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                  <p className="font-medium truncate">{sess.patient.name}</p>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {sess.appointment ? formatDateTime(sess.appointment.startTime) : formatDateTime(sess.date)}
@@ -85,10 +85,10 @@ export default function SessoesPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${
-                    sess.status === "IN_PROGRESS" ? "bg-emerald-500/15 text-emerald-400" :
-                    sess.status === "PAUSED" ? "bg-amber-500/15 text-amber-400" :
-                    sess.status === "COMPLETED" ? "bg-slate-800 text-gray-300" :
-                    "bg-slate-800 text-gray-400"
+                    sess.status === "IN_PROGRESS" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" :
+                    sess.status === "PAUSED" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400" :
+                    sess.status === "COMPLETED" ? "bg-muted text-muted-foreground" :
+                    "bg-muted text-muted-foreground"
                   }`}>
                     {sess.status === "IN_PROGRESS" ? <Play className="h-3 w-3" /> :
                      sess.status === "PAUSED" ? <Pause className="h-3 w-3" /> :
@@ -102,7 +102,7 @@ export default function SessoesPage() {
                     }</span>
                   </div>
                   {sess.duration && (
-                    <span className="text-xs text-gray-400 font-mono tabular-nums">{formatDuration(sess.duration)}</span>
+                    <span className="text-xs text-muted-foreground font-mono tabular-nums">{formatDuration(sess.duration)}</span>
                   )}
                 </div>
               </div>
