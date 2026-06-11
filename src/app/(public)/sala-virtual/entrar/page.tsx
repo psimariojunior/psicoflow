@@ -273,6 +273,12 @@ function EntrarSalaForm() {
     return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); streamRef.current = null; setCameraReady(false) }
   }, [])
 
+  useEffect(() => {
+    if (psychologistPresent && typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification("Psicólogo entrou na sala", { body: "O profissional está disponível para a sessão." })
+    }
+  }, [psychologistPresent])
+
   if (token) {
     return (
       <div className="h-screen relative bg-black">
