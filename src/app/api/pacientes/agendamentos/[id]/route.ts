@@ -37,9 +37,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Não é possível cancelar uma consulta que já passou" }, { status: 400 })
     }
 
+    const body = await request.json().catch(() => ({}))
     await prisma.appointment.update({
       where: { id: params.id },
-      data: { status: "CANCELLED" },
+      data: { status: "CANCELLED", cancelReason: body.cancelReason || null },
     })
 
     cancelPendingReminders(params.id).catch(
