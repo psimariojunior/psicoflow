@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createTransactionSchema } from "@/lib/validation"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -13,23 +13,35 @@ export async function GET() {
     }
 
     const psychologistId = (session.user as { id: string }).id
+    const { searchParams } = request.nextUrl
+    const startDate = searchParams.get("startDate")
+    const endDate = searchParams.get("endDate")
+
+    const dateFilter: any = {}
+    if (startDate || endDate) {
+      dateFilter.createdAt = {}
+      if (startDate) dateFilter.createdAt.gte = new Date(startDate)
+      if (endDate) dateFilter.createdAt.lte = new Date(endDate + "T23:59:59.999Z")
+    }
+
+    const whereBase = { psychologistId }
 
     const [income, expense] = await Promise.all([
       prisma.financialTransaction.aggregate({
-        where: { psychologistId, type: "INCOME", paymentStatus: "PAID" },
+        where: { ...whereBase, type: "INCOME", paymentStatus: "PAID" },
         _sum: { amount: true },
       }),
       prisma.financialTransaction.aggregate({
-        where: { psychologistId, type: "EXPENSE", paymentStatus: "PAID" },
+        where: { ...whereBase, type: "EXPENSE", paymentStatus: "PAID" },
         _sum: { amount: true },
       }),
     ])
 
     const transactions = await prisma.financialTransaction.findMany({
-      where: { psychologistId },
+      where: { ...whereBase, ...dateFilter },
       include: { patient: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: 200,
     })
 
     return NextResponse.json({
