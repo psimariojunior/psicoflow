@@ -42,7 +42,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-gray-400">Link inválido. Solicite um novo link de recuperação.</p>
+        <p className="text-slate-400 dark:text-gray-400">Link inválido. Solicite um novo link de recuperação.</p>
       </div>
     )
   }
@@ -51,10 +51,10 @@ function ResetPasswordForm() {
     return (
       <div className="w-full max-w-sm text-center">
         <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/15 mb-6">
-          <CheckCircle className="h-8 w-8 text-emerald-400" />
+          <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">Senha redefinida!</h1>
-        <p className="text-gray-300 text-sm mb-6">Sua senha foi alterada com sucesso.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Senha redefinida!</h1>
+        <p className="text-slate-500 dark:text-gray-300 text-sm mb-6">Sua senha foi alterada com sucesso.</p>
         <Button className="w-full h-12" onClick={() => router.push("/paciente/login")}>
           Ir para o login
         </Button>
@@ -65,8 +65,8 @@ function ResetPasswordForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-1">Nova senha</h1>
-        <p className="text-gray-300 text-sm">Digite sua nova senha</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Nova senha</h1>
+        <p className="text-slate-500 dark:text-gray-300 text-sm">Digite sua nova senha</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -74,14 +74,14 @@ function ResetPasswordForm() {
           placeholder="Nova senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
+          className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
         />
         <Input
           type="password"
           placeholder="Confirmar senha"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
+          className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
         />
         <Button
           type="submit"
@@ -98,11 +98,11 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950">
       <div className="flex-1 flex items-center justify-center p-4">
         <Suspense fallback={
           <div className="flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600 dark:text-emerald-400" />
           </div>
         }>
           <ResetPasswordForm />

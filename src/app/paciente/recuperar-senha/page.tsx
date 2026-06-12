@@ -35,19 +35,19 @@ export default function RecuperarSenhaPage() {
 
   if (sent) {
     return (
-      <div className="flex min-h-screen bg-slate-950">
+      <div className="flex min-h-screen bg-white dark:bg-slate-950">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm text-center">
             <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/15 mb-6">
-              <CheckCircle className="h-8 w-8 text-emerald-400" />
+              <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Email enviado!</h1>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Email enviado!</h1>
+            <p className="text-slate-500 dark:text-gray-300 text-sm leading-relaxed">
               Se o email estiver cadastrado, você receberá um link para redefinir sua senha em instantes.
             </p>
             <Link
               href="/paciente/login"
-              className="inline-flex items-center gap-2 mt-6 text-sm text-emerald-400 hover:text-emerald-300"
+              className="inline-flex items-center gap-2 mt-6 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
             >
               <ArrowLeft className="h-4 w-4" /> Voltar ao login
             </Link>
@@ -58,12 +58,12 @@ export default function RecuperarSenhaPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-1">Recuperar senha</h1>
-            <p className="text-gray-300 text-sm">Receba um link para redefinir sua senha</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Recuperar senha</h1>
+            <p className="text-slate-500 dark:text-gray-300 text-sm">Receba um link para redefinir sua senha</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -71,7 +71,7 @@ export default function RecuperarSenhaPage() {
               placeholder="Seu email cadastrado"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
+              className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
             />
             <Button
               type="submit"
@@ -83,7 +83,7 @@ export default function RecuperarSenhaPage() {
             </Button>
           </form>
           <p className="text-center mt-6">
-            <Link href="/paciente/login" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/login" className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
               <ArrowLeft className="h-4 w-4 inline mr-1" /> Voltar ao login
             </Link>
           </p>
