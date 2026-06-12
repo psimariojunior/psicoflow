@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Brain, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function RegisterPage() {
@@ -63,8 +63,8 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl gradient-primary shadow-lg">
-            <Brain className="h-7 w-7 text-white" />
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30 ring-4 ring-emerald-500/20 mb-1">
+            <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-3xl font-bold">Criar Conta</h1>
           <p className="text-sm text-muted-foreground">

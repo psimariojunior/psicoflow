@@ -3,26 +3,34 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import bcrypt from "bcryptjs"
 import { signPatientToken } from "@/lib/patient-auth"
+import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { validateOrigin } from "@/lib/csrf"
+import { z } from "zod"
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido").max(255),
+  password: z.string().min(1, "Senha é obrigatória").max(128),
+})
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, password } = await request.json()
+  const rateLimit = rateLimitMiddleware(10, 60000)
+  const blocked = rateLimit(request)
+  if (blocked) return blocked
 
-    if (!email?.trim() || !password?.trim()) {
+  const originCheck = validateOrigin(request)
+  if (!originCheck.allowed) return originCheck.error
+
+  try {
+    const raw = await request.json()
+    const parsed = loginSchema.safeParse(raw)
+    if (!parsed.success) {
       return NextResponse.json({ error: "Email e senha são obrigatórios" }, { status: 400 })
     }
-
-    const psychologist = await prisma.user.findFirst({
-      where: { role: "PSYCHOLOGIST", active: true },
-      orderBy: { createdAt: "asc" },
-    })
-
-    if (!psychologist) {
-      return NextResponse.json({ error: "Nenhum psicólogo disponível" }, { status: 404 })
-    }
+    const { email, password } = parsed.data
 
     const patient = await prisma.patient.findFirst({
-      where: { email: email.trim(), psychologistId: psychologist.id },
+      where: { email: email.trim() },
+      include: { psychologist: true },
     })
 
     if (!patient || !patient.password) {

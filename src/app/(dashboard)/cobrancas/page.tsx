@@ -12,7 +12,8 @@ import { DataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { Plus, Download, Receipt, Barcode, FileText, Loader2 } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { Plus, Download, Receipt, Barcode, FileText, Loader2, Trash2, CheckCircle } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import toast from "react-hot-toast"
 
@@ -25,7 +26,16 @@ interface Invoice {
   dueDate: string
   status: string
   issueDate: string
+  paymentMethod?: string
 }
+
+const PAYMENT_METHODS = [
+  { value: "PIX", label: "PIX" },
+  { value: "CREDIT_CARD", label: "Cartão de Crédito" },
+  { value: "BOLETO", label: "Boleto" },
+  { value: "CASH", label: "Dinheiro" },
+  { value: "TRANSFER", label: "Transferência" },
+]
 
 export default function CobrancasPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -33,11 +43,23 @@ export default function CobrancasPage() {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false)
   const [patients, setPatients] = useState<{ id: string; name: string }[]>([])
   const [invForm, setInvForm] = useState({ description: "", amount: "", dueDate: "", patientId: "", notes: "" })
+  const [payDialog, setPayDialog] = useState<Invoice | null>(null)
+  const [payMethod, setPayMethod] = useState("PIX")
+  const [detailDialog, setDetailDialog] = useState<Invoice | null>(null)
+  const [pixKey, setPixKey] = useState("")
+  const [paymentInfo, setPaymentInfo] = useState("")
 
   useEffect(() => {
     fetch("/api/pacientes?limit=100")
       .then(r => r.ok ? r.json() : { patients: [] })
       .then(d => setPatients(d.patients || []))
+      .catch(() => {})
+    fetch("/api/configuracoes")
+      .then(r => r.ok ? r.json() : Promise.resolve({} as { pixKey?: string; paymentInfo?: string }))
+      .then((d: { pixKey?: string; paymentInfo?: string }) => {
+        setPixKey(d.pixKey || "")
+        setPaymentInfo(d.paymentInfo || "")
+      })
       .catch(() => {})
   }, [])
 
@@ -65,6 +87,36 @@ export default function CobrancasPage() {
     { accessorKey: "amount", header: "Valor", cell: ({ row }) => formatCurrency(row.original.amount) },
     { accessorKey: "dueDate", header: "Vencimento", cell: ({ row }) => formatDate(row.original.dueDate) },
     { accessorKey: "status", header: "Status", cell: ({ row }) => <StatusBadge status={row.original.status} /> },
+    {
+      id: "actions",
+      header: "Ações",
+      cell: ({ row }) => {
+        const inv = row.original
+        return (
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setDetailDialog(inv)} aria-label="Detalhes">
+              <FileText className="h-4 w-4" />
+            </Button>
+            {inv.status !== "PAID" && inv.status !== "CANCELLED" && (
+              <Button variant="ghost" size="icon" onClick={() => { setPayDialog(inv); setPayMethod("PIX") }} aria-label="Marcar como pago">
+                <CheckCircle className="h-4 w-4 text-emerald-500" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" aria-label="Excluir fatura" onClick={async () => {
+              if (!confirm("Excluir esta fatura?")) return
+              try {
+                const res = await fetch(`/api/invoices/${inv.id}`, { method: "DELETE" })
+                if (!res.ok) throw new Error()
+                toast.success("Fatura excluída")
+                setInvoices(prev => prev.filter(i => i.id !== inv.id))
+              } catch { toast.error("Erro ao excluir") }
+            }}>
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        )
+      },
+    },
   ]
 
   const totalOpen = invoices.filter(i => i.status === "PENDING" || i.status === "OVERDUE").reduce((a, i) => a + i.amount, 0)
@@ -86,7 +138,19 @@ export default function CobrancasPage() {
           <p className="text-muted-foreground">Gerenciamento de faturas e cobranças</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Exportar</Button>
+          <Button variant="outline" onClick={() => {
+            const rows = [["Nº","Paciente","Descrição","Valor","Vencimento","Status"]]
+            invoices.forEach((i) => {
+              rows.push([i.number, i.patientName, i.description, String(i.amount), formatDate(i.dueDate), i.status])
+            })
+            const csv = "\uFEFF" + rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(";")).join("\n")
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url; a.download = "cobrancas.csv"; a.click()
+            URL.revokeObjectURL(url)
+            toast.success("CSV exportado!")
+          }}><Download className="mr-2 h-4 w-4" /> Exportar</Button>
           <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
             <DialogTrigger asChild>
               <Button><Plus className="mr-2 h-4 w-4" /> Nova Fatura</Button>
@@ -142,6 +206,89 @@ export default function CobrancasPage() {
                 </div>
                 <Button type="submit">Criar Fatura</Button>
               </form>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={!!payDialog} onOpenChange={(o) => { if (!o) setPayDialog(null) }}>
+            <DialogContent className="sm:max-w-[400px]">
+              <DialogHeader><DialogTitle>Receber Pagamento</DialogTitle></DialogHeader>
+              {payDialog && (
+                <form onSubmit={async (e) => {
+                  e.preventDefault()
+                  try {
+                    const res = await fetch(`/api/invoices/${payDialog.id}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "PAID", paymentMethod: payMethod }),
+                    })
+                    if (!res.ok) throw new Error()
+                    toast.success("Pagamento registrado!")
+                    setPayDialog(null)
+                    const data = await fetch("/api/invoices").then(r => r.json())
+                    setInvoices(data.invoices || [])
+                  } catch { toast.error("Erro ao registrar pagamento") }
+                }} className="space-y-4 py-4">
+                  <div className="text-sm text-muted-foreground">
+                    Fatura: <strong>{payDialog.number}</strong> — {formatCurrency(payDialog.amount)}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Método de Pagamento</Label>
+                    <Select value={payMethod} onValueChange={setPayMethod}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {PAYMENT_METHODS.map((m) => (
+                          <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button type="submit" className="w-full">Confirmar Pagamento</Button>
+                </form>
+              )}
+            </DialogContent>
+          </Dialog>
+          <Dialog open={!!detailDialog} onOpenChange={(o) => { if (!o) setDetailDialog(null) }}>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader><DialogTitle>Detalhes da Fatura</DialogTitle></DialogHeader>
+              {detailDialog && (
+                <div className="space-y-4 py-2">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div><span className="text-muted-foreground">Nº:</span> <strong>{detailDialog.number}</strong></div>
+                    <div><span className="text-muted-foreground">Status:</span> <StatusBadge status={detailDialog.status} /></div>
+                    <div><span className="text-muted-foreground">Paciente:</span> <strong>{detailDialog.patientName}</strong></div>
+                    <div><span className="text-muted-foreground">Valor:</span> <strong>{formatCurrency(detailDialog.amount)}</strong></div>
+                    <div><span className="text-muted-foreground">Descrição:</span> <span>{detailDialog.description}</span></div>
+                    <div><span className="text-muted-foreground">Vencimento:</span> <span>{formatDate(detailDialog.dueDate)}</span></div>
+                    {detailDialog.paymentMethod && (
+                      <div><span className="text-muted-foreground">Pagamento:</span> <span>{PAYMENT_METHODS.find(m => m.value === detailDialog.paymentMethod)?.label || detailDialog.paymentMethod}</span></div>
+                    )}
+                    <div className="col-span-2"><span className="text-muted-foreground">Criada em:</span> <span>{formatDate(detailDialog.issueDate)}</span></div>
+                  </div>
+                  {detailDialog.status !== "CANCELLED" && (
+                    <>
+                      <Separator />
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Dados para pagamento</p>
+                        <div className="rounded-lg bg-muted/50 p-3 text-sm space-y-2">
+                          {pixKey ? (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-muted-foreground text-xs">PIX</p>
+                                <p className="font-mono text-sm">{pixKey}</p>
+                              </div>
+                              <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(pixKey); toast.success("Chave PIX copiada!") }}>Copiar</Button>
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground italic text-xs">Nenhuma chave PIX configurada em Configurações &gt; Pagamentos</p>
+                          )}
+                          {paymentInfo && (
+                            <p className="text-xs text-muted-foreground whitespace-pre-line">{paymentInfo}</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </DialogContent>
           </Dialog>
         </div>

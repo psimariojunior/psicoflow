@@ -13,8 +13,21 @@ function getLiveKitConfig() {
 }
 
 export async function GET() {
-  const closed = await prisma.closedRoom.findMany({ orderBy: { closedAt: "desc" }, take: 10 })
-  return NextResponse.json({ closed })
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    }
+    const closed = await prisma.closedRoom.findMany({
+      where: { psychologistId: session.user.id },
+      orderBy: { closedAt: "desc" },
+      take: 10,
+    })
+    return NextResponse.json({ closed })
+  } catch (error) {
+    console.error("GET closed rooms error:", error)
+    return NextResponse.json({ error: "Erro ao buscar salas" }, { status: 500 })
+  }
 }
 
 export async function POST(request: Request) {

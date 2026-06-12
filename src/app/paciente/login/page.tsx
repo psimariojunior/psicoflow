@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { usePatientAuth } from "@/components/patient-auth-provider"
@@ -31,7 +32,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error || "Erro ao entrar")
 
       login(data.token, data.patient)
-      router.push("/paciente/agenda")
+      router.push("/paciente")
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao entrar")
     } finally {
@@ -71,12 +72,18 @@ export default function LoginPage() {
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5 mr-2" />}
               {loading ? "Entrando..." : "Entrar"}
             </Button>
+
+            <div className="text-center text-sm">
+              <Link href="/paciente/recuperar-senha" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                Esqueci minha senha
+              </Link>
+            </div>
           </form>
 
           <p className="text-center mt-6">
-            <a href="/paciente/cadastro" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/cadastro" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
               Não tem conta? Cadastre-se
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -1,13 +1,34 @@
-export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
+import { Resend } from "resend"
+
+const resend = new Resend(process.env.RESEND_API_KEY || "")
+
+async function sendViaResend(to: string, subject: string, html: string): Promise<string | null> {
+  if (!process.env.RESEND_API_KEY) return "RESEND_API_KEY não configurada"
+
+  try {
+    const { error } = await resend.emails.send({
+      from: "PsicoFlow <onboarding@resend.dev>",
+      to: [to],
+      subject,
+      html,
+    })
+    if (error) {
+      console.error("[sendViaResend] error", error)
+      return `Resend: ${error.message}`
+    }
+    console.log("[sendViaResend] success", { to, subject })
+    return null
+  } catch (err: unknown) {
+    console.error("[sendViaResend] exception", String(err))
+    return String(err)
+  }
+}
+
+async function sendViaSendGrid(to: string, subject: string, html: string): Promise<string | null> {
   const apiKey = process.env.SENDGRID_API_KEY
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || "psi_mariojunior@hotmail.com"
-  const fromName = "PsicoFlow"
 
-  console.log("[sendEmail] starting", { to, subject, hasApiKey: !!apiKey, fromEmail })
-
-  if (!apiKey) {
-    return "SENDGRID_API_KEY não configurada nas variáveis de ambiente"
-  }
+  if (!apiKey) return "SENDGRID_API_KEY não configurada"
 
   try {
     const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
@@ -18,7 +39,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
       },
       body: JSON.stringify({
         personalizations: [{ to: [{ email: to }] }],
-        from: { email: fromEmail, name: fromName },
+        from: { email: fromEmail, name: "PsicoFlow" },
         subject,
         content: [{ type: "text/html", value: html }],
       }),
@@ -26,22 +47,52 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 
     if (!res.ok) {
       const body = await res.text()
-      console.error("[sendEmail] SendGrid API error", { status: res.status, body })
+      console.error("[sendViaSendGrid] error", { status: res.status, body })
       return `SendGrid: ${body}`
     }
-
-    console.log("[sendEmail] success", { to, subject })
+    console.log("[sendViaSendGrid] success", { to, subject })
     return null
   } catch (err: unknown) {
-    const msg = String(err)
-    console.error("[sendEmail] exception", msg)
-    return msg
+    console.error("[sendViaSendGrid] exception", String(err))
+    return String(err)
   }
 }
 
-export async function sendPasswordResetEmail(email: string, token: string): Promise<string | null> {
+const PSYCHOLOGIST_EMAIL = "psi_mariojunior@hotmail.com"
+
+export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
+  if (to === PSYCHOLOGIST_EMAIL && process.env.RESEND_API_KEY) {
+    return sendViaResend(to, subject, html)
+  }
+  return sendViaSendGrid(to, subject, html)
+}
+
+export async function sendCancellationNotification(
+  psyEmail: string,
+  patientName: string,
+  date: string,
+  time: string,
+  reason?: string | null
+): Promise<string | null> {
+  return sendEmail(
+    psyEmail,
+    "Cancelamento de Consulta - PsicoFlow",
+    `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2 style="color: #dc2626;">Cancelamento de Consulta</h2>
+      <p>O paciente <strong>${patientName}</strong> cancelou a consulta:</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <tr><td style="padding: 8px 0; color: #666;">Data</td><td style="padding: 8px 0;"><strong>${date}</strong></td></tr>
+        <tr><td style="padding: 8px 0; color: #666;">Horário</td><td style="padding: 8px 0;"><strong>${time}</strong></td></tr>
+        ${reason ? `<tr><td style="padding: 8px 0; color: #666;">Motivo</td><td style="padding: 8px 0;"><strong>${reason}</strong></td></tr>` : ""}
+      </table>
+      <p style="font-size: 0.875rem; color: #666;">O horário foi liberado para novos agendamentos.</p>
+    </div>`
+  )
+}
+
+export async function sendPasswordResetEmail(email: string, token: string, path = "/paciente/reset-password"): Promise<string | null> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  const resetUrl = `${appUrl}/reset-password?token=${token}`
+  const resetUrl = `${appUrl}${path}?token=${token}`
   return sendEmail(
     email,
     "Recuperação de Senha - PsicoFlow",

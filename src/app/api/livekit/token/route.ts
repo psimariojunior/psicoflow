@@ -3,8 +3,14 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { AccessToken } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
+import { rateLimitMiddleware } from "@/lib/rate-limit"
+
+const rateLimit = rateLimitMiddleware(10, 60000)
 
 export async function GET(request: Request) {
+  const rateLimitResponse = rateLimit(request)
+  if (rateLimitResponse) return rateLimitResponse
+
   try {
     const { searchParams } = new URL(request.url)
     const room = searchParams.get("room")

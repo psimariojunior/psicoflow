@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { verifyPatientToken } from "@/lib/patient-auth"
+import { validate, updatePatientSchema } from "@/lib/validation"
+import { sanitizeHtml } from "@/lib/security"
 
 async function authenticate(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
@@ -45,32 +47,21 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { name, cpf, rg, dateOfBirth, gender, maritalStatus, profession, company, address, neighborhood, city, state, zipCode, phone, emergencyContact, emergencyPhone, healthInsurance, insuranceNumber, observations } = body
+    const raw = await request.json()
+    const result = validate(updatePatientSchema, raw)
+    if (result.error) return result.error
+
+    const data = result.data! as Record<string, unknown>
+    const textFields = ["name", "gender", "maritalStatus", "profession", "address", "neighborhood", "city", "state", "emergencyContact", "healthInsurance", "insuranceNumber", "referredBy", "observations", "company"] as const
+    for (const field of textFields) {
+      if (typeof data[field] === "string") {
+        data[field] = sanitizeHtml(data[field] as string)
+      }
+    }
 
     const patient = await prisma.patient.update({
       where: { id: payload.patientId },
-      data: {
-        name: name?.trim(),
-        cpf: cpf?.trim() || null,
-        rg: rg?.trim() || null,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : dateOfBirth === null ? null : undefined,
-        gender: gender || null,
-        maritalStatus: maritalStatus || null,
-        profession: profession?.trim() || null,
-        company: company?.trim() || null,
-        address: address?.trim() || null,
-        neighborhood: neighborhood?.trim() || null,
-        city: city?.trim() || null,
-        state: state || null,
-        zipCode: zipCode?.trim() || null,
-        phone: phone?.trim() || null,
-        emergencyContact: emergencyContact?.trim() || null,
-        emergencyPhone: emergencyPhone?.trim() || null,
-        healthInsurance: healthInsurance?.trim() || null,
-        insuranceNumber: insuranceNumber?.trim() || null,
-        observations: observations?.trim() || null,
-      },
+      data,
     })
 
     const { password: _, ...patientSafe } = patient

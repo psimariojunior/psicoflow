@@ -3,7 +3,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { Loader2, BookHeart, CalendarDays, History, User } from "lucide-react"
+import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt } from "lucide-react"
 
 export interface PatientData {
   id: string
@@ -103,7 +103,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  const isPublicPage = pathname === "/paciente/login" || pathname === "/paciente/cadastro"
+  const isPublicPage = pathname === "/paciente/login" || pathname === "/paciente/cadastro" || pathname === "/paciente/recuperar-senha" || pathname === "/paciente/reset-password"
 
   if (!patient && !isPublicPage) {
     router.push("/paciente/login")
@@ -111,7 +111,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
   }
 
   if (patient && isPublicPage) {
-    router.push("/paciente/agenda")
+    router.push("/paciente")
     return null
   }
 
@@ -121,9 +121,20 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
         {patient && (
           <header className="border-b border-slate-800 bg-slate-900">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-              <span className="text-white font-semibold text-sm">PsicoFlow</span>
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
+                  <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+                </div>
+                <span className="text-white font-semibold text-sm">PsicoFlow</span>
+              </Link>
               <div className="flex items-center gap-4">
                 <nav className="flex items-center gap-1">
+                <Link href="/paciente" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Início
+                </Link>
                 <Link href="/paciente/agenda" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
                   pathname === "/paciente/agenda" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
                 }`}>
@@ -147,6 +158,12 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                 }`}>
                   <User className="h-3.5 w-3.5" />
                   Meus Dados
+                </Link>
+                <Link href="/paciente/faturas" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                  pathname === "/paciente/faturas" ? "bg-emerald-500/15 text-emerald-300" : "text-gray-400 hover:text-gray-200 hover:bg-slate-800"
+                }`}>
+                  <Receipt className="h-3.5 w-3.5" />
+                  Faturas
                 </Link>
               </nav>
               <span className="text-gray-300 text-sm">{patient.name}</span>

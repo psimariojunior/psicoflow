@@ -35,6 +35,9 @@ export const createAppointmentSchema = z.object({
   modality: z.string().optional(),
   notes: z.string().optional(),
   color: z.string().optional(),
+  price: z.union([z.string(), z.number()]).optional(),
+  isRecurring: z.boolean().optional(),
+  recurringRule: z.string().optional(),
 })
 
 export const createRecordSchema = z.object({
@@ -55,6 +58,45 @@ export const createDiaryEntrySchema = z.object({
   sleepHours: z.number().min(0).max(24).optional(),
   sleepQuality: z.number().int().min(1).max(10).optional(),
   anxietyLevel: z.number().int().min(1).max(10).optional(),
+})
+
+export const updatePatientSchema = z.object({
+  name: nameSchema.optional(),
+  email: emailSchema.optional().or(z.literal("")),
+  phone: z.string().max(20).optional().or(z.literal("")),
+  cpf: z.string().max(14).optional().or(z.literal("")),
+  rg: z.string().max(20).optional().or(z.literal("")),
+  dateOfBirth: z.string().optional().or(z.literal("")),
+  gender: z.string().max(20).optional().or(z.literal("")),
+  maritalStatus: z.string().max(20).optional().or(z.literal("")),
+  profession: z.string().max(100).optional().or(z.literal("")),
+  company: z.string().max(100).optional().or(z.literal("")),
+  address: z.string().max(255).optional().or(z.literal("")),
+  neighborhood: z.string().max(100).optional().or(z.literal("")),
+  city: z.string().max(100).optional().or(z.literal("")),
+  state: z.string().max(50).optional().or(z.literal("")),
+  zipCode: z.string().max(10).optional().or(z.literal("")),
+  emergencyContact: z.string().max(100).optional().or(z.literal("")),
+  emergencyPhone: z.string().max(20).optional().or(z.literal("")),
+  healthInsurance: z.string().max(100).optional().or(z.literal("")),
+  insuranceNumber: z.string().max(50).optional().or(z.literal("")),
+  referredBy: z.string().max(100).optional().or(z.literal("")),
+  howFound: z.string().max(100).optional().or(z.literal("")),
+  observations: z.string().max(1000).optional().or(z.literal("")),
+  active: z.boolean().optional(),
+  photoUrl: z.string().max(500).optional().or(z.literal("")),
+  privacyConsent: z.boolean().optional(),
+})
+
+export const updateSettingsSchema = z.object({
+  name: nameSchema.optional(),
+  email: emailSchema.optional(),
+  phone: z.string().max(20).optional().or(z.literal("")),
+  crp: z.string().max(20).optional().or(z.literal("")),
+  specialty: z.string().max(200).optional().or(z.literal("")),
+  bio: z.string().max(2000).optional().or(z.literal("")),
+  pixKey: z.string().max(100).optional().or(z.literal("")),
+  paymentInfo: z.string().max(2000).optional().or(z.literal("")),
 })
 
 export const createTransactionSchema = z.object({

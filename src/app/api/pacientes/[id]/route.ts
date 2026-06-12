@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { logAudit } from "@/lib/security"
+import { logAudit, sanitizeHtml } from "@/lib/security"
+import { validate, updatePatientSchema } from "@/lib/validation"
 
 export async function GET(
   request: NextRequest,
@@ -66,7 +67,18 @@ export async function PUT(
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const data = await request.json()
+    const raw = await request.json()
+    const result = validate(updatePatientSchema, raw)
+    if (result.error) return result.error
+
+    const data = result.data! as Record<string, unknown>
+    const textFields = ["name", "gender", "maritalStatus", "profession", "address", "neighborhood", "city", "state", "emergencyContact", "healthInsurance", "insuranceNumber", "referredBy", "observations", "company"] as const
+    for (const field of textFields) {
+      if (typeof data[field] === "string") {
+        data[field] = sanitizeHtml(data[field] as string)
+      }
+    }
+
     const patient = await prisma.patient.update({
       where: {
         id: params.id,
@@ -116,6 +128,12 @@ export async function DELETE(
       prisma.medicalRecord.deleteMany({ where: { patientId: params.id, psychologistId } }),
       prisma.therapySession.deleteMany({ where: { patientId: params.id, psychologistId } }),
       prisma.appointment.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.invoice.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.emotionDiary.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.consentLog.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.financialTransaction.deleteMany({ where: { patientId: params.id, psychologistId } }),
+      prisma.attachment.deleteMany({ where: { patientId: params.id } }),
+      prisma.notification.deleteMany({ where: { patientId: params.id } }),
       prisma.patient.delete({ where: { id: params.id } }),
     ])
 

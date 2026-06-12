@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
@@ -51,7 +52,7 @@ function ResetPasswordForm() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Link inválido</h1>
           <p className="text-muted-foreground mb-4">Token de recuperação não encontrado.</p>
-          <a href="/recuperar-senha" className="text-primary hover:underline">Solicitar novo link</a>
+          <Link href="/recuperar-senha" className="text-primary hover:underline">Solicitar novo link</Link>
         </div>
       </div>
     )

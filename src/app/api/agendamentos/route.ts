@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createAppointmentSchema } from "@/lib/validation"
 import { scheduleReminders } from "@/lib/notifications"
+import { sanitizeHtml } from "@/lib/security"
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,31 +67,59 @@ export async function POST(request: Request) {
 
     const psychologistId = (session.user as { id: string }).id
 
-    const appointment = await prisma.appointment.create({
-      data: {
-        title: data.title || null,
-        startTime: new Date(data.startTime),
-        endTime: new Date(data.endTime),
-        type: data.type || null,
-        modality: data.modality || "presential",
-        notes: data.notes || null,
-        price: data.price ? parseFloat(data.price) : null,
-        color: data.color || null,
-        status: "SCHEDULED",
-        patientId: data.patientId,
-        psychologistId,
-      },
-      include: {
-        patient: {
-          select: { id: true, name: true, email: true, phone: true },
+    const createSingleAppointment = async (
+      startTime: Date, endTime: Date, index: number, total: number
+    ) => {
+      const appt = await prisma.appointment.create({
+        data: {
+          title: data.title ? sanitizeHtml(data.title) : null,
+          startTime,
+          endTime,
+          type: data.type || null,
+          modality: data.modality || "presential",
+          notes: data.notes ? sanitizeHtml(data.notes) : null,
+          price: data.price ? parseFloat(String(data.price)) : null,
+          color: data.color || null,
+          status: "SCHEDULED",
+          patientId: data.patientId,
+          psychologistId,
+          isRecurring: total > 1,
+          recurringRule: total > 1 ? JSON.stringify({ index, total }) : null,
         },
-      },
-    })
+        include: {
+          patient: { select: { id: true, name: true, email: true, phone: true } },
+        },
+      })
 
-    scheduleReminders(appointment.id, appointment.patientId, psychologistId, appointment.startTime).catch(
-      (e) => logger.error("scheduleReminders failed", { error: String(e) })
+      scheduleReminders(appt.id, appt.patientId, psychologistId, appt.startTime).catch(
+        (e) => logger.error("scheduleReminders failed", { error: String(e) })
+      )
+
+      return appt
+    }
+
+    const duration = new Date(data.endTime).getTime() - new Date(data.startTime).getTime()
+
+    if (data.isRecurring && data.recurringRule) {
+      let rule: { frequency: string; occurrences: number }
+      try { rule = JSON.parse(data.recurringRule) } catch {
+        return NextResponse.json({ error: "Regra de recorrência inválida" }, { status: 400 })
+      }
+      const intervalDays = rule.frequency === "weekly" ? 7 : 14
+      const maxOccurrences = Math.min(rule.occurrences || 4, 52)
+      const results = []
+      for (let i = 0; i < maxOccurrences; i++) {
+        const start = new Date(data.startTime)
+        start.setDate(start.getDate() + i * intervalDays)
+        const end = new Date(start.getTime() + duration)
+        results.push(await createSingleAppointment(start, end, i + 1, maxOccurrences))
+      }
+      return NextResponse.json(results, { status: 201 })
+    }
+
+    const appointment = await createSingleAppointment(
+      new Date(data.startTime), new Date(data.endTime), 1, 1
     )
-
     return NextResponse.json(appointment, { status: 201 })
   } catch (error) {
     logger.error("Error creating appointment", { error: String(error) })

@@ -18,6 +18,8 @@ model User {
   crp           String?
   specialty     String?
   bio           String?
+  pixKey        String?
+  paymentInfo   String?
   emailVerified DateTime?
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret String?

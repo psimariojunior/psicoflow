@@ -1,12 +1,14 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 
+const LIVEKIT_WS = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
+
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
 
-    if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/agendar") && !pathname.startsWith("/paciente") && !pathname.startsWith("/api/pacientes") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/disponibilidade/public") && !pathname.startsWith("/api/agendamentos/public") && !pathname.startsWith("/api/cron")) {
+    if (!token && pathname !== "/" && pathname !== "/robots.txt" && pathname !== "/sitemap.xml" && pathname !== "/manifest.webmanifest" && pathname !== "/termos" && pathname !== "/privacidade" && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/reset-password") && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/agendar") && !pathname.startsWith("/paciente") && !pathname.startsWith("/api/pacientes/auth") && !pathname.startsWith("/api/pacientes/agendamentos") && !pathname.startsWith("/api/pacientes/diario") && !pathname.startsWith("/api/pacientes/me") && !pathname.startsWith("/api/pacientes/invoices") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/disponibilidade/public") && !pathname.startsWith("/api/agendamentos/public") && !pathname.startsWith("/api/cron") && !pathname.startsWith("/api/health") && !pathname.startsWith("/api/invoices")) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
 
@@ -23,7 +25,20 @@ export default withAuth(
     )
     response.headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: http: https:; media-src 'self' blob: mediastream:; worker-src 'self' blob:; child-src 'self' blob:;"
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        `img-src 'self' data: blob: https:`,
+        "font-src 'self' data:",
+        `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud`,
+        "media-src 'self' blob: mediastream:",
+        "worker-src 'self' blob:",
+        "child-src 'self' blob:",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join("; ")
     )
 
     const isProduction = process.env.NODE_ENV === "production"
@@ -40,10 +55,10 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/webrtc") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/disponibilidade/public") || pathname.startsWith("/api/agendamentos/public") || pathname.startsWith("/api/pacientes") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/health") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
+        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/disponibilidade/public") || pathname.startsWith("/api/agendamentos/public") || pathname.startsWith("/api/pacientes/auth") || pathname.startsWith("/api/pacientes/agendamentos") || pathname.startsWith("/api/pacientes/diario") || pathname.startsWith("/api/pacientes/me") || pathname.startsWith("/api/pacientes/invoices") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/health") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
           return true
         }
-        if (pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar") || pathname.startsWith("/agendar") || pathname.startsWith("/paciente")) {
+        if (pathname === "/" || pathname === "/robots.txt" || pathname === "/sitemap.xml" || pathname === "/manifest.webmanifest" || pathname === "/termos" || pathname === "/privacidade" || pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar") || pathname.startsWith("/agendar") || pathname.startsWith("/paciente")) {
           return true
         }
         return !!token
@@ -53,5 +68,5 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest).*)"],
 }

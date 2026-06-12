@@ -3,6 +3,15 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { sanitizeHtml } from "@/lib/security"
+import { z } from "zod"
+
+const updateRecordSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  content: z.string().max(10000).optional(),
+  type: z.string().max(100).optional(),
+  isConfidential: z.boolean().optional(),
+})
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -49,12 +58,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Prontuário não encontrado" }, { status: 404 })
     }
 
-    const data = await request.json()
+    const body = await request.json()
+    const result = updateRecordSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Dados inválidos", details: result.error.issues.map((i) => i.message) },
+        { status: 400 }
+      )
+    }
+    const data = result.data
     const record = await prisma.medicalRecord.update({
       where: { id: params.id },
       data: {
-        title: data.title ?? existing.title,
-        content: data.content ?? existing.content,
+        title: data.title ? sanitizeHtml(data.title) : existing.title,
+        content: data.content ? sanitizeHtml(data.content) : existing.content,
         type: data.type ?? existing.type,
         isConfidential: data.isConfidential ?? existing.isConfidential,
       },

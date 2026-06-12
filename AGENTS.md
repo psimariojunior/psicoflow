@@ -1,7 +1,7 @@
 # PsicoFlow — Session Log
 
 ## Goal
-Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without login; room closing with DB persistence; polished pre-join camera preview.
+Professional psychology practice website + management platform. Public landing page, SEO optimized, full patient portal, video call, billing, dashboard analytics.
 
 ## Architecture
 - **Auth**: NextAuth (Credentials) — psychologist only; patient bypasses auth via `?patient=true` on token API
@@ -9,6 +9,10 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 - **DB**: Neon PostgreSQL via Prisma — stores users, sessions, closed rooms
 - **Deploy**: Vercel (Hobby) + Neon free tier
 - **Patient flow**: Welcome (room code) → Pre-join (camera preview + toggles) → Video call (LiveKitRoom)
+- **Public pages**: `/` (landing page), `/agendar` (booking), `/termos`, `/privacidade`
+- **Dashboard**: `/dashboard` (authenticated), all other routes in `(dashboard)/` group
+
+## Key Decisions & History
 
 ## Key Decisions & History
 
@@ -80,7 +84,7 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 
 ### Para o cron automático
 1. Criar conta em https://cron-job.org
-2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes` a cada 30 min
+2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes?secret=ApvVr8FOWwhgkSEtfZ2uDJ1sRx73XmCl` a cada 30 min
 
 ### Lembretes automáticos agendados (2026-06-10)
 - `prisma/schema.prisma`: Notification ganhou campo `scheduledAt` (DateTime?) para agendamento
@@ -102,6 +106,40 @@ Deploy to Vercel + Neon PostgreSQL + LiveKit Cloud; patient video call without l
 - Env vars novas: `RESEND_API_KEY`, `EMAIL_FROM`
 - Setup: criar conta em https://resend.com, verificar domínio (ou usar `onboarding@resend.dev` para testes), gerar API key
 
+### Pre-Launch Audit Fixes (2026-06-11)
+- **Email**: `src/lib/email.ts` migrado definitivamente para Resend SDK (`resend.emails.send()`) — antes usava `fetch` para SendGrid mas env vars do Vercel tinham `RESEND_API_KEY`
+- **Reset password link**: corrigido de `/reset-password?token=...` → `/paciente/reset-password?token=...` (estava dando 404)
+- **`NEXT_PUBLIC_APP_URL`**: adicionado no Vercel (`https://psicoflow-iota.vercel.app`) — antes caía pra `localhost:3000`
+- **Login/forgot-password**: agora busca paciente por email em **todos os psicólogos** (antes usava `findFirst` — só funcionava pro primeiro psicólogo cadastrado)
+- **Nome do paciente na pré-chamada**: input não era mais `readOnly` — agora o paciente pode digitar o nome
+- **Rate limit no forgot-password**: limite de 1 requisição por email a cada 2 minutos (em memória)
+- **Modalidade nos lembretes**: corrigido de `"presential"` fixo para `"online"` (todas as consultas são online)
+- **Cron route**: `?testbrevo` renomeado para `?testemail`
+- **Segurança**: fallback de JWT removido de 5 arquivos — agora joga erro se `ENCRYPTION_KEY` não estiver configurada
+- **Mass assignment**: `PUT /api/pacientes/[id]` e `PUT /api/configuracoes` agora usam Zod validation (não aceitam campos não permitidos)
+- **Health API**: adicionado `/api/health` no middleware bypass (estava sendo redirecionado para login)
+- **Notificação de cancelamento**: psicólogo recebe email quando paciente cancela consulta (com data/hora/motivo)
+- **Email híbrido**: psicólogo (`psi_mariojunior@hotmail.com`) via **Resend** (entrega garantida); pacientes via **SendGrid** — `src/lib/email.ts` escolhe baseado no destinatário
+- **Consultas recorrentes**: nova opção "Repetir consulta" no diálogo de agendamento — suporta semanal/quinzenal com N repetições; API gera múltiplos appointments automaticamente
+
+### Landing page profissional & SEO (2026-06-12)
+- **Landing page** em `src/app/page.tsx`: hero com gradiente, seção "Como Funciona" (3 passos), Serviços (6 cards), Depoimentos (carrossel automático), Sobre o profissional, FAQ (accordion), CTA final, Footer completo
+- **SEO completo**: `robots.ts`, `sitemap.ts`, `manifest.ts`, metadados Open Graph + Twitter + JSON-LD no layout raiz
+- **Middleware**: permite acesso público a `/`, `/termos`, `/privacidade`, `/agendar`, rotas de paciente e APIs públicas
+- **Dashboard movido** para `/dashboard` (sidebar atualizada), landing page ocupa a raiz
+- **CSS global**: custom scrollbar, selection color, animações `fade-in`/`slide-up`/`scale-in`, primary color alterada para verde (emerald)
+- **Dashboard aprimorado**: cards de métricas com ícones, seção de "Meta do Mês" com barra de progresso, ações rápidas com descrições, layout responsivo
+- **Dashboard do paciente**: página inicial após login com saudação, próxima consulta (filtro corrigido de `CONFIRMED` para `!CANCELLED`), grid de acesso rápido (Agenda/Diário/Histórico/Meus Dados)
+- **Navbar**: adicionado link "Início" com ícone LayoutDashboard, mudado redirect pós-login de `/paciente/agenda` para `/paciente`
+- **Recuperar senha**: `recuperar-senha` e `reset-password` adicionados como páginas públicas no `PatientAuthProvider` (antes redirecionava para login)
+- **CTA pós-agendamento público**: botão "Criar conta para gerenciar consultas" na tela de confirmação
+- **`h-13` → `h-12`**: classe Tailwind inválida em `booking-flow.tsx` e `prejoin-view.tsx`
+- **Código morto**: `/api/webrtc` removido (migrou para LiveKit)
+- **Cascade delete paciente**: agora inclui Invoice, EmotionDiary, ConsentLog, FinancialTransaction, Attachment, Notification (antes faltavam 5 modelos com FK)
+- **`<a>` → `<Link>`**: 4 links em cadastro, login, reset-password (navegação sem recarregar)
+- **`aria-label`**: adicionado em 8 botões de câmera/mic/tela-cheia/sair e navegação de meses
+- **Build/lint/deploy**: tudo compilando sem erros, lint limpo
+
 ### Setup Details
 Ver `LEMBRETES_SETUP.md` na raiz do projeto.
 
@@ -113,4 +151,13 @@ Ver `LEMBRETES_SETUP.md` na raiz do projeto.
 - `src/middleware.ts` — auth bypass for patient routes
 - `prisma/schema.prisma` — ClosedRoom model + PostgreSQL provider
 - `next.config.js` — Vercel-compatible config
-- `.env.local` — local dev vars
+
+### Pentest & Security Hardening (2026-06-12)
+- **CRITICAL — CRON test bypass**: `?testemail` e `?testwhatsapp` ignoravam o cron secret. Corrigido: secret é obrigatório SEMPRE
+- **CRITICAL — XSS Stored**: `POST /api/agendamentos/public` aceitava `<script>` no `name` sem sanitização. Corrigido: `sanitizeHtml()` + Zod schema com length validation + input limits
+- **HIGH — ID leakage**: `GET /api/disponibilidade/public` vazava `psychologistId` interno mesmo sem filtro. Corrigido: `psychologistId` só aparece na resposta se foi enviado no request
+- **MEDIUM — Patient reg input limits**: registro aceitava nome de 500 chars sem validação. Corrigido: Zod schema com max 120 chars e sanitização
+- **MEDIUM — JWT sem jti**: tokens de paciente não tinham nonce para proteção contra replay. Corrigido: `randomUUID()` adicionado como `jti`
+- **MEDIUM — Zod gap**: `PUT /api/pacientes/me` não usava Zod schema. Corrigido: migrado para `updatePatientSchema`
+- **MEDIUM — Zod gap**: `POST /api/agendamentos/public` não validava tipos. Corrigido: schema Zod + `modality` enum + `psychologistId` validation
+- **Build command**: `vercel.json` migrado de `prisma db push --accept-data-loss` para `prisma migrate deploy` com fallback seguro

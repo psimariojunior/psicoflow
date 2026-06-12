@@ -1,19 +1,42 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { scheduleReminders } from "@/lib/notifications"
+import { sendEmail } from "@/lib/email"
+import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { validateOrigin } from "@/lib/csrf"
+import { sanitizeHtml } from "@/lib/security"
+
+const publicBookingSchema = z.object({
+  name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres").max(120, "Nome muito longo"),
+  email: z.string().email("Email inválido").max(255).optional().or(z.literal("")),
+  phone: z.string().max(20).optional().or(z.literal("")),
+  startTime: z.string().min(1, "Data/hora é obrigatória"),
+  psychologistId: z.string().optional(),
+  modality: z.enum(["online", "presential"]).optional(),
+})
 
 export async function POST(request: NextRequest) {
-  try {
-    const data = await request.json()
-    const { name, email, phone, startTime, psychologistId, modality } = data
+  const rateLimit = rateLimitMiddleware(10, 60000)
+  const blocked = rateLimit(request)
+  if (blocked) return blocked
 
-    if (!name?.trim()) {
-      return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 })
+  const originCheck = validateOrigin(request)
+  if (!originCheck.allowed) return originCheck.error
+
+  try {
+    const raw = await request.json()
+    const parse = publicBookingSchema.safeParse(raw)
+    if (!parse.success) {
+      return NextResponse.json({
+        error: "Dados inválidos",
+        details: parse.error.issues.map((i) => ({ field: i.path.join("."), message: i.message })),
+      }, { status: 400 })
     }
-    if (!startTime) {
-      return NextResponse.json({ error: "Data/hora é obrigatória" }, { status: 400 })
-    }
+
+    const { name, email, phone, startTime, psychologistId, modality } = parse.data
+    const sanitizedName = sanitizeHtml(name.trim())
 
     const startDate = new Date(startTime)
     if (isNaN(startDate.getTime()) || startDate < new Date()) {
@@ -30,10 +53,18 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Nenhum psicólogo disponível" }, { status: 404 })
       }
       psychologistIdFinal = firstPsych.id
+    } else {
+      const psychExists = await prisma.user.findUnique({
+        where: { id: psychologistIdFinal, role: "PSYCHOLOGIST" },
+      })
+      if (!psychExists) {
+        return NextResponse.json({ error: "Psicólogo não encontrado" }, { status: 404 })
+      }
     }
 
+    const durationMinutes = parseInt(process.env.APPOINTMENT_DURATION_MINUTES || "30", 10)
     const endDate = new Date(startDate)
-    endDate.setMinutes(endDate.getMinutes() + 40)
+    endDate.setMinutes(endDate.getMinutes() + durationMinutes)
 
     const conflict = await prisma.appointment.findFirst({
       where: {
@@ -64,7 +95,7 @@ export async function POST(request: NextRequest) {
     if (!patient) {
       patient = await prisma.patient.create({
         data: {
-          name: name.trim(),
+          name: sanitizedName,
           email: email?.trim() || null,
           phone: phone?.trim() || null,
           psychologistId: psychologistIdFinal,
@@ -74,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     const appointment = await prisma.appointment.create({
       data: {
-        title: `Consulta - ${patient.name}`,
+        title: `Consulta - ${sanitizedName}`,
         startTime: startDate,
         endTime: endDate,
         status: "SCHEDULED",
@@ -92,6 +123,60 @@ export async function POST(request: NextRequest) {
     scheduleReminders(appointment.id, patient.id, psychologistIdFinal, startDate).catch(
       (e) => logger.error("scheduleReminders failed", { error: String(e) })
     )
+
+    if (email?.trim()) {
+      const tz = "America/Sao_Paulo"
+      const dateStr = startDate.toLocaleDateString("pt-BR", { timeZone: tz, day: "numeric", month: "long", year: "numeric" })
+      const timeStr = startDate.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
+      sendEmail(
+        email.trim(),
+        "Confirmação de Consulta - PsicoFlow",
+        `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #10b981; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+            <p style="color: #666; margin: 0;">Confirmação de agendamento</p>
+          </div>
+          <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
+            <p style="font-size: 1.125rem; margin: 0 0 16px;">Olá, <strong>${sanitizedName}</strong>!</p>
+            <p style="margin: 0 0 8px;">Sua consulta foi agendada com sucesso:</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px 0; color: #666;">Data</td><td style="padding: 8px 0;"><strong>${dateStr}</strong></td></tr>
+              <tr><td style="padding: 8px 0; color: #666;">Horário</td><td style="padding: 8px 0;"><strong>${timeStr}</strong></td></tr>
+              <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "presential" ? "Presencial" : "Online"}</strong></td></tr>
+            </table>
+            <p style="margin-top: 16px; font-size: 0.875rem; color: #666;">Você receberá um lembrete 24h antes da consulta.</p>
+          </div>
+          <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
+        </div>`
+      ).catch((e: unknown) => logger.error("confirmation email failed", { error: String(e) }))
+    }
+
+    const psychEmail = "psi_mariojunior@hotmail.com"
+    const tz = "America/Sao_Paulo"
+    const dateStr = startDate.toLocaleDateString("pt-BR", { timeZone: tz, day: "numeric", month: "long", year: "numeric" })
+    const timeStr = startDate.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
+    sendEmail(
+      psychEmail,
+      "Novo Agendamento - PsicoFlow",
+      `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #10b981; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+          <p style="color: #666; margin: 0;">Novo agendamento recebido</p>
+        </div>
+        <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
+          <p style="font-size: 1.125rem; margin: 0 0 16px;">Um paciente agendou uma consulta:</p>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; color: #666;">Paciente</td><td style="padding: 8px 0;"><strong>${sanitizedName}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Email</td><td style="padding: 8px 0;"><strong>${email?.trim() || "—"}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Telefone</td><td style="padding: 8px 0;"><strong>${phone?.trim() || "—"}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Data</td><td style="padding: 8px 0;"><strong>${dateStr}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Horário</td><td style="padding: 8px 0;"><strong>${timeStr}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "presential" ? "Presencial" : "Online"}</strong></td></tr>
+          </table>
+        </div>
+        <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
+      </div>`
+    ).catch((e: unknown) => logger.error("psychologist notification email failed", { error: String(e) }))
 
     return NextResponse.json(
       {

@@ -2,7 +2,13 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { z } from "zod"
 import bcrypt from "bcryptjs"
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token é obrigatório"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres").max(128),
+})
 
 export async function POST(request: Request) {
   const limit = rateLimitMiddleware(5, 60000)
@@ -10,11 +16,12 @@ export async function POST(request: Request) {
   if (blocked) return blocked
 
   try {
-    const { token, password } = await request.json()
-
-    if (!token || !password || password.length < 6) {
+    const raw = await request.json()
+    const parsed = resetPasswordSchema.safeParse(raw)
+    if (!parsed.success) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     }
+    const { token, password } = parsed.data
 
     const sessionToken = await prisma.sessionToken.findUnique({
       where: { token },

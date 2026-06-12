@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createTransactionSchema } from "@/lib/validation"
+import { sanitizeHtml } from "@/lib/security"
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,15 +75,15 @@ export async function POST(request: Request) {
 
     const transaction = await prisma.financialTransaction.create({
       data: {
-        description: data.description,
+        description: sanitizeHtml(data.description),
         type: data.type,
-        category: data.category || null,
+        category: data.category ? sanitizeHtml(data.category) : null,
         amount: data.amount,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
-        paymentMethod: data.paymentMethod || null,
+        paymentMethod: data.paymentMethod ? sanitizeHtml(data.paymentMethod) : null,
         paymentStatus: "PENDING",
-        notes: data.notes || null,
+        notes: data.notes ? sanitizeHtml(data.notes) : null,
         patientId: data.patientId || null,
         psychologistId: (session.user as { id: string }).id,
       },

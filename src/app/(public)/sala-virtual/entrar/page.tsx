@@ -2,215 +2,16 @@
 
 import { Suspense, useState, useCallback, useRef, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { LiveKitRoom, VideoTrack, useRemoteParticipants, useTracks, useLocalParticipant, RoomAudioRenderer, useRoomContext } from "@livekit/components-react"
-import { Track } from "livekit-client"
+import { Loader2 } from "lucide-react"
+import { LiveKitRoom, RoomAudioRenderer, StartAudio } from "@livekit/components-react"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Shield, Wifi, Camera, LogOut, ArrowLeft, Calendar, Maximize2, Minimize2, User } from "lucide-react"
 import toast from "react-hot-toast"
-
-function AudioSubscriber() {
-  const room = useRoomContext()
-  const [audioCount, setAudioCount] = useState(0)
-
-  useEffect(() => {
-    if (!room) return
-    const subs = new Map<string, HTMLAudioElement>()
-
-    const attach = (pub: any) => {
-      const track = pub.track
-      if (!track || pub.kind !== "audio") return
-      if (subs.has(pub.trackSid)) return
-      console.log("[AudioSubscriber] attaching audio track:", pub.trackSid, track.mediaStreamTrack?.id)
-      const el = new Audio()
-      el.srcObject = new MediaStream([track.mediaStreamTrack])
-      el.autoplay = true
-      el.play().catch(() => {})
-      subs.set(pub.trackSid, el)
-      setAudioCount(subs.size)
-      console.log("[Audio] attached:", pub.trackSid)
-    }
-
-    const detach = (pub: any) => {
-      const el = subs.get(pub.trackSid)
-      if (el) {
-        el.pause()
-        el.srcObject = null
-        subs.delete(pub.trackSid)
-        setAudioCount(subs.size)
-      }
-    }
-
-    const onSub = (track: any, pub: any) => attach(pub)
-    const onUnsub = (track: any, pub: any) => detach(pub)
-
-    room.on("trackSubscribed", onSub)
-    room.on("trackUnsubscribed", onUnsub)
-
-    Array.from(room.remoteParticipants.values()).forEach((p) => {
-      Array.from(p.trackPublications.values()).forEach((pub: any) => {
-        if (pub.kind === "audio" && pub.track && pub.isSubscribed) {
-          attach(pub)
-        }
-      })
-    })
-
-    return () => {
-      room.off("trackSubscribed", onSub)
-      room.off("trackUnsubscribed", onUnsub)
-      Array.from(subs.values()).forEach((el) => {
-        el.pause()
-        el.srcObject = null
-      })
-      subs.clear()
-    }
-  }, [room])
-
-  return <div className="hidden" data-audio-count={audioCount} />
-}
-
-function ParticipantWatcher({ onParticipantsChange }: { onParticipantsChange: (hasRemote: boolean) => void }) {
-  const participants = useRemoteParticipants()
-  useEffect(() => { onParticipantsChange(participants.length > 0) }, [participants, onParticipantsChange])
-  return null
-}
-
-function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
-  const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
-  const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [callDuration, setCallDuration] = useState(0)
-  const remoteParticipants = useRemoteParticipants()
-
-  const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
-  const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
-  const primaryTrack = screenTrack || remoteVideoTrack
-  const hasRemote = remoteParticipants.length > 0
-
-  useEffect(() => {
-    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
-    document.addEventListener("fullscreenchange", onChange)
-    return () => document.removeEventListener("fullscreenchange", onChange)
-  }, [])
-
-  useEffect(() => {
-    const id = setInterval(() => setCallDuration(t => t + 1), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen()
-    } else {
-      document.exitFullscreen()
-    }
-  }, [])
-
-  const toggleCam = useCallback(() => {
-    localParticipant?.setCameraEnabled(!isCameraEnabled)
-  }, [isCameraEnabled, localParticipant])
-
-  const toggleMic = useCallback(() => {
-    localParticipant?.setMicrophoneEnabled(!isMicrophoneEnabled)
-  }, [isMicrophoneEnabled, localParticipant])
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
-  }
-
-  return (
-    <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
-        <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-          {primaryTrack ? (
-            <>
-              <VideoTrack trackRef={primaryTrack} className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-              <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-emerald-500/30 backdrop-blur-md text-emerald-200 text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-emerald-400/30">
-                  {hasRemote ? remoteParticipants[0]?.name || "Psicólogo" : "Psicólogo"}
-                </span>
-                {hasRemote && (
-                  <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/80 text-xs px-2.5 py-1 rounded-full">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
-                    {formatTime(callDuration)}
-                  </span>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-              <div className="text-center">
-                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                  <User className="h-6 w-6 text-slate-500" />
-                </div>
-                <p className="text-xs text-slate-500 font-medium">Aguardando psicólogo...</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-          {cameraTrack && isCameraEnabled ? (
-            <>
-              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-              <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você</span>
-              </div>
-            </>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-              <div className="text-center">
-                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                  <User className="h-6 w-6 text-slate-500" />
-                </div>
-                <p className="text-xs text-slate-500 font-medium">Câmera desligada</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      </div>
-
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-lg text-white/80 text-xs px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
-        <Camera className="h-3 w-3 text-emerald-400" />
-        {roomName}
-      </div>
-
-      <div className="absolute top-4 right-4 z-20">
-        {hasRemote && (
-          <span className="flex items-center gap-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs px-3 py-1.5 rounded-full border border-emerald-400/20">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Conectado
-          </span>
-        )}
-      </div>
-
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 md:gap-3 bg-black/50 backdrop-blur-xl rounded-full px-3 md:px-4 py-2 md:py-2.5 ring-1 ring-white/10 shadow-2xl">
-        <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isCameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-        </Button>
-        <Button size="icon" variant={isMicrophoneEnabled ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isMicrophoneEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-        </Button>
-        <div className="w-px h-6 bg-white/10" />
-        <Button size="icon" variant="secondary" onClick={toggleFullscreen} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
-        </Button>
-        <div className="w-px h-6 bg-white/10" />
-        <Button variant="destructive" size="icon" onClick={onLeave} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          <LogOut className="h-5 w-5" />
-        </Button>
-      </div>
-    </div>
-  )
-}
+import { AudioSubscriber } from "./components/audio-subscriber"
+import { ParticipantWatcher } from "./components/participant-watcher"
+import { InCallUI } from "./components/in-call-ui"
+import { PrejoinView } from "./components/prejoin-view"
+import { EndedView } from "./components/end-view"
+import { WelcomeView } from "./components/welcome-view"
 
 function EntrarSalaForm() {
   const searchParams = useSearchParams()
@@ -258,14 +59,10 @@ function EntrarSalaForm() {
     navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
       .then((s) => {
         streamRef.current = s
-        if (videoRef.current) {
-          videoRef.current.srcObject = s
-        }
+        if (videoRef.current) videoRef.current.srcObject = s
         setCameraReady(true)
       })
-      .catch(() => {
-        toast.error("Permita acesso à câmera e microfone nas configurações do navegador")
-      })
+      .catch(() => toast.error("Permita acesso à câmera e microfone nas configurações do navegador"))
   }, [])
 
   const stopCamera = useCallback(() => {
@@ -276,11 +73,8 @@ function EntrarSalaForm() {
 
   const toggleCamera = () => setCameraOn((c) => {
     const next = !c
-    if (streamRef.current) {
-      streamRef.current.getVideoTracks().forEach((t) => (t.enabled = next))
-    } else if (next) {
-      startCamera()
-    }
+    if (streamRef.current) streamRef.current.getVideoTracks().forEach((t) => (t.enabled = next))
+    else if (next) startCamera()
     return next
   })
 
@@ -327,9 +121,7 @@ function EntrarSalaForm() {
   }, [])
 
   useEffect(() => {
-    if (typeof Notification !== "undefined" && Notification.permission === "default") {
-      Notification.requestPermission()
-    }
+    if (typeof Notification !== "undefined" && Notification.permission === "default") Notification.requestPermission()
   }, [])
 
   useEffect(() => {
@@ -341,15 +133,16 @@ function EntrarSalaForm() {
   if (token) {
     return (
       <div className="h-screen relative bg-black">
-          <LiveKitRoom
-            token={token}
-            serverUrl={livekitUrl}
-            connect={true}
-            video={cameraOn}
-            audio={micOn ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false}
-            onDisconnected={handleDisconnected}
-            style={{ height: "100%" }}
-          >
+        <LiveKitRoom
+          token={token}
+          serverUrl={livekitUrl}
+          connect={true}
+          video={cameraOn}
+          audio={micOn ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false}
+          onDisconnected={handleDisconnected}
+          style={{ height: "100%" }}
+        >
+          <StartAudio label="Clique para ativar o áudio" className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 text-white text-lg font-semibold cursor-pointer" />
           <RoomAudioRenderer volume={1} />
           <AudioSubscriber />
           <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
@@ -361,255 +154,31 @@ function EntrarSalaForm() {
 
   if (step === "prejoin") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-[#0a1120] to-slate-900">
-        <div className="flex-1 flex items-center justify-center p-4 relative">
-          {/* Decorative background elements */}
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-
-          <div className="w-full max-w-4xl relative z-10">
-            {/* Top bar */}
-            <div className="flex items-center justify-between mb-8">
-              <button
-                onClick={() => { stopCamera(); setStep("welcome") }}
-                className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-all hover:gap-3"
-              >
-                <ArrowLeft className="h-4 w-4" /> Voltar
-              </button>
-              <div className="flex items-center gap-2 text-white/30 text-xs">
-                <Shield className="h-3.5 w-3.5" />
-                Sala {roomInput}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-5 gap-6">
-              {/* Left — camera preview */}
-              <div className="md:col-span-3">
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] ring-1 ring-white/10 shadow-2xl backdrop-blur-xl">
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-800 to-black">
-                    <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${cameraReady ? "block" : "hidden"}`} />
-
-                    {!cameraReady && !connecting && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-8">
-                        <div className="h-20 w-20 rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.08] flex items-center justify-center">
-                          <Camera className="h-9 w-9 text-white/30" />
-                        </div>
-                        <div className="text-center space-y-1">
-                          <p className="text-white/50 text-base font-medium">Câmera desativada</p>
-                          <p className="text-white/30 text-sm">Ative sua câmera para ver como aparece</p>
-                        </div>
-                        <Button variant="secondary" size="default" onClick={startCamera} className="rounded-full px-6 shadow-xl">
-                          <Camera className="mr-2 h-4 w-4" /> Ativar Câmera
-                        </Button>
-                      </div>
-                    )}
-
-                    {cameraReady && (
-                      <div className="absolute inset-0">
-                        <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md ring-1 ring-white/10">
-                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50" />
-                          Câmera ativa
-                          <span className="ml-2 text-[10px] uppercase tracking-wider opacity-60">{hd ? "HD" : "SD"}</span>
-                        </div>
-                        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4">
-                          <Button size="icon" variant={cameraOn ? "secondary" : "destructive"} onClick={toggleCamera} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform">
-                            {cameraOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-                          </Button>
-                          <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform">
-                            {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-                          </Button>
-                          <Button size="icon" variant={hd ? "secondary" : "default"} onClick={toggleHd} className="rounded-full h-12 w-12 shadow-2xl ring-1 ring-white/20 hover:scale-105 transition-transform text-xs font-bold">
-                            {hd ? "HD" : "SD"}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {connecting && (
-                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10 backdrop-blur-sm">
-                        <div className="text-center text-white">
-                          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-emerald-400" />
-                          <p className="text-lg font-medium">Conectando à sala...</p>
-                          <p className="text-sm text-white/50 mt-1">Preparando ambiente seguro</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right — informações */}
-              <div className="md:col-span-2 flex flex-col justify-center space-y-6">
-                {/* Saudação */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50" />
-                    <span className="text-xs text-emerald-400 font-semibold uppercase tracking-[0.2em]">Você está na sala</span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-white leading-tight">
-                    Pronto para sua<br />sessão?
-                  </h2>
-                  <p className="text-white/50 text-sm leading-relaxed">
-                    Respire fundo. Este é um espaço seguro e acolhedor para você compartilhar.
-                    Seu psicólogo entrará em instantes.
-                  </p>
-                </div>
-
-                {/* Input nome */}
-                <div className="space-y-2">
-                  <label className="text-xs text-white/40 font-medium uppercase tracking-wider">Como prefere ser chamado</label>
-                  <div className="relative">
-                    <Input
-                      placeholder="Seu nome"
-                      value={patientName}
-                      onChange={(e) => setPatientName(e.target.value)}
-                      className="bg-white/[0.06] border-white/10 text-white placeholder:text-white/20 h-12 pl-4 pr-10 rounded-xl text-base focus:border-emerald-500/50 focus:ring-emerald-500/20 transition-all"
-                    />
-                    {patientName.trim() && (
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 text-lg">&#10003;</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { icon: Shield, label: "Privacidade", desc: "Criptografia" },
-                    { icon: Wifi, label: "Conexão", desc: "Estável" },
-                    { icon: Mic, label: "Áudio", desc: "Opcional" },
-                  ].map(({ icon: Icon, label, desc }) => (
-                    <div key={label} className="bg-white/[0.04] rounded-xl p-3 text-center ring-1 ring-white/[0.06]">
-                      <Icon className="h-4 w-4 text-emerald-400/70 mx-auto mb-1.5" />
-                      <p className="text-[11px] text-white/60 font-medium">{label}</p>
-                      <p className="text-[10px] text-white/30">{desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Botão */}
-                <Button
-                  className="w-full h-13 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-                  size="lg"
-                  onClick={handleConnect}
-                  disabled={connecting}
-                >
-                  {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                  {connecting ? "Conectando..." : "Entrar na Sala"}
-                </Button>
-
-                <p className="text-[11px] text-white/25 text-center leading-relaxed">
-                  Ao entrar, você aceita os termos de uso e política de privacidade do PsicoFlow.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PrejoinView
+        roomInput={roomInput}
+        patientName={patientName}
+        cameraReady={cameraReady}
+        connecting={connecting}
+        cameraOn={cameraOn}
+        micOn={micOn}
+        hd={hd}
+        videoRef={videoRef}
+        onBack={() => { stopCamera(); setStep("welcome") }}
+        onStartCamera={startCamera}
+        onToggleCamera={toggleCamera}
+        onToggleMic={toggleMic}
+        onToggleHd={toggleHd}
+        onConnect={handleConnect}
+        onPatientNameChange={setPatientName}
+      />
     )
   }
 
   if (step === "ended") {
-    return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-md text-center">
-            <div className="mb-8">
-              <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white/5 mb-6">
-                <VideoOff className="h-10 w-10 text-white/40" />
-              </div>
-              <h1 className="text-3xl font-bold text-white mb-2">Conexão encerrada</h1>
-              <p className="text-white/60">Obrigado por utilizar o PsicoFlow.</p>
-            </div>
-            <Button
-              className="w-full h-12 text-base"
-              size="lg"
-              onClick={() => { setStep("welcome"); setRoomInput("") }}
-            >
-              <Camera className="mr-2 h-5 w-5" />
-              Entrar em outra sala
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
+    return <EndedView onNewRoom={() => { setStep("welcome"); setRoomInput("") }} />
   }
 
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-primary/30 to-blue-500/30 mb-6 shadow-lg">
-              <Video className="h-10 w-10 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Sala Virtual</h1>
-            <p className="text-white/60">Sessão de terapia online com seu psicólogo</p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur rounded-2xl p-8 shadow-xl">
-            <div className="space-y-4">
-              <div className="text-left">
-                <label className="block text-sm font-medium text-white/80 mb-2">Código da Sala</label>
-                <Input
-                  placeholder="Digite o código fornecido pelo psicólogo"
-                  value={roomInput}
-                  onChange={(e) => setRoomInput(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40 h-12 text-center text-lg tracking-widest"
-                />
-              </div>
-              <Button
-                className="w-full h-12 text-base"
-                size="lg"
-                onClick={() => { if (roomInput.trim()) { setStep("prejoin"); startCamera() } }}
-                disabled={!roomInput.trim()}
-              >
-                <Camera className="mr-2 h-5 w-5" />
-                Continuar
-              </Button>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-white/10">
-              <div className="grid grid-cols-3 gap-4 text-xs text-white/40">
-                <div className="text-center">
-                  <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-1">
-                    <Shield className="h-4 w-4" />
-                  </div>
-                  Seguro
-                </div>
-                <div className="text-center">
-                  <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-1">
-                    <Wifi className="h-4 w-4" />
-                  </div>
-                  Estável
-                </div>
-                <div className="text-center">
-                  <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-1">
-                    <Video className="h-4 w-4" />
-                  </div>
-                  HD
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-white/10">
-              <p className="text-xs text-white/40 mb-3">Ainda não tem consulta agendada?</p>
-              <a
-                href="/agendar"
-                className="inline-flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
-              >
-                <Calendar className="h-4 w-4" />
-                Agende sua consulta
-              </a>
-            </div>
-          </div>
-
-          <p className="mt-6 text-xs text-white/30">
-            PsicoFlow &mdash; Tecnologia a serviço da saúde mental
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+  return <WelcomeView initialRoom={roomParam} onContinue={(room) => { setRoomInput(room); setStep("prejoin"); startCamera() }} />
 }
 
 export default function EntrarSalaPage() {

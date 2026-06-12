@@ -15,7 +15,7 @@ export default function VirtualRoomPage() {
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
 
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
 
   const sanitize = (name: string) => name.replace(/[^a-zA-Z0-9_-]/g, "-")
 

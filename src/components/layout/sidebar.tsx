@@ -35,7 +35,7 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/pacientes", label: "Pacientes", icon: Users },
   { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/disponibilidade", label: "Disponibilidade", icon: Clock },
@@ -56,14 +56,17 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
   const sidebarContent = (
     <div className="flex h-full flex-col bg-card border-r">
       <div className="flex h-16 items-center justify-between px-4 border-b">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
-            <span className="text-sm font-bold text-white">PF</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
+            <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
           </div>
           {!collapsed && (
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-              PsicoFlow
-            </span>
+            <div>
+              <span className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                PsicoFlow
+              </span>
+              <p className="text-[10px] text-slate-500 leading-none mt-0.5">Gestão em Psicologia</p>
+            </div>
           )}
         </Link>
         <Button
