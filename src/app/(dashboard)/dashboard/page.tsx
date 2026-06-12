@@ -9,7 +9,7 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Loader2, Sparkles, ArrowRight, TrendingUp } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
@@ -47,8 +47,28 @@ export default function DashboardHome() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="space-y-6 animate-fade-in">
+        <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
+        <div className="grid gap-4 md:grid-cols-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
+        </div>
+        <div className="grid gap-4 md:grid-cols-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-card rounded-xl animate-pulse" />)}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="h-72 bg-card rounded-xl animate-pulse" />
+              <div className="h-72 bg-card rounded-xl animate-pulse" />
+            </div>
+            <div className="h-64 bg-card rounded-xl animate-pulse" />
+          </div>
+          <div className="space-y-6">
+            <div className="h-44 bg-card rounded-xl animate-pulse" />
+            <div className="h-44 bg-card rounded-xl animate-pulse" />
+          </div>
+        </div>
+        <div className="h-48 bg-card rounded-xl animate-pulse" />
       </div>
     )
   }
