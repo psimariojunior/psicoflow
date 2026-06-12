@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
+import { maskCpf, maskPhone, maskCep } from "@/lib/utils"
 import { Loader2, UserPlus, ChevronLeft, ChevronRight, Check, ArrowLeft } from "lucide-react"
 
 const BRAZILIAN_STATES = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
@@ -77,7 +79,7 @@ export default function CadastroPage() {
       if (!res.ok) throw new Error(data.error || "Erro ao cadastrar")
 
       login(data.token, data.patient)
-      router.push("/paciente/agenda")
+      router.push("/paciente")
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao cadastrar")
     } finally {
@@ -117,7 +119,7 @@ export default function CadastroPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cpf" className="text-gray-300">CPF</Label>
-                  <Input id="cpf" value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="000.000.000-00" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Input id="cpf" value={cpf} onChange={(e) => setCpf(maskCpf(e.target.value))} placeholder="000.000.000-00" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -151,7 +153,7 @@ export default function CadastroPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-gray-300">WhatsApp</Label>
-                  <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-8888" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="(11) 99999-8888" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -177,7 +179,7 @@ export default function CadastroPage() {
                 <h2 className="text-lg font-semibold text-white mb-4">Endereço</h2>
                 <div className="space-y-2">
                   <Label htmlFor="zipCode" className="text-gray-300">CEP</Label>
-                  <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="00000-000" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(maskCep(e.target.value))} placeholder="00000-000" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="address" className="text-gray-300">Endereço</Label>
@@ -231,9 +233,9 @@ export default function CadastroPage() {
           </form>
 
           <p className="text-center mt-6">
-            <a href="/paciente/login" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/login" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
               Já tem conta? Entrar
-            </a>
+            </Link>
           </p>
         </div>
       </div>

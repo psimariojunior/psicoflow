@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { z } from "zod"
 
 export async function GET() {
   try {
@@ -32,23 +33,24 @@ export async function POST(request: Request) {
     }
 
     const psychologistId = (session.user as { id: string }).id
-    const { slots } = await request.json()
 
-    if (!Array.isArray(slots)) {
-      return NextResponse.json({ error: "Formato inválido" }, { status: 400 })
-    }
+    const slotSchema = z.object({
+      dayOfWeek: z.number().int().min(0).max(6),
+      startTime: z.string().min(1, "Horário início é obrigatório"),
+      endTime: z.string().min(1, "Horário fim é obrigatório"),
+      isActive: z.boolean().optional(),
+    })
 
-    for (const slot of slots) {
-      if (
-        typeof slot.dayOfWeek !== "number" ||
-        slot.dayOfWeek < 0 ||
-        slot.dayOfWeek > 6 ||
-        !slot.startTime ||
-        !slot.endTime
-      ) {
-        return NextResponse.json({ error: "Dados inválidos em um dos horários" }, { status: 400 })
-      }
+    const bodySchema = z.object({
+      slots: z.array(slotSchema).min(0),
+    })
+
+    const raw = await request.json()
+    const parsed = bodySchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     }
+    const { slots } = parsed.data
 
     await prisma.$transaction([
       prisma.availabilitySlot.deleteMany({ where: { psychologistId } }),

@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       end: new Date(a.endTime).getTime(),
     }))
 
-    const APPOINTMENT_DURATION = 40
+    const APPOINTMENT_DURATION = parseInt(process.env.APPOINTMENT_DURATION_MINUTES || "30", 10)
     const availableDays: {
       date: string
       dayOfWeek: number
@@ -114,7 +114,11 @@ export async function GET(request: NextRequest) {
       currentDate.setDate(currentDate.getDate() + 1)
     }
 
-    return NextResponse.json({ availableDays, psychologistId: psychologistIdFinal })
+    const response: Record<string, unknown> = { availableDays }
+    if (psychologistId) {
+      response.psychologistId = psychologistIdFinal
+    }
+    return NextResponse.json(response)
   } catch (error) {
     logger.error("Error fetching public availability", { error: String(error) })
     return NextResponse.json({ error: "Erro ao buscar horários disponíveis" }, { status: 500 })

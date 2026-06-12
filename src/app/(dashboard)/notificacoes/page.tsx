@@ -53,16 +53,23 @@ export default function NotificationsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     try {
+      const payload = {
+        ...formData,
+        patientId: formData.patientId === "all" ? "" : formData.patientId,
+      }
       const res = await fetch("/api/notificacoes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error()
-      toast.success("Notificação enviada com sucesso!")
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || "Erro ao enviar")
+      }
+      toast.success(formData.sendLater ? "Notificação agendada!" : "Notificação enviada com sucesso!")
       setFormData({ title: "", message: "", channel: "WHATSAPP", patientId: "", sendLater: false, sendAt: "" })
-    } catch {
-      toast.error("Erro ao enviar notificação")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao enviar notificação")
     }
   }
 

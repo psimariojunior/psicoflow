@@ -3,6 +3,14 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { sanitizeHtml } from "@/lib/security"
+import { z } from "zod"
+
+const updateInvoiceSchema = z.object({
+  status: z.enum(["PENDING", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"]).optional(),
+  paymentMethod: z.string().max(100).optional(),
+  notes: z.string().max(2000).optional(),
+})
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -46,14 +54,22 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Fatura não encontrada" }, { status: 404 })
     }
 
-    const data = await request.json()
+    const body = await request.json()
+    const result = updateInvoiceSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Dados inválidos", details: result.error.issues.map((i) => i.message) },
+        { status: 400 }
+      )
+    }
+    const data = result.data
     const updated = await prisma.invoice.update({
       where: { id: params.id },
       data: {
         status: data.status ?? existing.status,
         paidDate: data.status === "PAID" ? new Date() : existing.paidDate,
-        paymentMethod: data.paymentMethod ?? existing.paymentMethod,
-        notes: data.notes ?? existing.notes,
+        paymentMethod: data.paymentMethod ? sanitizeHtml(data.paymentMethod) : existing.paymentMethod,
+        notes: data.notes ? sanitizeHtml(data.notes) : existing.notes,
       },
       include: {
         patient: { select: { id: true, name: true } },

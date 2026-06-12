@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createDiaryEntrySchema } from "@/lib/validation"
+import { sanitizeHtml } from "@/lib/security"
 
 export async function GET() {
   try {
@@ -43,11 +44,11 @@ export async function POST(request: Request) {
       data: {
         mood: data.mood,
         date: data.date ? new Date(data.date) : new Date(),
-        emotions: data.emotions || null,
-        activities: data.activities || null,
-        notes: data.notes || null,
+        emotions: data.emotions ? sanitizeHtml(data.emotions) : null,
+        activities: data.activities ? sanitizeHtml(data.activities) : null,
+        notes: data.notes ? sanitizeHtml(data.notes) : null,
         sleepHours: data.sleepHours ? data.sleepHours : null,
-        sleepQuality: data.sleepQuality || null,
+        sleepQuality: data.sleepQuality ?? null,
         anxietyLevel: data.anxietyLevel || null,
         patientId: data.patientId,
         psychologistId: (session.user as { id: string }).id,

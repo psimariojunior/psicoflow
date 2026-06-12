@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
+import { maskCpf, maskPhone, maskCep } from "@/lib/utils"
 import { Loader2, Save } from "lucide-react"
 
 const BRAZILIAN_STATES = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
@@ -101,7 +102,7 @@ export default function MeusDadosPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cpf" className="text-gray-300">CPF</Label>
-              <Input id="cpf" value={form.cpf} onChange={(e) => handleChange("cpf", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Input id="cpf" value={form.cpf} onChange={(e) => handleChange("cpf", maskCpf(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth" className="text-gray-300">Data de Nascimento</Label>
@@ -152,7 +153,7 @@ export default function MeusDadosPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-gray-300">WhatsApp</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Input id="phone" value={form.phone} onChange={(e) => handleChange("phone", maskPhone(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
             </div>
           </div>
         </div>
@@ -161,7 +162,7 @@ export default function MeusDadosPage() {
           <h2 className="text-lg font-semibold text-white">Endereço</h2>
           <div className="space-y-2">
             <Label htmlFor="zipCode" className="text-gray-300">CEP</Label>
-            <Input id="zipCode" value={form.zipCode} onChange={(e) => handleChange("zipCode", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Input id="zipCode" value={form.zipCode} onChange={(e) => handleChange("zipCode", maskCep(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="address" className="text-gray-300">Endereço</Label>
@@ -201,7 +202,7 @@ export default function MeusDadosPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="emergencyPhone" className="text-gray-300">Telefone de Emergência</Label>
-              <Input id="emergencyPhone" value={form.emergencyPhone} onChange={(e) => handleChange("emergencyPhone", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Input id="emergencyPhone" value={form.emergencyPhone} onChange={(e) => handleChange("emergencyPhone", maskPhone(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, formatTime } from "@/lib/utils"
-import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play, Bell, ClipboardEdit } from "lucide-react"
+import { Plus, ChevronLeft, ChevronRight, Clock, Video, MapPin, Loader2, CheckCircle, XCircle, Play, Bell, ClipboardEdit, Receipt } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
@@ -31,6 +31,7 @@ interface Appt {
   modality: string | null
   type: string | null
   day: number
+  price: number | null
 }
 
 interface PatientOption {
@@ -49,6 +50,9 @@ export default function AgendaPage() {
   const [showDialog, setShowDialog] = useState(false)
   const [selectedAppt, setSelectedAppt] = useState<Appt | null>(null)
   const [showDetail, setShowDetail] = useState(false)
+  const [recurring, setRecurring] = useState(false)
+  const [recurringFreq, setRecurringFreq] = useState<"weekly" | "biweekly">("weekly")
+  const [recurringOccurrences, setRecurringOccurrences] = useState(4)
 
   const fetchAppointments = useCallback(async (signal?: AbortSignal) => {
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
@@ -57,7 +61,7 @@ export default function AgendaPage() {
       const res = await fetch(`/api/agendamentos?startDate=${startOfMonth.toISOString()}&endDate=${endOfMonth.toISOString()}`, { signal })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      const mapped = (data || []).map((apt: { id: string; patientId: string; patient: { name: string; email: string | null; phone: string | null }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null }) => ({
+      const mapped = (data || []).map((apt: { id: string; patientId: string; patient: { name: string; email: string | null; phone: string | null }; startTime: string; endTime: string; status: string; modality: string | null; type: string | null; price: number | null }) => ({
         id: apt.id,
         patientId: apt.patientId,
         patientName: apt.patient?.name || "Paciente",
@@ -70,6 +74,7 @@ export default function AgendaPage() {
         modality: apt.modality,
         type: apt.type,
         day: new Date(apt.startTime).getDate(),
+        price: apt.price ?? null,
       }))
       setAppointments(mapped)
     } catch (err) {
@@ -186,25 +191,30 @@ export default function AgendaPage() {
     const formData = new FormData(form)
     const date = formData.get("date") as string
     const startTime = formData.get("startTime") as string
-    const duration = parseInt(formData.get("duration") as string) || 50
+    const duration = parseInt(formData.get("duration") as string) || 40
     const offset = -new Date().getTimezoneOffset()
     const sign = offset >= 0 ? '+' : '-'
     const pad = (n: number) => String(Math.abs(Math.floor(n))).padStart(2, '0')
     const tz = `${sign}${pad(offset / 60)}:${pad(offset % 60)}`
     const startDateTime = new Date(`${date}T${startTime}:00${tz}`)
     try {
+      const body: Record<string, unknown> = {
+        patientId: formData.get("patientId"),
+        startTime: startDateTime.toISOString(),
+        endTime: new Date(startDateTime.getTime() + duration * 60000).toISOString(),
+        type: formData.get("type"),
+        modality: formData.get("modality"),
+        price: formData.get("price"),
+        notes: formData.get("notes"),
+      }
+      if (recurring) {
+        body.isRecurring = true
+        body.recurringRule = JSON.stringify({ frequency: recurringFreq, occurrences: recurringOccurrences })
+      }
       const res = await fetch("/api/agendamentos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: formData.get("patientId"),
-          startTime: startDateTime.toISOString(),
-          endTime: new Date(startDateTime.getTime() + duration * 60000).toISOString(),
-          type: formData.get("type"),
-          modality: formData.get("modality"),
-          price: formData.get("price"),
-          notes: formData.get("notes"),
-        }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error()
       toast.success("Consulta agendada com sucesso!")
@@ -270,10 +280,11 @@ export default function AgendaPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="duration">Duração</Label>
-                  <Select name="duration" defaultValue="50">
+                  <Select name="duration" defaultValue="40">
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="30">30 min</SelectItem>
+                      <SelectItem value="40">40 min</SelectItem>
                       <SelectItem value="50">50 min</SelectItem>
                       <SelectItem value="60">60 min</SelectItem>
                       <SelectItem value="90">90 min</SelectItem>
@@ -314,7 +325,30 @@ export default function AgendaPage() {
                   <Textarea id="notes" name="notes" rows={2} />
                 </div>
               </div>
-              <Button type="submit">Agendar Consulta</Button>
+              <div className="flex items-center gap-2 pt-2 border-t">
+                <input type="checkbox" id="recurring" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                <Label htmlFor="recurring" className="text-sm font-normal">Repetir consulta</Label>
+              </div>
+              {recurring && (
+                <div className="grid grid-cols-2 gap-4 pl-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringFreq">Frequência</Label>
+                    <select id="recurringFreq" value={recurringFreq} onChange={(e) => setRecurringFreq(e.target.value as "weekly" | "biweekly")} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <option value="weekly">Semanal</option>
+                      <option value="biweekly">Quinzenal</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="recurringOccurrences">Repetições</Label>
+                    <select id="recurringOccurrences" value={recurringOccurrences} onChange={(e) => setRecurringOccurrences(Number(e.target.value))} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
+                        <option key={n} value={n}>{n}x</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+              <Button type="submit">Agendar Consulta{recurring ? ` (${recurringOccurrences}x)` : ""}</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -413,7 +447,7 @@ export default function AgendaPage() {
                             : apt.status === "CANCELLED"
                             ? "border-red-200 bg-red-50 dark:bg-red-950/10 opacity-60"
                             : apt.status === "COMPLETED"
-                            ? "border-gray-200 bg-gray-50 dark:bg-gray-950/10"
+                            ? "border-muted bg-muted/30"
                             : "hover:bg-accent/50"
                         }`}
                       >
@@ -519,6 +553,31 @@ export default function AgendaPage() {
                 )}
                 <Button size="sm" variant="outline" className="border-blue-300 text-blue-600" onClick={() => handleSendReminder(selectedAppt)}>
                   <Bell className="mr-1 h-4 w-4" /> Enviar Lembrete
+                </Button>
+                <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-600" onClick={async () => {
+                  try {
+                    const desc = `Sessão de ${selectedAppt.type || "psicologia"} - ${new Date(selectedAppt.startTimeRaw).toLocaleDateString("pt-BR")}`
+                    const val = selectedAppt.price || 100
+                    const due = new Date(selectedAppt.startTimeRaw)
+                    due.setDate(due.getDate() + 7)
+                    const res = await fetch("/api/invoices", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        patientId: selectedAppt.patientId,
+                        description: desc,
+                        amount: val,
+                        dueDate: due.toISOString().split("T")[0],
+                      }),
+                    })
+                    if (!res.ok) throw new Error()
+                    toast.success("Fatura criada com sucesso!")
+                    router.push("/cobrancas")
+                  } catch {
+                    toast.error("Erro ao criar fatura")
+                  }
+                }}>
+                  <Receipt className="mr-1 h-4 w-4" /> Criar Fatura
                 </Button>
               </div>
             </div>

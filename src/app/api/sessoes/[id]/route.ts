@@ -1,8 +1,34 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { sanitizeHtml } from "@/lib/security"
+
+const updateSessionSchema = z.object({
+  action: z.enum(["start", "pause", "resume", "end"]).optional(),
+  subjective: z.string().max(10000).optional(),
+  objective: z.string().max(10000).optional(),
+  assessment: z.string().max(10000).optional(),
+  plan: z.string().max(10000).optional(),
+  notes: z.string().max(10000).optional(),
+  moodBefore: z.number().int().min(0).max(10).optional(),
+  moodAfter: z.number().int().min(0).max(10).optional(),
+  tags: z.string().max(500).optional(),
+  type: z.string().max(100).optional(),
+  isRemote: z.boolean().optional(),
+})
+
+function sanitizeSessionFields(data: Record<string, any>) {
+  const textFields = ["subjective", "objective", "assessment", "plan", "notes", "tags", "type"]
+  for (const field of textFields) {
+    if (typeof data[field] === "string") {
+      data[field] = sanitizeHtml(data[field])
+    }
+  }
+  return data
+}
 
 async function getSessionById(id: string, psychologistId: string) {
   return prisma.therapySession.findFirst({
@@ -50,8 +76,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Sessão não encontrada" }, { status: 404 })
     }
 
-    const body = await request.json()
-    const { action, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, type, isRemote } = body
+    const raw = await request.json()
+    const parse = updateSessionSchema.safeParse(raw)
+    if (!parse.success) {
+      return NextResponse.json({
+        error: "Dados inválidos",
+        details: parse.error.issues.map((i) => ({ field: i.path.join("."), message: i.message })),
+      }, { status: 400 })
+    }
+
+    const data = sanitizeSessionFields(parse.data)
+    const { action, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, type, isRemote } = data
 
     const now = new Date()
 

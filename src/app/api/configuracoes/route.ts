@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { validate, updateSettingsSchema } from "@/lib/validation"
+import { sanitizeHtml } from "@/lib/security"
 
 export async function GET() {
   try {
@@ -12,7 +14,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: (session.user as { id: string }).id },
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true },
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true },
     })
 
     if (!user) {
@@ -36,13 +38,22 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const data = await request.json()
-    const { name, email, phone, crp, specialty, bio } = data
+    const raw = await request.json()
+    const result = validate(updateSettingsSchema, raw)
+    if (result.error) return result.error
+
+    const data = result.data! as Record<string, unknown>
+    const textFields = ["name", "specialty", "bio", "paymentInfo"] as const
+    for (const field of textFields) {
+      if (typeof data[field] === "string") {
+        data[field] = sanitizeHtml(data[field] as string)
+      }
+    }
 
     const user = await prisma.user.update({
       where: { id: (session.user as { id: string }).id },
-      data: { name, email, phone, crp, specialty, bio },
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true },
+      data,
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true },
     })
 
     return NextResponse.json(user)

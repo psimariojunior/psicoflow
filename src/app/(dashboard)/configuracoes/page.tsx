@@ -23,6 +23,8 @@ export default function SettingsPage() {
     phone: "",
     specialty: "",
     bio: "",
+    pixKey: "",
+    paymentInfo: "",
   })
   const [loading, setLoading] = useState(true)
 
@@ -37,6 +39,8 @@ export default function SettingsPage() {
           phone: data.phone || "",
           specialty: data.specialty || "",
           bio: data.bio || "",
+          pixKey: data.pixKey || "",
+          paymentInfo: data.paymentInfo || "",
         })
       })
       .catch(() => toast.error("Erro ao carregar configurações"))
@@ -81,7 +85,7 @@ export default function SettingsPage() {
           <TabsTrigger value="security"><Lock className="mr-2 h-4 w-4" />Segurança</TabsTrigger>
           <TabsTrigger value="appearance"><Palette className="mr-2 h-4 w-4" />Aparência</TabsTrigger>
           <TabsTrigger value="schedule"><Globe className="mr-2 h-4 w-4" />Agenda</TabsTrigger>
-          <TabsTrigger value="financial"><CreditCard className="mr-2 h-4 w-4" />Financeiro</TabsTrigger>
+          <TabsTrigger value="financial"><CreditCard className="mr-2 h-4 w-4" />Pagamentos</TabsTrigger>
           <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Equipe</TabsTrigger>
         </TabsList>
 
@@ -273,10 +277,11 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Duração padrão da sessão (minutos)</Label>
-                <Select defaultValue="50">
+                <Select defaultValue="40">
                   <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="30">30 min</SelectItem>
+                    <SelectItem value="40">40 min</SelectItem>
                     <SelectItem value="50">50 min</SelectItem>
                     <SelectItem value="60">60 min</SelectItem>
                     <SelectItem value="90">90 min</SelectItem>
@@ -310,30 +315,45 @@ export default function SettingsPage() {
         <TabsContent value="financial" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Configurações Financeiras</CardTitle>
+              <CardTitle>Configuração de Pagamentos</CardTitle>
+              <CardDescription>Configure como os pacientes podem pagar pelas consultas</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Valor padrão da sessão</Label>
-                <Input type="number" placeholder="100,00" className="w-[200px]" />
+                <Label>Chave PIX</Label>
+                <Input
+                  value={profile.pixKey}
+                  onChange={(e) => setProfile({...profile, pixKey: e.target.value})}
+                  placeholder="CPF, CNPJ, email, telefone ou chave aleatória"
+                />
+                <p className="text-sm text-muted-foreground">
+                  A chave PIX será exibida nas faturas para o paciente realizar o pagamento
+                </p>
               </div>
               <div className="space-y-2">
-                <Label>Formas de pagamento aceitas</Label>
-                <div className="flex flex-wrap gap-2">
-                  {["Dinheiro", "Pix", "Cartão de Crédito", "Cartão de Débito", "Boleto", "Transferência"].map((method) => (
-                    <div key={method} className="flex items-center gap-2 rounded-lg border px-3 py-2">
-                      <Switch defaultChecked={["Dinheiro", "Pix", "Cartão de Crédito"].includes(method)} />
-                      <span className="text-sm">{method}</span>
-                    </div>
-                  ))}
-                </div>
+                <Label>Instruções de Pagamento</Label>
+                <Textarea
+                  rows={4}
+                  value={profile.paymentInfo}
+                  onChange={(e) => setProfile({...profile, paymentInfo: e.target.value})}
+                  placeholder="Ex: Após o pagamento, envie o comprovante via WhatsApp..."
+                />
+                <p className="text-sm text-muted-foreground">
+                  Informações adicionais exibidas nas faturas do paciente
+                </p>
               </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">Emissão de Notas Fiscais</p>
-                  <p className="text-sm text-muted-foreground">Configurar emissão de NFS-e</p>
+              <div className="rounded-lg border bg-card p-4 space-y-2">
+                <p className="text-sm font-medium">Pré-visualização na fatura do paciente</p>
+                <div className="rounded-md bg-slate-100 dark:bg-slate-800 p-3 text-sm space-y-1">
+                  {profile.pixKey ? (
+                    <p><strong>PIX:</strong> {profile.pixKey}</p>
+                  ) : (
+                    <p className="text-muted-foreground italic">Nenhuma chave PIX configurada</p>
+                  )}
+                  {profile.paymentInfo && (
+                    <p className="text-muted-foreground whitespace-pre-line">{profile.paymentInfo}</p>
+                  )}
                 </div>
-                <Button variant="outline">Configurar</Button>
               </div>
               <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Salvar</Button>
             </CardContent>

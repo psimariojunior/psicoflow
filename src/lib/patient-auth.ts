@@ -1,25 +1,29 @@
 import { SignJWT, jwtVerify } from "jose"
+import { randomUUID } from "crypto"
 
-const secret = new TextEncoder().encode(
-  process.env.ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET || "fallback-dev-secret-key-change-in-production"
-)
+function getSecret(): Uint8Array {
+  const key = process.env.ENCRYPTION_KEY
+  if (!key) throw new Error("ENCRYPTION_KEY não configurada")
+  return new TextEncoder().encode(key)
+}
 
 export interface PatientTokenPayload {
   patientId: string
   email: string | null
+  jti?: string
   [key: string]: unknown
 }
 
 export async function signPatientToken(payload: PatientTokenPayload): Promise<string> {
-  return new SignJWT(payload)
+  return new SignJWT({ ...payload, jti: randomUUID() })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
-    .sign(secret)
+    .sign(getSecret())
 }
 
 export async function verifyPatientToken(token: string): Promise<PatientTokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret)
+    const { payload } = await jwtVerify(token, getSecret())
     return payload as unknown as PatientTokenPayload
   } catch {
     return null

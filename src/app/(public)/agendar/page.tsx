@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 import { Loader2, Calendar, Clock, User, Phone, Mail, CheckCircle, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -168,6 +169,14 @@ function AgendarPage() {
             <p className="text-white/40 text-sm">
               Você receberá um lembrete por email/WhatsApp próximo ao horário da consulta.
             </p>
+            <div className="mt-6 space-y-3">
+              <Link href="/paciente/cadastro" className="block w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-400 text-white font-medium rounded-xl transition-all text-center">
+                Criar conta para gerenciar consultas
+              </Link>
+              <Link href="/" className="block w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl transition-all text-center text-sm">
+                Voltar ao início
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -352,9 +361,14 @@ function AgendarPage() {
           </>
         )}
 
-        <p className="text-center text-xs text-white/20 mt-8">
-          PsicoFlow &mdash; Tecnologia a serviço da saúde mental
-        </p>
+        <div className="flex items-center justify-center gap-3 mt-8">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 ring-1 ring-emerald-500/30">
+            <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+          </div>
+          <p className="text-center text-xs text-white/20">
+            PsicoFlow &mdash; Tecnologia a serviço da saúde mental
+          </p>
+        </div>
       </div>
     </div>
   )

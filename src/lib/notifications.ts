@@ -43,7 +43,7 @@ export async function sendReminderNow(
     }
     const err = await sendAppointmentReminderEmail(
       patientEmail, patientName, psychologistName,
-      appointmentDate || "", appointmentTime || "", "Atendimento", "presential"
+      appointmentDate || "", appointmentTime || "", "Atendimento", "online"
     )
     console.log("[sendReminderNow] EMAIL result", { patientId, err })
     return err ? { ok: false, error: err } : { ok: true }
@@ -126,7 +126,7 @@ export async function dispatchNotification(
       appointmentDate,
       appointmentTime,
       "Atendimento",
-      "presential"
+      "online"
     )
   } else if (notification.channel === "WHATSAPP" && patientPhone) {
     const ok = await sendAppointmentReminderWhatsApp(patientPhone, patientName, appointmentDate, appointmentTime)

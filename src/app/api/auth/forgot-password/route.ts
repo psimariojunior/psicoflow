@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sendPasswordResetEmail } from "@/lib/email"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { validate, forgotPasswordSchema } from "@/lib/validation"
 import crypto from "crypto"
 
 export async function POST(request: Request) {
@@ -11,15 +12,14 @@ export async function POST(request: Request) {
   if (blocked) return blocked
 
   try {
-    const { email } = await request.json()
-
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email é obrigatório" }, { status: 400 })
-    }
+    const raw = await request.json()
+    const result = validate(forgotPasswordSchema, raw)
+    if (result.error) return result.error
+    const { email } = result.data!
 
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      return NextResponse.json({ error: "Email não encontrado" }, { status: 404 })
+      return NextResponse.json({ message: "Se o email estiver cadastrado, você receberá um link de recuperação." })
     }
 
     const token = crypto.randomBytes(32).toString("hex")
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       data: { token, expires, userId: user.id },
     })
 
-    const err = await sendPasswordResetEmail(email, token)
+    const err = await sendPasswordResetEmail(email, token, "/reset-password")
 
     if (err) {
       logger.warn("Password reset token generated but email not sent", { email, error: err })

@@ -1,18 +1,35 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
-import { logAudit } from "@/lib/security"
+import { logAudit, sanitizeHtml } from "@/lib/security"
+import { rateLimitMiddleware } from "@/lib/rate-limit"
+
+const registerSchema = z.object({
+  name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres").max(120, "Nome muito longo"),
+  email: z.string().email("Email inválido").max(255),
+  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").max(128, "Senha muito longa"),
+  crp: z.string().max(20).optional().or(z.literal("")),
+})
+
+const rateLimit = rateLimitMiddleware(3, 60000)
 
 export async function POST(request: Request) {
-  try {
-    const { name, email, password, crp } = await request.json()
+  const blocked = rateLimit(request)
+  if (blocked) return blocked
 
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Dados obrigatórios não informados" },
-        { status: 400 }
-      )
+  try {
+    const raw = await request.json()
+    const parse = registerSchema.safeParse(raw)
+    if (!parse.success) {
+      return NextResponse.json({
+        error: "Dados inválidos",
+        details: parse.error.issues.map((i) => ({ field: i.path.join("."), message: i.message })),
+      }, { status: 400 })
     }
+
+    const { name, email, password, crp } = parse.data
+    const sanitizedName = sanitizeHtml(name.trim())
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -29,7 +46,7 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: {
-        name,
+        name: sanitizedName,
         email,
         password: hashedPassword,
         crp: crp || null,

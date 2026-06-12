@@ -1,22 +1,115 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
 import { Providers } from "./providers"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+
+const siteUrl = "https://psicoflow-iota.vercel.app"
+const siteName = "PsicoFlow"
+const title = "PsicoFlow — Sistema de Gestão para Psicólogos | Agenda Online, Prontuários e Sala Virtual"
+const description = "Sistema completo de gestão para psicólogos. Agende consultas online, emita prontuários, gerencie finanças e realize atendimentos via sala virtual segura. Tudo em um só lugar."
 
 export const metadata: Metadata = {
-  title: "PsicoFlow - Sistema de Gestão para Psicólogos",
-  description: "Sistema completo de gestão para psicólogos com agenda online, prontuários, controle financeiro e sala virtual",
-  keywords: ["psicologia", "gestão", "agenda online", "prontuário", "psicólogo"],
-  icons: "/favicon.svg",
+  title: {
+    default: title,
+    template: `%s | ${siteName}`,
+  },
+  description,
+  keywords: [
+    "psicologia", "gestão para psicólogos", "agenda online psicólogo",
+    "prontuário psicológico", "sala virtual psicologia", "terapia online",
+    "atendimento psicológico", "software psicologia", "psicólogo",
+    "consulta online", "CRP", "clínica de psicologia",
+  ],
+  authors: [{ name: "PsicoFlow" }],
+  creator: "PsicoFlow",
+  publisher: "PsicoFlow",
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: siteUrl,
+    siteName,
+    title,
+    description,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PsicoFlow - Gestão para Psicólogos",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og-image.png"],
+    creator: "@psicoflow",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  manifest: "/manifest",
+  other: {
+    "application/ld+json": JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      name: "PsicoFlow",
+      description: "Sistema de gestão para psicólogos com agenda online, prontuários e sala virtual",
+      url: siteUrl,
+      areaServed: "BR",
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Serviços de Psicologia",
+        itemListElement: [
+          { "@type": "Offer", name: "Terapia Individual" },
+          { "@type": "Offer", name: "Terapia de Casal" },
+          { "@type": "Offer", name: "Terapia Online" },
+          { "@type": "Offer", name: "Supervisão Clínica" },
+        ],
+      },
+    }),
+  },
 }
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>{children}</Providers>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   )

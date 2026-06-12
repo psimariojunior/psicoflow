@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createRecordSchema } from "@/lib/validation"
+import { sanitizeHtml } from "@/lib/security"
 
 export async function GET() {
   try {
@@ -39,14 +40,23 @@ export async function POST(request: Request) {
     const { error } = validate(createRecordSchema, data)
     if (error) return error
 
+    const psychologistId = (session.user as { id: string }).id
+
+    const patient = await prisma.patient.findFirst({
+      where: { id: data.patientId, psychologistId },
+    })
+    if (!patient) {
+      return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+    }
+
     const record = await prisma.medicalRecord.create({
       data: {
         type: data.type || "SESSION_NOTE",
-        title: data.title,
-        content: data.content || "",
+        title: sanitizeHtml(data.title),
+        content: data.content ? sanitizeHtml(data.content) : "",
         isConfidential: data.isConfidential || false,
         patientId: data.patientId,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
       include: {
         patient: { select: { id: true, name: true } },
