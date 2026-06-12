@@ -41,12 +41,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950 transition-colors">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-1">Entrar</h1>
-            <p className="text-gray-300 text-sm">Acesse sua área do paciente</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Entrar</h1>
+            <p className="text-slate-500 dark:text-gray-300 text-sm">Acesse sua área do paciente</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,14 +55,14 @@ export default function LoginPage() {
               placeholder="Seu email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
+              className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
             />
             <Input
               type="password"
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-400 h-12"
+              className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
             />
             <Button
               type="submit"
@@ -74,14 +74,14 @@ export default function LoginPage() {
             </Button>
 
             <div className="text-center text-sm">
-              <Link href="/paciente/recuperar-senha" className="text-gray-400 hover:text-emerald-400 transition-colors">
+              <Link href="/paciente/recuperar-senha" className="text-slate-400 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                 Esqueci minha senha
               </Link>
             </div>
           </form>
 
           <p className="text-center mt-6">
-            <Link href="/paciente/cadastro" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/cadastro" className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
               Não tem conta? Cadastre-se
             </Link>
           </p>

@@ -88,48 +88,48 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950 transition-colors">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-1">Criar conta</h1>
-            <p className="text-gray-400 text-sm">Preencha seus dados para agendar consultas</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Criar conta</h1>
+            <p className="text-slate-500 dark:text-gray-400 text-sm">Preencha seus dados para agendar consultas</p>
           </div>
 
           <div className="flex items-center justify-center gap-2 mb-8">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step > i ? "bg-emerald-500 text-white" : step === i ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/50" : "bg-slate-800 text-gray-500"
+                  step > i ? "bg-emerald-500 text-slate-900 dark:text-white" : step === i ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/50" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-gray-500"
                 }`}>
                   {step > i ? <Check className="h-4 w-4" /> : i + 1}
                 </div>
-                {i < 2 && <div className={`w-12 h-0.5 transition-all ${step > i ? "bg-emerald-500" : "bg-slate-700"}`} />}
+                {i < 2 && <div className={`w-12 h-0.5 transition-all ${step > i ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"}`} />}
               </div>
             ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 0 && (
-              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-                <h2 className="text-lg font-semibold text-white mb-4">Dados Pessoais</h2>
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-200 dark:ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Dados Pessoais</h2>
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-gray-300">Nome completo *</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="name" className="text-slate-600 dark:text-gray-300">Nome completo *</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="cpf" className="text-gray-300">CPF</Label>
-                  <Input id="cpf" value={cpf} onChange={(e) => setCpf(maskCpf(e.target.value))} placeholder="000.000.000-00" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="cpf" className="text-slate-600 dark:text-gray-300">CPF</Label>
+                  <Input id="cpf" value={cpf} onChange={(e) => setCpf(maskCpf(e.target.value))} placeholder="000.000.000-00" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth" className="text-gray-300">Data de Nascimento</Label>
-                    <Input id="dateOfBirth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12 [color-scheme:dark]" />
+                    <Label htmlFor="dateOfBirth" className="text-slate-600 dark:text-gray-300">Data de Nascimento</Label>
+                    <Input id="dateOfBirth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white h-12 [color-scheme:light] dark:[color-scheme:dark]" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="gender" className="text-gray-300">Gênero</Label>
+                    <Label htmlFor="gender" className="text-slate-600 dark:text-gray-300">Gênero</Label>
                     <Select value={gender} onValueChange={setGender}>
-                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                      <SelectTrigger className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white h-12">
                         <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
                       <SelectContent>
@@ -145,24 +145,24 @@ export default function CadastroPage() {
             )}
 
             {step === 1 && (
-              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-                <h2 className="text-lg font-semibold text-white mb-4">Contato & Acesso</h2>
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-200 dark:ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Contato & Acesso</h2>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-300">Email *</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="email" className="text-slate-600 dark:text-gray-300">Email *</Label>
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-gray-300">WhatsApp</Label>
-                  <Input id="phone" value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="(11) 99999-8888" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="phone" className="text-slate-600 dark:text-gray-300">WhatsApp</Label>
+                  <Input id="phone" value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="(11) 99999-8888" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-gray-300">Senha *</Label>
-                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                    <Label htmlFor="password" className="text-slate-600 dark:text-gray-300">Senha *</Label>
+                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-gray-300">Confirmar Senha *</Label>
-                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                    <Label htmlFor="confirmPassword" className="text-slate-600 dark:text-gray-300">Confirmar Senha *</Label>
+                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                   </div>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
@@ -175,30 +175,30 @@ export default function CadastroPage() {
             )}
 
             {step === 2 && (
-              <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-                <h2 className="text-lg font-semibold text-white mb-4">Endereço</h2>
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-200 dark:ring-slate-700/50 space-y-4">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Endereço</h2>
                 <div className="space-y-2">
-                  <Label htmlFor="zipCode" className="text-gray-300">CEP</Label>
-                  <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(maskCep(e.target.value))} placeholder="00000-000" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="zipCode" className="text-slate-600 dark:text-gray-300">CEP</Label>
+                  <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(maskCep(e.target.value))} placeholder="00000-000" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address" className="text-gray-300">Endereço</Label>
-                  <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua, número, complemento" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                  <Label htmlFor="address" className="text-slate-600 dark:text-gray-300">Endereço</Label>
+                  <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua, número, complemento" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="neighborhood" className="text-gray-300">Bairro</Label>
-                    <Input id="neighborhood" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Bairro" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                    <Label htmlFor="neighborhood" className="text-slate-600 dark:text-gray-300">Bairro</Label>
+                    <Input id="neighborhood" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Bairro" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city" className="text-gray-300">Cidade</Label>
-                    <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Cidade" className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12" />
+                    <Label htmlFor="city" className="text-slate-600 dark:text-gray-300">Cidade</Label>
+                    <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Cidade" className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 dark:text-gray-500 h-12" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="state" className="text-gray-300">Estado</Label>
+                  <Label htmlFor="state" className="text-slate-600 dark:text-gray-300">Estado</Label>
                   <Select value={state} onValueChange={setState}>
-                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                    <SelectTrigger className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white h-12">
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
@@ -213,7 +213,7 @@ export default function CadastroPage() {
 
             <div className="flex items-center justify-between">
               {step > 0 ? (
-                <Button type="button" onClick={prevStep} variant="ghost" className="text-gray-400 hover:text-white h-12 px-6">
+                <Button type="button" onClick={prevStep} variant="ghost" className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-white h-12 px-6">
                   <ChevronLeft className="h-4 w-4 mr-1" /> Voltar
                 </Button>
               ) : (
@@ -233,7 +233,7 @@ export default function CadastroPage() {
           </form>
 
           <p className="text-center mt-6">
-            <Link href="/paciente/login" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/login" className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
               Já tem conta? Entrar
             </Link>
           </p>
