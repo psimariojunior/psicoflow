@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { Plus, Download, ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Wallet, CreditCard, Loader2 } from "lucide-react"
+import { Plus, Download, TrendingUp, TrendingDown, DollarSign, Wallet, CreditCard, Loader2, Receipt, ExternalLink, Copy, Check } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import toast from "react-hot-toast"
 
@@ -28,13 +28,30 @@ interface Transaction {
   patientId?: string
 }
 
+interface Invoice {
+  id: string
+  number: string
+  description: string
+  amount: number
+  dueDate: string
+  status: string
+  patientName: string
+  paymentMethod: string | null
+  issueDate: string
+  stripeCheckoutSessionId: string | null
+}
+
 export default function FinancialPage() {
+  const [activeTab, setActiveTab] = useState("transactions")
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [summary, setSummary] = useState({ totalRevenue: 0, totalExpenses: 0, balance: 0 })
   const [loading, setLoading] = useState(true)
   const [showTransactionDialog, setShowTransactionDialog] = useState(false)
+  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false)
   const [patients, setPatients] = useState<{ id: string; name: string }[]>([])
   const [txForm, setTxForm] = useState({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
+  const [invForm, setInvForm] = useState({ description: "", amount: "", patientId: "", dueDate: "" })
   const [dateRange, setDateRange] = useState({ start: "", end: "" })
 
   useEffect(() => {
@@ -69,7 +86,33 @@ export default function FinancialPage() {
       .finally(() => setLoading(false))
   }
 
+  function loadInvoices() {
+    fetch("/api/invoices")
+      .then(r => r.ok ? r.json() : { invoices: [] })
+      .then(data => setInvoices(data.invoices || []))
+      .catch(() => {})
+  }
+
   useEffect(() => { loadTransactions() }, [])
+  useEffect(() => { if (activeTab === "invoices") loadInvoices() }, [activeTab])
+
+  const handleCreateInvoice = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/invoices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...invForm, amount: parseFloat(invForm.amount) }),
+      })
+      if (!res.ok) throw new Error()
+      toast.success("Fatura criada!")
+      setShowInvoiceDialog(false)
+      setInvForm({ description: "", amount: "", patientId: "", dueDate: "" })
+      loadInvoices()
+    } catch {
+      toast.error("Erro ao criar fatura")
+    }
+  }
 
   const incomeColumns: ColumnDef<Transaction>[] = [
     { accessorKey: "date", header: "Data", cell: ({ row }) => formatDate(row.original.date) },
@@ -87,11 +130,20 @@ export default function FinancialPage() {
     { accessorKey: "status", header: "Status", cell: ({ row }) => <StatusBadge status={row.original.status} /> },
   ]
 
+  const invoiceColumns: ColumnDef<Invoice>[] = [
+    { accessorKey: "number", header: "Nº" },
+    { accessorKey: "description", header: "Descrição" },
+    { accessorKey: "patientName", header: "Paciente" },
+    { accessorKey: "amount", header: "Valor", cell: ({ row }) => formatCurrency(row.original.amount) },
+    { accessorKey: "dueDate", header: "Vencimento", cell: ({ row }) => formatDate(row.original.dueDate) },
+    { accessorKey: "status", header: "Status", cell: ({ row }) => <StatusBadge status={row.original.status} /> },
+  ]
+
   const totalRevenue = summary.totalRevenue || transactions.filter(t => t.type === "INCOME").reduce((acc, t) => acc + t.amount, 0)
   const totalExpenses = summary.totalExpenses || transactions.filter(t => t.type === "EXPENSE").reduce((acc, t) => acc + t.amount, 0)
   const pendingAmount = transactions.filter(t => t.type === "INCOME" && (t.status === "PENDING" || t.status === "OVERDUE")).reduce((acc, t) => acc + t.amount, 0)
 
-  if (loading) {
+  if (loading && activeTab === "transactions") {
     return (
       <div className="flex h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -104,140 +156,170 @@ export default function FinancialPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Financeiro</h2>
-          <p className="text-muted-foreground">
-            Controle de receitas, despesas e notas fiscais
-          </p>
+          <p className="text-muted-foreground">Controle de receitas, despesas e faturas</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Input type="date" value={dateRange.start} onChange={(e) => setDateRange({...dateRange, start: e.target.value})} className="h-9 w-36" />
-            <span className="text-muted-foreground">até</span>
-            <Input type="date" value={dateRange.end} onChange={(e) => setDateRange({...dateRange, end: e.target.value})} className="h-9 w-36" />
-            <Button variant="secondary" size="sm" onClick={() => loadTransactions(dateRange.start, dateRange.end)}>
-              Filtrar
-            </Button>
-            {(dateRange.start || dateRange.end) && (
-              <Button variant="ghost" size="sm" onClick={() => { setDateRange({ start: "", end: "" }); loadTransactions() }}>
-                Limpar
-              </Button>
-            )}
-          </div>
-          <Button variant="outline" onClick={() => {
-            try {
-              const esc = (v: string | number | null | undefined) => { if (v === null || v === undefined) return '""'; return '"' + String(v).replace(/"/g, '""') + '"' }
-              const header = "Data;Descrição;Categoria;Valor;Tipo;Status;Paciente\n"
-              const rows = transactions.map((t) =>
-                [esc(formatDate(t.date)), esc(t.description), esc(t.category), esc(t.amount), esc(t.type === "INCOME" ? "Receita" : "Despesa"), esc(t.status), esc(t.patient)].join(";")
-              ).join("\n")
-              const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" })
-              const url = URL.createObjectURL(blob)
-              const a = document.createElement("a")
-              a.href = url; a.download = "financeiro.csv"; a.click()
-              URL.revokeObjectURL(url)
-              toast.success("CSV exportado")
-            } catch { toast.error("Erro ao exportar CSV") }
-          }}>
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
-          </Button>
-          <Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Nova Transação
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader><DialogTitle>Nova Transação</DialogTitle></DialogHeader>
-              <form onSubmit={async (e) => {
-                e.preventDefault()
+          {activeTab === "transactions" && (
+            <>
+              <div className="flex items-center gap-2 text-sm">
+                <Input type="date" value={dateRange.start} onChange={(e) => setDateRange({...dateRange, start: e.target.value})} className="h-9 w-36" />
+                <span className="text-muted-foreground">até</span>
+                <Input type="date" value={dateRange.end} onChange={(e) => setDateRange({...dateRange, end: e.target.value})} className="h-9 w-36" />
+                <Button variant="secondary" size="sm" onClick={() => loadTransactions(dateRange.start, dateRange.end)}>Filtrar</Button>
+                {(dateRange.start || dateRange.end) && (
+                  <Button variant="ghost" size="sm" onClick={() => { setDateRange({ start: "", end: "" }); loadTransactions() }}>Limpar</Button>
+                )}
+              </div>
+              <Button variant="outline" onClick={() => {
                 try {
-                  const res = await fetch("/api/financeiro", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
-                  })
-                  if (!res.ok) throw new Error()
-                  toast.success("Transação criada!")
-                  setShowTransactionDialog(false)
-                  setTxForm({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
-                  const data = await fetch("/api/financeiro").then(r => r.json())
-                  if (data.summary) setSummary(data.summary)
-                  const mapped = (data.transactions || []).map((t: { createdAt: string; paymentStatus: string; patient: { name: string } | null }) => ({ ...t, date: t.createdAt, status: t.paymentStatus, patient: t.patient?.name || null }))
-                  setTransactions(mapped)
-                } catch { toast.error("Erro ao criar transação") }
-              }} className="grid gap-4 py-4">
-                <div className="space-y-2">
-                  <Label>Descrição</Label>
-                  <Input required value={txForm.description} onChange={(e) => setTxForm({...txForm, description: e.target.value})} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                  const esc = (v: string | number | null | undefined) => { if (v === null || v === undefined) return '""'; return '"' + String(v).replace(/"/g, '""') + '"' }
+                  const header = "Data;Descrição;Categoria;Valor;Tipo;Status;Paciente\n"
+                  const rows = transactions.map((t) =>
+                    [esc(formatDate(t.date)), esc(t.description), esc(t.category), esc(t.amount), esc(t.type === "INCOME" ? "Receita" : "Despesa"), esc(t.status), esc(t.patient)].join(";")
+                  ).join("\n")
+                  const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement("a")
+                  a.href = url; a.download = "financeiro.csv"; a.click()
+                  URL.revokeObjectURL(url)
+                  toast.success("CSV exportado")
+                } catch { toast.error("Erro ao exportar CSV") }
+              }}>
+                <Download className="mr-2 h-4 w-4" /> Exportar
+              </Button>
+              <Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
+                <DialogTrigger asChild>
+                  <Button><Plus className="mr-2 h-4 w-4" /> Nova Transação</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader><DialogTitle>Nova Transação</DialogTitle></DialogHeader>
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    try {
+                      const res = await fetch("/api/financeiro", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
+                      })
+                      if (!res.ok) throw new Error()
+                      toast.success("Transação criada!")
+                      setShowTransactionDialog(false)
+                      setTxForm({ description: "", type: "INCOME", category: "", amount: "", paymentMethod: "", patientId: "", notes: "", dueDate: "" })
+                      const data = await fetch("/api/financeiro").then(r => r.json())
+                      if (data.summary) setSummary(data.summary)
+                      const mapped = (data.transactions || []).map((t: { createdAt: string; paymentStatus: string; patient: { name: string } | null }) => ({ ...t, date: t.createdAt, status: t.paymentStatus, patient: t.patient?.name || null }))
+                      setTransactions(mapped)
+                    } catch { toast.error("Erro ao criar transação") }
+                  }} className="grid gap-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Descrição</Label>
+                      <Input required value={txForm.description} onChange={(e) => setTxForm({...txForm, description: e.target.value})} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Tipo</Label>
+                        <Select value={txForm.type} onValueChange={(v) => setTxForm({...txForm, type: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="INCOME">Receita</SelectItem>
+                            <SelectItem value="EXPENSE">Despesa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Valor</Label>
+                        <Input type="number" step="0.01" required value={txForm.amount} onChange={(e) => setTxForm({...txForm, amount: e.target.value})} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Categoria</Label>
+                        <Select value={txForm.category} onValueChange={(v) => setTxForm({...txForm, category: v})}>
+                          <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="session">Sessão</SelectItem>
+                            <SelectItem value="package">Pacote</SelectItem>
+                            <SelectItem value="supervision">Supervisão</SelectItem>
+                            <SelectItem value="material">Material</SelectItem>
+                            <SelectItem value="rent">Aluguel</SelectItem>
+                            <SelectItem value="other">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Forma de Pagamento</Label>
+                        <Select value={txForm.paymentMethod} onValueChange={(v) => setTxForm({...txForm, paymentMethod: v})}>
+                          <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PIX">Pix</SelectItem>
+                            <SelectItem value="CREDIT_CARD">Cartão de Crédito</SelectItem>
+                            <SelectItem value="DEBIT_CARD">Cartão de Débito</SelectItem>
+                            <SelectItem value="CASH">Dinheiro</SelectItem>
+                            <SelectItem value="BOLETO">Boleto</SelectItem>
+                            <SelectItem value="TRANSFER">Transferência</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Paciente (opcional)</Label>
+                      <Select value={txForm.patientId} onValueChange={(v) => setTxForm({...txForm, patientId: v})}>
+                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Data de Vencimento</Label>
+                      <Input type="date" value={txForm.dueDate} onChange={(e) => setTxForm({...txForm, dueDate: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Observações</Label>
+                      <Textarea value={txForm.notes} onChange={(e) => setTxForm({...txForm, notes: e.target.value})} rows={2} />
+                    </div>
+                    <Button type="submit">Criar Transação</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+          {activeTab === "invoices" && (
+            <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
+              <DialogTrigger asChild>
+                <Button><Plus className="mr-2 h-4 w-4" /> Nova Fatura</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader><DialogTitle>Nova Fatura</DialogTitle></DialogHeader>
+                <form onSubmit={handleCreateInvoice} className="grid gap-4 py-4">
                   <div className="space-y-2">
-                    <Label>Tipo</Label>
-                    <Select value={txForm.type} onValueChange={(v) => setTxForm({...txForm, type: v})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                    <Label>Descrição</Label>
+                    <Input required value={invForm.description} onChange={(e) => setInvForm({...invForm, description: e.target.value})} placeholder="Ex: Consulta de terapia - Maio/2026" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Valor (R$)</Label>
+                      <Input type="number" step="0.01" required value={invForm.amount} onChange={(e) => setInvForm({...invForm, amount: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Vencimento</Label>
+                      <Input type="date" required value={invForm.dueDate} onChange={(e) => setInvForm({...invForm, dueDate: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Paciente</Label>
+                    <Select value={invForm.patientId} onValueChange={(v) => setInvForm({...invForm, patientId: v})}>
+                      <SelectTrigger><SelectValue placeholder="Selecione o paciente" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="INCOME">Receita</SelectItem>
-                        <SelectItem value="EXPENSE">Despesa</SelectItem>
+                        {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Valor</Label>
-                    <Input type="number" step="0.01" required value={txForm.amount} onChange={(e) => setTxForm({...txForm, amount: e.target.value})} />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Categoria</Label>
-                    <Select value={txForm.category} onValueChange={(v) => setTxForm({...txForm, category: v})}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="session">Sessão</SelectItem>
-                        <SelectItem value="package">Pacote</SelectItem>
-                        <SelectItem value="supervision">Supervisão</SelectItem>
-                        <SelectItem value="material">Material</SelectItem>
-                        <SelectItem value="rent">Aluguel</SelectItem>
-                        <SelectItem value="other">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Forma de Pagamento</Label>
-                    <Select value={txForm.paymentMethod} onValueChange={(v) => setTxForm({...txForm, paymentMethod: v})}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="PIX">Pix</SelectItem>
-                        <SelectItem value="CREDIT_CARD">Cartão de Crédito</SelectItem>
-                        <SelectItem value="DEBIT_CARD">Cartão de Débito</SelectItem>
-                        <SelectItem value="CASH">Dinheiro</SelectItem>
-                        <SelectItem value="BOLETO">Boleto</SelectItem>
-                        <SelectItem value="TRANSFER">Transferência</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Paciente (opcional)</Label>
-                  <Select value={txForm.patientId} onValueChange={(v) => setTxForm({...txForm, patientId: v})}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Data de Vencimento</Label>
-                  <Input type="date" value={txForm.dueDate} onChange={(e) => setTxForm({...txForm, dueDate: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Observações</Label>
-                  <Textarea value={txForm.notes} onChange={(e) => setTxForm({...txForm, notes: e.target.value})} rows={2} />
-                </div>
-                <Button type="submit">Criar Transação</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <Button type="submit">Criar Fatura</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -296,28 +378,41 @@ export default function FinancialPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="all">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="all">Todas</TabsTrigger>
-          <TabsTrigger value="income">Receitas</TabsTrigger>
-          <TabsTrigger value="expenses">Despesas</TabsTrigger>
-          <TabsTrigger value="pending">Pendentes</TabsTrigger>
-          <TabsTrigger value="overdue">Vencidas</TabsTrigger>
+          <TabsTrigger value="transactions">Transações</TabsTrigger>
+          <TabsTrigger value="invoices">Faturas</TabsTrigger>
         </TabsList>
-        <TabsContent value="all" className="mt-4">
-          <DataTable columns={incomeColumns} data={transactions} searchKey="description" searchPlaceholder="Buscar transação..." />
+
+        <TabsContent value="transactions" className="mt-4">
+          <Tabs defaultValue="all">
+            <TabsList>
+              <TabsTrigger value="all">Todas</TabsTrigger>
+              <TabsTrigger value="income">Receitas</TabsTrigger>
+              <TabsTrigger value="expenses">Despesas</TabsTrigger>
+              <TabsTrigger value="pending">Pendentes</TabsTrigger>
+              <TabsTrigger value="overdue">Vencidas</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="mt-4">
+              <DataTable columns={incomeColumns} data={transactions} searchKey="description" searchPlaceholder="Buscar transação..." />
+            </TabsContent>
+            <TabsContent value="income" className="mt-4">
+              <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "INCOME")} searchKey="description" />
+            </TabsContent>
+            <TabsContent value="expenses" className="mt-4">
+              <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "EXPENSE")} searchKey="description" />
+            </TabsContent>
+            <TabsContent value="pending" className="mt-4">
+              <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "PENDING")} searchKey="description" />
+            </TabsContent>
+            <TabsContent value="overdue" className="mt-4">
+              <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "OVERDUE")} searchKey="description" />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
-        <TabsContent value="income" className="mt-4">
-          <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "INCOME")} searchKey="description" />
-        </TabsContent>
-        <TabsContent value="expenses" className="mt-4">
-          <DataTable columns={incomeColumns} data={transactions.filter(t => t.type === "EXPENSE")} searchKey="description" />
-        </TabsContent>
-        <TabsContent value="pending" className="mt-4">
-          <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "PENDING")} searchKey="description" />
-        </TabsContent>
-        <TabsContent value="overdue" className="mt-4">
-          <DataTable columns={incomeColumns} data={transactions.filter(t => t.status === "OVERDUE")} searchKey="description" />
+
+        <TabsContent value="invoices" className="mt-4">
+          <DataTable columns={invoiceColumns} data={invoices} searchKey="description" searchPlaceholder="Buscar fatura..." />
         </TabsContent>
       </Tabs>
     </div>
