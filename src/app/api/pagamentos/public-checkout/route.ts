@@ -110,7 +110,8 @@ export async function POST(request: NextRequest) {
 
     return apiSuccess({ url: session.url })
   } catch (error) {
-    logger.error("Error creating public checkout session", { error: String(error) })
-    return apiError("Erro ao criar sessão de pagamento")
+    const msg = error instanceof Error ? error.message : String(error)
+    logger.error("Error creating public checkout session", { error: msg })
+    return apiError(`Erro ao criar sessão de pagamento: ${msg}`)
   }
 }
