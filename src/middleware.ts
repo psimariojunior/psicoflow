@@ -18,6 +18,7 @@ const publicApiPrefixes = [
   "/api/pacientes/agendamentos", "/api/pacientes/diario",
   "/api/pacientes/me", "/api/pacientes/invoices",
   "/api/cron", "/api/health",
+  "/api/integrations/google-calendar", "/api/pagamentos/webhook",
 ]
 
 const staticPrefixes = ["/_next", "/static"]
@@ -56,11 +57,11 @@ export default withAuth(
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+        "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https:",
         "font-src 'self' data:",
-        `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud`,
+        `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud https://api.stripe.com`,
         "media-src 'self' blob: mediastream:",
         "worker-src 'self' blob:",
         "child-src 'self' blob:",

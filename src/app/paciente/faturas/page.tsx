@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { usePatientAuth } from "@/components/patient-auth-provider"
-import { Loader2, Receipt, CheckCircle, Clock, AlertCircle, FileText, Copy, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Loader2, Receipt, CheckCircle, Clock, AlertCircle, FileText, Copy, Check, CreditCard } from "lucide-react"
+import toast from "react-hot-toast"
 
 interface Invoice {
   id: string
@@ -44,6 +46,7 @@ export default function PatientInvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [payingId, setPayingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!token) return
@@ -140,33 +143,74 @@ export default function PatientInvoicesPage() {
                   </div>
                 </div>
 
-                {isUnpaid && inv.pixKey && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-sm font-medium text-foreground mb-2">
-                      {inv.psychologistName} — Dados para pagamento
+                {isUnpaid && (
+                  <div className="mt-4 pt-4 border-t border-border space-y-3">
+                    <p className="text-sm font-medium text-foreground">
+                      Dados para pagamento
                     </p>
-                    <div className="bg-card rounded-xl p-3 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground mb-0.5">PIX</p>
-                          <p className="text-sm text-foreground font-mono truncate">{inv.pixKey}</p>
+
+                    {inv.pixKey && (
+                      <div className="bg-card rounded-xl p-3 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-muted-foreground mb-0.5">PIX</p>
+                            <p className="text-sm text-foreground font-mono truncate">{inv.pixKey}</p>
+                          </div>
+                          <button
+                            onClick={() => copyPix(inv.pixKey!, inv.id)}
+                            className="flex-shrink-0 ml-3 p-2 rounded-lg bg-card hover:bg-accent transition-colors"
+                            aria-label="Copiar chave PIX"
+                          >
+                            {copiedId === inv.id ? (
+                              <Check className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Copy className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => copyPix(inv.pixKey!, inv.id)}
-                          className="flex-shrink-0 ml-3 p-2 rounded-lg bg-card hover:bg-accent transition-colors"
-                          aria-label="Copiar chave PIX"
-                        >
-                          {copiedId === inv.id ? (
-                            <Check className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Copy className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </button>
+                        {inv.paymentInfo && (
+                          <p className="text-xs text-muted-foreground whitespace-pre-line">{inv.paymentInfo}</p>
+                        )}
                       </div>
-                      {inv.paymentInfo && (
-                        <p className="text-xs text-muted-foreground whitespace-pre-line">{inv.paymentInfo}</p>
-                      )}
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <div className="h-px flex-1 bg-border" />
+                      <span className="text-xs text-muted-foreground">ou</span>
+                      <div className="h-px flex-1 bg-border" />
                     </div>
+
+                    <Button
+                      onClick={async () => {
+                        setPayingId(inv.id)
+                        try {
+                          const res = await fetch("/api/pagamentos/public-checkout", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ invoiceId: inv.id }),
+                          })
+                          const data = await res.json()
+                          if (res.ok && data.url) {
+                            window.location.href = data.url
+                          } else {
+                            toast.error(data.error || "Erro ao processar pagamento")
+                          }
+                        } catch {
+                          toast.error("Erro ao conectar com gateway de pagamento")
+                        } finally {
+                          setPayingId(null)
+                        }
+                      }}
+                      disabled={payingId === inv.id}
+                      className="w-full"
+                    >
+                      {payingId === inv.id ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="mr-2 h-4 w-4" />
+                      )}
+                      Pagar com Cartão / PIX / Boleto
+                    </Button>
                   </div>
                 )}
               </div>

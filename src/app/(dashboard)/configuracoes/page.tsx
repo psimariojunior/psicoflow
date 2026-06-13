@@ -12,8 +12,120 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2 } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink } from "lucide-react"
 import toast from "react-hot-toast"
+
+function GoogleCalendarStatus() {
+  const [connected, setConnected] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<{ synced?: number; failed?: number } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/integrations/google-calendar")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.connected !== undefined) setConnected(data.connected)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleConnect = () => {
+    window.location.href = "/api/integrations/google-calendar/auth"
+  }
+
+  const handleDisconnect = async () => {
+    try {
+      const res = await fetch("/api/integrations/google-calendar", { method: "POST" })
+      if (res.ok) {
+        setConnected(false)
+        toast.success("Google Calendar desconectado")
+      }
+    } catch {
+      toast.error("Erro ao desconectar")
+    }
+  }
+
+  const handleSync = async () => {
+    setSyncing(true)
+    setSyncResult(null)
+    try {
+      const res = await fetch("/api/integrations/google-calendar/sync", { method: "POST" })
+      const data = await res.json()
+      setSyncResult(data)
+      if (res.ok) {
+        toast.success(`${data.synced} consulta(s) sincronizada(s)`)
+      }
+    } catch {
+      toast.error("Erro ao sincronizar")
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Verificando integração...
+      </div>
+    )
+  }
+
+  if (connected) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-5 w-5 text-emerald-500" />
+            <div>
+              <p className="font-medium text-emerald-700 dark:text-emerald-300">Google Calendar conectado</p>
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">Suas consultas serão sincronizadas automaticamente</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleDisconnect} className="text-red-500 border-red-200 hover:bg-red-50 dark:hover:bg-red-950">
+            <XCircle className="mr-1 h-4 w-4" /> Desconectar
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button onClick={handleSync} disabled={syncing}>
+            {syncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Calendar className="mr-2 h-4 w-4" />}
+            {syncing ? "Sincronizando..." : "Sincronizar Agora"}
+          </Button>
+          <Button variant="outline" asChild>
+            <a href="https://calendar.google.com" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" /> Abrir Google Agenda
+            </a>
+          </Button>
+        </div>
+
+        {syncResult && (
+          <div className="rounded-lg border p-3 text-sm space-y-1">
+            <p className={syncResult.failed ? "text-amber-500" : "text-emerald-500"}>
+              Sincronização concluída: {syncResult.synced} criado(s)
+              {syncResult.failed ? `, ${syncResult.failed} falha(s)` : ""}
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between rounded-lg border p-4">
+        <div>
+          <p className="font-medium">Conectar Google Calendar</p>
+          <p className="text-sm text-muted-foreground">Agende consultas diretamente do Google Agenda</p>
+        </div>
+        <Button onClick={handleConnect}>
+          <Calendar className="mr-2 h-4 w-4" /> Conectar
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState({
@@ -269,7 +381,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="schedule" className="mt-4">
+        <TabsContent value="schedule" className="mt-4 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Configurações da Agenda</CardTitle>
@@ -300,14 +412,17 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">Integração Google Calendar</p>
-                  <p className="text-sm text-muted-foreground">Sincronizar agenda com Google</p>
-                </div>
-                <Button variant="outline">Conectar</Button>
-              </div>
               <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Salvar</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Google Calendar</CardTitle>
+              <CardDescription>Sincronize seus agendamentos automaticamente com o Google Agenda</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <GoogleCalendarStatus />
             </CardContent>
           </Card>
         </TabsContent>

@@ -31,6 +31,9 @@ model User {
   pixKey        String?
   paymentInfo   String?
   emailVerified DateTime?
+  googleRefreshToken String?
+  googleCalendarId   String?
+  stripeConnectAccountId String?
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret String?
   active        Boolean  @default(true)
@@ -126,6 +129,7 @@ model Patient {
   active         Boolean  @default(true)
   photoUrl       String?
   privacyConsent Boolean  @default(false)
+  stripeCustomerId String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -162,6 +166,8 @@ model Appointment {
   paid           Boolean  @default(false)
   paymentMethod  String?
   googleEventId  String?
+  stripePaymentIntentId String?
+  stripeCheckoutSessionId String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -301,6 +307,8 @@ model Invoice {
   pdfUrl          String?
   xmlUrl          String?
   qrCodeUrl       String?
+  stripeCheckoutSessionId String?
+  stripePaymentIntentId String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

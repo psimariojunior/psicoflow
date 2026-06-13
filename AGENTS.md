@@ -54,7 +54,7 @@ Professional psychology practice website + management platform. Public landing p
 - Production URL: `https://psicoflow-iota.vercel.app`
 - Build command: `prisma db push --accept-data-loss && next build` (vercel.json)
 - `POSTGRES_PRISMA_URL` env (non-pooled) for DDL via prisma db push
-- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL, WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID, RESEND_API_KEY, EMAIL_FROM
+- Vercel env vars: nextauth vars, LIVEKIT_API_KEY/SECRET, LIVEKIT_URL, DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, ENCRYPTION_KEY, NEXTAUTH_URL, WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID, RESEND_API_KEY, EMAIL_FROM, GOOGLE_CALENDAR_CLIENT_ID, GOOGLE_CALENDAR_CLIENT_SECRET, STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
 - Middleware allows unauthenticated access to `/sala-virtual/entrar`, `/api/livekit/*`, and `/api/cron/*`
 - **SSO Protection**: foi desativado no projeto Vercel (impedia acesso do paciente sem login Vercel)
 
@@ -105,6 +105,14 @@ Professional psychology practice website + management platform. Public landing p
 - Env vars antigas removidas: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
 - Env vars novas: `RESEND_API_KEY`, `EMAIL_FROM`
 - Setup: criar conta em https://resend.com, verificar domínio (ou usar `onboarding@resend.dev` para testes), gerar API key
+
+### Google Calendar + Stripe + CSP + Cache (2026-06-13)
+- **Google Calendar sync**: Serviço completo em `src/lib/google-calendar.ts` (OAuth2, CRUD de eventos, Google Meet); rotas `/api/integrations/google-calendar` (auth, status, disconnect) e `/sync`; UI na aba "Agenda" das configurações. Schema: `googleRefreshToken`, `googleCalendarId` no User
+- **Stripe payment gateway**: `src/lib/stripe.ts` (lazy init); `/api/pagamentos/create-checkout` (psicólogo), `/api/pagamentos/public-checkout` (paciente), `/api/pagamentos/webhook` (checkout.session.completed/expired + payment_intent.payment_failed). Schema: `stripeCustomerId` no Patient, `stripeCheckoutSessionId` + `stripePaymentIntentId` no Invoice. UI: botão "Pagar com Cartão / PIX / Boleto" na fatura do paciente
+- **CSP**: `'unsafe-eval'` removido do `script-src`; `https://api.stripe.com` adicionado ao `connect-src`
+- **Cache headers**: `/api/disponibilidade/public` (public, max-age=30), `/api/health` (no-store), `/api/agendamentos/public` POST (no-store)
+- **Deps atualizadas**: Next.js 14.2.35, Prisma 5.22.0, TypeScript 5.7.3
+- Setup detalhado em `SETUP_INTEGRACOES.md` na raiz
 
 ### Pre-Launch Audit Fixes (2026-06-11)
 - **Email**: `src/lib/email.ts` migrado definitivamente para Resend SDK (`resend.emails.send()`) — antes usava `fetch` para SendGrid mas env vars do Vercel tinham `RESEND_API_KEY`

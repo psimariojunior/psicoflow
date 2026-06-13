@@ -29,6 +29,9 @@ export async function GET() {
       uptime: process.uptime(),
       checks,
     },
-    { status: healthy ? 200 : 503 }
+    {
+      status: healthy ? 200 : 503,
+      headers: { "Cache-Control": "no-store, max-age=0" },
+    }
   )
 }

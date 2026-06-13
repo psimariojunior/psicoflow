@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
           patient: appointment.patient,
         },
       },
-      { status: 201 }
+      { status: 201, headers: { "Cache-Control": "no-store" } }
     )
   } catch (error) {
     logger.error("Error creating public appointment", { error: String(error) })
