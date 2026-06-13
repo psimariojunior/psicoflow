@@ -69,13 +69,13 @@ export function StatsCards({ stats }: StatsCardsProps) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => {
+      {cards.map((card, index) => {
         const value = stats[card.key] as number
         const change = stats[card.changeKey]
         const isPositive = change >= 0
 
         return (
-          <Card key={card.key} className="group card-hover overflow-hidden">
+          <Card key={card.key} className="group card-hover overflow-hidden animate-fade-in" style={{ animationDelay: `${(index + 1) * 50}ms` }}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className={cn(

@@ -9,7 +9,7 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, TrendingUp } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, TrendingUp, CalendarX, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
@@ -30,6 +30,7 @@ export default function DashboardHome() {
     financialSummary: { totalRevenue: number; totalExpenses: number; balance: number; pending: number; overdue: number; received: number; goal: number }
   } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [progressWidth, setProgressWidth] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -45,27 +46,36 @@ export default function DashboardHome() {
     return () => controller.abort()
   }, [])
 
+  useEffect(() => {
+    if (!data?.financialSummary) return
+    const pct = data.financialSummary.goal > 0
+      ? Math.min(100, Math.round((data.financialSummary.received / data.financialSummary.goal) * 100))
+      : 0
+    const timer = setTimeout(() => setProgressWidth(pct), 100)
+    return () => clearTimeout(timer)
+  }, [data])
+
   if (loading) {
     return (
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-8 animate-fade-in">
         <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-card rounded-xl animate-pulse" />)}
+        </div>
         <div className="grid gap-4 md:grid-cols-4">
           {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
         </div>
-        <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-card rounded-xl animate-pulse" />)}
-        </div>
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="h-72 bg-card rounded-xl animate-pulse" />
               <div className="h-72 bg-card rounded-xl animate-pulse" />
             </div>
             <div className="h-64 bg-card rounded-xl animate-pulse" />
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="h-44 bg-card rounded-xl animate-pulse" />
-            <div className="h-44 bg-card rounded-xl animate-pulse" />
+            <div className="h-64 bg-card rounded-xl animate-pulse" />
           </div>
         </div>
         <div className="h-48 bg-card rounded-xl animate-pulse" />
@@ -83,8 +93,8 @@ export default function DashboardHome() {
     : 0
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
           <p className="text-muted-foreground">Visão geral da sua prática clínica</p>
@@ -125,14 +135,14 @@ export default function DashboardHome() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <RevenueChart data={data?.monthlyData || []} />
-            <AppointmentsChart data={data?.monthlyData || []} />
+          <div className="lg:col-span-2 space-y-4">
+            <div className="grid gap-6 md:grid-cols-2">
+              <RevenueChart data={data?.monthlyData || []} />
+              <AppointmentsChart data={data?.monthlyData || []} />
+            </div>
+            <UpcomingAppointments appointments={appointments} />
           </div>
-          <UpcomingAppointments appointments={appointments} />
-        </div>
-        <div className="space-y-6">
+          <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -146,9 +156,9 @@ export default function DashboardHome() {
                   <span className="text-muted-foreground">Progresso</span>
                   <span className="font-medium">{progressToGoal}%</span>
                 </div>
-                <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out" style={{ width: `${progressToGoal}%` }} />
-                </div>
+                  <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out" style={{ width: `${progressWidth}%` }} />
+                  </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Recebido</span>
                   <span className="font-medium text-emerald-500">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>

@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate } from "@/lib/utils"
-import { Users } from "lucide-react"
+import { Users, UserPlus } from "lucide-react"
+import { EmptyState } from "@/components/empty-state"
 
 interface Patient {
   id: string
@@ -23,9 +24,7 @@ export function RecentPatients({ patients }: { patients: Patient[] }) {
       </CardHeader>
       <CardContent>
         {patients.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            Nenhum paciente cadastrado
-          </p>
+          <EmptyState icon={UserPlus} title="Nenhum paciente cadastrado" />
         ) : (
           <div className="space-y-4">
             {patients.slice(0, 5).map((patient) => (

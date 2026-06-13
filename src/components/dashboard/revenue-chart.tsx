@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { formatCurrency } from "@/lib/utils"
+import { BarChart3 } from "lucide-react"
+import { EmptyState } from "@/components/empty-state"
 
 interface RevenueChartProps {
   data: { month: string; receita: number }[]
@@ -32,9 +34,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
-            Nenhuma receita registrada este ano
-          </div>
+          <EmptyState icon={BarChart3} title="Nenhuma receita registrada" description="A receita mensal aparecerá aqui conforme você realizar consultas." />
         )}
       </CardContent>
     </Card>
