@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatTime } from "@/lib/utils"
-import { Calendar } from "lucide-react"
+import { Calendar, CalendarX } from "lucide-react"
+import { EmptyState } from "@/components/empty-state"
 
 interface Appointment {
   id: string
@@ -33,9 +34,7 @@ export function UpcomingAppointments({ appointments }: { appointments: Appointme
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            Nenhuma consulta agendada
-          </p>
+          <EmptyState icon={CalendarX} title="Nenhuma consulta agendada" />
         ) : (
           <div className="space-y-4">
             {appointments.slice(0, 5).map((apt) => (

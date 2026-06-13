@@ -88,10 +88,13 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
+                title={collapsed ? item.label : undefined}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  !collapsed && "hover:pl-4",
+                  collapsed && "justify-center px-2",
                   isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
@@ -119,7 +122,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:flex-col",
+          "hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:flex-col transition-[width] duration-300 ease-in-out",
           collapsed ? "lg:w-20" : "lg:w-64"
         )}
       >
@@ -128,9 +131,9 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={onMobileClose} />
-          <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-card">
+        <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-200">
+          <div className="fixed inset-0 bg-black/50 animate-in fade-in duration-200" onClick={onMobileClose} />
+          <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-card animate-in slide-in-from-left duration-300">
             {sidebarContent}
           </aside>
         </div>

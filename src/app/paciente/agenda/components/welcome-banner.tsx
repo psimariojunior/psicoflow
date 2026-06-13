@@ -38,9 +38,9 @@ export function WelcomeBanner({ patientName, onStartBooking }: { patientName: st
 
         <button onClick={onStartBooking} className="w-full group relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-[1px] shadow-2xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300">
           <div className="relative rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-5 flex items-center justify-center gap-3">
-            <Calendar className="h-6 w-6 text-foreground" />
-            <span className="text-lg font-semibold text-foreground">Agendar minha primeira consulta</span>
-            <ChevronRight className="h-5 w-5 text-foreground/70 group-hover:translate-x-1 transition-transform" />
+            <Calendar className="h-6 w-6 text-white" />
+            <span className="text-lg font-semibold text-white">Agendar minha primeira consulta</span>
+            <ChevronRight className="h-5 w-5 text-white/70 group-hover:translate-x-1 transition-transform" />
           </div>
         </button>
 

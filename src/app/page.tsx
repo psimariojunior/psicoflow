@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
@@ -206,11 +207,20 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-200/20 via-transparent to-transparent dark:from-blue-900/10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="space-y-8"
+            >
+              <motion.div
+                animate={{ opacity: [1, 0.7, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium"
+              >
                 <Sparkles className="h-4 w-4" />
                 Atendimento psicológico online e presencial
-              </div>
+              </motion.div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">Cuide da sua mente</span>
                 <br />
@@ -236,7 +246,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-emerald-500" /><span>Online ou Presencial</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-500" /><span>CRP Ativo</span></div>
               </div>
-            </div>
+            </motion.div>
             <div className="relative hidden lg:block">
               <div className="relative w-full aspect-[4/5] rounded-3xl bg-gradient-to-br from-emerald-100 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-teal-950/20 dark:to-blue-950/30 overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center p-8">
@@ -271,7 +281,13 @@ export default function LandingPage() {
       </section>
 
       {/* Como Funciona */}
-      <section className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400">Como Funciona</Badge>
@@ -280,7 +296,14 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, i) => (
-              <div key={step.title} className="relative group">
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="relative group"
+              >
                 <div className="text-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-300">
                   <div className="relative inline-flex mb-6">
                     <div className="absolute inset-0 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-xl" />
@@ -295,14 +318,21 @@ export default function LandingPage() {
                 {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-1/2 -right-4 text-slate-300 dark:text-slate-700"><ArrowRight className="h-6 w-6" /></div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Serviços */}
-      <section id="servicos" className="py-20 md:py-28">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        id="servicos"
+        className="py-20 md:py-28"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400">Serviços</Badge>
@@ -310,21 +340,37 @@ export default function LandingPage() {
             <p className="text-lg text-slate-600 dark:text-slate-400">Diversas modalidades para cuidar de você.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map(service => (
-              <Card key={service.title} className="group p-6 border border-slate-200 dark:border-slate-800 hover:border-transparent hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 overflow-hidden">
-                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300", service.bgLight, service.textLight)}>
-                  <service.icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{service.desc}</p>
-              </Card>
+            {services.map((service, index) => (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              >
+                <Card className="group p-6 border border-slate-200 dark:border-slate-800 hover:border-transparent hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 overflow-hidden">
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300", service.bgLight, service.textLight)}>
+                    <service.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{service.desc}</p>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Sobre */}
-      <section id="sobre" className="py-20 md:py-28">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        id="sobre"
+        className="py-20 md:py-28"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
@@ -370,10 +416,17 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        id="faq"
+        className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50"
+      >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400">FAQ</Badge>
@@ -382,23 +435,46 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {faqItems.map((item, i) => (
-              <div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200"
+              >
                 <button onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <span className="font-medium text-slate-900 dark:text-white pr-4">{item.q}</span>
                   <ChevronDown className={cn("h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-200", activeFaq === i && "rotate-180")} />
                 </button>
-                <div className={cn("grid transition-all duration-200", activeFaq === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
-                  <div className="overflow-hidden"><p className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.a}</p></div>
-                </div>
-              </div>
+                <AnimatePresence initial={false}>
+                  {activeFaq === i && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                    >
+                      <p className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA Final */}
-      <section className="py-20 md:py-28 relative overflow-hidden">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="py-20 md:py-28 relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-400/20 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent" />
@@ -421,7 +497,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800">

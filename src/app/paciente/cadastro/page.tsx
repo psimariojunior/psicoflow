@@ -37,6 +37,7 @@ export default function CadastroPage() {
 
   const isStep1Valid = name.trim().length > 0
   const isStep2Valid = email.trim().length > 0 && password.length >= 6 && password === confirmPassword
+  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
   function canGoNext(): boolean {
     if (step === 0) return isStep1Valid
@@ -111,19 +112,19 @@ export default function CadastroPage() {
           <div className="flex items-center justify-center gap-2 mb-8">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                   step > i ? "bg-primary text-primary-foreground" : step === i ? "bg-primary/20 text-primary ring-1 ring-primary/50" : "bg-muted text-muted-foreground"
                 }`}>
                   {step > i ? <Check className="h-4 w-4" /> : i + 1}
                 </div>
-                {i < 2 && <div className={`w-12 h-0.5 transition-all ${step > i ? "bg-primary" : "bg-border"}`} />}
+                {i < 2 && <div className={`w-12 h-0.5 transition-all duration-300 ${step > i ? "bg-primary" : "bg-border"}`} />}
               </div>
             ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 0 && (
-              <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+              <div className="bg-card rounded-2xl p-6 ring-1 ring-border shadow-md border-t-2 border-t-primary/10 space-y-4">
                 <h2 className="text-lg font-semibold text-foreground mb-4">Dados Pessoais</h2>
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome completo *</Label>
@@ -157,7 +158,7 @@ export default function CadastroPage() {
             )}
 
             {step === 1 && (
-              <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+              <div className="bg-card rounded-2xl p-6 ring-1 ring-border shadow-md border-t-2 border-t-primary/10 space-y-4">
                 <h2 className="text-lg font-semibold text-foreground mb-4">Contato e Acesso</h2>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
@@ -170,18 +171,18 @@ export default function CadastroPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Senha *</Label>
-                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className={passwordsMismatch ? "animate-shake" : ""} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirmar senha *</Label>
-                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" />
+                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" className={passwordsMismatch ? "animate-shake" : ""} />
                   </div>
                 </div>
               </div>
             )}
 
             {step === 2 && (
-              <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+              <div className="bg-card rounded-2xl p-6 ring-1 ring-border shadow-md border-t-2 border-t-primary/10 space-y-4">
                 <h2 className="text-lg font-semibold text-foreground mb-4">Endereço</h2>
                 <div className="space-y-2">
                   <Label htmlFor="zipCode">CEP</Label>
