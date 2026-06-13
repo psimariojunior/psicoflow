@@ -19,6 +19,7 @@ const publicApiPrefixes = [
   "/api/pacientes/me", "/api/pacientes/invoices",
   "/api/cron", "/api/health",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
+  "/api/pagamentos/public-checkout",
 ]
 
 const staticPrefixes = ["/_next", "/static"]

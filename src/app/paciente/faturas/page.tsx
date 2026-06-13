@@ -184,9 +184,11 @@ export default function PatientInvoicesPage() {
                       onClick={async () => {
                         setPayingId(inv.id)
                         try {
+                          const headers: Record<string, string> = { "Content-Type": "application/json" }
+                          if (token) headers["Authorization"] = `Bearer ${token}`
                           const res = await fetch("/api/pagamentos/public-checkout", {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers,
                             body: JSON.stringify({ invoiceId: inv.id }),
                           })
                           const data = await res.json()
