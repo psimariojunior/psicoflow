@@ -2,11 +2,14 @@ import { NextResponse } from "next/server"
 
 const store = new Map<string, { count: number; resetAt: number }>()
 
-let kv: { get: (key: string) => Promise<unknown>; set: (key: string, value: unknown, opts?: { ex?: number }) => Promise<unknown> } | null = null
+let redis: { get: (key: string) => Promise<unknown>; set: (key: string, value: unknown, opts?: { ex?: number }) => Promise<unknown> } | null = null
 try {
-  if (process.env.KV_URL || process.env.KV_REST_API_URL) {
-    const { kv: kvClient } = require("@vercel/kv")
-    kv = kvClient
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const { Redis } = require("@upstash/redis")
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
   }
 } catch {}
 
@@ -16,13 +19,13 @@ export function rateLimit(limit = 30, windowMs = 60000) {
   return async (ip: string): Promise<{ allowed: boolean; remaining: number }> => {
     const now = Date.now()
     
-    if (kv) {
+    if (redis) {
       try {
         const key = `rate_limit:${ip}`
-        const data = await kv.get(key) as { count: number; resetAt: number } | null
+        const data = await redis.get(key) as { count: number; resetAt: number } | null
         
         if (!data || now > data.resetAt) {
-          await kv.set(key, { count: 1, resetAt: now + windowMs }, { ex: Math.ceil(windowMs / 1000) })
+          await redis.set(key, { count: 1, resetAt: now + windowMs }, { ex: Math.ceil(windowMs / 1000) })
           return { allowed: true, remaining: limit - 1 }
         }
         
@@ -30,16 +33,16 @@ export function rateLimit(limit = 30, windowMs = 60000) {
           return { allowed: false, remaining: 0 }
         }
         
-        await kv.set(key, { count: data.count + 1, resetAt: data.resetAt }, { ex: Math.ceil((data.resetAt - now) / 1000) })
+        await redis.set(key, { count: data.count + 1, resetAt: data.resetAt }, { ex: Math.ceil((data.resetAt - now) / 1000) })
         return { allowed: true, remaining: limit - (data.count + 1) }
       } catch {}
     }
     
-    const key = getMemoryKey(ip)
-    const record = store.get(key)
+    const memoryKey = getMemoryKey(ip)
+    const record = store.get(memoryKey)
 
     if (!record || now > record.resetAt) {
-      store.set(key, { count: 1, resetAt: now + windowMs })
+      store.set(memoryKey, { count: 1, resetAt: now + windowMs })
       return { allowed: true, remaining: limit - 1 }
     }
 
