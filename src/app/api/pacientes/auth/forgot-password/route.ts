@@ -14,7 +14,7 @@ function getSecret(): Uint8Array {
 
 export async function POST(request: NextRequest) {
   const rateLimit = rateLimitMiddleware(5, 120000)
-  const blocked = rateLimit(request)
+  const blocked = await rateLimit(request)
   if (blocked) return blocked
 
   try {

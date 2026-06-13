@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import Image from "next/image"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -50,7 +51,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30 ring-4 ring-emerald-500/20 mb-2">
-              <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+              <Image src="/logo.png" alt="PsicoFlow" width={80} height={80} className="w-full h-full object-cover" priority />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">PsicoFlow</h1>
             <p className="text-sm text-muted-foreground">

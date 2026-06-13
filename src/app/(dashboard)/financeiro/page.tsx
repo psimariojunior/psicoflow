@@ -124,7 +124,7 @@ export default function FinancialPage() {
           </div>
           <Button variant="outline" onClick={() => {
             try {
-              const esc = (v: any) => { if (v === null || v === undefined) return '""'; return '"' + String(v).replace(/"/g, '""') + '"' }
+              const esc = (v: string | number | null | undefined) => { if (v === null || v === undefined) return '""'; return '"' + String(v).replace(/"/g, '""') + '"' }
               const header = "Data;Descrição;Categoria;Valor;Tipo;Status;Paciente\n"
               const rows = transactions.map((t) =>
                 [esc(formatDate(t.date)), esc(t.description), esc(t.category), esc(t.amount), esc(t.type === "INCOME" ? "Receita" : "Despesa"), esc(t.status), esc(t.patient)].join(";")

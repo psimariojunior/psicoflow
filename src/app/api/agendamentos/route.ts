@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createAppointmentSchema } from "@/lib/validation"
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("endDate")
     const patientId = searchParams.get("patientId")
 
-    const where: Record<string, unknown> = {
+    const where: Prisma.AppointmentWhereInput = {
       psychologistId,
     }
 

@@ -15,7 +15,7 @@ const registerSchema = z.object({
 const rateLimit = rateLimitMiddleware(3, 60000)
 
 export async function POST(request: Request) {
-  const blocked = rateLimit(request)
+  const blocked = await rateLimit(request)
   if (blocked) return blocked
 
   try {

@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext, ReactNode } from "react
 import { useRouter, usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import Image from "next/image"
 import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt, Sun, Moon } from "lucide-react"
 
 export interface PatientData {
@@ -125,7 +126,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 group">
                 <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
-                  <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+                  <Image src="/logo.png" alt="PsicoFlow" width={36} height={36} className="w-full h-full object-cover" priority />
                 </div>
                 <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
               </Link>

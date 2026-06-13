@@ -48,6 +48,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-table": "^8.11.0",
+    "@vercel/kv": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -66,6 +67,7 @@
     "react-icons": "^5.0.1",
     "recharts": "^3.8.1",
     "resend": "^6.12.4",
+    "sharp": "^0.34.5",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
@@ -87,7 +89,6 @@
     "prettier": "^3.2.2",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "prisma": "^5.8.0",
-    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "vitest": "^4.1.8"

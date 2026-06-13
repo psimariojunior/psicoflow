@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import Image from "next/image"
 import { Loader2, Calendar, Clock, User, Phone, Mail, CheckCircle, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -363,7 +364,7 @@ function AgendarPage() {
 
         <div className="flex items-center justify-center gap-3 mt-8">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 ring-1 ring-emerald-500/30">
-            <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+            <Image src="/logo.png" alt="PsicoFlow" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <p className="text-center text-xs text-white/20">
             PsicoFlow &mdash; Tecnologia a serviço da saúde mental

@@ -3,18 +3,47 @@ import { NextResponse } from "next/server"
 
 const LIVEKIT_WS = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
 
+const publicPages = [
+  "/", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest",
+  "/termos", "/privacidade", "/login", "/register", "/recuperar-senha",
+]
+
+const publicPrefixes = [
+  "/reset-password", "/sala-virtual/entrar", "/agendar", "/paciente",
+]
+
+const publicApiPrefixes = [
+  "/api/auth", "/api/livekit", "/api/disponibilidade/public",
+  "/api/agendamentos/public", "/api/pacientes/auth",
+  "/api/pacientes/agendamentos", "/api/pacientes/diario",
+  "/api/pacientes/me", "/api/pacientes/invoices",
+  "/api/cron", "/api/health",
+]
+
+const staticPrefixes = ["/_next", "/static"]
+
+function isPublic(pathname: string): boolean {
+  if (publicPages.includes(pathname)) return true
+  if (publicPrefixes.some((p) => pathname.startsWith(p))) return true
+  return false
+}
+
+function isPublicApi(pathname: string): boolean {
+  if (publicApiPrefixes.some((p) => pathname.startsWith(p))) return true
+  return false
+}
+
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
 
-    if (!token && pathname !== "/" && pathname !== "/robots.txt" && pathname !== "/sitemap.xml" && pathname !== "/manifest.webmanifest" && pathname !== "/termos" && pathname !== "/privacidade" && pathname !== "/login" && pathname !== "/register" && pathname !== "/recuperar-senha" && !pathname.startsWith("/reset-password") && !pathname.startsWith("/sala-virtual/entrar") && !pathname.startsWith("/agendar") && !pathname.startsWith("/paciente") && !pathname.startsWith("/api/pacientes/auth") && !pathname.startsWith("/api/pacientes/agendamentos") && !pathname.startsWith("/api/pacientes/diario") && !pathname.startsWith("/api/pacientes/me") && !pathname.startsWith("/api/pacientes/invoices") && !pathname.startsWith("/api/livekit") && !pathname.startsWith("/api/disponibilidade/public") && !pathname.startsWith("/api/agendamentos/public") && !pathname.startsWith("/api/cron") && !pathname.startsWith("/api/health") && !pathname.startsWith("/api/invoices")) {
+    if (!token && !isPublic(pathname) && !isPublicApi(pathname)) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
 
     const response = NextResponse.next()
 
-    // Security headers
     response.headers.set("X-Frame-Options", "DENY")
     response.headers.set("X-Content-Type-Options", "nosniff")
     response.headers.set("X-XSS-Protection", "1; mode=block")
@@ -29,7 +58,7 @@ export default withAuth(
         "default-src 'self'",
         "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
-        `img-src 'self' data: blob: https:`,
+        "img-src 'self' data: blob: https:",
         "font-src 'self' data:",
         `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud`,
         "media-src 'self' blob: mediastream:",
@@ -41,8 +70,7 @@ export default withAuth(
       ].join("; ")
     )
 
-    const isProduction = process.env.NODE_ENV === "production"
-    if (isProduction) {
+    if (process.env.NODE_ENV === "production") {
       response.headers.set(
         "Strict-Transport-Security",
         "max-age=63072000; includeSubDomains; preload"
@@ -55,10 +83,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/livekit") || pathname.startsWith("/api/disponibilidade/public") || pathname.startsWith("/api/agendamentos/public") || pathname.startsWith("/api/pacientes/auth") || pathname.startsWith("/api/pacientes/agendamentos") || pathname.startsWith("/api/pacientes/diario") || pathname.startsWith("/api/pacientes/me") || pathname.startsWith("/api/pacientes/invoices") || pathname.startsWith("/api/cron") || pathname.startsWith("/api/health") || pathname.startsWith("/_next") || pathname.startsWith("/static")) {
-          return true
-        }
-        if (pathname === "/" || pathname === "/robots.txt" || pathname === "/sitemap.xml" || pathname === "/manifest.webmanifest" || pathname === "/termos" || pathname === "/privacidade" || pathname === "/login" || pathname === "/register" || pathname === "/recuperar-senha" || pathname.startsWith("/reset-password") || pathname.startsWith("/sala-virtual/entrar") || pathname.startsWith("/agendar") || pathname.startsWith("/paciente")) {
+        if (isPublicApi(pathname) || staticPrefixes.some((p) => pathname.startsWith(p)) || isPublic(pathname)) {
           return true
         }
         return !!token

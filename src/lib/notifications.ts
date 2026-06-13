@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import { prisma } from "./prisma"
 import { logger } from "./logger"
 import { sendAppointmentReminderEmail } from "./email"
@@ -192,7 +193,7 @@ export async function cancelPendingReminders(appointmentId: string): Promise<voi
 }
 
 export async function processPendingNotifications(force = false): Promise<{ sent: number; failed: number }> {
-  const where: any = { status: "PENDING" }
+  const where: Prisma.NotificationWhereInput = { status: "PENDING" }
   if (!force) {
     where.scheduledAt = { lte: new Date() }
   }

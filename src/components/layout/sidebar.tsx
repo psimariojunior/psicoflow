@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
@@ -58,7 +59,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
       <div className="flex h-16 items-center justify-between px-4 border-b">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
-            <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
+            <Image src="/logo.png" alt="PsicoFlow" width={40} height={40} className="w-full h-full object-cover" priority />
           </div>
           {!collapsed && (
             <div>

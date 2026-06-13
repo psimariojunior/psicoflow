@@ -18,7 +18,7 @@ if (!encKey) throw new Error("ENCRYPTION_KEY não configurada")
 const secret = new TextEncoder().encode(encKey)
 
 export async function POST(request: NextRequest) {
-  const blocked = rateLimit(request)
+  const blocked = await rateLimit(request)
   if (blocked) return blocked
 
   try {
@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
 
     const { token, password } = parse.data
 
-    let payload: { patientId: string; email: string }
+    let payload: { patientId: string; email: string; purpose: string }
     try {
       const { payload: verified } = await jwtVerify(token, secret)
-      payload = verified as unknown as { patientId: string; email: string }
-      if ((payload as any).purpose !== "reset-password") throw new Error("Invalid purpose")
+      payload = verified as unknown as { patientId: string; email: string; purpose: string }
+      if (payload.purpose !== "reset-password") throw new Error("Invalid purpose")
     } catch {
       return NextResponse.json({ error: "Token inválido ou expirado" }, { status: 400 })
     }
