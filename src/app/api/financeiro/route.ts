@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
 
-    const dateFilter: any = {}
+    const dateFilter: { createdAt?: { gte?: Date; lte?: Date } } = {}
     if (startDate || endDate) {
       dateFilter.createdAt = {}
       if (startDate) dateFilter.createdAt.gte = new Date(startDate)

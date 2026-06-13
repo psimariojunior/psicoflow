@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRoomContext } from "@livekit/components-react"
+import { type RemoteTrackPublication, type Track } from "livekit-client"
 
 export function AudioSubscriber() {
   const room = useRoomContext()
@@ -11,7 +12,7 @@ export function AudioSubscriber() {
     if (!room) return
     const subs = new Map<string, HTMLAudioElement>()
 
-    const attach = (pub: any) => {
+    const attach = (pub: RemoteTrackPublication) => {
       const track = pub.track
       if (!track || pub.kind !== "audio") return
       if (subs.has(pub.trackSid)) return
@@ -23,7 +24,7 @@ export function AudioSubscriber() {
       setAudioCount(subs.size)
     }
 
-    const detach = (pub: any) => {
+    const detach = (pub: RemoteTrackPublication) => {
       const el = subs.get(pub.trackSid)
       if (el) {
         el.pause()
@@ -33,14 +34,14 @@ export function AudioSubscriber() {
       }
     }
 
-    const onSub = (_track: any, pub: any) => attach(pub)
-    const onUnsub = (_track: any, pub: any) => detach(pub)
+    const onSub = (_track: Track, pub: RemoteTrackPublication) => attach(pub)
+    const onUnsub = (_track: Track, pub: RemoteTrackPublication) => detach(pub)
 
     room.on("trackSubscribed", onSub)
     room.on("trackUnsubscribed", onUnsub)
 
     Array.from(room.remoteParticipants.values()).forEach((p) => {
-      Array.from(p.trackPublications.values()).forEach((pub: any) => {
+      Array.from(p.trackPublications.values()).forEach((pub: RemoteTrackPublication) => {
         if (pub.kind === "audio" && pub.track && pub.isSubscribed) {
           attach(pub)
         }

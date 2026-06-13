@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -130,7 +131,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="flex items-center justify-center w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105">
-                <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" loading="lazy" />
+                <Image src="/logo.png" alt="PsicoFlow" width={64} height={64} className="w-full h-full object-cover" priority />
               </div>
               <div className={cn(
                 "flex flex-col transition-all duration-500",
@@ -255,7 +256,7 @@ export default function LandingPage() {
                       <Heart className="h-10 w-10 text-white" />
                     </div>
                     <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl shadow-emerald-500/30 mb-6">
-                      <img src="/profile.jpg" alt="Mário Júnior" className="w-full h-full object-cover" loading="lazy" />
+                      <Image src="/profile.jpg" alt="Mário Júnior" width={112} height={112} className="w-full h-full object-cover" priority />
                     </div>
                     <p className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Mário Júnior</p>
                     <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-2">Psicólogo Clínico</p>
@@ -378,7 +379,7 @@ export default function LandingPage() {
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="text-center">
                     <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl shadow-emerald-500/30 mb-6">
-                      <img src="/profile.jpg" alt="Mário Júnior" className="w-full h-full object-cover" loading="lazy" />
+                      <Image src="/profile.jpg" alt="Mário Júnior" width={112} height={112} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <p className="text-2xl font-bold text-slate-800 dark:text-white">Mário Júnior</p>
                     <p className="text-emerald-600 dark:text-emerald-400 font-medium">Psicólogo Clínico</p>
@@ -506,7 +507,7 @@ export default function LandingPage() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/20 ring-2 ring-emerald-500/30">
-                  <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" loading="lazy" />
+                  <Image src="/logo.png" alt="PsicoFlow" width={56} height={56} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div>
                   <span className="text-xl font-bold text-white block">PsicoFlow</span>

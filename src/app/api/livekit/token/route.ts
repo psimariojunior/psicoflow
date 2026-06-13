@@ -9,7 +9,7 @@ import { apiError } from "@/lib/api-helpers"
 const rateLimit = rateLimitMiddleware(10, 60000)
 
 export async function GET(request: Request) {
-  const rateLimitResponse = rateLimit(request)
+  const rateLimitResponse = await rateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   try {
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       if (!session?.user) {
         return apiError("Não autorizado", 401)
       }
-      identity = (session.user as any).id || session.user.email || "unknown"
+      identity = session.user.id || session.user.email || "unknown"
       name = session.user.name || "Psicólogo"
     }
 

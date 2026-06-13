@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Prisma } from "@prisma/client"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
@@ -19,11 +20,14 @@ const updateSessionSchema = z.object({
   isRemote: z.boolean().optional(),
 })
 
-function sanitizeSessionFields(data: Record<string, any>) {
-  const textFields = ["subjective", "objective", "assessment", "plan", "notes", "tags", "type"]
+type SessionUpdateData = z.infer<typeof updateSessionSchema>
+
+function sanitizeSessionFields(data: SessionUpdateData): SessionUpdateData {
+  const textFields: (keyof SessionUpdateData)[] = ["subjective", "objective", "assessment", "plan", "notes", "tags", "type"]
   for (const field of textFields) {
-    if (typeof data[field] === "string") {
-      data[field] = sanitizeHtml(data[field])
+    const val = data[field]
+    if (typeof val === "string") {
+      ;(data as Record<string, unknown>)[field] = sanitizeHtml(val)
     }
   }
   return data
@@ -81,7 +85,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const now = new Date()
 
-    const updateAndFetch = async (data: any) => {
+    const updateAndFetch = async (data: Prisma.TherapySessionUpdateInput) => {
       await prisma.therapySession.update({ where: { id: params.id }, data })
       return getSessionById(params.id, psychologistId)
     }

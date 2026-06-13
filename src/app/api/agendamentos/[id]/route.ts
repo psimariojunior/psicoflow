@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { AppointmentStatus } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { scheduleReminders, cancelPendingReminders } from "@/lib/notifications"
@@ -39,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const updated = await prisma.appointment.update({
       where: { id: params.id },
       data: {
-        status: data.status ?? existing.status,
+        status: data.status && data.status !== "DELETE" ? (data.status as typeof existing.status) : existing.status,
         startTime: data.startTime ? new Date(data.startTime) : existing.startTime,
         endTime: data.endTime ? new Date(data.endTime) : existing.endTime,
         type: data.type ?? existing.type,

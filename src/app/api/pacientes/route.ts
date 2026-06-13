@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { logAudit, sanitizeHtml } from "@/lib/security"
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"))
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")))
 
-    const where: Record<string, unknown> = {
+    const where: Prisma.PatientWhereInput = {
       psychologistId,
       ...(search ? {
         OR: [

@@ -20,7 +20,7 @@ const diarySchema = z.object({
 
 export async function GET(request: Request) {
   try {
-    const rateLimitResponse = rateLimit(request)
+    const rateLimitResponse = await rateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
     const auth = request.headers.get("authorization")
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const rateLimitResponse = rateLimit(request)
+    const rateLimitResponse = await rateLimit(request)
     if (rateLimitResponse) return rateLimitResponse
 
     const auth = request.headers.get("authorization")

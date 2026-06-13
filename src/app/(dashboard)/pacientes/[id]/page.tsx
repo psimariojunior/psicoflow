@@ -11,10 +11,43 @@ import { getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/uti
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Loader2, Pencil, Lock, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
+interface MedicalRecord {
+  id: string
+  title: string
+  createdAt: string
+  isConfidential: boolean
+  type: string
+}
+
+interface PatientDetail {
+  id: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  cpf?: string | null
+  gender?: string | null
+  dateOfBirth?: string | null
+  profession?: string | null
+  city?: string | null
+  state?: string | null
+  observations?: string | null
+  active: boolean
+  medicalRecords?: MedicalRecord[]
+}
+
+interface FinancialTransaction {
+  id: string
+  description: string
+  amount: number
+  dueDate?: string | null
+  paymentStatus: string
+  patientId: string
+}
+
 export default function PatientDetailPage({ params }: { params: { id: string } }) {
-  const [patient, setPatient] = useState<any>(null)
-  const [sessions, setSessions] = useState<any[]>([])
-  const [financials, setFinancials] = useState<any[]>([])
+  const [patient, setPatient] = useState<PatientDetail | null>(null)
+  const [sessions, setSessions] = useState<unknown[]>([])
+  const [financials, setFinancials] = useState<FinancialTransaction[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,7 +63,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
         }
         if (transRes.ok) {
           const data = await transRes.json()
-          setFinancials((data.transactions || []).filter((t: any) => t.patientId === params.id))
+          setFinancials((data.transactions || []).filter((t: FinancialTransaction) => t.patientId === params.id))
         }
       } catch {}
       setLoading(false)
@@ -109,7 +142,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
             <TabsContent value="financial" className="space-y-4">
               {financials.length === 0 ? (
                 <Card><CardContent className="p-8 text-center text-muted-foreground"><DollarSign className="mx-auto h-8 w-8 mb-2" /><p>Nenhuma transação financeira</p></CardContent></Card>
-              ) : financials.map((fin: any) => (
+              ) : financials.map((fin: FinancialTransaction) => (
                 <Card key={fin.id} className="card-hover">
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
@@ -140,7 +173,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                   </CardContent>
                 </Card>
               ) : (
-                patient.medicalRecords.map((rec: any) => (
+                patient.medicalRecords.map((rec: MedicalRecord) => (
                   <Link key={rec.id} href={`/prontuarios/${rec.id}`}>
                     <Card className="card-hover">
                       <CardContent className="flex items-center justify-between p-4">

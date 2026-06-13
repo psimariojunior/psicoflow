@@ -8,7 +8,7 @@ import crypto from "crypto"
 
 export async function POST(request: Request) {
   const limit = rateLimitMiddleware(5, 60000)
-  const blocked = limit(request)
+  const blocked = await limit(request)
   if (blocked) return blocked
 
   try {

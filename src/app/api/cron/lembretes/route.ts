@@ -17,7 +17,7 @@ function checkAuth(request: Request): { authorized: boolean; url: URL } {
 }
 
 export async function GET(request: Request) {
-  const rateLimitResponse = rateLimit(request)
+  const rateLimitResponse = await rateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { authorized, url } = checkAuth(request)

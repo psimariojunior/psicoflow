@@ -14,7 +14,7 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const rateLimit = rateLimitMiddleware(10, 60000)
-  const blocked = rateLimit(request)
+  const blocked = await rateLimit(request)
   if (blocked) return blocked
 
   const originCheck = validateOrigin(request)

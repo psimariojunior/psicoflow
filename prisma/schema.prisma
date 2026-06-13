@@ -7,6 +7,16 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  PAUSED
+  NO_SHOW
+}
+
 model User {
   id            String   @id @default(cuid())
   name          String
@@ -139,7 +149,7 @@ model Appointment {
   title          String?
   startTime      DateTime
   endTime        DateTime
-  status         String   @default("SCHEDULED")
+  status         AppointmentStatus   @default(SCHEDULED)
   type           String?
   modality       String?  @default("presential")
   onlineRoomUrl  String?
@@ -161,6 +171,7 @@ model Appointment {
   patient        Patient  @relation(fields: [patientId], references: [id])
 
   therapySession TherapySession?
+  notifications  Notification[]
 
   @@index([psychologistId])
   @@index([patientId])
@@ -171,7 +182,7 @@ model Appointment {
 
 model TherapySession {
   id            String   @id @default(cuid())
-  status        String   @default("SCHEDULED")
+  status        AppointmentStatus   @default(SCHEDULED)
   date          DateTime @default(now())
   startedAt     DateTime?
   endedAt       DateTime?
@@ -322,10 +333,13 @@ model Notification {
   psychologist    User     @relation(fields: [psychologistId], references: [id])
   recipientId     String?
   patientId       String?
+  appointmentId   String?
+  appointment     Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@index([psychologistId])
   @@index([patientId])
   @@index([status])
+  @@index([appointmentId])
 }
 
 model Message {
