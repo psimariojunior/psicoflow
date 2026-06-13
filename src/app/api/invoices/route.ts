@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const createInvoiceSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória").max(500),
@@ -17,10 +16,7 @@ const createInvoiceSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const searchParams = request.nextUrl.searchParams
     const status = searchParams.get("status") || ""
@@ -28,7 +24,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50")))
 
     const where: Record<string, unknown> = {
-      psychologistId: (session.user as { id: string }).id,
+      psychologistId,
       ...(status ? { status } : {}),
     }
 
@@ -57,19 +53,16 @@ export async function GET(request: NextRequest) {
       paymentMethod: inv.paymentMethod,
     }))
 
-    return NextResponse.json({ invoices: enriched, total, page, totalPages: Math.ceil(total / limit) })
+    return apiSuccess({ invoices: enriched, total, page, totalPages: Math.ceil(total / limit) })
   } catch (error) {
     logger.error("Error fetching invoices", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao buscar faturas" }, { status: 500 })
+    return apiError("Erro ao buscar faturas")
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const body = await request.json()
     const result = createInvoiceSchema.safeParse(body)
@@ -82,19 +75,19 @@ export async function POST(request: Request) {
     const data = result.data
 
     const patient = await prisma.patient.findFirst({
-      where: { id: data.patientId, psychologistId: (session.user as { id: string }).id },
+      where: { id: data.patientId, psychologistId },
       select: { id: true },
     })
     if (!patient) {
-      return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+      return apiError("Paciente não encontrado", 404)
     }
 
     const dueDate = new Date(data.dueDate)
     if (isNaN(dueDate.getTime())) {
-      return NextResponse.json({ error: "Data de vencimento inválida" }, { status: 400 })
+      return apiError("Data de vencimento inválida", 400)
     }
 
-    const nextNumber = `NF-${String((await prisma.invoice.count({ where: { psychologistId: (session.user as { id: string }).id } })) + 1).padStart(4, "0")}`
+    const nextNumber = `NF-${String((await prisma.invoice.count({ where: { psychologistId } })) + 1).padStart(4, "0")}`
 
     const invoice = await prisma.invoice.create({
       data: {
@@ -106,7 +99,7 @@ export async function POST(request: Request) {
         dueDate,
         issueDate: new Date(),
         patientId: data.patientId,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
         status: data.status || "PENDING",
       },
       include: {
@@ -114,9 +107,9 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(invoice, { status: 201 })
+    return apiSuccess(invoice, 201)
   } catch (error) {
     logger.error("Error creating invoice", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao criar fatura" }, { status: 500 })
+    return apiError("Erro ao criar fatura")
   }
 }

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const updateSessionSchema = z.object({
   action: z.enum(["start", "pause", "resume", "end"]).optional(),
@@ -44,31 +43,23 @@ async function getSessionById(id: string, psychologistId: string) {
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
-    const therapySession = await getSessionById(params.id, (session.user as { id: string }).id)
+    const therapySession = await getSessionById(params.id, psychologistId)
     if (!therapySession) {
-      return NextResponse.json({ error: "Sessão não encontrada" }, { status: 404 })
+      return apiError("Sessão não encontrada", 404)
     }
 
-    return NextResponse.json(therapySession)
+    return apiSuccess(therapySession)
   } catch (error) {
     logger.error("Error fetching session", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao buscar sessão" }, { status: 500 })
+    return apiError("Erro ao buscar sessão")
   }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
     const existing = await prisma.therapySession.findFirst({
       where: { id: params.id, psychologistId },
     })
@@ -101,30 +92,30 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         where: { id: existing.appointmentId ?? "", psychologistId },
         data: { status: "IN_PROGRESS" },
       })
-      return NextResponse.json(updated)
+      return apiSuccess(updated)
     }
 
     if (action === "pause") {
       if (existing.status !== "IN_PROGRESS") {
-        return NextResponse.json({ error: "Sessão não está em andamento" }, { status: 400 })
+        return apiError("Sessão não está em andamento", 400)
       }
       const elapsed = existing.startedAt ? Math.floor((now.getTime() - existing.startedAt.getTime()) / 1000) : 0
       const totalPaused = (existing.pausedSeconds ?? 0) + elapsed
       const updated = await updateAndFetch({ status: "PAUSED", pausedSeconds: totalPaused, duration: totalPaused })
-      return NextResponse.json(updated)
+      return apiSuccess(updated)
     }
 
     if (action === "resume") {
       if (existing.status !== "PAUSED") {
-        return NextResponse.json({ error: "Sessão não está pausada" }, { status: 400 })
+        return apiError("Sessão não está pausada", 400)
       }
       const updated = await updateAndFetch({ status: "IN_PROGRESS", startedAt: now })
-      return NextResponse.json(updated)
+      return apiSuccess(updated)
     }
 
     if (action === "end") {
       if (existing.status !== "IN_PROGRESS" && existing.status !== "PAUSED") {
-        return NextResponse.json({ error: "Sessão não está ativa" }, { status: 400 })
+        return apiError("Sessão não está ativa", 400)
       }
 
       let totalSeconds = existing.pausedSeconds ?? 0
@@ -175,7 +166,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         },
       })
 
-      return NextResponse.json(updated)
+      return apiSuccess(updated)
     }
 
     const updated = await updateAndFetch({
@@ -191,31 +182,28 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       isRemote: isRemote ?? existing.isRemote,
     })
 
-    return NextResponse.json(updated)
+    return apiSuccess(updated)
   } catch (error) {
     logger.error("Error updating session", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao atualizar sessão" }, { status: 500 })
+    return apiError("Erro ao atualizar sessão")
   }
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const existing = await prisma.therapySession.findFirst({
-      where: { id: params.id, psychologistId: (session.user as { id: string }).id },
+      where: { id: params.id, psychologistId },
     })
     if (!existing) {
-      return NextResponse.json({ error: "Sessão não encontrada" }, { status: 404 })
+      return apiError("Sessão não encontrada", 404)
     }
 
     await prisma.therapySession.delete({ where: { id: params.id } })
-    return NextResponse.json({ message: "Sessão removida" })
+    return apiSuccess({ message: "Sessão removida" })
   } catch (error) {
     logger.error("Error deleting session", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao remover sessão" }, { status: 500 })
+    return apiError("Erro ao remover sessão")
   }
 }

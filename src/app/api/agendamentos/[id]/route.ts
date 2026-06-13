@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { scheduleReminders, cancelPendingReminders } from "@/lib/notifications"
 import { z } from "zod"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const updateAppointmentSchema = z.object({
   status: z.enum(["SCHEDULED", "CONFIRMED", "CANCELLED", "COMPLETED", "DELETE"]).optional(),
@@ -18,16 +17,13 @@ const updateAppointmentSchema = z.object({
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const existing = await prisma.appointment.findFirst({
-      where: { id: params.id, psychologistId: (session.user as { id: string }).id },
+      where: { id: params.id, psychologistId },
     })
     if (!existing) {
-      return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 })
+      return apiError("Agendamento não encontrado", 404)
     }
 
     const body = await request.json()
@@ -66,34 +62,31 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       )
     }
 
-    return NextResponse.json(updated)
+    return apiSuccess(updated)
   } catch (error) {
     logger.error("Error updating appointment", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao atualizar agendamento" }, { status: 500 })
+    return apiError("Erro ao atualizar agendamento")
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const existing = await prisma.appointment.findFirst({
-      where: { id: params.id, psychologistId: (session.user as { id: string }).id },
+      where: { id: params.id, psychologistId },
     })
     if (!existing) {
-      return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 })
+      return apiError("Agendamento não encontrado", 404)
     }
 
     cancelPendingReminders(params.id).catch(
       (e) => logger.error("cancelPendingReminders failed", { error: String(e) })
     )
     await prisma.appointment.delete({ where: { id: params.id } })
-    return NextResponse.json({ message: "Agendamento cancelado com sucesso" })
+    return apiSuccess({ message: "Agendamento cancelado com sucesso" })
   } catch (error) {
     logger.error("Error deleting appointment", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao cancelar agendamento" }, { status: 500 })
+    return apiError("Erro ao cancelar agendamento")
   }
 }

@@ -1,17 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
     const now = new Date()
     const brtNow = new Date(now.getTime() - 3 * 3600000)
     const startOfMonth = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), 1))
@@ -95,7 +89,7 @@ export async function GET(request: NextRequest) {
       revenue: 0,
     }))
 
-    return NextResponse.json({
+    return apiSuccess({
       summary: {
         totalPatients,
         activePatients,
@@ -111,6 +105,6 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     logger.error("Error generating reports", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao gerar relatórios" }, { status: 500 })
+    return apiError("Erro ao gerar relatórios")
   }
 }

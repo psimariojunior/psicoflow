@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const createAttachmentSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").max(255),
@@ -17,10 +16,7 @@ const createAttachmentSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const data = await request.json()
     const result = createAttachmentSchema.safeParse(data)
@@ -35,21 +31,21 @@ export async function POST(request: Request) {
 
     if (patientId) {
       const patient = await prisma.patient.findFirst({
-        where: { id: patientId, psychologistId: session.user.id },
+        where: { id: patientId, psychologistId },
         select: { id: true },
       })
       if (!patient) {
-        return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+        return apiError("Paciente não encontrado", 404)
       }
     }
 
     if (recordId) {
       const record = await prisma.medicalRecord.findFirst({
-        where: { id: recordId, psychologistId: session.user.id },
+        where: { id: recordId, psychologistId },
         select: { id: true },
       })
       if (!record) {
-        return NextResponse.json({ error: "Prontuário não encontrado" }, { status: 404 })
+        return apiError("Prontuário não encontrado", 404)
       }
     }
 
@@ -57,9 +53,9 @@ export async function POST(request: Request) {
       data: { name: sanitizeHtml(name), type: sanitizeHtml(type), url, size: size || null, patientId: patientId || null, recordId: recordId || null },
     })
 
-    return NextResponse.json(attachment, { status: 201 })
+    return apiSuccess(attachment, 201)
   } catch (error) {
     logger.error("Error uploading attachment", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao fazer upload" }, { status: 500 })
+    return apiError("Erro ao fazer upload")
   }
 }

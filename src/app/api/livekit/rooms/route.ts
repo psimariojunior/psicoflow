@@ -1,8 +1,6 @@
-import { NextResponse } from "next/server"
 import { RoomServiceClient } from "livekit-server-sdk"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 function getLiveKitConfig() {
   const raw = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
@@ -14,35 +12,29 @@ function getLiveKitConfig() {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
     const closed = await prisma.closedRoom.findMany({
-      where: { psychologistId: session.user.id },
+      where: { psychologistId },
       orderBy: { closedAt: "desc" },
       take: 10,
     })
-    return NextResponse.json({ closed })
+    return apiSuccess({ closed })
   } catch (error) {
     console.error("GET closed rooms error:", error)
-    return NextResponse.json({ error: "Erro ao buscar salas" }, { status: 500 })
+    return apiError("Erro ao buscar salas")
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const { room } = await request.json()
     if (!room) {
-      return NextResponse.json({ error: "Room name required" }, { status: 400 })
+      return apiError("Room name required", 400)
     }
 
-    console.log("POST room", { room, userId: session.user.id })
+    console.log("POST room", { room, userId: psychologistId })
 
     const { host, apiKey, apiSecret } = getLiveKitConfig()
 
@@ -62,14 +54,14 @@ export async function POST(request: Request) {
       update: {},
       create: {
         roomName: room,
-        psychologistId: session.user.id,
+        psychologistId,
       },
     })
     console.log("ClosedRoom created:", record)
 
-    return NextResponse.json({ success: true })
+    return apiSuccess({ success: true })
   } catch (error) {
     console.error("Delete room error:", error)
-    return NextResponse.json({ error: "Erro ao encerrar sala" }, { status: 500 })
+    return apiError("Erro ao encerrar sala")
   }
 }

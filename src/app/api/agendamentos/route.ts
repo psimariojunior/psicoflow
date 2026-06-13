@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createAppointmentSchema } from "@/lib/validation"
 import { scheduleReminders } from "@/lib/notifications"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const searchParams = request.nextUrl.searchParams
     const startDate = searchParams.get("startDate")
@@ -20,7 +16,7 @@ export async function GET(request: NextRequest) {
     const patientId = searchParams.get("patientId")
 
     const where: Record<string, unknown> = {
-      psychologistId: (session.user as { id: string }).id,
+      psychologistId,
     }
 
     if (startDate && endDate) {
@@ -40,32 +36,24 @@ export async function GET(request: NextRequest) {
       orderBy: { startTime: "asc" },
     })
 
-    return NextResponse.json(appointments)
+    return apiSuccess(appointments)
   } catch (error) {
     logger.error("Error fetching appointments", { error: String(error) })
-    return NextResponse.json(
-      { error: "Erro ao buscar agendamentos" },
-      { status: 500 }
-    )
+    return apiError("Erro ao buscar agendamentos")
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const data = await request.json()
     const { error } = validate(createAppointmentSchema, data)
     if (error) return error
 
     if (new Date(data.endTime) <= new Date(data.startTime)) {
-      return NextResponse.json({ error: "Data/hora fim deve ser após data/hora início" }, { status: 400 })
+      return apiError("Data/hora fim deve ser após data/hora início", 400)
     }
-
-    const psychologistId = (session.user as { id: string }).id
 
     const createSingleAppointment = async (
       startTime: Date, endTime: Date, index: number, total: number
@@ -103,7 +91,7 @@ export async function POST(request: Request) {
     if (data.isRecurring && data.recurringRule) {
       let rule: { frequency: string; occurrences: number }
       try { rule = JSON.parse(data.recurringRule) } catch {
-        return NextResponse.json({ error: "Regra de recorrência inválida" }, { status: 400 })
+        return apiError("Regra de recorrência inválida", 400)
       }
       const intervalDays = rule.frequency === "weekly" ? 7 : 14
       const maxOccurrences = Math.min(rule.occurrences || 4, 52)
@@ -114,18 +102,15 @@ export async function POST(request: Request) {
         const end = new Date(start.getTime() + duration)
         results.push(await createSingleAppointment(start, end, i + 1, maxOccurrences))
       }
-      return NextResponse.json(results, { status: 201 })
+      return apiSuccess(results, 201)
     }
 
     const appointment = await createSingleAppointment(
       new Date(data.startTime), new Date(data.endTime), 1, 1
     )
-    return NextResponse.json(appointment, { status: 201 })
+    return apiSuccess(appointment, 201)
   } catch (error) {
     logger.error("Error creating appointment", { error: String(error) })
-    return NextResponse.json(
-      { error: "Erro ao criar agendamento" },
-      { status: 500 }
-    )
+    return apiError("Erro ao criar agendamento")
   }
 }

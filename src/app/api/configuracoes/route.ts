@@ -1,42 +1,32 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { validate, updateSettingsSchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const user = await prisma.user.findUnique({
-      where: { id: (session.user as { id: string }).id },
+      where: { id: psychologistId },
       select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true },
     })
 
     if (!user) {
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+      return apiError("Usuário não encontrado", 404)
     }
 
-    return NextResponse.json(user)
+    return apiSuccess(user)
   } catch (error) {
     console.error("Error fetching settings:", error)
-    return NextResponse.json(
-      { error: "Erro ao buscar configurações" },
-      { status: 500 }
-    )
+    return apiError("Erro ao buscar configurações")
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const raw = await request.json()
     const result = validate(updateSettingsSchema, raw)
@@ -51,17 +41,14 @@ export async function PUT(request: Request) {
     }
 
     const user = await prisma.user.update({
-      where: { id: (session.user as { id: string }).id },
+      where: { id: psychologistId },
       data,
       select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true },
     })
 
-    return NextResponse.json(user)
+    return apiSuccess(user)
   } catch (error) {
     console.error("Error updating settings:", error)
-    return NextResponse.json(
-      { error: "Erro ao salvar configurações" },
-      { status: 500 }
-    )
+    return apiError("Erro ao salvar configurações")
   }
 }

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const createSessionSchema = z.object({
   patientId: z.string().min(1, "Paciente é obrigatório"),
@@ -24,13 +23,10 @@ const createSessionSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const sessions = await prisma.therapySession.findMany({
-      where: { psychologistId: (session.user as { id: string }).id },
+      where: { psychologistId },
       include: {
         patient: { select: { id: true, name: true } },
         appointment: { select: { id: true, startTime: true } },
@@ -39,19 +35,16 @@ export async function GET() {
       take: 50,
     })
 
-    return NextResponse.json(sessions)
+    return apiSuccess(sessions)
   } catch (error) {
     logger.error("Error fetching sessions", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao buscar sessões" }, { status: 500 })
+    return apiError("Erro ao buscar sessões")
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const body = await request.json()
     const result = createSessionSchema.safeParse(body)
@@ -65,11 +58,11 @@ export async function POST(request: Request) {
     const data = result.data
 
     const patientExists = await prisma.patient.findFirst({
-      where: { id: data.patientId, psychologistId: (session.user as { id: string }).id },
+      where: { id: data.patientId, psychologistId },
       select: { id: true },
     })
     if (!patientExists) {
-      return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+      return apiError("Paciente não encontrado", 404)
     }
 
     const therapySession = await prisma.therapySession.create({
@@ -88,16 +81,16 @@ export async function POST(request: Request) {
         isRemote: data.isRemote || false,
         appointmentId: data.appointmentId || null,
         patientId: data.patientId,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
       include: {
         patient: { select: { id: true, name: true, cpf: true, phone: true, email: true } },
       },
     })
 
-    return NextResponse.json(therapySession, { status: 201 })
+    return apiSuccess(therapySession, 201)
   } catch (error) {
     logger.error("Error creating session", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao criar sessão" }, { status: 500 })
+    return apiError("Erro ao criar sessão")
   }
 }

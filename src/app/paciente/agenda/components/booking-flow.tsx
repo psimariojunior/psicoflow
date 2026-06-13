@@ -84,28 +84,28 @@ export function BookingFlow({
     <div className="max-w-2xl mx-auto px-4 py-8">
       {!selectedDate ? (
         <>
-          <button onClick={onClose} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
+          <button onClick={onClose} className="flex items-center gap-2 text-muted-foreground hover:text-accent-foreground text-sm mb-6 transition-all">
             <ChevronLeft className="h-4 w-4" /> Voltar
           </button>
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white">Agendar consulta</h1>
-            <p className="text-gray-300 text-sm mt-1">Escolha o melhor dia para você</p>
+            <h1 className="text-2xl font-bold text-foreground">Agendar consulta</h1>
+            <p className="text-foreground text-sm mt-1">Escolha o melhor dia para você</p>
           </div>
-          <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50">
+          <div className="bg-card rounded-2xl p-6 ring-1 ring-border">
             <div className="flex items-center justify-between mb-6">
               <button aria-label="Mês anterior" onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1) } else { setCurrentMonth(currentMonth - 1) } }}
-                className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-700/50 transition-all">
+                className="p-2 text-muted-foreground hover:text-foreground rounded-xl hover:bg-accent transition-all">
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <h2 className="text-lg font-semibold text-white">{MONTH_NAMES[currentMonth]} {currentYear}</h2>
+              <h2 className="text-lg font-semibold text-foreground">{MONTH_NAMES[currentMonth]} {currentYear}</h2>
               <button aria-label="Próximo mês" onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear(currentYear + 1) } else { setCurrentMonth(currentMonth + 1) } }}
-                className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-700/50 transition-all">
+                className="p-2 text-muted-foreground hover:text-foreground rounded-xl hover:bg-accent transition-all">
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
             <div className="grid grid-cols-7 gap-1 mb-2">
               {DAY_NAMES_SHORT.map((d) => (
-                <div key={d} className="text-center text-xs text-gray-400 font-medium py-2">{d}</div>
+                <div key={d} className="text-center text-xs text-muted-foreground font-medium py-2">{d}</div>
               ))}
             </div>
             <div className="grid grid-cols-7 gap-1">
@@ -118,8 +118,8 @@ export function BookingFlow({
                 return (
                   <button key={day} disabled={!isAvail} onClick={() => setSelectedDate(dateStr)}
                     className={`aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all ${
-                      isAvail ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 cursor-pointer" : "text-gray-600 cursor-not-allowed"
-                    } ${isToday ? "ring-1 ring-emerald-500/40" : ""}`}>
+                      isAvail ? "bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer" : "text-muted-foreground cursor-not-allowed"
+                    } ${isToday ? "ring-1 ring-primary/40" : ""}`}>
                     {day}
                   </button>
                 )
@@ -129,17 +129,17 @@ export function BookingFlow({
         </>
       ) : !selectedSlot ? (
         <>
-          <button onClick={() => setSelectedDate(null)} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
+          <button onClick={() => setSelectedDate(null)} className="flex items-center gap-2 text-muted-foreground hover:text-accent-foreground text-sm mb-6 transition-all">
             <ChevronLeft className="h-4 w-4" /> Voltar
           </button>
-          <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50">
+          <div className="bg-card rounded-2xl p-6 ring-1 ring-border">
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-12 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-emerald-400" />
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">{formatDateBR(selectedDate)}</h2>
-                <p className="text-gray-400 text-sm">
+                <h2 className="text-lg font-semibold text-foreground">{formatDateBR(selectedDate)}</h2>
+                <p className="text-muted-foreground text-sm">
                   {["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][new Date(selectedDate).getUTCDay()]}
                 </p>
               </div>
@@ -148,36 +148,36 @@ export function BookingFlow({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {selectedDay.slots.map((s) => (
                   <button key={s.time} onClick={() => setSelectedSlot(s)}
-                    className="bg-slate-700/50 hover:bg-emerald-500/15 text-gray-200 hover:text-emerald-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-slate-600/50 hover:ring-emerald-500/30">
+                    className="bg-muted hover:bg-primary/10 text-foreground hover:text-primary/80 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-border hover:ring-primary/30">
                     <Clock className="h-4 w-4 inline mr-1.5" />{s.time}
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">Nenhum horário disponível neste dia</p>
+              <p className="text-center text-muted-foreground py-8">Nenhum horário disponível neste dia</p>
             )}
           </div>
         </>
       ) : (
         <>
-          <button onClick={() => setSelectedSlot(null)} className="flex items-center gap-2 text-gray-400 hover:text-gray-200 text-sm mb-6 transition-all">
+          <button onClick={() => setSelectedSlot(null)} className="flex items-center gap-2 text-muted-foreground hover:text-accent-foreground text-sm mb-6 transition-all">
             <ChevronLeft className="h-4 w-4" /> Voltar
           </button>
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/15 ring-1 ring-emerald-500/20 mb-4">
-              <Calendar className="h-8 w-8 text-emerald-400" />
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 ring-1 ring-primary/20 mb-4">
+              <Calendar className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-white">{formatDateBR(selectedDate)}</h2>
-            <p className="text-gray-300 text-lg">às {selectedSlot.time}</p>
+            <h2 className="text-xl font-bold text-foreground">{formatDateBR(selectedDate)}</h2>
+            <p className="text-foreground text-lg">às {selectedSlot.time}</p>
           </div>
-          <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50 mb-6">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Modalidade</h3>
+          <div className="bg-card rounded-2xl p-6 ring-1 ring-border mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Modalidade</h3>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => setSelectedModality("online")}
                 className={`rounded-xl py-4 px-4 text-sm font-medium transition-all ring-1 text-left ${
                   selectedModality === "online"
-                    ? "bg-emerald-500/15 ring-emerald-500/30 text-emerald-300"
-                    : "bg-slate-700/50 ring-slate-600/50 text-gray-300 hover:bg-slate-700"
+                    ? "bg-primary/10 ring-primary/30 text-primary"
+                    : "bg-muted ring-border text-foreground hover:bg-accent"
                 }`}>
                 <Video className="h-5 w-5 mb-1.5" />
                 <p className="font-medium">Online</p>
@@ -186,8 +186,8 @@ export function BookingFlow({
               <button onClick={() => setSelectedModality("presential")}
                 className={`rounded-xl py-4 px-4 text-sm font-medium transition-all ring-1 text-left ${
                   selectedModality === "presential"
-                    ? "bg-emerald-500/15 ring-emerald-500/30 text-emerald-300"
-                    : "bg-slate-700/50 ring-slate-600/50 text-gray-300 hover:bg-slate-700"
+                    ? "bg-primary/10 ring-primary/30 text-primary"
+                    : "bg-muted ring-border text-foreground hover:bg-accent"
                 }`}>
                 <Calendar className="h-5 w-5 mb-1.5" />
                 <p className="font-medium">Presencial</p>
@@ -195,17 +195,17 @@ export function BookingFlow({
               </button>
             </div>
           </div>
-          <div className="bg-slate-800/50 rounded-2xl p-6 ring-1 ring-slate-700/50 mb-6">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Confirmar agendamento</h3>
+          <div className="bg-card rounded-2xl p-6 ring-1 ring-border mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Confirmar agendamento</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <div className="h-8 w-8 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0">
-                  <span className="text-emerald-400 text-xs font-bold">{patientName?.charAt(0).toUpperCase()}</span>
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <span className="text-primary text-xs font-bold">{patientName?.charAt(0).toUpperCase()}</span>
                 </div>
-                <span className="text-gray-200">{patientName}</span>
+                <span className="text-foreground">{patientName}</span>
               </div>
-              {patientEmail && <p className="text-gray-300 text-sm ml-11">{patientEmail}</p>}
-              {patientPhone && <p className="text-gray-300 text-sm ml-11">{patientPhone}</p>}
+              {patientEmail && <p className="text-foreground text-sm ml-11">{patientEmail}</p>}
+              {patientPhone && <p className="text-foreground text-sm ml-11">{patientPhone}</p>}
             </div>
           </div>
           <Button onClick={handleBook} disabled={bookingLoading}

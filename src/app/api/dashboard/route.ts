@@ -1,17 +1,10 @@
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
     const now = new Date()
     const brtNow = new Date(now.getTime() - 3 * 3600000)
     const currentYear = brtNow.getUTCFullYear()
@@ -128,7 +121,7 @@ export async function GET() {
     const thisMonthAppointments = monthlyAppointments[currentMonth]
     const appointmentChange = lastMonthAppointments > 0 ? ((thisMonthAppointments - lastMonthAppointments) / lastMonthAppointments) * 100 : 0
 
-    return NextResponse.json({
+    return apiSuccess({
       stats: {
         totalPatients,
         appointmentsToday,
@@ -164,6 +157,6 @@ export async function GET() {
     })
   } catch (error) {
     logger.error("Error fetching dashboard data", { error: String(error) })
-    return NextResponse.json({ error: "Erro ao carregar dashboard" }, { status: 500 })
+    return apiError("Erro ao carregar dashboard")
   }
 }
