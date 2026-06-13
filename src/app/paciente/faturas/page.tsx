@@ -26,9 +26,9 @@ interface InvoicesResponse {
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   PENDING: { label: "Pendente", color: "text-amber-400", icon: Clock },
-  PAID: { label: "Pago", color: "text-emerald-400", icon: CheckCircle },
+  PAID: { label: "Pago", color: "text-primary", icon: CheckCircle },
   OVERDUE: { label: "Vencido", color: "text-red-400", icon: AlertCircle },
-  CANCELLED: { label: "Cancelado", color: "text-gray-400", icon: FileText },
+  CANCELLED: { label: "Cancelado", color: "text-muted-foreground", icon: FileText },
 }
 
 const methodLabels: Record<string, string> = {
@@ -75,7 +75,7 @@ export default function PatientInvoicesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -83,8 +83,8 @@ export default function PatientInvoicesPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Minhas Faturas</h1>
-        <p className="text-gray-400 text-sm mt-1">Histórico de cobranças</p>
+        <h1 className="text-2xl font-bold text-foreground">Minhas Faturas</h1>
+        <p className="text-muted-foreground text-sm mt-1">Histórico de cobranças</p>
       </div>
 
       {totalPending > 0 && (
@@ -97,9 +97,9 @@ export default function PatientInvoicesPage() {
       )}
 
       {invoices.length === 0 ? (
-        <div className="bg-slate-800/50 rounded-2xl p-12 ring-1 ring-slate-700/50 text-center">
-          <Receipt className="h-10 w-10 text-gray-500 mx-auto mb-3" />
-          <p className="text-gray-400">Nenhuma fatura encontrada</p>
+        <div className="bg-card rounded-2xl p-12 ring-1 ring-border text-center">
+          <Receipt className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">Nenhuma fatura encontrada</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -108,32 +108,32 @@ export default function PatientInvoicesPage() {
             const Icon = config.icon
             const isUnpaid = inv.status === "PENDING" || inv.status === "OVERDUE"
             return (
-              <div key={inv.id} className="bg-slate-800/50 rounded-2xl p-5 ring-1 ring-slate-700/50">
+              <div key={inv.id} className="bg-card rounded-2xl p-5 ring-1 ring-border">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Icon className={`h-4 w-4 ${config.color}`} />
-                      <span className="text-white font-medium">{inv.description}</span>
+                      <span className="text-foreground font-medium">{inv.description}</span>
                     </div>
-                    <p className="text-xs text-gray-500">Fatura {inv.number}</p>
+                    <p className="text-xs text-muted-foreground">Fatura {inv.number}</p>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="text-gray-300">
+                      <span className="text-foreground">
                         <strong>Vencimento:</strong> {formatDate(inv.dueDate)}
                       </span>
                       {inv.paidDate && (
-                        <span className="text-emerald-300">
+                        <span className="text-primary">
                           <strong>Pago em:</strong> {formatDate(inv.paidDate)}
                         </span>
                       )}
                     </div>
                     {inv.paymentMethod && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         Pagamento: {methodLabels[inv.paymentMethod] || inv.paymentMethod}
                       </span>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-white">
+                    <p className="text-lg font-bold text-foreground">
                       R$ {inv.totalAmount.toFixed(2)}
                     </p>
                     <p className={`text-xs mt-1 ${config.color}`}>{config.label}</p>
@@ -141,30 +141,30 @@ export default function PatientInvoicesPage() {
                 </div>
 
                 {isUnpaid && inv.pixKey && (
-                  <div className="mt-4 pt-4 border-t border-slate-700/50">
-                    <p className="text-sm font-medium text-gray-300 mb-2">
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-sm font-medium text-foreground mb-2">
                       {inv.psychologistName} — Dados para pagamento
                     </p>
-                    <div className="bg-slate-900/50 rounded-xl p-3 space-y-3">
+                    <div className="bg-card rounded-xl p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-500 mb-0.5">PIX</p>
-                          <p className="text-sm text-white font-mono truncate">{inv.pixKey}</p>
+                          <p className="text-xs text-muted-foreground mb-0.5">PIX</p>
+                          <p className="text-sm text-foreground font-mono truncate">{inv.pixKey}</p>
                         </div>
                         <button
                           onClick={() => copyPix(inv.pixKey!, inv.id)}
-                          className="flex-shrink-0 ml-3 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+                          className="flex-shrink-0 ml-3 p-2 rounded-lg bg-card hover:bg-accent transition-colors"
                           aria-label="Copiar chave PIX"
                         >
                           {copiedId === inv.id ? (
-                            <Check className="h-4 w-4 text-emerald-400" />
+                            <Check className="h-4 w-4 text-primary" />
                           ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
+                            <Copy className="h-4 w-4 text-muted-foreground" />
                           )}
                         </button>
                       </div>
                       {inv.paymentInfo && (
-                        <p className="text-xs text-gray-400 whitespace-pre-line">{inv.paymentInfo}</p>
+                        <p className="text-xs text-muted-foreground whitespace-pre-line">{inv.paymentInfo}</p>
                       )}
                     </div>
                   </div>

@@ -63,8 +63,8 @@ export default function HistoricoPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Histórico de Sessões</h1>
-        <p className="text-gray-300 text-sm mt-1">Todas as suas consultas realizadas</p>
+        <h1 className="text-2xl font-bold text-foreground">Histórico de Sessões</h1>
+        <p className="text-foreground text-sm mt-1">Todas as suas consultas realizadas</p>
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -74,8 +74,8 @@ export default function HistoricoPage() {
             onClick={() => setFilter(t.key)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
               filter === t.key
-                ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
-                : "text-gray-400 hover:text-gray-200 bg-slate-800/50"
+                ? "bg-primary/10 text-primary ring-1 ring-emerald-500/30"
+                : "text-muted-foreground hover:text-accent-foreground bg-card"
             }`}
           >
             {t.label}
@@ -85,43 +85,43 @@ export default function HistoricoPage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
-          <FileText className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400">Nenhuma sessão encontrada</p>
+          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Nenhuma sessão encontrada</p>
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((a) => (
             <div
               key={a.id}
-              className="bg-slate-800/50 rounded-xl p-4 ring-1 ring-slate-700/50"
+              className="bg-card rounded-xl p-4 ring-1 ring-border"
             >
               <div className="flex items-start gap-3">
                 <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
                   a.status === "CANCELLED"
                     ? "bg-red-500/10"
-                    : "bg-emerald-500/10"
+                    : "bg-primary/10"
                 }`}>
                   {a.status === "CANCELLED"
                     ? <XCircle className="h-5 w-5 text-red-400" />
-                    : <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                    : <CheckCircle2 className="h-5 w-5 text-primary" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-medium">{formatDateBR(a.startTime)}</span>
+                    <span className="text-foreground font-medium">{formatDateBR(a.startTime)}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       a.status === "CANCELLED"
                         ? "bg-red-500/10 text-red-300"
-                        : "bg-emerald-500/10 text-emerald-300"
+                        : "bg-primary/10 text-primary"
                     }`}>
                       {a.status === "CANCELLED" ? "Cancelada" : "Realizada"}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                     <span>
                       <Clock className="h-3.5 w-3.5 inline mr-1" />
                       {formatTime(a.startTime)} — {formatTime(a.endTime)}
@@ -130,7 +130,7 @@ export default function HistoricoPage() {
                     <span>{a.psychologist.name}</span>
                   </div>
                   {a.status === "CANCELLED" && a.cancelReason && (
-                    <p className="text-sm text-gray-500 mt-1.5">
+                    <p className="text-sm text-muted-foreground mt-1.5">
                       Motivo: {a.cancelReason}
                     </p>
                   )}

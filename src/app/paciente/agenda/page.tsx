@@ -72,8 +72,8 @@ export default function AgendaPacientePage() {
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">Minha Agenda</h1>
-              <p className="text-gray-300 text-sm mt-1">Olá, {patient?.name?.split(" ")[0]}</p>
+              <h1 className="text-2xl font-bold text-foreground">Minha Agenda</h1>
+              <p className="text-foreground text-sm mt-1">Olá, {patient?.name?.split(" ")[0]}</p>
             </div>
             <Button onClick={handleStartBooking} className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
               <Calendar className="h-4 w-4 mr-2" />
@@ -83,7 +83,7 @@ export default function AgendaPacientePage() {
 
           {loadingAppts ? (
             <div className="flex justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
             <AppointmentList

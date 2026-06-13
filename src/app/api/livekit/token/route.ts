@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { AccessToken } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { apiError } from "@/lib/api-helpers"
 
 const rateLimit = rateLimitMiddleware(10, 60000)
 
@@ -17,18 +18,18 @@ export async function GET(request: Request) {
     const isPatient = searchParams.get("patient") === "true"
 
     if (!room) {
-      return NextResponse.json({ error: "Room name required" }, { status: 400 })
+      return apiError("Room name required", 400)
     }
 
     const closed = await prisma.closedRoom.findUnique({ where: { roomName: room } })
     if (closed) {
-      return NextResponse.json({ error: "Esta sala foi encerrada e não está mais disponível." }, { status: 410 })
+      return apiError("Esta sala foi encerrada e não está mais disponível.", 410)
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY
     const apiSecret = process.env.LIVEKIT_API_SECRET
     if (!apiKey || !apiSecret) {
-      return NextResponse.json({ error: "LiveKit não configurado" }, { status: 500 })
+      return apiError("LiveKit não configurado")
     }
 
     let identity: string
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
     } else {
       const session = await getServerSession(authOptions)
       if (!session?.user) {
-        return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+        return apiError("Não autorizado", 401)
       }
       identity = (session.user as any).id || session.user.email || "unknown"
       name = session.user.name || "Psicólogo"

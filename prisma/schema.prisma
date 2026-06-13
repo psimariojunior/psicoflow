@@ -65,6 +65,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model NextAuthSession {
@@ -74,6 +75,8 @@ model NextAuthSession {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -127,6 +130,8 @@ model Patient {
   therapySessions TherapySession[]
   attachments    Attachment[]
   transactions   FinancialTransaction[]
+
+  @@index([psychologistId])
 }
 
 model Appointment {
@@ -156,6 +161,12 @@ model Appointment {
   patient        Patient  @relation(fields: [patientId], references: [id])
 
   therapySession TherapySession?
+
+  @@index([psychologistId])
+  @@index([patientId])
+  @@index([startTime])
+  @@index([psychologistId, status])
+  @@index([psychologistId, startTime])
 }
 
 model TherapySession {
@@ -189,6 +200,9 @@ model TherapySession {
   patient       Patient  @relation(fields: [patientId], references: [id])
   psychologistId String
   psychologist  User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
+  @@index([patientId])
 }
 
 model MedicalRecord {
@@ -207,6 +221,9 @@ model MedicalRecord {
   psychologist  User     @relation(fields: [psychologistId], references: [id])
 
   attachments   Attachment[]
+
+  @@index([psychologistId])
+  @@index([patientId])
 }
 
 model Attachment {
@@ -221,6 +238,9 @@ model Attachment {
   record    MedicalRecord? @relation(fields: [recordId], references: [id])
   patientId String?
   patient   Patient?       @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([recordId])
 }
 
 model FinancialTransaction {
@@ -247,6 +267,10 @@ model FinancialTransaction {
   patient         Patient? @relation(fields: [patientId], references: [id])
   invoiceId       String?
   invoice         Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([psychologistId])
+  @@index([patientId])
+  @@index([invoiceId])
 }
 
 model Invoice {
@@ -275,6 +299,9 @@ model Invoice {
   patient         Patient  @relation(fields: [patientId], references: [id])
 
   transactions    FinancialTransaction[]
+
+  @@index([psychologistId])
+  @@index([patientId])
 }
 
 model Notification {
@@ -295,6 +322,10 @@ model Notification {
   psychologist    User     @relation(fields: [psychologistId], references: [id])
   recipientId     String?
   patientId       String?
+
+  @@index([psychologistId])
+  @@index([patientId])
+  @@index([status])
 }
 
 model Message {
@@ -309,6 +340,9 @@ model Message {
   sender     User     @relation("SenderMessages", fields: [senderId], references: [id])
   receiverId String
   receiver   User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
 }
 
 model EmotionDiary {
@@ -328,6 +362,9 @@ model EmotionDiary {
   patient       Patient  @relation(fields: [patientId], references: [id])
   psychologistId String
   psychologist  User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([patientId])
+  @@index([psychologistId])
 }
 
 model TherapyResource {
@@ -345,6 +382,8 @@ model TherapyResource {
 
   psychologistId String
   psychologist   User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
 }
 
 model AvailabilitySlot {
@@ -358,6 +397,8 @@ model AvailabilitySlot {
 
   psychologistId String
   psychologist   User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
 }
 
 model UserPermission {
@@ -394,6 +435,9 @@ model ConsentLog {
   patient       Patient  @relation(fields: [patientId], references: [id])
   psychologistId String
   psychologist  User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([patientId])
+  @@index([psychologistId])
 }
 
 model AuditLog {
@@ -407,6 +451,8 @@ model AuditLog {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model SessionToken {
@@ -417,6 +463,8 @@ model SessionToken {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model ClosedRoom {
@@ -425,5 +473,7 @@ model ClosedRoom {
   closedAt        DateTime @default(now())
   psychologistId  String
   psychologist    User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
 }
 

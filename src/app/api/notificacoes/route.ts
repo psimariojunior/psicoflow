@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { sendReminderNow } from "@/lib/notifications"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const notificationSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(200),
@@ -22,12 +23,7 @@ const notificationSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
 
     const notifications = await prisma.notification.findMany({
       where: { psychologistId },
@@ -46,13 +42,10 @@ export async function GET() {
       patientName: n.patientId ? patientMap[n.patientId] || null : null,
     }))
 
-    return NextResponse.json(enriched)
+    return apiSuccess(enriched)
   } catch (error) {
     console.error("Error fetching notifications:", error)
-    return NextResponse.json(
-      { error: "Erro ao buscar notificações" },
-      { status: 500 }
-    )
+    return apiError("Erro ao buscar notificações")
   }
 }
 
@@ -60,7 +53,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+      return apiError("Não autorizado", 401)
     }
 
     const raw = await request.json()
@@ -92,7 +85,7 @@ export async function POST(request: Request) {
           scheduledAt: new Date(sendAt),
         },
       })
-      return NextResponse.json(notification, { status: 201 })
+      return apiSuccess(notification, 201)
     }
 
     const notification = await prisma.notification.create({
@@ -131,15 +124,12 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
       console.error("[POST /api/notificacoes] send failed", { channel, patientId, error: result.error })
-      return NextResponse.json({ error: errorMessage }, { status: 500 })
+      return apiError(errorMessage || "Falha no envio", 500)
     }
 
-    return NextResponse.json({ ...notification, status: "SENT" }, { status: 201 })
+    return apiSuccess({ ...notification, status: "SENT" }, 201)
   } catch (error) {
     console.error("Error creating notification:", error)
-    return NextResponse.json(
-      { error: "Erro ao criar notificação" },
-      { status: 500 }
-    )
+    return apiError("Erro ao criar notificação")
   }
 }

@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { validate, createTransactionSchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
     const { searchParams } = request.nextUrl
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
@@ -45,7 +39,7 @@ export async function GET(request: NextRequest) {
       take: 200,
     })
 
-    return NextResponse.json({
+    return apiSuccess({
       summary: {
         totalRevenue: income._sum.amount || 0,
         totalExpenses: expense._sum.amount || 0,
@@ -55,19 +49,13 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     logger.error("Error fetching financial data", { error: String(error) })
-    return NextResponse.json(
-      { error: "Erro ao buscar dados financeiros" },
-      { status: 500 }
-    )
+    return apiError("Erro ao buscar dados financeiros")
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const data = await request.json()
     const { error } = validate(createTransactionSchema, data)
@@ -85,16 +73,13 @@ export async function POST(request: Request) {
         paymentStatus: "PENDING",
         notes: data.notes ? sanitizeHtml(data.notes) : null,
         patientId: data.patientId || null,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
     })
 
-    return NextResponse.json(transaction, { status: 201 })
+    return apiSuccess(transaction, 201)
   } catch (error) {
     logger.error("Error creating transaction", { error: String(error) })
-    return NextResponse.json(
-      { error: "Erro ao criar transação" },
-      { status: 500 }
-    )
+    return apiError("Erro ao criar transação")
   }
 }

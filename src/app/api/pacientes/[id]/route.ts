@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { logAudit, sanitizeHtml } from "@/lib/security"
 import { validate, updatePatientSchema } from "@/lib/validation"
+import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const patient = await prisma.patient.findFirst({
       where: {
         id: params.id,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
       include: {
         appointments: {
@@ -41,19 +37,13 @@ export async function GET(
     })
 
     if (!patient) {
-      return NextResponse.json(
-        { error: "Paciente não encontrado" },
-        { status: 404 }
-      )
+      return apiError("Paciente não encontrado", 404)
     }
 
-    return NextResponse.json(patient)
+    return apiSuccess(patient)
   } catch (error) {
     console.error("Error fetching patient:", error)
-    return NextResponse.json(
-      { error: "Erro ao buscar paciente" },
-      { status: 500 }
-    )
+    return apiError("Erro ao buscar paciente")
   }
 }
 
@@ -62,10 +52,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
+    const psychologistId = await requireAuth()
 
     const raw = await request.json()
     const result = validate(updatePatientSchema, raw)
@@ -82,26 +69,23 @@ export async function PUT(
     const patient = await prisma.patient.update({
       where: {
         id: params.id,
-        psychologistId: (session.user as { id: string }).id,
+        psychologistId,
       },
       data,
     })
 
     await logAudit(
-      (session.user as { id: string }).id,
+      psychologistId,
       "UPDATE",
       "Patient",
       patient.id,
       `Paciente ${patient.name} atualizado`
     )
 
-    return NextResponse.json(patient)
+    return apiSuccess(patient)
   } catch (error) {
     console.error("Error updating patient:", error)
-    return NextResponse.json(
-      { error: "Erro ao atualizar paciente" },
-      { status: 500 }
-    )
+    return apiError("Erro ao atualizar paciente")
   }
 }
 
@@ -110,18 +94,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
-    }
-
-    const psychologistId = (session.user as { id: string }).id
+    const psychologistId = await requireAuth()
 
     const patient = await prisma.patient.findFirst({
       where: { id: params.id, psychologistId },
     })
     if (!patient) {
-      return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
+      return apiError("Paciente não encontrado", 404)
     }
 
     await prisma.$transaction([
@@ -145,12 +124,9 @@ export async function DELETE(
       "Paciente removido"
     )
 
-    return NextResponse.json({ message: "Paciente removido com sucesso" })
+    return apiSuccess({ message: "Paciente removido com sucesso" })
   } catch (error) {
     console.error("Error deleting patient:", error)
-    return NextResponse.json(
-      { error: "Erro ao remover paciente" },
-      { status: 500 }
-    )
+    return apiError("Erro ao remover paciente")
   }
 }

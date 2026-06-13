@@ -79,7 +79,7 @@ export default function MeusDadosPage() {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </div>
     )
@@ -88,30 +88,30 @@ export default function MeusDadosPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Meus Dados</h1>
-        <p className="text-gray-400 text-sm mt-1">Mantenha suas informações atualizadas</p>
+        <h1 className="text-2xl font-bold text-foreground">Meus Dados</h1>
+        <p className="text-muted-foreground text-sm mt-1">Mantenha suas informações atualizadas</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
-        <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Dados Pessoais</h2>
+        <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Dados Pessoais</h2>
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-gray-300">Nome completo</Label>
-            <Input id="name" value={form.name} onChange={(e) => handleChange("name", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+            <Label htmlFor="name" className="text-foreground">Nome completo</Label>
+            <Input id="name" value={form.name} onChange={(e) => handleChange("name", e.target.value)}  />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cpf" className="text-gray-300">CPF</Label>
-              <Input id="cpf" value={form.cpf} onChange={(e) => handleChange("cpf", maskCpf(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="cpf" className="text-foreground">CPF</Label>
+              <Input id="cpf" value={form.cpf} onChange={(e) => handleChange("cpf", maskCpf(e.target.value))}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dateOfBirth" className="text-gray-300">Data de Nascimento</Label>
-              <Input id="dateOfBirth" type="date" value={form.dateOfBirth} onChange={(e) => handleChange("dateOfBirth", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12 [color-scheme:dark]" />
+              <Label htmlFor="dateOfBirth" className="text-foreground">Data de Nascimento</Label>
+              <Input id="dateOfBirth" type="date" value={form.dateOfBirth} onChange={(e) => handleChange("dateOfBirth", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gender" className="text-gray-300">Gênero</Label>
+              <Label htmlFor="gender" className="text-foreground">Gênero</Label>
               <Select value={form.gender} onValueChange={(v) => handleChange("gender", v)}>
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                <SelectTrigger >
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
@@ -123,13 +123,13 @@ export default function MeusDadosPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profession" className="text-gray-300">Profissão</Label>
-              <Input id="profession" value={form.profession} onChange={(e) => handleChange("profession", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="profession" className="text-foreground">Profissão</Label>
+              <Input id="profession" value={form.profession} onChange={(e) => handleChange("profession", e.target.value)}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="maritalStatus" className="text-gray-300">Estado Civil</Label>
+              <Label htmlFor="maritalStatus" className="text-foreground">Estado Civil</Label>
               <Select value={form.maritalStatus} onValueChange={(v) => handleChange("maritalStatus", v)}>
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                <SelectTrigger >
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
@@ -144,43 +144,43 @@ export default function MeusDadosPage() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Contato</h2>
+        <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Contato</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Input id="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-gray-300">WhatsApp</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => handleChange("phone", maskPhone(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="phone" className="text-foreground">WhatsApp</Label>
+              <Input id="phone" value={form.phone} onChange={(e) => handleChange("phone", maskPhone(e.target.value))}  />
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Endereço</h2>
+        <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Endereço</h2>
           <div className="space-y-2">
-            <Label htmlFor="zipCode" className="text-gray-300">CEP</Label>
-              <Input id="zipCode" value={form.zipCode} onChange={(e) => handleChange("zipCode", maskCep(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
+            <Label htmlFor="zipCode" className="text-foreground">CEP</Label>
+              <Input id="zipCode" value={form.zipCode} onChange={(e) => handleChange("zipCode", maskCep(e.target.value))}  />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="address" className="text-gray-300">Endereço</Label>
-            <Input id="address" value={form.address} onChange={(e) => handleChange("address", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+            <Label htmlFor="address" className="text-foreground">Endereço</Label>
+            <Input id="address" value={form.address} onChange={(e) => handleChange("address", e.target.value)}  />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="neighborhood" className="text-gray-300">Bairro</Label>
-              <Input id="neighborhood" value={form.neighborhood} onChange={(e) => handleChange("neighborhood", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="neighborhood" className="text-foreground">Bairro</Label>
+              <Input id="neighborhood" value={form.neighborhood} onChange={(e) => handleChange("neighborhood", e.target.value)}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city" className="text-gray-300">Cidade</Label>
-              <Input id="city" value={form.city} onChange={(e) => handleChange("city", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="city" className="text-foreground">Cidade</Label>
+              <Input id="city" value={form.city} onChange={(e) => handleChange("city", e.target.value)}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="state" className="text-gray-300">Estado</Label>
+              <Label htmlFor="state" className="text-foreground">Estado</Label>
               <Select value={form.state} onValueChange={(v) => handleChange("state", v)}>
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white h-12">
+                <SelectTrigger >
                   <SelectValue placeholder="UF" />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,16 +193,16 @@ export default function MeusDadosPage() {
           </div>
         </div>
 
-        <div className="bg-slate-900/50 rounded-2xl p-6 ring-1 ring-slate-700/50 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Emergência</h2>
+        <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Emergência</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="emergencyContact" className="text-gray-300">Contato de Emergência</Label>
-              <Input id="emergencyContact" value={form.emergencyContact} onChange={(e) => handleChange("emergencyContact", e.target.value)} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="emergencyContact" className="text-foreground">Contato de Emergência</Label>
+              <Input id="emergencyContact" value={form.emergencyContact} onChange={(e) => handleChange("emergencyContact", e.target.value)}  />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="emergencyPhone" className="text-gray-300">Telefone de Emergência</Label>
-              <Input id="emergencyPhone" value={form.emergencyPhone} onChange={(e) => handleChange("emergencyPhone", maskPhone(e.target.value))} className="bg-slate-800 border-slate-700 text-white h-12" />
+              <Label htmlFor="emergencyPhone" className="text-foreground">Telefone de Emergência</Label>
+              <Input id="emergencyPhone" value={form.emergencyPhone} onChange={(e) => handleChange("emergencyPhone", maskPhone(e.target.value))}  />
             </div>
           </div>
         </div>

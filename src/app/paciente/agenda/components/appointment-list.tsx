@@ -69,48 +69,48 @@ export function AppointmentList({
     <>
       {upcoming.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Próximas consultas</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Próximas consultas</h2>
           <div className="space-y-3">
             {upcoming.map((a) => (
-              <div key={a.id} className="bg-slate-800/50 hover:bg-slate-800 rounded-xl p-4 ring-1 ring-slate-700/50 transition-all">
+              <div key={a.id} className="bg-card hover:bg-accent rounded-xl p-4 ring-1 ring-border transition-all">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
-                    <Calendar className="h-6 w-6 text-emerald-400" />
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Calendar className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium">{formatDateBR(a.startTime)}</p>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-foreground font-medium">{formatDateBR(a.startTime)}</p>
+                    <p className="text-foreground text-sm">
                       <Clock className="h-3.5 w-3.5 inline mr-1" />
                       {formatTime(a.startTime)} — {formatTime(a.endTime)}
                     </p>
                   </div>
-                  <div className="text-xs text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-full">
+                  <div className="text-xs text-primary bg-primary/10 px-3 py-1 rounded-full">
                     {a.modality === "online" ? "Online" : "Presencial"}
                   </div>
                   <Dialog open={cancelTarget === a.id} onOpenChange={(open) => { if (!open) { setCancelTarget(null); setCancelReason("") } }}>
                     <DialogTrigger asChild>
                       <button onClick={() => setCancelTarget(a.id)} disabled={cancelling === a.id}
-                        className="text-gray-500 hover:text-red-400 transition-colors p-1 disabled:opacity-50" title="Cancelar consulta">
+                        className="text-muted-foreground hover:text-red-400 transition-colors p-1 disabled:opacity-50" title="Cancelar consulta">
                         {cancelling === a.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-5 w-5" />}
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="bg-slate-900 border-slate-700 text-white max-w-sm">
+                    <DialogContent className="max-w-sm">
                       <DialogHeader>
                         <DialogTitle>Cancelar consulta</DialogTitle>
-                        <DialogDescription className="text-gray-400">
+                        <DialogDescription className="text-muted-foreground">
                           Tem certeza que deseja cancelar a consulta do dia {formatDateBR(a.startTime)}?
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <label className="text-sm text-gray-300 block mb-1">Motivo (opcional)</label>
+                          <label className="text-sm text-foreground block mb-1">Motivo (opcional)</label>
                           <Input placeholder="Ex: imprevisto, mudança de horário..." value={cancelReason}
                             onChange={(e) => setCancelReason(e.target.value)}
-                            className="bg-slate-800 border-slate-600 text-white placeholder:text-gray-500" />
+                            />
                         </div>
                         <div className="flex gap-3">
                           <DialogClose asChild>
-                            <Button variant="outline" className="flex-1 border-slate-600 text-gray-300">Voltar</Button>
+                            <Button variant="outline" className="flex-1">Voltar</Button>
                           </DialogClose>
                           <Button variant="destructive" className="flex-1" disabled={cancelling === a.id}
                             onClick={() => handleCancel(a.id, cancelReason)}>
@@ -130,17 +130,17 @@ export function AppointmentList({
 
       {past.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Histórico</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Histórico</h2>
           <div className="space-y-2">
             {past.slice(0, 5).map((a) => (
-              <div key={a.id} className="bg-slate-800/30 rounded-xl p-3 ring-1 ring-slate-700/30">
+              <div key={a.id} className="bg-card rounded-xl p-3 ring-1 ring-border">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-                    <Clock className="h-5 w-5 text-gray-400" />
+                  <div className="h-10 w-10 rounded-lg bg-card flex items-center justify-center shrink-0">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-300 text-sm">{formatDateBR(a.startTime)} — {formatTime(a.startTime)}</p>
-                    <p className="text-gray-500 text-xs">{a.status === "CANCELLED" ? "Cancelada" : "Realizada"}</p>
+                    <p className="text-foreground text-sm">{formatDateBR(a.startTime)} — {formatTime(a.startTime)}</p>
+                    <p className="text-muted-foreground text-xs">{a.status === "CANCELLED" ? "Cancelada" : "Realizada"}</p>
                   </div>
                 </div>
               </div>
