@@ -99,8 +99,8 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center transition-colors">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -119,20 +119,20 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <PatientAuthContext.Provider value={{ patient, token, login, logout, loading }}>
-      <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors">
+      <div className="min-h-screen bg-background">
         {patient && (
-          <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+          <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 group">
                 <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
                   <img src="/logo.png" alt="PsicoFlow" className="w-full h-full object-cover" />
                 </div>
-                <span className="text-slate-900 dark:text-white font-semibold text-sm">PsicoFlow</span>
+                <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
               </Link>
               <div className="flex items-center gap-2 sm:gap-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
                   aria-label="Alternar tema"
                 >
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -140,44 +140,44 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                 </button>
                 <nav className="hidden sm:flex items-center gap-1">
                 <Link href="/paciente" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   Início
                 </Link>
                 <Link href="/paciente/agenda" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/agenda" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente/agenda" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <CalendarDays className="h-3.5 w-3.5" />
                   Agenda
                 </Link>
                 <Link href="/paciente/diario" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/diario" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente/diario" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <BookHeart className="h-3.5 w-3.5" />
                   Diário
                 </Link>
                 <Link href="/paciente/historico" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/historico" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente/historico" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <History className="h-3.5 w-3.5" />
                   Histórico
                 </Link>
                 <Link href="/paciente/meus-dados" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/meus-dados" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente/meus-dados" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <User className="h-3.5 w-3.5" />
                   Meus Dados
                 </Link>
                 <Link href="/paciente/faturas" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/faturas" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  pathname === "/paciente/faturas" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                 }`}>
                   <Receipt className="h-3.5 w-3.5" />
                   Faturas
                 </Link>
               </nav>
-              <span className="hidden sm:block text-slate-700 dark:text-gray-300 text-sm">{patient.name}</span>
-                <button onClick={logout} className="text-xs text-slate-400 dark:text-gray-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+              <span className="hidden sm:block text-muted-foreground text-sm">{patient.name}</span>
+                <button onClick={logout} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   Sair
                 </button>
               </div>

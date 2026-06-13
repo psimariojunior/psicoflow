@@ -4,8 +4,9 @@ import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useTheme } from "next-themes"
 import toast from "react-hot-toast"
-import { Loader2, Lock, CheckCircle } from "lucide-react"
+import { Loader2, Lock, CheckCircle, Sun, Moon } from "lucide-react"
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams()
@@ -15,6 +16,7 @@ function ResetPasswordForm() {
   const [confirm, setConfirm] = useState("")
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const { theme, setTheme } = useTheme()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,7 +44,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-slate-400 dark:text-gray-400">Link inválido. Solicite um novo link de recuperação.</p>
+        <p className="text-muted-foreground">Link inválido. Solicite um novo link de recuperação.</p>
       </div>
     )
   }
@@ -50,11 +52,11 @@ function ResetPasswordForm() {
   if (done) {
     return (
       <div className="w-full max-w-sm text-center">
-        <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/15 mb-6">
-          <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+        <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/15 mb-6">
+          <CheckCircle className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Senha redefinida!</h1>
-        <p className="text-slate-500 dark:text-gray-300 text-sm mb-6">Sua senha foi alterada com sucesso.</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Senha redefinida!</h1>
+        <p className="text-muted-foreground text-sm mb-6">Sua senha foi alterada com sucesso.</p>
         <Button className="w-full h-12" onClick={() => router.push("/paciente/login")}>
           Ir para o login
         </Button>
@@ -65,8 +67,16 @@ function ResetPasswordForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Nova senha</h1>
-        <p className="text-slate-500 dark:text-gray-300 text-sm">Digite sua nova senha</p>
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="float-right flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+          aria-label="Alternar tema"
+        >
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        </button>
+        <h1 className="text-2xl font-bold text-foreground mb-1">Nova senha</h1>
+        <p className="text-muted-foreground text-sm">Digite sua nova senha</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -74,18 +84,16 @@ function ResetPasswordForm() {
           placeholder="Nova senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
         />
         <Input
           type="password"
           placeholder="Confirmar senha"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
         />
         <Button
           type="submit"
-          className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl"
+          className="w-full h-12 text-base font-semibold"
           disabled={loading || !password.trim() || !confirm.trim()}
         >
           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-5 w-5 mr-2" />}
@@ -98,11 +106,11 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen bg-white dark:bg-slate-950">
+    <div className="flex min-h-screen bg-background">
       <div className="flex-1 flex items-center justify-center p-4">
         <Suspense fallback={
           <div className="flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-600 dark:text-emerald-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         }>
           <ResetPasswordForm />

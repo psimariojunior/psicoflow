@@ -1,20 +1,31 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import toast from "react-hot-toast"
-import { Loader2, Mail, ArrowLeft, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { Loader2, Mail, ArrowLeft, CheckCircle, Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 
-export default function RecuperarSenhaPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const { theme, setTheme } = useTheme()
+
+  // Rate limit: max 1 request per email every 2 minutes
+  const [lastRequest, setLastRequest] = useState(0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
+
+    const now = Date.now()
+    if (now - lastRequest < 120_000) {
+      toast.error("Aguarde 2 minutos para uma nova tentativa")
+      return
+    }
 
     setLoading(true)
     try {
@@ -24,7 +35,8 @@ export default function RecuperarSenhaPage() {
         body: JSON.stringify({ email: email.trim() }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Erro ao enviar")
+      if (!res.ok) throw new Error(data.error || "Erro ao enviar email")
+      setLastRequest(now)
       setSent(true)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao enviar email")
@@ -35,19 +47,27 @@ export default function RecuperarSenhaPage() {
 
   if (sent) {
     return (
-      <div className="flex min-h-screen bg-white dark:bg-slate-950">
+      <div className="flex min-h-screen bg-background">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm text-center">
-            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/15 mb-6">
-              <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="float-right flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+              aria-label="Alternar tema"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </button>
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/15 mb-6">
+              <CheckCircle className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Email enviado!</h1>
-            <p className="text-slate-500 dark:text-gray-300 text-sm leading-relaxed">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Email enviado!</h1>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Se o email estiver cadastrado, você receberá um link para redefinir sua senha em instantes.
             </p>
             <Link
               href="/paciente/login"
-              className="inline-flex items-center gap-2 mt-6 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
+              className="inline-flex items-center gap-2 mt-6 text-sm text-primary hover:text-primary/80"
             >
               <ArrowLeft className="h-4 w-4" /> Voltar ao login
             </Link>
@@ -58,12 +78,20 @@ export default function RecuperarSenhaPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white dark:bg-slate-950">
+    <div className="flex min-h-screen bg-background">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Recuperar senha</h1>
-            <p className="text-slate-500 dark:text-gray-300 text-sm">Receba um link para redefinir sua senha</p>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="float-right flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+              aria-label="Alternar tema"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </button>
+            <h1 className="text-2xl font-bold text-foreground mb-1">Recuperar senha</h1>
+            <p className="text-muted-foreground text-sm">Receba um link para redefinir sua senha</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -71,11 +99,10 @@ export default function RecuperarSenhaPage() {
               placeholder="Seu email cadastrado"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-400 h-12"
             />
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl"
+              className="w-full h-12 text-base font-semibold"
               disabled={loading || !email.trim()}
             >
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Mail className="h-5 w-5 mr-2" />}
@@ -83,7 +110,7 @@ export default function RecuperarSenhaPage() {
             </Button>
           </form>
           <p className="text-center mt-6">
-            <Link href="/paciente/login" className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+            <Link href="/paciente/login" className="text-sm text-primary hover:text-primary/80 transition-colors">
               <ArrowLeft className="h-4 w-4 inline mr-1" /> Voltar ao login
             </Link>
           </p>
