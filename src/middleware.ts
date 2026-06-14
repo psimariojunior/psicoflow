@@ -16,7 +16,7 @@ const publicApiPrefixes = [
   "/api/auth", "/api/livekit", "/api/disponibilidade/public",
   "/api/agendamentos/public", "/api/pacientes/auth",
   "/api/pacientes/agendamentos", "/api/pacientes/diario",
-  "/api/pacientes/me", "/api/pacientes/invoices",
+  "/api/pacientes/me",   "/api/pacientes/invoices", "/api/pacientes/auth/refresh",
   "/api/cron", "/api/health",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
   "/api/pagamentos/public-checkout",

@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger"
 import { validate, createTransactionSchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { logAudit } from "@/lib/security"
 
 export async function GET(request: NextRequest) {
   try {
@@ -77,6 +78,7 @@ export async function POST(request: Request) {
       },
     })
 
+    logAudit(psychologistId, "CREATE", "FinancialTransaction", transaction.id, `${data.type}: ${data.description}`).catch(() => {})
     return apiSuccess(transaction, 201)
   } catch (error) {
     logger.error("Error creating transaction", { error: String(error) })

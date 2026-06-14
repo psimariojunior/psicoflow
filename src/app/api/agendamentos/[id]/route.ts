@@ -3,6 +3,7 @@ import { AppointmentStatus } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { scheduleReminders, cancelPendingReminders } from "@/lib/notifications"
+import { logAudit } from "@/lib/security"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
@@ -85,6 +86,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       (e) => logger.error("cancelPendingReminders failed", { error: String(e) })
     )
     await prisma.appointment.delete({ where: { id: params.id } })
+    logAudit(psychologistId, "DELETE", "Appointment", params.id, `Consulta: ${existing.startTime.toISOString()}`).catch(() => {})
     return apiSuccess({ message: "Agendamento cancelado com sucesso" })
   } catch (error) {
     logger.error("Error deleting appointment", { error: String(error) })

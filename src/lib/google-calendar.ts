@@ -16,7 +16,7 @@ function cleanupNonces() {
 export function getOAuth2Client() {
   const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID
   const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/integrations/google-calendar`
+  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/integrations/google-calendar/callback`
 
   if (!clientId || !clientSecret) {
     throw new Error("Google Calendar OAuth credentials not configured")
