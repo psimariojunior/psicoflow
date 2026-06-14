@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import toast from "react-hot-toast"
 
 export function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
@@ -20,41 +20,36 @@ export function PwaInstallPrompt() {
     return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [])
 
+  const handleInstall = useCallback(() => {
+    if (deferredPrompt) {
+      (deferredPrompt as unknown as { prompt: () => Promise<void> }).prompt()
+      setDeferredPrompt(null)
+      return
+    }
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (isMobile) {
+      toast("No Chrome: menu \u22EE > Adicionar \u00E0 tela inicial\nNo Safari: compartilhar > Adicionar \u00E0 tela de in\u00EDcio", { duration: 5000 })
+    } else {
+      toast("Clique no \u00EDcone de instalar na barra de endere\u00E7o do navegador", { duration: 5000 })
+    }
+  }, [deferredPrompt])
+
   if (dismissed || isStandalone) return null
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 items-end">
-      {deferredPrompt ? (
-        <Button
-          size="sm"
-          className="shadow-lg gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-          onClick={() => {
-            (deferredPrompt as unknown as { prompt: () => Promise<void> }).prompt()
-            setDeferredPrompt(null)
-          }}
-        >
-          <Download className="h-4 w-4" />
-          Instalar App
-        </Button>
-      ) : (
-        <div className="relative">
-          <button
-            onClick={() => setDismissed(true)}
-            className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20"
-          >
-            <X className="h-3 w-3" />
-          </button>
-          <div className="bg-card border rounded-lg shadow-lg p-3 max-w-[240px] text-sm">
-            <p className="font-medium mb-1">Instale o PsicoFlow</p>
-            <p className="text-xs text-muted-foreground mb-2">
-              No Chrome: menu ⋮ &rarr; Adicionar &agrave; tela inicial
-            </p>
-            <p className="text-xs text-muted-foreground">
-              No Safari: compartilhar &rarr; Adicionar &agrave; tela de in&iacute;cio
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
+    <Button
+      size="sm"
+      className="fixed bottom-20 right-4 z-50 shadow-lg gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+      onClick={handleInstall}
+    >
+      <Download className="h-4 w-4" />
+      Instalar App
+      <button
+        onClick={(e) => { e.stopPropagation(); setDismissed(true) }}
+        className="ml-1 h-4 w-4 rounded-full flex items-center justify-center hover:bg-white/20"
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </Button>
   )
 }
