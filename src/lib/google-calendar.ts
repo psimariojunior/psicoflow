@@ -1,6 +1,17 @@
 import { google } from "googleapis"
+import { randomUUID } from "crypto"
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+
+const nonceStore = new Map<string, string>()
+const NONCE_TTL = 10 * 60_000
+
+function cleanupNonces() {
+  const now = Date.now()
+  for (const [key, timestamp] of nonceStore) {
+    if (now - Number(timestamp) > NONCE_TTL) nonceStore.delete(key)
+  }
+}
 
 export function getOAuth2Client() {
   const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID
@@ -16,12 +27,27 @@ export function getOAuth2Client() {
 
 export function getAuthUrl(psychologistId: string): string {
   const oauth2Client = getOAuth2Client()
+  const nonce = randomUUID()
+  nonceStore.set(nonce, String(Date.now()))
+  cleanupNonces()
   return oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
-    state: psychologistId,
+    state: JSON.stringify({ id: psychologistId, nonce }),
     prompt: "consent",
   })
+}
+
+export function verifyOAuthState(state: string): { id: string; valid: boolean } {
+  try {
+    const parsed = JSON.parse(state)
+    const stored = nonceStore.get(parsed.nonce)
+    if (!stored) return { id: parsed.id, valid: false }
+    nonceStore.delete(parsed.nonce)
+    return { id: parsed.id, valid: true }
+  } catch {
+    return { id: state, valid: false }
+  }
 }
 
 export async function getCalendarClient(refreshToken: string) {

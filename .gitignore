@@ -19,3 +19,4 @@ out/
 .vercel
 
 backups/
+deploy/.env.docker

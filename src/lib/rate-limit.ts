@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server"
 
 const store = new Map<string, { count: number; resetAt: number }>()
+const CLEANUP_INTERVAL = 60_000
+let lastCleanup = Date.now()
+function cleanupStore() {
+  const now = Date.now()
+  if (now - lastCleanup < CLEANUP_INTERVAL) return
+  lastCleanup = now
+  for (const [key, value] of store) {
+    if (now > value.resetAt) store.delete(key)
+  }
+}
 
 let redis: { get: (key: string) => Promise<unknown>; set: (key: string, value: unknown, opts?: { ex?: number }) => Promise<unknown> } | null = null
 try {
@@ -39,6 +49,7 @@ export function rateLimit(limit = 30, windowMs = 60000) {
     }
     
     const memoryKey = getMemoryKey(ip)
+    cleanupStore()
     const record = store.get(memoryKey)
 
     if (!record || now > record.resetAt) {

@@ -46,6 +46,19 @@ export default withAuth(
 
     const response = NextResponse.next()
 
+    const origin = req.headers.get("origin") || ""
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""),
+      "https://psicoflow-iota.vercel.app",
+      "http://localhost:3000",
+    ].filter(Boolean) as string[]
+    if (origin && allowedOrigins.includes(origin)) {
+      response.headers.set("Access-Control-Allow-Origin", origin)
+      response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+      response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      response.headers.set("Access-Control-Max-Age", "86400")
+    }
+
     response.headers.set("X-Frame-Options", "DENY")
     response.headers.set("X-Content-Type-Options", "nosniff")
     response.headers.set("X-XSS-Protection", "1; mode=block")

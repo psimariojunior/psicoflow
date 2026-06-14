@@ -17,7 +17,7 @@ export interface PatientTokenPayload {
 export async function signPatientToken(payload: PatientTokenPayload): Promise<string> {
   return new SignJWT({ ...payload, jti: randomUUID() })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
+    .setExpirationTime("24h")
     .sign(getSecret())
 }
 

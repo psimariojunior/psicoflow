@@ -23,7 +23,7 @@ describe("encrypt/decrypt", () => {
   const originalKey = process.env.ENCRYPTION_KEY
 
   beforeAll(() => {
-    process.env.ENCRYPTION_KEY = "TNjALRQDFqX1ysa8w3JZW57ctEM6pemv"
+    process.env.ENCRYPTION_KEY = "test-key-not-used-in-production-abcdef123456"
   })
 
   afterAll(() => {

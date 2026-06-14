@@ -1,4 +1,5 @@
 import { Resend } from "resend"
+import { sanitizeHtml } from "./security"
 
 const resend = new Resend(process.env.RESEND_API_KEY || "")
 
@@ -121,6 +122,8 @@ export async function sendAppointmentReminderEmail(
   type: string,
   modality: string
 ): Promise<string | null> {
+  const safePatientName = sanitizeHtml(patientName)
+  const safePsychologistName = sanitizeHtml(psychologistName)
   return sendEmail(
     to,
     "Lembrete de Consulta - PsicoFlow",
@@ -130,14 +133,14 @@ export async function sendAppointmentReminderEmail(
         <p style="color: #666; margin: 0;">Seu lembrete de consulta</p>
       </div>
       <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
-        <p style="font-size: 1.125rem; margin: 0 0 16px;">Olá, <strong>${patientName}</strong>!</p>
+        <p style="font-size: 1.125rem; margin: 0 0 16px;">Olá, <strong>${safePatientName}</strong>!</p>
         <p style="margin: 0 0 8px;">Você tem uma consulta agendada:</p>
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; color: #666;">Data</td><td style="padding: 8px 0;"><strong>${date}</strong></td></tr>
           <tr><td style="padding: 8px 0; color: #666;">Horário</td><td style="padding: 8px 0;"><strong>${time}</strong></td></tr>
           <tr><td style="padding: 8px 0; color: #666;">Tipo</td><td style="padding: 8px 0;"><strong>${type}</strong></td></tr>
           <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "online" ? "Online" : "Presencial"}</strong></td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Psicólogo(a)</td><td style="padding: 8px 0;"><strong>${psychologistName}</strong></td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Psicólogo(a)</td><td style="padding: 8px 0;"><strong>${safePsychologistName}</strong></td></tr>
         </table>
         ${modality === "online"
           ? '<p style="margin-top: 16px; padding: 12px; background: #e0f2fe; border-radius: 6px; font-size: 0.875rem;">A consulta ser\u00e1 online. Acesse o link da sala virtual no momento da consulta.</p>'
