@@ -8,9 +8,9 @@ const NONCE_TTL = 10 * 60_000
 
 function cleanupNonces() {
   const now = Date.now()
-  for (const [key, timestamp] of nonceStore) {
+  nonceStore.forEach((timestamp, key) => {
     if (now - Number(timestamp) > NONCE_TTL) nonceStore.delete(key)
-  }
+  })
 }
 
 export function getOAuth2Client() {

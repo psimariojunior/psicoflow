@@ -7,9 +7,9 @@ function cleanupStore() {
   const now = Date.now()
   if (now - lastCleanup < CLEANUP_INTERVAL) return
   lastCleanup = now
-  for (const [key, value] of store) {
+  store.forEach((value, key) => {
     if (now > value.resetAt) store.delete(key)
-  }
+  })
 }
 
 let redis: { get: (key: string) => Promise<unknown>; set: (key: string, value: unknown, opts?: { ex?: number }) => Promise<unknown> } | null = null
