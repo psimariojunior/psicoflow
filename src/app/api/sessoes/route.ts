@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
@@ -21,18 +21,23 @@ const createSessionSchema = z.object({
   appointmentId: z.string().optional(),
 })
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const psychologistId = await requireAuth()
+    const { searchParams } = new URL(request.url)
+    const patientId = searchParams.get("patientId")
 
     const sessions = await prisma.therapySession.findMany({
-      where: { psychologistId },
+      where: {
+        psychologistId,
+        ...(patientId ? { patientId } : {}),
+      },
       include: {
         patient: { select: { id: true, name: true } },
         appointment: { select: { id: true, startTime: true } },
       },
       orderBy: { date: "desc" },
-      take: 50,
+      take: patientId ? 200 : 50,
     })
 
     return apiSuccess(sessions)

@@ -5,13 +5,17 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { getInitials, calculateAge, formatDateTime } from "@/lib/utils"
+import { RichTextEditor } from "@/components/prontuario/rich-text-editor"
+import { SessionTimeline } from "@/components/prontuario/session-timeline"
 import toast from "react-hot-toast"
-import { Play, Pause, Square, Clock, Save, User, FileText, Calendar, MapPin, Video, Loader2, ChevronLeft, CheckCircle } from "lucide-react"
+import { Play, Pause, Square, Clock, Save, User, FileText, Calendar, MapPin, Video, Loader2, ChevronLeft, CheckCircle, Sparkles, Heart, Activity, Brain, Quote, ListTodo, Target, Eye } from "lucide-react"
 import Link from "next/link"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 interface SessionData {
   id: string
@@ -55,6 +59,18 @@ interface SessionData {
   } | null
 }
 
+interface SessionListItem {
+  id: string
+  date: string
+  createdAt: string
+  status: string
+  moodBefore?: number | null
+  moodAfter?: number | null
+  type?: string | null
+  notes?: string | null
+  tags?: string | null
+}
+
 function formatTimer(seconds: number): string {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
@@ -62,14 +78,24 @@ function formatTimer(seconds: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
 }
 
+const moodEmoji = (m: number | null | undefined) => {
+  if (m == null) return "—"
+  if (m <= 3) return "😔"
+  if (m <= 5) return "😐"
+  if (m <= 7) return "🙂"
+  return "😊"
+}
+
 export default function SessionPage() {
   const params = useParams()
   const router = useRouter()
   const [session, setSession] = useState<SessionData | null>(null)
+  const [allSessions, setAllSessions] = useState<SessionListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [dirty, setDirty] = useState(false)
+  const [tab, setTab] = useState<"soap" | "timeline" | "gestalt">("soap")
 
   const [subjective, setSubjective] = useState("")
   const [objective, setObjective] = useState("")
@@ -81,6 +107,10 @@ export default function SessionPage() {
   const [tags, setTags] = useState("")
   const [sessionType, setSessionType] = useState("")
   const [isRemote, setIsRemote] = useState(false)
+
+  const [gestaltTechniques, setGestaltTechniques] = useState("")
+  const [gestaltAwareness, setGestaltAwareness] = useState("")
+  const [gestaltCycle, setGestaltCycle] = useState("")
 
   const autoSaveRef = useRef<NodeJS.Timeout | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -109,6 +139,15 @@ export default function SessionPage() {
         } else if (data.duration) {
           setElapsed(data.duration)
         }
+
+        const hist = await fetch(`/api/sessoes?patientId=${data.patient.id}`)
+        if (hist.ok) {
+          const list = await hist.json()
+          setAllSessions(
+            (Array.isArray(list) ? list : list.data || [])
+              .filter((s: SessionListItem) => s.id !== data.id)
+          )
+        }
       } catch {
         toast.error("Erro ao carregar sessão")
         router.push("/agenda")
@@ -134,10 +173,22 @@ export default function SessionPage() {
     if (!dirty || !session) return
     setSaving(true)
     try {
+      const body: Record<string, unknown> = {
+        subjective, objective, assessment, plan, notes,
+        moodBefore: moodBefore ? parseInt(moodBefore) : null,
+        moodAfter: moodAfter ? parseInt(moodAfter) : null,
+        tags, type: sessionType, isRemote,
+        gestaltTechniques, gestaltAwareness, gestaltCycle,
+      }
+      if (tab === "gestalt") {
+        body.subjective = gestaltAwareness
+        body.assessment = gestaltTechniques
+        body.plan = gestaltCycle
+      }
       await fetch(`/api/sessoes/${session.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subjective, objective, assessment, plan, notes, moodBefore: moodBefore ? parseInt(moodBefore) : null, moodAfter: moodAfter ? parseInt(moodAfter) : null, tags, type: sessionType, isRemote }),
+        body: JSON.stringify(body),
       })
       setDirty(false)
     } catch {
@@ -145,7 +196,7 @@ export default function SessionPage() {
     } finally {
       setSaving(false)
     }
-  }, [dirty, session, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote])
+  }, [dirty, session, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote, gestaltTechniques, gestaltAwareness, gestaltCycle, tab])
 
   function markDirty() {
     if (!dirty) setDirty(true)
@@ -166,7 +217,13 @@ export default function SessionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action,
-          ...(action === "end" ? { subjective, objective, assessment, plan, notes, moodBefore: moodBefore ? parseInt(moodBefore) : null, moodAfter: moodAfter ? parseInt(moodAfter) : null, tags, type: sessionType, isRemote } : {}),
+          ...(action === "end" ? {
+            subjective, objective, assessment, plan, notes,
+            moodBefore: moodBefore ? parseInt(moodBefore) : null,
+            moodAfter: moodAfter ? parseInt(moodAfter) : null,
+            tags, type: sessionType, isRemote,
+            gestaltTechniques, gestaltAwareness, gestaltCycle,
+          } : {}),
         }),
       })
       if (!res.ok) {
@@ -198,7 +255,7 @@ export default function SessionPage() {
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
       </div>
     )
   }
@@ -213,18 +270,29 @@ export default function SessionPage() {
   const patient = session.patient
   const age = patient.dateOfBirth ? calculateAge(patient.dateOfBirth) : null
 
+  const statusConfig = {
+    SCHEDULED: { label: "Agendada", color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400", border: "border-blue-200 dark:border-blue-800" },
+    IN_PROGRESS: { label: "Em andamento", color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400", border: "border-emerald-200 dark:border-emerald-800" },
+    PAUSED: { label: "Pausada", color: "text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800" },
+    COMPLETED: { label: "Concluída", color: "text-slate-600 bg-slate-100 dark:bg-slate-900/30 dark:text-slate-400", border: "border-slate-200 dark:border-slate-800" },
+  }[session.status] || { label: session.status, color: "", border: "" }
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <motion.div className="space-y-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/agenda">
+            <Link href="/sessoes">
               <ChevronLeft className="h-5 w-5" />
             </Link>
           </Button>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Sessão Terapêutica</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold tracking-tight">Sessão Terapêutica</h2>
+              <Badge variant="outline" className={cn("text-xs font-normal", statusConfig.color, statusConfig.border)}>
+                {statusConfig.label}
+              </Badge>
+            </div>
             <p className="text-muted-foreground text-sm">
               {session.appointment ? formatDateTime(session.appointment.startTime) : formatDateTime(session.createdAt)}
             </p>
@@ -232,40 +300,45 @@ export default function SessionPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border ${
-            isActive ? "border-emerald-500/30 bg-emerald-500/10" : isPaused ? "border-amber-500/30 bg-amber-500/10" : "border bg-card"
-          }`}>
-            <Clock className={`h-5 w-5 ${isActive ? "text-emerald-500" : isPaused ? "text-amber-500" : "text-muted-foreground"}`} />
-            <span className={`text-2xl font-mono font-bold tabular-nums ${
+          <div className={cn(
+            "flex items-center gap-3 px-4 py-2 rounded-xl border transition-all",
+            isActive ? "border-emerald-500/30 bg-emerald-500/10 shadow-lg shadow-emerald-500/10" :
+            isPaused ? "border-amber-500/30 bg-amber-500/10" :
+            "border bg-card"
+          )}>
+            <Clock className={cn("h-5 w-5", isActive ? "text-emerald-500 animate-pulse" : isPaused ? "text-amber-500" : "text-muted-foreground")} />
+            <span className={cn("text-2xl font-mono font-bold tabular-nums",
               isActive ? "text-emerald-600 dark:text-emerald-400" : isPaused ? "text-amber-600 dark:text-amber-400" : "text-foreground"
-            }`}>
+            )}>
               {formatTimer(elapsed)}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {isScheduled && (
-              <Button onClick={() => handleAction("start")} disabled={saving}>
-                <Play className="h-4 w-4 mr-1.5" /> Iniciar
+              <Button onClick={() => handleAction("start")} disabled={saving}
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-1.5 shadow-lg shadow-emerald-500/20">
+                <Play className="h-4 w-4" /> Iniciar
               </Button>
             )}
             {isActive && (
               <>
-                <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline">
-                  <Pause className="h-4 w-4 mr-1.5" /> Pausar
+                <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline" className="gap-1.5">
+                  <Pause className="h-4 w-4" /> Pausar
                 </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive">
-                  <Square className="h-4 w-4 mr-1.5" /> Encerrar
+                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
+                  <Square className="h-4 w-4" /> Encerrar
                 </Button>
               </>
             )}
             {isPaused && (
               <>
-                <Button onClick={() => handleAction("resume")} disabled={saving}>
-                  <Play className="h-4 w-4 mr-1.5" /> Retomar
+                <Button onClick={() => handleAction("resume")} disabled={saving}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-1.5">
+                  <Play className="h-4 w-4" /> Retomar
                 </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive">
-                  <Square className="h-4 w-4 mr-1.5" /> Encerrar
+                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
+                  <Square className="h-4 w-4" /> Encerrar
                 </Button>
               </>
             )}
@@ -280,95 +353,146 @@ export default function SessionPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left — Patient Info */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-card rounded-xl p-5 border">
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-12 w-12 ring-2 ring-border">
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-                  {getInitials(patient.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold text-lg">{patient.name}</h3>
-                {age && <p className="text-muted-foreground text-xs">{age} anos</p>}
+          <motion.div className="bg-card rounded-xl border overflow-hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-5">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-14 w-14 ring-2 ring-white/30 shadow-lg">
+                  <AvatarFallback className="bg-white/20 text-white text-lg font-bold">
+                    {getInitials(patient.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-white">
+                  <h3 className="font-semibold text-lg leading-tight">{patient.name}</h3>
+                  <div className="flex items-center gap-2 text-sm text-emerald-100 mt-0.5">
+                    {age && <span>{age} anos</span>}
+                    {patient.gender && <span>• {patient.gender === "M" ? "Masculino" : patient.gender === "F" ? "Feminino" : patient.gender}</span>}
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="space-y-2.5 text-sm">
+            <div className="p-4 space-y-2.5 text-sm">
               {patient.cpf && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <FileText className="h-3.5 w-3.5" />
-                  <span>CPF: <span className="text-foreground">{patient.cpf}</span></span>
+                  <span>CPF: <span className="text-foreground font-medium">{patient.cpf}</span></span>
                 </div>
               )}
               {patient.phone && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <User className="h-3.5 w-3.5" />
-                  <span>{patient.phone}</span>
+                  <span className="text-foreground font-medium">{patient.phone}</span>
                 </div>
               )}
               {patient.email && (
-                <div className="text-muted-foreground truncate">{patient.email}</div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="truncate text-foreground font-medium">{patient.email}</span>
+                </div>
               )}
               {patient.profession && (
-                <div className="text-muted-foreground">Profissão: <span className="text-foreground">{patient.profession}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  <span className="text-foreground font-medium">{patient.profession}</span>
+                </div>
               )}
               {patient.address && (
-                <div className="text-muted-foreground text-xs leading-relaxed">
-                  {patient.address}
-                  {patient.neighborhood && `, ${patient.neighborhood}`}
-                  {patient.city && ` - ${patient.city}`}
-                  {patient.state && `/${patient.state}`}
+                <div className="flex items-start gap-2 text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5 mt-0.5" />
+                  <span className="text-xs leading-relaxed text-foreground">
+                    {patient.address}
+                    {patient.neighborhood && `, ${patient.neighborhood}`}
+                    {patient.city && ` - ${patient.city}`}
+                    {patient.state && `/${patient.state}`}
+                  </span>
+                </div>
+              )}
+              {patient.observations && (
+                <div className="pt-2 border-t mt-3">
+                  <p className="text-xs text-muted-foreground mb-1">Observações</p>
+                  <p className="text-xs text-foreground">{patient.observations}</p>
                 </div>
               )}
               {session.appointment && (
-                <div className={`flex items-center gap-2 text-xs mt-3 pt-3 border-t ${
+                <div className={cn(
+                  "flex items-center gap-2 text-xs pt-3 border-t mt-3",
                   session.appointment.modality === "online" ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"
-                }`}>
+                )}>
                   {session.appointment.modality === "online" ? <Video className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
                   <span>{session.appointment.modality === "online" ? "Online" : "Presencial"}</span>
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Mood */}
-          <div className="bg-card rounded-xl p-5 border">
-            <h4 className="text-sm font-semibold mb-3">Avaliação de Humor</h4>
+          <motion.div className="bg-card rounded-xl border p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Heart className="h-4 w-4 text-rose-400" />
+              <h4 className="text-sm font-semibold">Humor</h4>
+            </div>
             <div className="space-y-3">
               <div>
-                <Label className="text-muted-foreground text-xs">Pré-sessão (1-10)</Label>
+                <Label className="text-muted-foreground text-xs flex items-center gap-1">
+                  Pré-sessão {moodBefore && <span className="text-lg">{moodEmoji(parseInt(moodBefore))}</span>}
+                </Label>
                 <Select value={moodBefore} onValueChange={(v) => { setMoodBefore(v); markDirty() }} disabled={!canEdit}>
                   <SelectTrigger className="h-10 mt-1">
                     <SelectValue placeholder="--" />
                   </SelectTrigger>
                   <SelectContent>
                     {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                      <SelectItem key={n} value={String(n)}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: n <= 3 ? "#f87171" : n <= 5 ? "#fbbf24" : n <= 7 ? "#a3e635" : "#34d399" }} />
+                          {n} - {n <= 3 ? "Muito baixo" : n <= 5 ? "Baixo" : n <= 7 ? "Bom" : "Ótimo"}
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-muted-foreground text-xs">Pós-sessão (1-10)</Label>
+                <Label className="text-muted-foreground text-xs flex items-center gap-1">
+                  Pós-sessão {moodAfter && <span className="text-lg">{moodEmoji(parseInt(moodAfter))}</span>}
+                </Label>
                 <Select value={moodAfter} onValueChange={(v) => { setMoodAfter(v); markDirty() }} disabled={!canEdit}>
                   <SelectTrigger className="h-10 mt-1">
                     <SelectValue placeholder="--" />
                   </SelectTrigger>
                   <SelectContent>
                     {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                      <SelectItem key={n} value={String(n)}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: n <= 3 ? "#f87171" : n <= 5 ? "#fbbf24" : n <= 7 ? "#a3e635" : "#34d399" }} />
+                          {n} - {n <= 3 ? "Muito baixo" : n <= 5 ? "Baixo" : n <= 7 ? "Bom" : "Ótimo"}
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+              {moodBefore && moodAfter && (
+                <div className="pt-2 border-t">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Evolução</span>
+                    <span className={cn(
+                      "font-medium",
+                      parseInt(moodAfter) > parseInt(moodBefore) ? "text-emerald-500" :
+                      parseInt(moodAfter) < parseInt(moodBefore) ? "text-rose-500" : "text-muted-foreground"
+                    )}>
+                      {parseInt(moodAfter) > parseInt(moodBefore) ? "↑ Melhora" :
+                       parseInt(moodAfter) < parseInt(moodBefore) ? "↓ Piora" : "→ Estável"}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Session Info */}
-          <div className="bg-card rounded-xl p-5 border">
-            <h4 className="text-sm font-semibold mb-3">Informações da Sessão</h4>
+          <motion.div className="bg-card rounded-xl border p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="h-4 w-4 text-violet-400" />
+              <h4 className="text-sm font-semibold">Sessão</h4>
+            </div>
             <div className="space-y-3">
               <div>
                 <Label className="text-muted-foreground text-xs">Tipo</Label>
@@ -377,100 +501,233 @@ export default function SessionPage() {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="individual">Individual</SelectItem>
-                    <SelectItem value="casal">Casal</SelectItem>
-                    <SelectItem value="familia">Família</SelectItem>
-                    <SelectItem value="grupo">Grupo</SelectItem>
-                    <SelectItem value="supervisao">Supervisão</SelectItem>
+                    <SelectItem value="INDIVIDUAL">Individual</SelectItem>
+                    <SelectItem value="COUPLE">Casal</SelectItem>
+                    <SelectItem value="FAMILY">Família</SelectItem>
+                    <SelectItem value="GROUP">Grupo</SelectItem>
+                    <SelectItem value="SUPERVISION">Supervisão</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-muted-foreground text-xs">Tags (separadas por vírgula)</Label>
-                <Input value={tags} onChange={(e) => { setTags(e.target.value); markDirty() }} placeholder="ansiedade, TCC, autoestima" disabled={!canEdit}
-                  className="h-10 mt-1" />
+                <Label className="text-muted-foreground text-xs">Tags</Label>
+                <Input value={tags} onChange={(e) => { setTags(e.target.value); markDirty() }}
+                  placeholder="ansiedade, autoestima, luto"
+                  disabled={!canEdit} className="h-10 mt-1" />
               </div>
               {session.appointment && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-3 pt-3 border-t">
-                  <Calendar className="h-3.5 w-3.5" />
-                  <span>Agendamento vinculado</span>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
+                  <Calendar className="h-3 w-3" />
+                  <span>Vinculado ao agendamento</span>
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Right — SOAP Form */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-card rounded-xl p-5 border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Prontuário SOAP
-              </h3>
-              {dirty && <span className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-1 rounded-lg">NÃO SALVO</span>}
-            </div>
-
-            <div className="space-y-5">
-              <div>
-                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs flex items-center justify-center font-bold">S</span>
-                  Subjetivo — Relato do paciente
-                </Label>
-                <Textarea value={subjective} onChange={(e) => { setSubjective(e.target.value); markDirty() }}
-                  placeholder="O que o paciente relatou? Queixas, sentimentos, percepções..."
-                  rows={4} disabled={!canEdit} className="resize-none" />
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-green-500/20 text-green-600 dark:text-green-400 text-xs flex items-center justify-center font-bold">O</span>
-                  Objetivo — Observações do psicólogo
-                </Label>
-                <Textarea value={objective} onChange={(e) => { setObjective(e.target.value); markDirty() }}
-                  placeholder="O que você observou? Comportamento, aparência, interação..."
-                  rows={4} disabled={!canEdit} className="resize-none" />
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs flex items-center justify-center font-bold">A</span>
-                  Avaliação — Análise clínica
-                </Label>
-                <Textarea value={assessment} onChange={(e) => { setAssessment(e.target.value); markDirty() }}
-                  placeholder="Sua análise clínica: diagnóstico, progresso, insights..."
-                  rows={4} disabled={!canEdit} className="resize-none" />
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
-                  <span className="w-5 h-5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs flex items-center justify-center font-bold">P</span>
-                  Plano — Próximos passos
-                </Label>
-                <Textarea value={plan} onChange={(e) => { setPlan(e.target.value); markDirty() }}
-                  placeholder="Plano terapêutico: intervenções, tarefas, encaminhamentos..."
-                  rows={4} disabled={!canEdit} className="resize-none" />
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium mb-1.5">Observações Gerais</Label>
-                <Textarea value={notes} onChange={(e) => { setNotes(e.target.value); markDirty() }}
-                  placeholder="Informações adicionais relevantes..."
-                  rows={3} disabled={!canEdit} className="resize-none" />
-              </div>
-            </div>
+          <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border">
+            {[
+              { id: "soap" as const, label: "SOAP", icon: FileText },
+              { id: "gestalt" as const, label: "Gestalt", icon: Brain },
+              { id: "timeline" as const, label: "Histórico", icon: Activity },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                  tab === t.id
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <t.icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{t.label}</span>
+              </button>
+            ))}
+            <div className="flex-1" />
+            {dirty && (
+              <span className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Não salvo
+              </span>
+            )}
           </div>
 
+          {tab === "soap" && (
+            <motion.div className="bg-card rounded-xl border p-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
+                  <FileText className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Prontuário SOAP</h3>
+                  <p className="text-xs text-muted-foreground">Subjetivo • Objetivo • Avaliação • Plano</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                {[
+                  { letter: "S", label: "Subjetivo", desc: "Relato do paciente", hint: "O que o paciente trouxe? Queixas, sentimentos, percepções...", color: "from-blue-500 to-indigo-600", value: subjective, set: setSubjective },
+                  { letter: "O", label: "Objetivo", desc: "Observações do psicólogo", hint: "O que você observou? Comportamento, aparência, interação...", color: "from-emerald-500 to-teal-600", value: objective, set: setObjective },
+                  { letter: "A", label: "Avaliação", desc: "Análise clínica", hint: "Diagnóstico, progresso, insights, interpretação...", color: "from-amber-500 to-orange-600", value: assessment, set: setAssessment },
+                  { letter: "P", label: "Plano", desc: "Próximos passos", hint: "Intervenções, tarefas, encaminhamentos, conduta...", color: "from-purple-500 to-violet-600", value: plan, set: setPlan },
+                ].map((field) => (
+                  <div key={field.letter}>
+                    <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                      <span className={cn(
+                        "w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white shadow-sm",
+                        field.color.replace("from-", "bg-").replace(" to-*", "").split(" ")[0]
+                      )}>
+                        {field.letter}
+                      </span>
+                      {field.label}
+                      <span className="text-xs text-muted-foreground font-normal">— {field.desc}</span>
+                    </Label>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={(v) => { field.set(v); markDirty() }}
+                      placeholder={field.hint}
+                      minHeight="120px"
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <Label className="text-sm font-medium mb-1.5">Observações Gerais</Label>
+                  <RichTextEditor
+                    value={notes}
+                    onChange={(v) => { setNotes(v); markDirty() }}
+                    placeholder="Informações adicionais relevantes..."
+                    minHeight="100px"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {tab === "gestalt" && (
+            <motion.div className="bg-card rounded-xl border p-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20">
+                  <Brain className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Anotações Gestalt-Terapia</h3>
+                  <p className="text-xs text-muted-foreground">Abordagem fenomenológica • Aqui e agora • Consciência</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                    <Eye className="h-4 w-4 text-emerald-500" />
+                    Consciência (Awareness) — O que emergiu no campo
+                  </Label>
+                  <RichTextEditor
+                    value={gestaltAwareness}
+                    onChange={(v) => { setGestaltAwareness(v); markDirty() }}
+                    placeholder="Figuras que emergiram • Contato • Fronteira • Resistências • Sensações corporais • Emoções presentes..."
+                    minHeight="120px"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                    <Target className="h-4 w-4 text-violet-500" />
+                    Técnicas e Intervenções
+                  </Label>
+                  <RichTextEditor
+                    value={gestaltTechniques}
+                    onChange={(v) => { setGestaltTechniques(v); markDirty() }}
+                    placeholder="Cadeira vazia • Polaridades • Amplificação • Corpo • Sonhos • Experimentos • Diálogo..."
+                    minHeight="120px"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                    <ListTodo className="h-4 w-4 text-amber-500" />
+                    Ciclo de Contato e Fechamento
+                  </Label>
+                  <RichTextEditor
+                    value={gestaltCycle}
+                    onChange={(v) => { setGestaltCycle(v); markDirty() }}
+                    placeholder="Onde o ciclo de contato foi interrompido? • Ajustamentos criativos • Suporte necessário • Encaminhamentos..."
+                    minHeight="120px"
+                  />
+                </div>
+
+                <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 border border-emerald-100 dark:border-emerald-900/50">
+                  <div className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                    <Sparkles className="h-4 w-4" />
+                    Lembretes Gestálticos
+                  </div>
+                  <ul className="mt-2 space-y-1 text-xs text-emerald-600 dark:text-emerald-400">
+                    <li>• Focar no <strong>aqui e agora</strong> — o que está acontecendo agora?</li>
+                    <li>• Atentar para a <strong>linguagem corporal</strong> — o corpo não mente</li>
+                    <li>• Observar <strong>polaridades</strong> — &ldquo;por um lado... por outro lado...&rdquo;</li>
+                    <li>• Identificar <strong>figuras</strong> — o que emerge como mais significativo?</li>
+                    <li>• Notar <strong>evitações</strong> — onde o contato é interrompido?</li>
+                    <li>• Validar os <strong>ajustamentos criativos</strong> do paciente</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {tab === "timeline" && (
+            <motion.div className="bg-card rounded-xl border p-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+                  <Activity className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Histórico de Sessões</h3>
+                  <p className="text-xs text-muted-foreground">{allSessions.length} sessões anteriores</p>
+                </div>
+              </div>
+
+              <SessionTimeline
+                sessions={[
+                  ...allSessions.map((s) => ({ ...s, date: s.date || s.createdAt })),
+                  {
+                    id: session.id,
+                    date: session.createdAt,
+                    status: session.status,
+                    moodBefore: session.moodBefore,
+                    moodAfter: session.moodAfter,
+                    type: session.type,
+                    notes: session.notes,
+                    tags: session.tags,
+                  },
+                ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())}
+                currentId={session.id}
+                onSelect={(id) => id !== session.id && router.push(`/sessoes/${id}`)}
+              />
+            </motion.div>
+          )}
+
           {canEdit && (
-            <div className="flex justify-end">
-              <Button onClick={() => handleAction("save")} disabled={saving || !dirty} variant="secondary">
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+            <motion.div className="flex justify-end gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <Button onClick={() => handleAction("save")} disabled={saving || !dirty} variant="secondary" className="gap-2">
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Salvar Rascunho
               </Button>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
+  )
+}
+
+function Briefcase(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
   )
 }

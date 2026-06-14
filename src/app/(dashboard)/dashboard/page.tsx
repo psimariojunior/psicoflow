@@ -10,19 +10,32 @@ import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
 import { PaymentMethodsPie } from "@/components/dashboard/payment-methods-pie"
 import { KeyIndicators } from "@/components/dashboard/key-indicators"
 import { PatientGrowthChart } from "@/components/dashboard/patient-growth-chart"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ActivityFeed } from "@/components/dashboard/activity-feed"
+import { ExportModal } from "@/components/dashboard/export-modal"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, TrendingUp, CalendarX, BarChart3 } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, Activity } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 const quickActions = [
-  { label: "Nova Consulta", href: "/agenda", icon: Calendar, color: "from-blue-500 to-indigo-600", desc: "Agende um novo horário" },
-  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, color: "from-emerald-500 to-teal-600", desc: "Cadastre um paciente" },
-  { label: "Nova Sessão", href: "/prontuarios/novo", icon: FileText, color: "from-violet-500 to-purple-600", desc: "Registre um prontuário" },
-  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, color: "from-rose-500 to-pink-600", desc: "Inicie uma videochamada" },
+  { label: "Nova Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Agende um novo horário" },
+  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-emerald-500 to-teal-600", desc: "Cadastre um paciente" },
+  { label: "Nova Sessão", href: "/sessoes", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre um prontuário" },
+  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-rose-500 to-pink-600", desc: "Inicie uma videochamada" },
 ]
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+}
 
 export default function DashboardHome() {
   const [data, setData] = useState<{
@@ -38,6 +51,7 @@ export default function DashboardHome() {
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
+  const [exportOpen, setExportOpen] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -58,18 +72,18 @@ export default function DashboardHome() {
     const pct = data.financialSummary.goal > 0
       ? Math.min(100, Math.round((data.financialSummary.received / data.financialSummary.goal) * 100))
       : 0
-    const timer = setTimeout(() => setProgressWidth(pct), 100)
+    const timer = setTimeout(() => setProgressWidth(pct), 200)
     return () => clearTimeout(timer)
   }, [data])
 
   if (loading) {
     return (
-      <div className="space-y-8 animate-fade-in">
+      <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
         <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-card rounded-xl animate-pulse" />)}
         </div>
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -85,8 +99,7 @@ export default function DashboardHome() {
             <div className="h-64 bg-card rounded-xl animate-pulse" />
           </div>
         </div>
-        <div className="h-48 bg-card rounded-xl animate-pulse" />
-      </div>
+      </motion.div>
     )
   }
 
@@ -96,20 +109,19 @@ export default function DashboardHome() {
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
   const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
 
-  const progressToGoal = financialSummary.goal > 0
-    ? Math.min(100, Math.round((financialSummary.received / financialSummary.goal) * 100))
-    : 0
-
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+    <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">Visão geral da sua prática clínica</p>
+          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            Dashboard
+          </h2>
+          <p className="text-muted-foreground mt-1">Visão geral da sua prática clínica</p>
         </div>
         <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/agenda"><Calendar className="mr-2 h-4 w-4" />Ver Agenda</Link>
+          <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
           </Button>
           <Button asChild size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25">
             <Link href="/agenda"><Plus className="mr-2 h-4 w-4" />Nova Consulta</Link>
@@ -117,18 +129,22 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      <StatsCards stats={stats} />
+      <motion.div variants={itemVariants}>
+        <StatsCards stats={stats} />
+      </motion.div>
 
-      <KeyIndicators indicators={indicators} />
+      <motion.div variants={itemVariants}>
+        <KeyIndicators indicators={indicators} />
+      </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <motion.div variants={itemVariants} className="grid gap-4 md:grid-cols-4">
         {quickActions.map((action) => (
           <Link key={action.label} href={action.href}>
-            <Card className="group card-hover cursor-pointer overflow-hidden">
+            <Card className="group cursor-pointer overflow-hidden border-0 bg-gradient-to-br from-card to-muted/50 card-hover">
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <div className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-transform group-hover:scale-110 duration-300 shadow-lg", action.color
+                    "flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all group-hover:scale-110 group-hover:rotate-3 duration-300 shadow-lg", action.gradient
                   )}>
                     <action.icon className="h-6 w-6 text-white" />
                   </div>
@@ -136,59 +152,81 @@ export default function DashboardHome() {
                     <p className="font-medium text-sm">{action.label}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                 </div>
               </CardContent>
             </Card>
           </Link>
         ))}
-      </div>
+      </motion.div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="grid gap-6 md:grid-cols-2">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="grid gap-6 md:grid-cols-2">
+            <motion.div variants={itemVariants}>
               <RevenueChart data={data?.monthlyData || []} />
+            </motion.div>
+            <motion.div variants={itemVariants}>
               <AppointmentsChart data={data?.monthlyData || []} />
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <PaymentMethodsPie data={data?.paymentsByMethod || []} />
-              <PatientGrowthChart data={data?.newPatientsByMonth || []} />
-            </div>
-            <UpcomingAppointments appointments={appointments} />
+            </motion.div>
           </div>
-          <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
-                Meta do Mês
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progresso</span>
-                  <span className="font-medium">{progressToGoal}%</span>
+          <div className="grid gap-6 md:grid-cols-2">
+            <motion.div variants={itemVariants}>
+              <PaymentMethodsPie data={data?.paymentsByMethod || []} />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <PatientGrowthChart data={data?.newPatientsByMonth || []} />
+            </motion.div>
+          </div>
+          <motion.div variants={itemVariants}>
+            <UpcomingAppointments appointments={appointments} />
+          </motion.div>
+        </div>
+        <div className="space-y-4">
+          <motion.div variants={itemVariants}>
+            <Card className="overflow-hidden border-0 bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-5 w-5 text-emerald-200" />
+                  <span className="font-semibold">Meta do Mês</span>
                 </div>
-                  <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out" style={{ width: `${progressWidth}%` }} />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-emerald-100">Progresso</span>
+                    <span className="font-bold text-white">{progressWidth}%</span>
                   </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Recebido</span>
-                  <span className="font-medium text-emerald-500">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>
+                  <div className="h-3 rounded-full bg-white/20 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-white transition-all duration-1000 ease-out"
+                      style={{ width: `${progressWidth}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-emerald-100">Recebido</span>
+                    <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-emerald-100">Meta</span>
+                    <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.goal)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Meta</span>
-                  <span className="font-medium">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.goal)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <FinancialSummaryCard summary={financialSummary} />
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <FinancialSummaryCard summary={financialSummary} />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <ActivityFeed activities={[]} />
+          </motion.div>
         </div>
       </div>
 
-      <RecentPatients patients={patients} />
-    </div>
+      <motion.div variants={itemVariants}>
+        <RecentPatients patients={patients} />
+      </motion.div>
+
+      <ExportModal open={exportOpen} onOpenChange={setExportOpen} />
+    </motion.div>
   )
 }
