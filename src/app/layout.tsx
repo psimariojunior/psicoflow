@@ -96,6 +96,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers><main className="animate-fade-in">{children}</main><PwaInstallPrompt /></Providers>
+        <Script id="pwa-capture" strategy="beforeInteractive">
+          {`
+            window.__deferredPwaPrompt = null;
+            window.addEventListener('beforeinstallprompt', (e) => {
+              e.preventDefault();
+              window.__deferredPwaPrompt = e;
+            });
+          `}
+        </Script>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
