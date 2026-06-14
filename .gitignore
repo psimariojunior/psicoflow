@@ -20,3 +20,4 @@ out/
 
 backups/
 deploy/.env.docker
+.env*

@@ -6,6 +6,7 @@ import { validate, createAppointmentSchema } from "@/lib/validation"
 import { scheduleReminders } from "@/lib/notifications"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { syncAppointmentToCalendar } from "@/lib/google-calendar"
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,6 +84,7 @@ export async function POST(request: Request) {
       scheduleReminders(appt.id, appt.patientId, psychologistId, appt.startTime).catch(
         (e) => logger.error("scheduleReminders failed", { error: String(e) })
       )
+      syncAppointmentToCalendar(psychologistId, appt as Parameters<typeof syncAppointmentToCalendar>[1]).catch(() => {})
 
       return appt
     }

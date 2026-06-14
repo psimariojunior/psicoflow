@@ -1,13 +1,18 @@
 import { Resend } from "resend"
 import { sanitizeHtml } from "./security"
 
-const resend = new Resend(process.env.RESEND_API_KEY || "")
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return null
+  return new Resend(key)
+}
 
 async function sendViaResend(to: string, subject: string, html: string): Promise<string | null> {
-  if (!process.env.RESEND_API_KEY) return "RESEND_API_KEY não configurada"
+  const client = getResend()
+  if (!client) return "RESEND_API_KEY não configurada"
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await client.emails.send({
       from: "PsicoFlow <onboarding@resend.dev>",
       to: [to],
       subject,

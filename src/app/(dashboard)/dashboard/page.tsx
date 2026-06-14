@@ -7,6 +7,9 @@ import { RecentPatients } from "@/components/dashboard/recent-patients"
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
+import { PaymentMethodsPie } from "@/components/dashboard/payment-methods-pie"
+import { KeyIndicators } from "@/components/dashboard/key-indicators"
+import { PatientGrowthChart } from "@/components/dashboard/patient-growth-chart"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, TrendingUp, CalendarX, BarChart3 } from "lucide-react"
@@ -28,6 +31,10 @@ export default function DashboardHome() {
     appointments: { id: string; patientName: string; startTime: string; status: string; modality: string }[]
     patients: { id: string; name: string; email: string | null; phone: string | null; createdAt: string }[]
     financialSummary: { totalRevenue: number; totalExpenses: number; balance: number; pending: number; overdue: number; received: number; goal: number }
+    indicators: { averageTicket: number; completionRate: number; cancellationRate: number; occupationRate: number }
+    paymentsByMethod: { name: string; value: number }[]
+    newPatientsByMonth: { month: string; count: number }[]
+    appointmentsPerMonth: { month: string; count: number }[]
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
@@ -87,6 +94,7 @@ export default function DashboardHome() {
   const appointments = (data?.appointments ?? []).map((a) => ({ ...a, startTime: new Date(a.startTime) }))
   const patients = (data?.patients ?? []).map((p) => ({ ...p, createdAt: new Date(p.createdAt) }))
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
+  const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
 
   const progressToGoal = financialSummary.goal > 0
     ? Math.min(100, Math.round((financialSummary.received / financialSummary.goal) * 100))
@@ -110,6 +118,8 @@ export default function DashboardHome() {
       </div>
 
       <StatsCards stats={stats} />
+
+      <KeyIndicators indicators={indicators} />
 
       <div className="grid gap-4 md:grid-cols-4">
         {quickActions.map((action) => (
@@ -139,6 +149,10 @@ export default function DashboardHome() {
             <div className="grid gap-6 md:grid-cols-2">
               <RevenueChart data={data?.monthlyData || []} />
               <AppointmentsChart data={data?.monthlyData || []} />
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <PaymentMethodsPie data={data?.paymentsByMethod || []} />
+              <PatientGrowthChart data={data?.newPatientsByMonth || []} />
             </div>
             <UpcomingAppointments appointments={appointments} />
           </div>

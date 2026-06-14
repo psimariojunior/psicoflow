@@ -1,5 +1,7 @@
 import { google } from "googleapis"
 import { randomUUID } from "crypto"
+import { prisma } from "./prisma"
+import { logger } from "./logger"
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
@@ -137,4 +139,45 @@ export async function deleteCalendarEvent(
 ): Promise<void> {
   const calendar = await getCalendarClient(refreshToken)
   await calendar.events.delete({ calendarId, eventId })
+}
+
+export async function syncAppointmentToCalendar(
+  psychologistId: string,
+  appointment: { id: string; title: string | null; startTime: Date; endTime: Date; status: string; modality: string | null; notes: string | null; googleEventId: string | null; patient: { id: string; name: string; email: string | null } }
+): Promise<string | null> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: psychologistId },
+      select: { googleRefreshToken: true, googleCalendarId: true },
+    })
+    if (!user?.googleRefreshToken || !user?.googleCalendarId) return null
+
+    if (appointment.status === "CANCELLED") {
+      if (appointment.googleEventId) {
+        await deleteCalendarEvent(user.googleRefreshToken, user.googleCalendarId, appointment.googleEventId).catch(() => {})
+      }
+      return null
+    }
+
+    const eventData = {
+      summary: `${appointment.title || "Sessão"} - ${appointment.patient.name}`,
+      description: `Paciente: ${appointment.patient.name}\nStatus: ${appointment.status}\nObservações: ${appointment.notes || "—"}`,
+      startTime: appointment.startTime.toISOString(),
+      endTime: appointment.endTime.toISOString(),
+      patientName: appointment.patient.name,
+      patientEmail: appointment.patient.email || undefined,
+      isOnline: appointment.modality === "online",
+    }
+
+    if (appointment.googleEventId) {
+      await updateCalendarEvent(user.googleRefreshToken, user.googleCalendarId, appointment.googleEventId, eventData)
+      return appointment.googleEventId
+    }
+
+    const eventId = await createCalendarEvent(user.googleRefreshToken, user.googleCalendarId, eventData)
+    return eventId
+  } catch (e) {
+    logger.error("syncAppointmentToCalendar failed", { error: String(e) })
+    return null
+  }
 }

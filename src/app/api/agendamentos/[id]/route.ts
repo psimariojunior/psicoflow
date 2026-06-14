@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { scheduleReminders, cancelPendingReminders } from "@/lib/notifications"
 import { logAudit } from "@/lib/security"
+import { syncAppointmentToCalendar } from "@/lib/google-calendar"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
@@ -64,6 +65,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       )
     }
 
+    syncAppointmentToCalendar(psychologistId, {
+      ...updated,
+      googleEventId: existing.googleEventId,
+    } as Parameters<typeof syncAppointmentToCalendar>[1]).catch(() => {})
+
     return apiSuccess(updated)
   } catch (error) {
     logger.error("Error updating appointment", { error: String(error) })
@@ -77,6 +83,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     const existing = await prisma.appointment.findFirst({
       where: { id: params.id, psychologistId },
+      include: { patient: { select: { id: true, name: true, email: true } } },
     })
     if (!existing) {
       return apiError("Agendamento não encontrado", 404)
@@ -85,6 +92,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     cancelPendingReminders(params.id).catch(
       (e) => logger.error("cancelPendingReminders failed", { error: String(e) })
     )
+    syncAppointmentToCalendar(psychologistId, {
+      ...existing,
+      status: "CANCELLED" as const,
+    } as Parameters<typeof syncAppointmentToCalendar>[1]).catch(() => {})
     await prisma.appointment.delete({ where: { id: params.id } })
     logAudit(psychologistId, "DELETE", "Appointment", params.id, `Consulta: ${existing.startTime.toISOString()}`).catch(() => {})
     return apiSuccess({ message: "Agendamento cancelado com sucesso" })

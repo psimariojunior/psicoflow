@@ -30,11 +30,11 @@
    - **Tipo**: Aplicativo Web
    - **Nome**: PsicoFlow Web
    - **Origens JavaScript autorizadas**: deixe vazio
-   - **URIs de redirecionamento autorizados**:
-     ```
-     https://psicoflow-iota.vercel.app/api/integrations/google-calendar
-     ```
-     (Para testar local: `http://localhost:3000/api/integrations/google-calendar`)
+    - **URIs de redirecionamento autorizados**:
+      ```
+      https://psicoflow-iota.vercel.app/api/integrations/google-calendar/callback
+      ```
+      (Para testar local: `http://localhost:3000/api/integrations/google-calendar/callback`)
 5. Clique **"Criar"**
 6. **IMPORTANTE**: Anote o **Client ID** e **Client Secret**
 

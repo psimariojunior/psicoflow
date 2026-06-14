@@ -14,7 +14,7 @@ export async function GET() {
     const startOfToday = new Date(Date.UTC(currentYear, currentMonth, brtNow.getUTCDate()))
     const endOfToday = new Date(startOfToday.getTime() + 86400000)
     const startOfYear = new Date(Date.UTC(currentYear, 0, 1))
-    const lastYear = new Date(Date.UTC(currentYear - 1, 0, 1))
+    const sixMonthsAgo = new Date(Date.UTC(currentYear, currentMonth - 5, 1))
 
     const [
       totalPatients,
@@ -28,6 +28,12 @@ export async function GET() {
       financialSummary,
       allAppointments,
       monthlyRevenueData,
+      paymentMethods,
+      newPatientsMonthly,
+      patientsPerMonth,
+      completedAppointments,
+      totalAppointments,
+      appointmentStatuses,
     ] = await Promise.all([
       prisma.patient.count({ where: { psychologistId, active: true } }),
       prisma.appointment.count({
@@ -84,6 +90,34 @@ export async function GET() {
         },
         _sum: { amount: true },
       }),
+      prisma.financialTransaction.groupBy({
+        by: ["paymentMethod"],
+        where: { psychologistId, type: "INCOME", paymentStatus: "PAID" },
+        _sum: { amount: true },
+      }),
+      prisma.patient.findMany({
+        where: { psychologistId, createdAt: { gte: sixMonthsAgo } },
+        select: { createdAt: true },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.$queryRawUnsafe<{ mes: string; total: bigint }[]>(
+        `SELECT to_char("startTime", 'YYYY-MM') as mes, COUNT(*) as total
+         FROM "Appointment"
+         WHERE "psychologistId" = $1 AND "startTime" >= $2 AND "status" != 'CANCELLED'
+         GROUP BY mes ORDER BY mes`,
+        psychologistId, sixMonthsAgo
+      ),
+      prisma.appointment.count({
+        where: { psychologistId, status: "COMPLETED" },
+      }),
+      prisma.appointment.count({
+        where: { psychologistId, status: { notIn: ["CANCELLED"] } },
+      }),
+      prisma.appointment.groupBy({
+        by: ["status"],
+        where: { psychologistId },
+        _count: true,
+      }),
     ])
 
     const income = financialSummary[0]._sum.amount || 0
@@ -121,6 +155,30 @@ export async function GET() {
     const thisMonthAppointments = monthlyAppointments[currentMonth]
     const appointmentChange = lastMonthAppointments > 0 ? ((thisMonthAppointments - lastMonthAppointments) / lastMonthAppointments) * 100 : 0
 
+    const paymentsByMethod = paymentMethods.map((pm) => ({
+      name: pm.paymentMethod || "Outros",
+      value: pm._sum.amount || 0,
+    }))
+
+    const totalPts = totalAppointments || 1
+    const completionRate = Math.round((completedAppointments / totalPts) * 100)
+    const cancellationCount = appointmentStatuses.find((s) => s.status === "CANCELLED")?._count || 0
+    const totalWithCancel = totalAppointments + cancellationCount || 1
+    const cancellationRate = Math.round((cancellationCount / totalWithCancel) * 100)
+    const averageTicket = totalPatients > 0 ? Math.round(income / totalPatients) : 0
+    const occupationRate = Math.min(100, Math.round((monthlyAppointments[currentMonth] / 22) * 100))
+
+    const sixMonthNames: string[] = []
+    for (let i = 5; i >= 0; i--) {
+      const m = new Date(currentYear, currentMonth - i, 1)
+      sixMonthNames.push(monthNames[m.getMonth()])
+    }
+    const newPatientsByMonth = sixMonthNames.map((m) => ({ month: m, count: 0 }))
+    for (const p of newPatientsMonthly) {
+      const idx = sixMonthNames.indexOf(monthNames[p.createdAt.getMonth()])
+      if (idx >= 0) newPatientsByMonth[idx].count++
+    }
+
     return apiSuccess({
       stats: {
         totalPatients,
@@ -154,6 +212,18 @@ export async function GET() {
         received: income,
         goal: 10000,
       },
+      indicators: {
+        averageTicket,
+        completionRate,
+        cancellationRate,
+        occupationRate,
+      },
+      paymentsByMethod,
+      newPatientsByMonth,
+      appointmentsPerMonth: patientsPerMonth.map((ap) => ({
+        month: ap.mes.slice(5),
+        count: Number(ap.total),
+      })),
     })
   } catch (error) {
     logger.error("Error fetching dashboard data", { error: String(error) })
