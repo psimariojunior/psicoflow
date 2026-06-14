@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const s = getStripe()
     const session = await s.checkout.sessions.create({
       ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
-      payment_method_types: ["card", "boleto", "pix"],
+      payment_method_types: ["card", "boleto"],
       line_items: [
         {
           price_data: {
@@ -112,6 +112,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     logger.error("Error creating public checkout session", { error: msg })
-    return apiError(`Erro ao criar sessão de pagamento: ${msg}`)
+    return apiError("Erro ao criar sessão de pagamento")
   }
 }

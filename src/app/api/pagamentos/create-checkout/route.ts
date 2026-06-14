@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const s = getStripe()
     const session = await s.checkout.sessions.create({
       customer: stripeCustomerId || undefined,
-      payment_method_types: ["card", "boleto", "pix"],
+      payment_method_types: ["card", "boleto"],
       line_items: [
         {
           price_data: {

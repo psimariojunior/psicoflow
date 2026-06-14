@@ -211,7 +211,7 @@ export default function PatientInvoicesPage() {
                       ) : (
                         <CreditCard className="mr-2 h-4 w-4" />
                       )}
-                      Pagar com Cartão / PIX / Boleto
+                      Pagar com Cartão ou Boleto
                     </Button>
                   </div>
                 )}
