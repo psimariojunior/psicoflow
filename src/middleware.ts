@@ -23,10 +23,12 @@ const publicApiPrefixes = [
 ]
 
 const staticPrefixes = ["/_next", "/static"]
+const staticExtensions = /\.(png|jpg|jpeg|gif|webp|svg|ico|css|js)$/
 
 function isPublic(pathname: string): boolean {
   if (publicPages.includes(pathname)) return true
   if (publicPrefixes.some((p) => pathname.startsWith(p))) return true
+  if (staticExtensions.test(pathname)) return true
   return false
 }
 

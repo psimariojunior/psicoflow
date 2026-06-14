@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import Script from "next/script"
 import "./globals.css"
 import { Providers } from "./providers"
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -94,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers><main className="animate-fade-in">{children}</main></Providers>
+        <Providers><main className="animate-fade-in">{children}</main><PwaInstallPrompt /></Providers>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
