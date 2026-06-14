@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { getOAuth2Client, verifyOAuthState } from "@/lib/google-calendar"
 import { apiError } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams

@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { getAuthUrl } from "@/lib/google-calendar"
 import { requireAuth } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const psychologistId = await requireAuth()
