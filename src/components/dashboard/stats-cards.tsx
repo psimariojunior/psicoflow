@@ -42,69 +42,61 @@ const cards = [
     bgLight: "bg-violet-100 dark:bg-violet-900/30",
     textLight: "text-violet-600 dark:text-violet-400",
     changeKey: "revenueChange" as const,
-    isCurrency: true,
   },
   {
     key: "pendingPayments" as const,
-    label: "Pendências",
+    label: "Pendentes",
     icon: AlertTriangle,
     color: "from-amber-500 to-orange-600",
     bgLight: "bg-amber-100 dark:bg-amber-900/30",
     textLight: "text-amber-600 dark:text-amber-400",
     changeKey: "revenueChange" as const,
-    isCurrency: true,
   },
 ]
 
 export function StatsCards({ stats }: StatsCardsProps) {
-  const formatValue = (value: number, isCurrency?: boolean) => {
-    if (isCurrency) {
-      return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(value)
-    }
-    return value.toString()
-  }
-
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card, index) => {
-        const value = stats[card.key] as number
+      {cards.map((card) => {
+        const Icon = card.icon
+        const value = stats[card.key]
         const change = stats[card.changeKey]
         const isPositive = change >= 0
 
         return (
-          <Card key={card.key} className="group card-hover overflow-hidden animate-fade-in" style={{ animationDelay: `${(index + 1) * 50}ms` }}>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className={cn(
-                  "flex h-12 w-12 items-center justify-center rounded-xl transition-transform group-hover:scale-110 duration-300",
-                  card.bgLight,
-                  card.textLight
-                )}>
-                  <card.icon className="h-6 w-6" />
+          <Card key={card.key} className="group relative overflow-hidden card-hover border-0 bg-gradient-to-br from-card to-muted/30">
+            <div className={cn("absolute inset-0 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500", card.color.replace("from-", "bg-gradient-to-br from-"))} />
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {card.label}
+                  </p>
+                  <p className="text-3xl font-bold tracking-tight">
+                    {card.key === "monthlyRevenue" || card.key === "pendingPayments"
+                      ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+                      : value}
+                  </p>
                 </div>
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all",
-                    isPositive
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
-                      : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400"
-                  )}
-                >
-                  {isPositive ? (
-                    <ArrowUpRight className="h-3 w-3" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3" />
-                  )}
-                  {Math.abs(change)}%
-                </span>
+                <div className={cn(
+                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3",
+                  card.color
+                )}>
+                  <Icon className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <p className="text-2xl font-bold tracking-tight">
-                {formatValue(value, card.isCurrency)}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{card.label}</p>
+              <div className="mt-3 flex items-center gap-1.5 text-xs">
+                {isPositive ? (
+                  <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <TrendingDown className="h-3.5 w-3.5 text-red-500" />
+                )}
+                <span className={isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
+                  {isPositive ? "+" : ""}{change}%
+                </span>
+                <span className="text-muted-foreground ml-1">vs. mês anterior</span>
+              </div>
             </CardContent>
           </Card>
         )

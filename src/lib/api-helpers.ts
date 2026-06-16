@@ -21,6 +21,10 @@ export function apiError(message: string, status = 500) {
   return NextResponse.json({ error: message }, { status })
 }
 
+export function isAuthError(error: unknown): boolean {
+  return error instanceof AuthError
+}
+
 export function apiSuccess<T>(data: T, status = 200) {
   return NextResponse.json(data, { status })
 }

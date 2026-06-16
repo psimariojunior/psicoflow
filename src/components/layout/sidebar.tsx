@@ -21,9 +21,9 @@ import {
   ChevronRight,
   MessageSquare,
   Receipt,
-  Menu,
-  X,
   ClipboardList,
+  Sparkles,
+  Heart,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -46,7 +46,8 @@ const menuItems = [
   { href: "/sessoes", label: "Sessões", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
-  { href: "/notificacoes", label: "Notificações", icon: Bell },
+  { href: "/notificacoes",   label: "Notificações",     icon: Bell },
+  { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ]
@@ -55,8 +56,9 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
   const pathname = usePathname()
 
   const sidebarContent = (
-    <div className="flex h-full flex-col bg-card border-r">
-      <div className="flex h-16 items-center justify-between px-4 border-b">
+    <div className="flex h-full flex-col bg-card border-r relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/[0.02] to-transparent pointer-events-none" />
+      <div className="flex h-16 items-center justify-between px-4 border-b relative">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
             <Image src="/logo.png" alt="PsicoFlow" width={40} height={40} className="w-full h-full object-cover" priority />
@@ -80,7 +82,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         </Button>
       </div>
 
-      <ScrollArea className="flex-1 py-2">
+      <ScrollArea className="flex-1 py-2 relative">
         <nav className="flex flex-col gap-1 px-3">
           {menuItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
@@ -91,27 +93,51 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                 onClick={onMobileClose}
                 title={collapsed ? item.label : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative group/item",
                   !collapsed && "hover:pl-4",
                   collapsed && "justify-center px-2",
                   isActive
-                    ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
+                {isActive && (
+                  <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5" />
+                )}
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-emerald-500 to-teal-600" />
+                )}
+                <div className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 shrink-0",
+                  isActive
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground group-hover/item:bg-accent group-hover/item:text-foreground"
+                )}>
+                  <item.icon className="h-4 w-4" />
+                </div>
+                {!collapsed && <span className="relative">{item.label}</span>}
               </Link>
             )
           })}
         </nav>
       </ScrollArea>
 
-      <div className="border-t p-4">
-        {!collapsed && (
-          <div className="rounded-lg bg-gradient-to-br from-primary/5 to-blue-500/5 p-4">
-            <p className="text-sm font-medium">Plano Profissional</p>
-            <p className="text-xs text-muted-foreground mt-1">Até 50 pacientes</p>
+      <div className="border-t p-4 relative">
+        {!collapsed ? (
+          <div className="rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 p-4 text-white shadow-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-emerald-200" />
+              <p className="text-sm font-semibold">CRP 04/52274</p>
+            </div>
+            <p className="text-xs text-emerald-100/80 leading-relaxed">
+              Mário Júnior · Gestalt-Terapia
+            </p>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 shadow-lg">
+              <Heart className="h-5 w-5 text-white" />
+            </div>
           </div>
         )}
       </div>

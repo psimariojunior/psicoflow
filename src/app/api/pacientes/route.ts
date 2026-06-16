@@ -36,8 +36,10 @@ export async function GET(request: NextRequest) {
       prisma.patient.count({ where }),
     ])
 
+    const safePatients = patients.map(({ password: _, ...p }) => p)
+
     return apiSuccess({
-      patients,
+      patients: safePatients,
       total,
       page,
       totalPages: Math.ceil(total / limit),

@@ -48,6 +48,10 @@
     --ring: 160 70% 50%;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border;
   }
@@ -73,6 +77,11 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-slate-400 dark:bg-slate-600;
   }
+
+  img {
+    @apply antialiased;
+    image-rendering: auto;
+  }
 }
 
 @layer utilities {
@@ -93,6 +102,17 @@
   .animate-scale-in {
     animation: scaleIn 0.3s ease-out;
   }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -106,6 +126,18 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
   }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+    50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.3); }
+  }
 }
 
 .gradient-primary {
@@ -118,4 +150,28 @@
 
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600;
+}
+
+.glass {
+  @apply bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/50;
+}
+
+.glass-card {
+  @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 shadow-xl shadow-slate-900/5;
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(160 84% 45%));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }

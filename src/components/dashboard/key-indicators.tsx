@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { formatCurrency } from "@/lib/utils"
-import { TrendingUp, TrendingDown, Target, Percent, Users, Ban, Clock } from "lucide-react"
+import { TrendingUp, TrendingDown, Target, Percent, Users, Ban, Clock, ArrowUpRight } from "lucide-react"
 
 interface KeyIndicatorsProps {
   indicators: {
@@ -26,7 +26,7 @@ const items = [
   },
   {
     key: "completionRate" as const,
-    label: "Taxa de Comparecimento",
+    label: "Comparecimento",
     icon: Users,
     color: "from-emerald-500 to-teal-600",
     bgLight: "bg-emerald-100 dark:bg-emerald-900/30",
@@ -35,7 +35,7 @@ const items = [
   },
   {
     key: "cancellationRate" as const,
-    label: "Taxa de Cancelamento",
+    label: "Cancelamento",
     icon: Ban,
     color: "from-rose-500 to-pink-600",
     bgLight: "bg-rose-100 dark:bg-rose-900/30",
@@ -44,7 +44,7 @@ const items = [
   },
   {
     key: "occupationRate" as const,
-    label: "Ocupação da Agenda",
+    label: "Ocupação",
     icon: Clock,
     color: "from-blue-500 to-indigo-600",
     bgLight: "bg-blue-100 dark:bg-blue-900/30",
@@ -59,15 +59,22 @@ export function KeyIndicators({ indicators }: KeyIndicatorsProps) {
       {items.map((item) => {
         const value = indicators[item.key]
         return (
-          <Card key={item.key} className="group card-hover overflow-hidden">
+          <Card key={item.key} className="group relative overflow-hidden card-hover">
+            <div className={cn("absolute inset-0 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-500", item.color.replace("from-", "bg-gradient-to-br from-"))} />
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", item.bgLight, item.textLight)}>
-                  <item.icon className="h-5 w-5" />
+                <div className={cn(
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3",
+                  item.color
+                )}>
+                  <item.icon className="h-5 w-5 text-white" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground truncate">{item.label}</p>
-                  <p className="text-lg font-bold tracking-tight">{item.format(value)}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {item.label}
+                  </p>
+                  <p className="text-xl font-bold tracking-tight">{item.format(value)}</p>
                 </div>
               </div>
             </CardContent>

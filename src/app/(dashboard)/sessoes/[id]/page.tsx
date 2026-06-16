@@ -12,10 +12,48 @@ import { getInitials, calculateAge, formatDateTime } from "@/lib/utils"
 import { RichTextEditor } from "@/components/prontuario/rich-text-editor"
 import { SessionTimeline } from "@/components/prontuario/session-timeline"
 import toast from "react-hot-toast"
-import { Play, Pause, Square, Clock, Save, User, FileText, Calendar, MapPin, Video, Loader2, ChevronLeft, CheckCircle, Sparkles, Heart, Activity, Brain, Quote, ListTodo, Target, Eye } from "lucide-react"
+import { Play, Pause, Square, Clock, Save, User, FileText, Calendar, MapPin, Video, Loader2, ChevronLeft, CheckCircle, Sparkles, Heart, Activity, Brain, Quote, ListTodo, Target, Eye, Trash2, Briefcase } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+const GESTALT_MARKER = "---GESTALT-DATA---"
+
+function encodeNotes(generalNotes: string, gestalt: { awareness: string; techniques: string; cycle: string }): string {
+  const gestaltJson = JSON.stringify(gestalt)
+  return `${generalNotes}\n\n${GESTALT_MARKER}\n${gestaltJson}`
+}
+
+function decodeNotes(notes: string | null): { generalNotes: string; gestalt: { awareness: string; techniques: string; cycle: string } } {
+  if (!notes) return { generalNotes: "", gestalt: { awareness: "", techniques: "", cycle: "" } }
+  const idx = notes.indexOf(GESTALT_MARKER)
+  if (idx === -1) return { generalNotes: notes, gestalt: { awareness: "", techniques: "", cycle: "" } }
+  const generalNotes = notes.slice(0, idx).trim()
+  const gestaltJson = notes.slice(idx + GESTALT_MARKER.length).trim()
+  try {
+    const gestalt = JSON.parse(gestaltJson)
+    return {
+      generalNotes,
+      gestalt: {
+        awareness: gestalt.awareness || "",
+        techniques: gestalt.techniques || "",
+        cycle: gestalt.cycle || "",
+      },
+    }
+  } catch {
+    return { generalNotes: notes, gestalt: { awareness: "", techniques: "", cycle: "" } }
+  }
+}
 
 interface SessionData {
   id: string
@@ -126,7 +164,11 @@ export default function SessionPage() {
         setObjective(data.objective || "")
         setAssessment(data.assessment || "")
         setPlan(data.plan || "")
-        setNotes(data.notes || "")
+        const decoded = decodeNotes(data.notes)
+        setNotes(decoded.generalNotes)
+        setGestaltAwareness(decoded.gestalt.awareness)
+        setGestaltTechniques(decoded.gestalt.techniques)
+        setGestaltCycle(decoded.gestalt.cycle)
         setMoodBefore(data.moodBefore ? String(data.moodBefore) : "")
         setMoodAfter(data.moodAfter ? String(data.moodAfter) : "")
         setTags(data.tags || "")
@@ -173,17 +215,17 @@ export default function SessionPage() {
     if (!dirty || !session) return
     setSaving(true)
     try {
+      const encodedNotes = encodeNotes(notes, {
+        awareness: gestaltAwareness,
+        techniques: gestaltTechniques,
+        cycle: gestaltCycle,
+      })
       const body: Record<string, unknown> = {
-        subjective, objective, assessment, plan, notes,
+        subjective, objective, assessment, plan,
+        notes: encodedNotes,
         moodBefore: moodBefore ? parseInt(moodBefore) : null,
         moodAfter: moodAfter ? parseInt(moodAfter) : null,
         tags, type: sessionType, isRemote,
-        gestaltTechniques, gestaltAwareness, gestaltCycle,
-      }
-      if (tab === "gestalt") {
-        body.subjective = gestaltAwareness
-        body.assessment = gestaltTechniques
-        body.plan = gestaltCycle
       }
       await fetch(`/api/sessoes/${session.id}`, {
         method: "PUT",
@@ -196,7 +238,7 @@ export default function SessionPage() {
     } finally {
       setSaving(false)
     }
-  }, [dirty, session, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote, gestaltTechniques, gestaltAwareness, gestaltCycle, tab])
+  }, [dirty, session, subjective, objective, assessment, plan, notes, moodBefore, moodAfter, tags, sessionType, isRemote, gestaltTechniques, gestaltAwareness, gestaltCycle])
 
   function markDirty() {
     if (!dirty) setDirty(true)
@@ -212,17 +254,22 @@ export default function SessionPage() {
     if (!session) return
     setSaving(true)
     try {
+      const encodedNotes = encodeNotes(notes, {
+        awareness: gestaltAwareness,
+        techniques: gestaltTechniques,
+        cycle: gestaltCycle,
+      })
       const res = await fetch(`/api/sessoes/${session.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action,
           ...(action === "end" ? {
-            subjective, objective, assessment, plan, notes,
+            subjective, objective, assessment, plan,
+            notes: encodedNotes,
             moodBefore: moodBefore ? parseInt(moodBefore) : null,
             moodAfter: moodAfter ? parseInt(moodAfter) : null,
             tags, type: sessionType, isRemote,
-            gestaltTechniques, gestaltAwareness, gestaltCycle,
           } : {}),
         }),
       })
@@ -299,57 +346,95 @@ export default function SessionPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className={cn(
-            "flex items-center gap-3 px-4 py-2 rounded-xl border transition-all",
-            isActive ? "border-emerald-500/30 bg-emerald-500/10 shadow-lg shadow-emerald-500/10" :
-            isPaused ? "border-amber-500/30 bg-amber-500/10" :
-            "border bg-card"
-          )}>
-            <Clock className={cn("h-5 w-5", isActive ? "text-emerald-500 animate-pulse" : isPaused ? "text-amber-500" : "text-muted-foreground")} />
-            <span className={cn("text-2xl font-mono font-bold tabular-nums",
-              isActive ? "text-emerald-600 dark:text-emerald-400" : isPaused ? "text-amber-600 dark:text-amber-400" : "text-foreground"
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "flex items-center gap-3 px-4 py-2 rounded-xl border transition-all",
+              isActive ? "border-emerald-500/30 bg-emerald-500/10 shadow-lg shadow-emerald-500/10" :
+              isPaused ? "border-amber-500/30 bg-amber-500/10" :
+              "border bg-card"
             )}>
-              {formatTimer(elapsed)}
-            </span>
-          </div>
+              <Clock className={cn("h-5 w-5", isActive ? "text-emerald-500 animate-pulse" : isPaused ? "text-amber-500" : "text-muted-foreground")} />
+              <span className={cn("text-2xl font-mono font-bold tabular-nums",
+                isActive ? "text-emerald-600 dark:text-emerald-400" : isPaused ? "text-amber-600 dark:text-amber-400" : "text-foreground"
+              )}>
+                {formatTimer(elapsed)}
+              </span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            {isScheduled && (
-              <Button onClick={() => handleAction("start")} disabled={saving}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-1.5 shadow-lg shadow-emerald-500/20">
-                <Play className="h-4 w-4" /> Iniciar
-              </Button>
-            )}
-            {isActive && (
-              <>
-                <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline" className="gap-1.5">
-                  <Pause className="h-4 w-4" /> Pausar
+            <div className="flex items-center gap-2">
+              {isScheduled && (
+                <Button onClick={() => handleAction("start")} disabled={saving}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-1.5 shadow-lg shadow-emerald-500/20">
+                  <Play className="h-4 w-4" /> Iniciar
                 </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
-                  <Square className="h-4 w-4" /> Encerrar
+              )}
+              {isActive && (
+                <>
+                  <Button onClick={() => handleAction("pause")} disabled={saving} variant="outline" className="gap-1.5">
+                    <Pause className="h-4 w-4" /> Pausar
+                  </Button>
+                  <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
+                    <Square className="h-4 w-4" /> Encerrar
+                  </Button>
+                </>
+              )}
+              {isPaused && (
+                <>
+                  <Button onClick={() => handleAction("resume")} disabled={saving}
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-emerald-700 gap-1.5">
+                    <Play className="h-4 w-4" /> Retomar
+                  </Button>
+                  <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
+                    <Square className="h-4 w-4" /> Encerrar
+                  </Button>
+                </>
+              )}
+              {isCompleted && (
+                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
+                  <CheckCircle className="h-5 w-5" />
+                  <span className="font-medium">Concluída</span>
+                </div>
+              )}
+            </div>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </>
-            )}
-            {isPaused && (
-              <>
-                <Button onClick={() => handleAction("resume")} disabled={saving}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-1.5">
-                  <Play className="h-4 w-4" /> Retomar
-                </Button>
-                <Button onClick={() => handleAction("end")} disabled={saving} variant="destructive" className="gap-1.5">
-                  <Square className="h-4 w-4" /> Encerrar
-                </Button>
-              </>
-            )}
-            {isCompleted && (
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
-                <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">Concluída</span>
-              </div>
-            )}
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Excluir sessão?</DialogTitle>
+                  <DialogDescription>
+                    Esta ação não pode ser desfeita. A sessão e seus dados serão removidos permanentemente.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2">
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancelar</Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      variant="destructive"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`/api/sessoes/${session.id}`, { method: "DELETE" })
+                          if (!res.ok) throw new Error()
+                          toast.success("Sessão excluída")
+                          router.push("/sessoes")
+                        } catch {
+                          toast.error("Erro ao excluir sessão")
+                        }
+                      }}
+                    >
+                      Excluir
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -723,11 +808,4 @@ export default function SessionPage() {
   )
 }
 
-function Briefcase(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-    </svg>
-  )
-}
+

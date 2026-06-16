@@ -91,7 +91,16 @@ export default function EditPatientPage({ params }: { params: { id: string } }) 
         body: JSON.stringify(formData),
       })
 
-      if (!res.ok) throw new Error("Erro ao salvar")
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        const details = body.details
+        if (details && details.length > 0) {
+          details.forEach((d: { field: string; message: string }) => toast.error(`${d.field}: ${d.message}`))
+        } else {
+          toast.error(body.error || "Erro ao salvar")
+        }
+        return
+      }
 
       toast.success("Paciente atualizado com sucesso!")
       router.push(`/pacientes/${params.id}`)

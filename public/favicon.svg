@@ -6,8 +6,5 @@
     </linearGradient>
   </defs>
   <rect width="32" height="32" rx="7" fill="url(#g)"/>
-  <g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 8c-3 0-5 2-5 5 0 1.5.6 2.8 1.5 3.8l-.5 2.7h2.5l.5-2c.3.1.7.2 1 .2s.7-.1 1-.2l.5 2h2.5l-.5-2.7c.9-1 1.5-2.3 1.5-3.8 0-3-2-5-5-5z"/>
-    <path d="M10 22c2-1.5 4-2 6-2s4 .5 6 2"/>
-  </g>
+  <text x="16" y="22" font-family="Arial,sans-serif" font-weight="bold" font-size="17" fill="white" text-anchor="middle">PF</text>
 </svg>

@@ -1,7 +1,16 @@
 # PsicoFlow — Session Log
 
 ## Goal
-Professional psychology practice website + management platform. Public landing page, SEO optimized, full patient portal, video call, billing, dashboard analytics.
+Professional psychology practice website + management platform. Public landing page, SEO optimized, full patient portal, video call, billing, dashboard analytics, Hermes Agent integration.
+
+## Hermes Agent (MCP — 2026-06-14)
+- **Installed**: `%LOCALAPPDATA%\hermes\hermes-agent` com venv em `.venv`
+- **MCP**: Configurado no `opencode.json` na raiz do projeto via `python.exe hermes mcp serve`
+- **Deps**: PyYAML, python-dotenv, rich, mcp, etc instalados via uv sync + uv pip
+- **Acesso CLI**: `hermes` (alias via PowerShell profile) ou `& "$env:LOCALAPPDATA\hermes\hermes-agent\.venv\Scripts\python.exe" "$env:LOCALAPPDATA\hermes\hermes-agent\hermes" <comando>`
+- **Provider**: OpenRouter (modelo: `openrouter/free` — gratuito)
+- **Working dir**: `C:\Users\miche\Desktop\PsicoFlow-Completo`
+- **Alias PowerShell**: `function hermes { ... }` adicionado ao `$PROFILE.CurrentUserAllHosts`
 
 ## Architecture
 - **Auth**: NextAuth (Credentials) — psychologist only; patient bypasses auth via `?patient=true` on token API
@@ -131,7 +140,7 @@ Professional psychology practice website + management platform. Public landing p
 - **Consultas recorrentes**: nova opção "Repetir consulta" no diálogo de agendamento — suporta semanal/quinzenal com N repetições; API gera múltiplos appointments automaticamente
 
 ### Landing page profissional & SEO (2026-06-12)
-- **Landing page** em `src/app/page.tsx`: hero com gradiente, seção "Como Funciona" (3 passos), Serviços (6 cards), Depoimentos (carrossel automático), Sobre o profissional, FAQ (accordion), CTA final, Footer completo
+- **Landing page** em `src/app/page.tsx`: hero com gradiente, seção "Como Funciona" (3 passos), Serviços (6 cards), Sobre o profissional, FAQ (accordion), CTA final, Footer completo
 - **SEO completo**: `robots.ts`, `sitemap.ts`, `manifest.ts`, metadados Open Graph + Twitter + JSON-LD no layout raiz
 - **Middleware**: permite acesso público a `/`, `/termos`, `/privacidade`, `/agendar`, rotas de paciente e APIs públicas
 - **Dashboard movido** para `/dashboard` (sidebar atualizada), landing page ocupa a raiz

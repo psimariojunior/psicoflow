@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { WhatsAppWidget } from "@/components/whatsapp-widget"
 import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
   Users, Globe,
@@ -479,20 +480,31 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-400/20 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent" />
+        {/* Floating decorative orbs */}
+        <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-emerald-400/10 blur-3xl animate-float" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-teal-400/10 blur-3xl animate-float" style={{ animationDelay: "-3s" }} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-2xl mx-auto">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-8"><Heart className="h-8 w-8 text-white" /></div>
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-8"
+            >
+              <Heart className="h-8 w-8 text-white" />
+            </motion.div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">Pronto para começar sua jornada?</h2>
             <p className="text-lg md:text-xl text-emerald-100/80 mb-10 max-w-lg mx-auto">Dê o primeiro passo em direção ao seu bem-estar emocional.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/agendar">
-                <Button size="lg" className="w-full sm:w-auto bg-white text-emerald-700 hover:bg-emerald-50 shadow-xl shadow-black/10 text-base h-12 px-8">
-                  <Calendar className="mr-2 h-5 w-5" /> Agendar Consulta
+                <Button size="lg" className="w-full sm:w-auto bg-white text-emerald-700 hover:bg-emerald-50 shadow-xl shadow-black/10 text-base h-12 px-8 group">
+                  <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" /> Agendar Consulta
                 </Button>
               </Link>
               <Link href="/paciente/cadastro">
-                <Button size="lg" className="w-full sm:w-auto bg-emerald-500 text-white hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 text-base h-12 px-8">
-                  <MessageCircle className="mr-2 h-5 w-5" /> Criar Conta
+                <Button size="lg" className="w-full sm:w-auto bg-emerald-500 text-white hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 text-base h-12 px-8 group">
+                  <MessageCircle className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" /> Criar Conta
                 </Button>
               </Link>
             </div>
@@ -550,6 +562,8 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <WhatsAppWidget />
     </div>
   )
 }

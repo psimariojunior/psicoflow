@@ -82,7 +82,7 @@ export const updatePatientSchema = z.object({
   insuranceNumber: z.string().max(50).optional().or(z.literal("")),
   referredBy: z.string().max(100).optional().or(z.literal("")),
   howFound: z.string().max(100).optional().or(z.literal("")),
-  observations: z.string().max(1000).optional().or(z.literal("")),
+  observations: z.string().max(2000).optional().or(z.literal("")),
   active: z.boolean().optional(),
   photoUrl: z.string().max(500).optional().or(z.literal("")),
   privacyConsent: z.boolean().optional(),

@@ -5,7 +5,8 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { sendReminderNow } from "@/lib/notifications"
 import { sanitizeHtml } from "@/lib/security"
-import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { logger } from "@/lib/logger"
+import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 
 const notificationSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(200),
@@ -21,17 +22,23 @@ const notificationSchema = z.object({
   sendAt: z.string().optional(),
 })
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const psychologistId = await requireAuth()
+    const { searchParams } = new URL(req.url)
+    const channel = searchParams.get("channel")
+    const limit = Math.min(Number(searchParams.get("limit")) || 50, 200)
+
+    const where: Record<string, unknown> = { psychologistId }
+    if (channel) where.channel = channel
 
     const notifications = await prisma.notification.findMany({
-      where: { psychologistId },
+      where: where as any,
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: limit,
     })
 
-    const patientIds = notifications.map((n) => n.patientId).filter(Boolean) as string[]
+    const patientIds = Array.from(new Set(notifications.map((n) => n.patientId).filter(Boolean))) as string[]
     const patients = patientIds.length > 0
       ? await prisma.patient.findMany({ where: { id: { in: patientIds } }, select: { id: true, name: true } })
       : []
@@ -44,7 +51,8 @@ export async function GET() {
 
     return apiSuccess(enriched)
   } catch (error) {
-    console.error("Error fetching notifications:", error)
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error fetching notifications", { error: String(error) })
     return apiError("Erro ao buscar notificações")
   }
 }
@@ -123,13 +131,14 @@ export async function POST(request: Request) {
     })
 
     if (!result.ok) {
-      console.error("[POST /api/notificacoes] send failed", { channel, patientId, error: result.error })
+      logger.error("[POST /api/notificacoes] send failed", { channel, patientId, error: result.error })
       return apiError(errorMessage || "Falha no envio", 500)
     }
 
     return apiSuccess({ ...notification, status: "SENT" }, 201)
   } catch (error) {
-    console.error("Error creating notification:", error)
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error creating notification", { error: String(error) })
     return apiError("Erro ao criar notificação")
   }
 }

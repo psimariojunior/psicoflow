@@ -1,13 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "next-themes"
-import { Toaster } from "react-hot-toast"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -48,18 +46,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            borderRadius: "12px",
-            background: "hsl(var(--card))",
-            color: "hsl(var(--foreground))",
-            border: "1px solid hsl(var(--border))",
-          },
-        }}
-      />
     </div>
   )
 }

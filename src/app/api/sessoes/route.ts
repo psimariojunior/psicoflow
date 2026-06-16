@@ -2,21 +2,21 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
+import { requireAuth, apiSuccess, apiError } from "@/lib/api-helpers"
 import { z } from "zod"
-import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
 const createSessionSchema = z.object({
-  patientId: z.string().min(1, "Paciente é obrigatório"),
+  patientId: z.string(),
   date: z.string().optional(),
-  type: z.string().max(100).optional(),
-  subjective: z.string().max(5000).optional(),
-  objective: z.string().max(5000).optional(),
-  assessment: z.string().max(5000).optional(),
-  plan: z.string().max(5000).optional(),
-  notes: z.string().max(5000).optional(),
-  moodBefore: z.union([z.number().int().min(0).max(10), z.string()]).optional(),
-  moodAfter: z.union([z.number().int().min(0).max(10), z.string()]).optional(),
-  tags: z.string().max(500).optional(),
+  type: z.string().optional(),
+  subjective: z.string().optional(),
+  objective: z.string().optional(),
+  assessment: z.string().optional(),
+  plan: z.string().optional(),
+  notes: z.string().optional(),
+  moodBefore: z.number().int().min(0).max(10).optional(),
+  moodAfter: z.number().int().min(0).max(10).optional(),
+  tags: z.string().optional(),
   isRemote: z.boolean().optional(),
   appointmentId: z.string().optional(),
 })
@@ -26,24 +26,31 @@ export async function GET(request: NextRequest) {
     const psychologistId = await requireAuth()
     const { searchParams } = new URL(request.url)
     const patientId = searchParams.get("patientId")
+    const cursor = searchParams.get("cursor")
+    const limit = Math.min(Number(searchParams.get("limit")) || 50, 100)
+
+    const where: Record<string, unknown> = { psychologistId }
+    if (patientId) where.patientId = patientId
 
     const sessions = await prisma.therapySession.findMany({
-      where: {
-        psychologistId,
-        ...(patientId ? { patientId } : {}),
-      },
+      where,
       include: {
         patient: { select: { id: true, name: true } },
         appointment: { select: { id: true, startTime: true } },
       },
       orderBy: { date: "desc" },
-      take: patientId ? 200 : 50,
+      take: patientId ? 200 : limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     })
 
-    return apiSuccess(sessions)
+    const hasMore = !patientId && sessions.length > limit
+    const items = hasMore ? sessions.slice(0, limit) : sessions
+    const nextCursor = hasMore ? items[items.length - 1]?.id : null
+
+    return apiSuccess({ data: items, nextCursor, hasMore: !!nextCursor })
   } catch (error) {
-    logger.error("Error fetching sessions", { error: String(error) })
-    return apiError("Erro ao buscar sessões")
+    logger.error("Error listing sessions", { error: String(error) })
+    return apiError("Erro ao listar sessões")
   }
 }
 

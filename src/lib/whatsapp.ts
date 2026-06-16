@@ -79,3 +79,42 @@ export async function sendAppointmentReminderWhatsApp(
 ): Promise<boolean> {
   return sendWhatsAppMessage(phone, "lembrete_consulta", [patientName, date, time])
 }
+
+export async function sendTextMessage(
+  to: string,
+  body: string
+): Promise<{ ok: boolean; messageId?: string; error?: string }> {
+  const config = getConfig()
+  if (!config) return { ok: false, error: "WhatsApp não configurado" }
+
+  const formattedTo = to.replace(/\D/g, "")
+  if (formattedTo.length < 10) return { ok: false, error: "Número inválido" }
+  const normalized = formattedTo.length <= 11 ? "55" + formattedTo : formattedTo
+
+  try {
+    const res = await fetch(`${WHATSAPP_API_BASE}/${config.phoneNumberId}/messages`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${config.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: normalized,
+        type: "text",
+        text: { preview_url: false, body },
+      }),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      logger.error("WhatsApp text send error", { to, status: res.status, error: data })
+      return { ok: false, error: data.error?.message || "Erro ao enviar mensagem" }
+    }
+
+    return { ok: true, messageId: data.messages?.[0]?.id }
+  } catch (err) {
+    logger.error("Failed to send WhatsApp text", { to, error: String(err) })
+    return { ok: false, error: String(err) }
+  }
+}

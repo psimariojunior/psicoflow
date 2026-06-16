@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useCallback, useEffect, useState } from "react"
-import { Bold, Italic, List, ListOrdered, Heading, Quote, Undo, Redo } from "lucide-react"
+import { Bold, Italic, List, ListOrdered, Heading, Quote, Undo, Redo, Link2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface RichTextEditorProps {
@@ -15,16 +15,19 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder, minHeight = "200px", className }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [isFocused, setIsFocused] = useState(false)
+  const isInternal = useRef(false)
 
   useEffect(() => {
-    if (editorRef.current && !editorRef.current.innerHTML) {
+    if (isInternal.current) { isInternal.current = false; return }
+    if (editorRef.current && editorRef.current.innerHTML !== (value || "")) {
       editorRef.current.innerHTML = value || ""
     }
-  }, [])
+  }, [value])
 
   const exec = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value)
     if (editorRef.current) {
+      isInternal.current = true
       onChange(editorRef.current.innerHTML)
       editorRef.current.focus()
     }
@@ -32,6 +35,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = "200p
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
+      isInternal.current = true
       onChange(editorRef.current.innerHTML)
     }
   }, [onChange])
@@ -41,6 +45,17 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = "200p
     const text = e.clipboardData.getData("text/plain")
     document.execCommand("insertText", false, text)
   }, [])
+
+  const addLink = useCallback(() => {
+    const selection = window.getSelection()
+    if (!selection || selection.isCollapsed) {
+      const url = prompt("URL do link:")
+      if (url) exec("insertHTML", `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
+      return
+    }
+    const url = prompt("URL do link:")
+    if (url) exec("createLink", url)
+  }, [exec])
 
   const clear = useCallback(() => {
     if (editorRef.current) {
@@ -59,6 +74,8 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = "200p
     { icon: ListOrdered, cmd: "insertOrderedList", title: "Lista numerada" },
     { type: "sep" as const },
     { icon: Quote, cmd: "formatBlock", value: "blockquote", title: "Citação" },
+    { type: "sep" as const },
+    { icon: Link2, action: "link" as const, title: "Inserir link" },
     { type: "sep" as const },
     { icon: Undo, cmd: "undo", title: "Desfazer" },
     { icon: Redo, cmd: "redo", title: "Refazer" },
@@ -80,7 +97,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = "200p
             <button
               key={i}
               type="button"
-              onMouseDown={(e) => { e.preventDefault(); exec(t.cmd, t.value) }}
+              onMouseDown={(e) => { e.preventDefault(); t.action === "link" ? addLink() : exec(t.cmd!, t.value) }}
               className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-background hover:text-emerald-600 text-muted-foreground transition-colors"
               title={t.title}
             >
@@ -109,8 +126,9 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = "200p
         onBlur={() => setIsFocused(false)}
         data-placeholder={placeholder}
         className={cn(
-          "prose prose-sm dark:prose-invert max-w-none p-4 outline-none min-h-[200px] overflow-y-auto",
-          "empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/50",
+          "prose prose-sm dark:prose-invert max-w-none p-4 outline-none overflow-y-auto",
+          "before:content-[attr(data-placeholder)] before:text-muted-foreground/50 before:pointer-events-none before:float-left before:h-0",
+          !value && "before:block before:h-0",
         )}
         style={{ minHeight }}
       />

@@ -140,8 +140,9 @@ export default function DashboardHome() {
       <motion.div variants={itemVariants} className="grid gap-4 md:grid-cols-4">
         {quickActions.map((action) => (
           <Link key={action.label} href={action.href}>
-            <Card className="group cursor-pointer overflow-hidden border-0 bg-gradient-to-br from-card to-muted/50 card-hover">
-              <CardContent className="p-4">
+            <Card className="group cursor-pointer overflow-hidden border-0 bg-gradient-to-br from-card to-muted/30 card-hover relative">
+              <div className={cn("absolute inset-0 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500", action.gradient.replace("from-", "bg-gradient-to-br from-"))} />
+              <CardContent className="p-4 relative">
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all group-hover:scale-110 group-hover:rotate-3 duration-300 shadow-lg", action.gradient

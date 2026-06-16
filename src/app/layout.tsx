@@ -64,8 +64,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/icon-192.png",
+    shortcut: "/favicon-32.png",
+    apple: "/pwa-192-v2.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "PsicoFlow",
+    statusBarStyle: "black-translucent",
+    startupImage: ["/pwa-512-v2.png"],
   },
   manifest: "/manifest",
   other: {
@@ -87,6 +93,10 @@ export const metadata: Metadata = {
         ],
       },
     }),
+    "mobile-web-app-capable": "yes",
+  },
+  formatDetection: {
+    telephone: false,
   },
 }
 

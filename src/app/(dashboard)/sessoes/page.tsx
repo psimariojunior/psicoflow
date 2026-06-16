@@ -36,15 +36,35 @@ const statusStyles: Record<string, { label: string; variant: "success" | "warnin
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<TherapySession[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
+  const [cursor, setCursor] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+
+  async function loadSessions(cursorVal?: string) {
+    const url = cursorVal ? `/api/sessoes?cursor=${cursorVal}&limit=30` : "/api/sessoes?limit=30"
+    try {
+      const r = await fetch(url)
+      const d = await r.json()
+      const items = d.data || []
+      if (cursorVal) {
+        setSessions((prev) => [...prev, ...items])
+      } else {
+        setSessions(items)
+      }
+      setCursor(d.nextCursor || null)
+      setHasMore(!!d.nextCursor)
+    } catch {
+      // silent
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }
 
   useEffect(() => {
-    fetch("/api/sessoes")
-      .then((r) => r.json())
-      .then((d) => setSessions(Array.isArray(d) ? d : d.data || []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    loadSessions()
   }, [])
 
   const filtered = sessions.filter((s) => {
@@ -209,6 +229,20 @@ export default function SessionsPage() {
               </motion.div>
             )
           })}
+        </div>
+      )}
+
+      {hasMore && !search && !filterStatus && (
+        <div className="flex justify-center pt-4">
+          <Button
+            variant="outline"
+            onClick={() => { setLoadingMore(true); loadSessions(cursor!) }}
+            disabled={loadingMore}
+            className="gap-2"
+          >
+            {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Carregar mais
+          </Button>
         </div>
       )}
     </motion.div>

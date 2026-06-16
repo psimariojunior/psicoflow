@@ -14,7 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getInitials } from "@/lib/utils"
-import { Bell, Menu, LogOut, User, Settings, Moon, Sun } from "lucide-react"
+import { Menu, LogOut, User, Settings, Moon, Sun } from "lucide-react"
+import { NotificationDropdown } from "@/components/comunicacao/notification-dropdown"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 
@@ -29,9 +30,12 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10)
-    window.addEventListener("scroll", handler)
+    window.addEventListener("scroll", handler, { passive: true })
     return () => window.removeEventListener("scroll", handler)
   }, [])
+
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite"
 
   return (
     <header
@@ -40,14 +44,21 @@ export function Header({ onMenuClick }: HeaderProps) {
         scrolled && "shadow-sm"
       )}
     >
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onMenuClick} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
-          <div>
-            <h1 className="text-lg font-semibold">Olá, {session?.user?.name?.split(" ")[0] || "Psicólogo"}</h1>
-            <p className="text-xs text-muted-foreground">Bem-vindo de volta</p>
+          <div className="relative pl-3 border-l-2 border-emerald-500/30">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold">{greeting}, {session?.user?.name?.split(" ")[0] || "Psicólogo"}</h1>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">CRP 04/52274</p>
           </div>
         </div>
 
@@ -56,10 +67,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
 
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1.5 top-1.5 flex h-2 w-2 rounded-full bg-destructive" />
-          </Button>
+          <NotificationDropdown />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

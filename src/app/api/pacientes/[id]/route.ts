@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logAudit, sanitizeHtml } from "@/lib/security"
 import { validate, updatePatientSchema } from "@/lib/validation"
-import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
+import { logger } from "@/lib/logger"
 
 export async function GET(
   request: NextRequest,
@@ -40,9 +41,11 @@ export async function GET(
       return apiError("Paciente não encontrado", 404)
     }
 
-    return apiSuccess(patient)
+    const { password: _, ...patientSafe } = patient
+    return apiSuccess(patientSafe)
   } catch (error) {
-    console.error("Error fetching patient:", error)
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error fetching patient", { error: String(error) })
     return apiError("Erro ao buscar paciente")
   }
 }
@@ -59,11 +62,20 @@ export async function PUT(
     if (result.error) return result.error
 
     const data = result.data! as Record<string, unknown>
+
+    // Sanitize text fields and convert empty strings to null for nullable fields
     const textFields = ["name", "gender", "maritalStatus", "profession", "address", "neighborhood", "city", "state", "emergencyContact", "healthInsurance", "insuranceNumber", "referredBy", "observations", "company"] as const
     for (const field of textFields) {
       if (typeof data[field] === "string") {
-        data[field] = sanitizeHtml(data[field] as string)
+        data[field] = sanitizeHtml(data[field] as string) || null
       }
+    }
+
+    // Convert empty date strings to null for Prisma DateTime fields
+    if (data.dateOfBirth === "" || data.dateOfBirth === null) {
+      data.dateOfBirth = null
+    } else if (typeof data.dateOfBirth === "string") {
+      data.dateOfBirth = new Date(data.dateOfBirth)
     }
 
     const patient = await prisma.patient.update({
@@ -82,9 +94,11 @@ export async function PUT(
       `Paciente ${patient.name} atualizado`
     )
 
-    return apiSuccess(patient)
+    const { password: _, ...patientSafe } = patient
+    return apiSuccess(patientSafe)
   } catch (error) {
-    console.error("Error updating patient:", error)
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error updating patient", { error: String(error) })
     return apiError("Erro ao atualizar paciente")
   }
 }
@@ -126,7 +140,8 @@ export async function DELETE(
 
     return apiSuccess({ message: "Paciente removido com sucesso" })
   } catch (error) {
-    console.error("Error deleting patient:", error)
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error deleting patient", { error: String(error) })
     return apiError("Erro ao remover paciente")
   }
 }
