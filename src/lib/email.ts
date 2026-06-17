@@ -13,7 +13,7 @@ async function sendViaResend(to: string, subject: string, html: string): Promise
 
   try {
     const { error } = await client.emails.send({
-      from: "PsicoFlow <onboarding@resend.dev>",
+      from: process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>",
       to: [to],
       subject,
       html,
@@ -64,7 +64,7 @@ async function sendViaSendGrid(to: string, subject: string, html: string): Promi
   }
 }
 
-const PSYCHOLOGIST_EMAIL = "psi_mariojunior@hotmail.com"
+const PSYCHOLOGIST_EMAIL = process.env.PSYCHOLOGIST_EMAIL || "psi_mariojunior@hotmail.com"
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
   if (to === PSYCHOLOGIST_EMAIL && process.env.RESEND_API_KEY) {

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatDate } from "@/lib/utils"
-import { Smile, Meh, Frown, Sun, Cloud, CloudRain, Brain, Heart, Activity, Plus, Loader2 } from "lucide-react"
+import { Smile, Meh, Frown, Sun, Cloud, CloudRain, Brain, Heart, Activity, Plus } from "lucide-react"
 import toast from "react-hot-toast"
 
 const moodIcons = [
@@ -104,8 +104,37 @@ export default function EmotionDiaryPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-48 animate-shimmer rounded-lg" />
+            <div className="h-4 w-56 animate-shimmer rounded-lg" />
+          </div>
+          <div className="h-9 w-32 animate-shimmer rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+        </div>
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-xl border p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl animate-shimmer" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 w-28 animate-shimmer rounded" />
+                  <div className="h-3 w-20 animate-shimmer rounded" />
+                </div>
+              </div>
+              <div className="flex gap-1.5">
+                {[...Array(4)].map((_, j) => (
+                  <div key={j} className="h-6 w-14 animate-shimmer rounded-full" />
+                ))}
+              </div>
+              <div className="h-12 w-full animate-shimmer rounded" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

@@ -103,9 +103,10 @@ export async function dispatchNotification(
     }
   }
 
-  if (notification.externalId) {
+  const appointmentLookupId = notification.appointmentId || notification.externalId
+  if (appointmentLookupId) {
     const appointment = await prisma.appointment.findUnique({
-      where: { id: notification.externalId },
+      where: { id: appointmentLookupId },
       select: { startTime: true },
     })
     if (appointment) {
@@ -169,17 +170,18 @@ export async function scheduleReminders(
     if (scheduledAt <= now) continue
     for (const channel of ["EMAIL", "WHATSAPP"]) {
       await prisma.notification.create({
-        data: {
-          title: "Lembrete de consulta",
-          message: "Lembrete automático de consulta",
-          channel,
-          status: "PENDING",
-          scheduledAt,
-          patientId,
-          recipientId: patientId,
-          psychologistId,
-          externalId: appointmentId,
-        },
+      data: {
+        title: "Lembrete de consulta",
+        message: "Lembrete automático de consulta",
+        channel,
+        status: "PENDING",
+        scheduledAt,
+        patientId,
+        recipientId: patientId,
+        psychologistId,
+        appointmentId,
+        externalId: appointmentId,
+      },
       })
     }
   }
@@ -187,7 +189,7 @@ export async function scheduleReminders(
 
 export async function cancelPendingReminders(appointmentId: string): Promise<void> {
   await prisma.notification.updateMany({
-    where: { externalId: appointmentId, status: "PENDING" },
+    where: { OR: [{ externalId: appointmentId }, { appointmentId }], status: "PENDING" },
     data: { status: "CANCELLED" },
   })
 }

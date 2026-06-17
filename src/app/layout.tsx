@@ -4,6 +4,7 @@ import Script from "next/script"
 import "./globals.css"
 import { Providers } from "./providers"
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
+import { CookieConsent } from "@/components/cookie-consent"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -65,13 +66,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon-32.png",
-    apple: "/pwa-192-v2.png",
+    apple: "/pwa-192-v3.png",
   },
   appleWebApp: {
     capable: true,
     title: "PsicoFlow",
     statusBarStyle: "black-translucent",
-    startupImage: ["/pwa-512-v2.png"],
+    startupImage: ["/pwa-512-v3.png"],
   },
   manifest: "/manifest",
   other: {
@@ -139,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           `}
         </Script>
+        <CookieConsent />
       </body>
     </html>
   )

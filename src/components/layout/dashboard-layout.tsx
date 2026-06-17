@@ -2,15 +2,21 @@
 
 import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { usePathname } from "next/navigation"
 import { redirect } from "next/navigation"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
+import { CommandPalette } from "@/components/command-palette"
+import { KeyboardShortcutsHint } from "@/components/keyboard-shortcuts"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
   const { data: session, status } = useSession()
+  const pathname = usePathname()
 
   if (status === "unauthenticated") {
     redirect("/login")
@@ -41,10 +47,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
         )}
       >
-        <Header onMenuClick={() => setMobileOpen(true)} />
+        <Header onMenuClick={() => setMobileOpen(true)} onPaletteOpen={() => setPaletteOpen(true)} />
         <main className="p-4 lg:p-6">
-          {children}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
+        <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+        <KeyboardShortcutsHint />
       </div>
     </div>
   )

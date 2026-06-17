@@ -14,7 +14,7 @@ import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { ExportModal } from "@/components/dashboard/export-modal"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, Activity } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, Activity, Filter } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
@@ -52,6 +52,7 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
   const [exportOpen, setExportOpen] = useState(false)
+  const [period, setPeriod] = useState<"6" | "12" | "all">("12")
 
   useEffect(() => {
     const controller = new AbortController()
@@ -109,6 +110,10 @@ export default function DashboardHome() {
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
   const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
 
+  const filteredMonthlyData = (data?.monthlyData ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
+  const filteredPaymentsByMethod = data?.paymentsByMethod ?? []
+  const filteredNewPatients = (data?.newPatientsByMonth ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
+
   return (
     <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -135,6 +140,24 @@ export default function DashboardHome() {
 
       <motion.div variants={itemVariants}>
         <KeyIndicators indicators={indicators} />
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="flex items-center gap-2">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground mr-1">Período:</span>
+        {(["6", "12", "all"] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriod(p)}
+            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
+              period === p
+                ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
+            }`}
+          >
+            {p === "6" ? "6 meses" : p === "12" ? "12 meses" : "Todos"}
+          </button>
+        ))}
       </motion.div>
 
       <motion.div variants={itemVariants} className="grid gap-4 md:grid-cols-4">
@@ -165,18 +188,18 @@ export default function DashboardHome() {
         <div className="lg:col-span-2 space-y-4">
           <div className="grid gap-6 md:grid-cols-2">
             <motion.div variants={itemVariants}>
-              <RevenueChart data={data?.monthlyData || []} />
+              <RevenueChart data={filteredMonthlyData} />
             </motion.div>
             <motion.div variants={itemVariants}>
-              <AppointmentsChart data={data?.monthlyData || []} />
+              <AppointmentsChart data={filteredMonthlyData} />
             </motion.div>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
             <motion.div variants={itemVariants}>
-              <PaymentMethodsPie data={data?.paymentsByMethod || []} />
+              <PaymentMethodsPie data={filteredPaymentsByMethod} />
             </motion.div>
             <motion.div variants={itemVariants}>
-              <PatientGrowthChart data={data?.newPatientsByMonth || []} />
+              <PatientGrowthChart data={filteredNewPatients} />
             </motion.div>
           </div>
           <motion.div variants={itemVariants}>

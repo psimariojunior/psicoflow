@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/utils"
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Loader2, Pencil, Lock, ExternalLink } from "lucide-react"
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Pencil, Lock, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 interface MedicalRecord {
@@ -72,7 +72,42 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
   }, [params.id])
 
   if (loading) {
-    return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 animate-shimmer rounded-lg" />
+          <div className="h-8 w-48 animate-shimmer rounded-lg" />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-4 lg:col-span-2">
+            <div className="rounded-xl border p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full animate-shimmer" />
+                <div className="space-y-2">
+                  <div className="h-5 w-40 animate-shimmer rounded" />
+                  <div className="h-4 w-28 animate-shimmer rounded" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="h-3 w-16 animate-shimmer rounded" />
+                    <div className="h-4 w-32 animate-shimmer rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="rounded-xl border p-6 space-y-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-12 w-full animate-shimmer rounded" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!patient) {

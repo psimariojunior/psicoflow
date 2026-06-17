@@ -175,8 +175,27 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <div className="h-8 w-44 animate-shimmer rounded-lg" />
+          <div className="h-4 w-64 animate-shimmer rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-9 w-28 animate-shimmer rounded-lg" />
+          ))}
+        </div>
+        <div className="rounded-xl border p-6 space-y-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="h-4 w-32 animate-shimmer rounded" />
+                <div className="h-3 w-48 animate-shimmer rounded" />
+              </div>
+              <div className="h-9 w-20 animate-shimmer rounded-lg" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

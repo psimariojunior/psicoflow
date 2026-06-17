@@ -14,16 +14,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getInitials } from "@/lib/utils"
-import { Menu, LogOut, User, Settings, Moon, Sun } from "lucide-react"
+import { Menu, LogOut, User, Settings, Moon, Sun, Search } from "lucide-react"
 import { NotificationDropdown } from "@/components/comunicacao/notification-dropdown"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 
 interface HeaderProps {
   onMenuClick: () => void
+  onPaletteOpen?: () => void
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, onPaletteOpen }: HeaderProps) {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
@@ -62,7 +63,27 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onPaletteOpen}
+            className="hidden sm:flex"
+            aria-label="Abrir paleta de comandos"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onPaletteOpen}
+            className="hidden lg:flex items-center gap-2 h-9 text-xs text-muted-foreground"
+            aria-label="Abrir paleta de comandos"
+          >
+            <Search className="h-3.5 w-3.5" />
+            Buscar...
+            <kbd className="ml-1 rounded border bg-muted px-1 py-0.5 text-[10px] font-mono">⌘K</kbd>
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>

@@ -65,7 +65,8 @@ export function NotificationDropdown() {
         <Bell className="h-5 w-5" />
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground animate-in zoom-in">
-            {unread > 9 ? "9+" : unread}
+            <span className="absolute inset-0 rounded-full bg-destructive animate-ping opacity-50" />
+            <span className="relative">{unread > 9 ? "9+" : unread}</span>
           </span>
         )}
       </Button>

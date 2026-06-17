@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import Image from "next/image"
+import { CommandPalette } from "@/components/command-palette"
+import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt, Sun, Moon } from "lucide-react"
 
 export interface PatientData {
@@ -57,6 +59,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
   const [patient, setPatient] = useState<PatientData | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [paletteOpen, setPaletteOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
@@ -121,6 +124,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
   return (
     <PatientAuthContext.Provider value={{ patient, token, login, logout, loading }}>
       <div className="min-h-screen bg-background">
+        <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         {patient && (
           <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -185,7 +189,17 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
             </div>
           </header>
         )}
-        {children}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </PatientAuthContext.Provider>
   )

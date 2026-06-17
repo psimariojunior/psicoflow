@@ -1,6 +1,6 @@
-const CACHE = "psicoflow-v3"
-const STATIC_CACHE = "psicoflow-static-v3"
-const IMAGE_CACHE = "psicoflow-images-v3"
+const CACHE = "psicoflow-v4"
+const STATIC_CACHE = "psicoflow-static-v4"
+const IMAGE_CACHE = "psicoflow-images-v4"
 
 const PRECACHE_URLS = [
   "/",
@@ -10,21 +10,25 @@ const PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/favicon.svg",
   "/favicon-32.png",
-  "/pwa-72-v2.png",
-  "/pwa-96-v2.png",
-  "/pwa-128-v2.png",
-  "/pwa-144-v2.png",
-  "/pwa-152-v2.png",
-  "/pwa-192-v2.png",
-  "/pwa-192-v2-maskable.png",
-  "/pwa-384-v2.png",
-  "/pwa-512-v2.png",
-  "/pwa-512-v2-maskable.png",
+  "/pwa-72-v3.png",
+  "/pwa-96-v3.png",
+  "/pwa-128-v3.png",
+  "/pwa-144-v3.png",
+  "/pwa-152-v3.png",
+  "/pwa-192-v3.png",
+  "/pwa-192-v3-maskable.png",
+  "/pwa-384-v3.png",
+  "/pwa-512-v3.png",
+  "/pwa-512-v3-maskable.png",
+  "/og-image.png",
+  "/logo.png",
 ]
 
 const isImage = (url) => /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url)
 const isFont = (url) => /\.(woff2?|ttf|otf|eot)$/i.test(url)
 const isApi = (url) => url.includes("/api/")
+const isNextStatic = (url) => url.includes("/_next/")
+const isDashboardPage = (url) => /^\/(dashboard|paciente|agenda|sessoes|prontuarios|financeiro|cobrancas|notificacoes|comunicacao|relatorios|diario-emocoes|configuracoes|disponibilidade|sala-virtual|pacientes)(\/|$)/.test(url)
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -56,28 +60,36 @@ self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET requests and API calls
-  if (request.method !== "GET" || isApi(url.pathname)) return
+  if (request.method !== "GET") return
 
-  // Network-first for HTML navigation
-  if (request.mode === "navigate") {
+  // API calls: network only
+  if (isApi(url.pathname)) return
+
+  // _next/ static: cache-first with long TTL
+  if (isNextStatic(url.pathname)) {
+    event.respondWith(cacheFirst(request, STATIC_CACHE))
+    return
+  }
+
+  // Dashboard/patient pages: network-first with offline fallback
+  if (isDashboardPage(url.pathname) || request.mode === "navigate") {
     event.respondWith(networkFirstWithFallback(request))
     return
   }
 
-  // Cache-first for images
+  // Images: cache-first
   if (isImage(url.pathname)) {
     event.respondWith(cacheFirst(request, IMAGE_CACHE))
     return
   }
 
-  // Cache-first for fonts
+  // Fonts: cache-first
   if (isFont(url.pathname)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE))
     return
   }
 
-  // Stale-while-revalidate for everything else
+  // Everything else: stale-while-revalidate
   event.respondWith(staleWhileRevalidate(request))
 })
 

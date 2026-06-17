@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
-import { BarChart3, TrendingUp, Users, Calendar, DollarSign, Download, Loader2 } from "lucide-react"
+import { BarChart3, TrendingUp, Users, Calendar, DollarSign, Download } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface MonthlySession {
@@ -44,8 +44,50 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-40 animate-shimmer rounded-lg" />
+            <div className="h-4 w-72 animate-shimmer rounded-lg" />
+          </div>
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-xl border p-5 space-y-3">
+              <div className="h-4 w-24 animate-shimmer rounded" />
+              <div className="h-8 w-16 animate-shimmer rounded" />
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl border p-6 space-y-4">
+          <div className="h-5 w-36 animate-shimmer rounded" />
+          <div className="flex items-end gap-3 h-48">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="flex-1 animate-shimmer rounded-t" style={{ height: `${20 + Math.random() * 60}%` }} />
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border p-6 space-y-3">
+            <div className="h-5 w-28 animate-shimmer rounded" />
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-4 w-32 animate-shimmer rounded" />
+                <div className="h-4 w-16 animate-shimmer rounded ml-auto" />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-xl border p-6 space-y-3">
+            <div className="h-5 w-36 animate-shimmer rounded" />
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-4 w-32 animate-shimmer rounded" />
+                <div className="h-4 w-16 animate-shimmer rounded ml-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }

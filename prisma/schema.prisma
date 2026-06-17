@@ -348,6 +348,7 @@ model Notification {
   @@index([patientId])
   @@index([status])
   @@index([appointmentId])
+  @@index([status, scheduledAt])
 }
 
 model Message {

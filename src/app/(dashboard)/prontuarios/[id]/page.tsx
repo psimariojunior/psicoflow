@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/utils"
-import { ArrowLeft, FileText, Lock, Download, Printer, Trash2, Edit, Save, Loader2, X } from "lucide-react"
+import { ArrowLeft, FileText, Lock, Download, Printer, Trash2, Edit, Save, X } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
@@ -104,8 +104,22 @@ export default function RecordDetailPage({ params }: { params: { id: string } })
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 animate-shimmer rounded-lg" />
+          <div className="h-8 w-52 animate-shimmer rounded-lg" />
+        </div>
+        <div className="rounded-xl border p-8 space-y-6">
+          <div className="space-y-2">
+            <div className="h-5 w-40 animate-shimmer rounded" />
+            <div className="h-4 w-64 animate-shimmer rounded" />
+          </div>
+          <div className="space-y-3">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-4 w-full animate-shimmer rounded" style={{ width: `${60 + Math.random() * 40}%` }} />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -136,7 +150,7 @@ export default function RecordDetailPage({ params }: { params: { id: string } })
               <X className="mr-2 h-4 w-4" /> Cancelar
             </Button>
             <Button onClick={saveEdit} disabled={saving}>
-              {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</> : <><Save className="mr-2 h-4 w-4" /> Salvar</>}
+              {saving ? <><div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Salvando...</> : <><Save className="mr-2 h-4 w-4" /> Salvar</>}
             </Button>
           </div>
         </div>

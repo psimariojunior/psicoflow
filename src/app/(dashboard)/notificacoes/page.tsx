@@ -12,7 +12,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Switch } from "@/components/ui/switch"
 import { formatDate, formatDateTime } from "@/lib/utils"
-import { Bell, Send, History, Mail, MessageSquare, Phone, Smartphone, Loader2 } from "lucide-react"
+import { Bell, Send, History, Mail, MessageSquare, Phone, Smartphone } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import toast from "react-hot-toast"
 
@@ -105,8 +105,33 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-44 animate-shimmer rounded-lg" />
+            <div className="h-4 w-60 animate-shimmer rounded-lg" />
+          </div>
+          <div className="h-9 w-32 animate-shimmer rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+          <div className="h-9 w-28 animate-shimmer rounded-lg" />
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-xl border p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-lg animate-shimmer" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-4 w-32 animate-shimmer rounded" />
+                  <div className="h-3 w-48 animate-shimmer rounded" />
+                </div>
+              </div>
+              <div className="h-3 w-24 animate-shimmer rounded" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

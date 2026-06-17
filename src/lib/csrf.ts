@@ -4,7 +4,9 @@ export function validateOrigin(request: Request): { allowed: boolean; error?: Ne
   const origin = request.headers.get("origin")
   const referer = request.headers.get("referer")
 
-  if (process.env.NODE_ENV === "development") {
+  const isDev = process.env.NODE_ENV !== "production"
+
+  if (isDev) {
     return { allowed: true }
   }
 
@@ -13,7 +15,6 @@ export function validateOrigin(request: Request): { allowed: boolean; error?: Ne
   const allowedOrigins = [
     appUrl.replace(/\/$/, ""),
     "https://psicoflow-iota.vercel.app",
-    "http://localhost:3000",
   ]
 
   if (origin && !allowedOrigins.includes(origin)) {

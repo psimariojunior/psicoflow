@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePatientAuth } from "@/components/patient-auth-provider"
-import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, MapPin } from "lucide-react"
+import { MoodChart } from "@/components/patient/mood-chart"
+import { Card } from "@/components/ui/card"
+import { motion } from "framer-motion"
+import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -13,105 +16,168 @@ interface Appointment {
   psychologist: { name: string }
 }
 
+interface DiaryEntry {
+  id: string
+  date: string
+  mood: number
+}
+
+const quickLinks = [
+  { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda", desc: "Ver consultas", gradient: "from-blue-500 to-indigo-600" },
+  { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-emerald-500 to-teal-600" },
+  { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600" },
+  { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600" },
+]
+
 export default function PacienteDashboard() {
   const { patient, token } = usePatientAuth()
   const [nextAppointment, setNextAppointment] = useState<Appointment | null>(null)
   const [loadingAppt, setLoadingAppt] = useState(true)
+  const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([])
+  const [sessionCount, setSessionCount] = useState(0)
 
   useEffect(() => {
     if (!token) return
-    fetch("/api/pacientes/agendamentos", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((data: Appointment[]) => {
-        const upcoming = data
+    Promise.all([
+      fetch("/api/pacientes/agendamentos", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
+      fetch("/api/pacientes/diario", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
+    ])
+      .then(([appts, diary]) => {
+        const upcoming = (appts as Appointment[])
           .filter((a) => a.status !== "CANCELLED" && new Date(a.startTime) > new Date())
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
         setNextAppointment(upcoming[0] || null)
+        setSessionCount((appts as Appointment[]).filter((a) => a.status !== "CANCELLED" && new Date(a.startTime) <= new Date()).length)
+        setDiaryEntries((diary as DiaryEntry[]) || [])
       })
       .catch(() => {})
       .finally(() => setLoadingAppt(false))
   }, [token])
 
-  const formatDate = (iso: string) => {
+  const formatDateTime = (iso: string) => {
     const d = new Date(iso)
-    return d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })
+    return {
+      date: d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" }),
+      time: d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+    }
   }
 
-  const formatTime = (iso: string) => {
-    const d = new Date(iso)
-    return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+  const timeUntilAppointment = () => {
+    if (!nextAppointment) return null
+    const diff = new Date(nextAppointment.startTime).getTime() - Date.now()
+    if (diff < 0) return null
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    if (days > 0) return `${days}d ${hours}h`
+    if (hours > 0) return `${hours}h`
+    return "<1h"
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Olá, {patient?.name?.split(" ")[0]}</h1>
-        <p className="text-muted-foreground text-sm mt-1">Bem-vindo ao PsicoFlow</p>
+    <motion.div
+      className="max-w-4xl mx-auto px-4 py-8 space-y-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Olá, {patient?.name?.split(" ")[0]}
+          </h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Bem-vindo ao PsicoFlow</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Activity className="h-4 w-4 text-primary" />
+          <span>{sessionCount} sessão{ sessionCount !== 1 ? "s" : "" } realizada{ sessionCount !== 1 ? "s" : "" }</span>
+        </div>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Próxima consulta</h2>
-        {loadingAppt ? (
-          <div className="bg-card rounded-2xl p-6 ring-1 ring-border animate-pulse h-28" />
-        ) : nextAppointment ? (
-          <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 ring-1 ring-primary/20">
-            <div className="flex items-start justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-primary">
-                  <CalendarDays className="h-4 w-4" />
-                  <span className="font-medium">{formatDate(nextAppointment.startTime)}</span>
-                </div>
-                <div className="flex items-center gap-2 text-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{formatTime(nextAppointment.startTime)}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <User className="h-4 w-4" />
-                  <span>{nextAppointment.psychologist.name}</span>
+      {loadingAppt ? (
+        <Card className="p-6">
+          <div className="space-y-3">
+            <div className="h-4 w-32 animate-shimmer rounded" />
+            <div className="h-4 w-48 animate-shimmer rounded" />
+            <div className="h-4 w-40 animate-shimmer rounded" />
+          </div>
+        </Card>
+      ) : nextAppointment ? (
+        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="h-5 w-5 text-emerald-200" />
+              <h3 className="font-semibold">Próxima Consulta</h3>
+              <span className="ml-auto text-xs bg-white/20 px-3 py-1 rounded-full">
+                em {timeUntilAppointment()}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/15">
+                <CalendarDays className="h-7 w-7" />
+              </div>
+              <div className="flex-1 space-y-1.5">
+                <p className="font-medium text-lg">{formatDateTime(nextAppointment.startTime).date}</p>
+                <div className="flex items-center gap-4 text-sm text-emerald-100">
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    {formatDateTime(nextAppointment.startTime).time}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <User className="h-3.5 w-3.5" />
+                    {nextAppointment.psychologist.name}
+                  </span>
                 </div>
               </div>
               <Link
                 href="/paciente/agenda"
-                className="text-primary hover:text-primary/80 transition-colors"
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 transition-all"
                 aria-label="Ver agenda completa"
               >
                 <ChevronRight className="h-5 w-5" />
               </Link>
             </div>
           </div>
-        ) : (
-          <div className="bg-card rounded-2xl p-6 ring-1 ring-border text-center">
-            <p className="text-muted-foreground text-sm">Nenhuma consulta agendada</p>
-            <p className="text-muted-foreground/60 text-xs mt-1">Entre em contato com seu psicólogo</p>
+        </div>
+      ) : (
+        <Card className="p-8 text-center border-dashed">
+          <div className="flex flex-col items-center gap-2">
+            <CalendarDays className="h-10 w-10 text-muted-foreground/50" />
+            <p className="text-muted-foreground">Nenhuma consulta agendada</p>
+            <p className="text-muted-foreground/60 text-xs">Entre em contato com seu psicólogo</p>
           </div>
-        )}
-      </div>
+        </Card>
+      )}
 
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Acesso rápido</h2>
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/paciente/agenda" className="bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all group">
-          <CalendarDays className="h-6 w-6 text-primary mb-3" />
-          <h3 className="text-foreground font-medium text-sm">Agenda</h3>
-          <p className="text-muted-foreground text-xs mt-1">Ver consultas</p>
-        </Link>
-        <Link href="/paciente/diario" className="bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all group">
-          <BookHeart className="h-6 w-6 text-primary mb-3" />
-          <h3 className="text-foreground font-medium text-sm">Diário</h3>
-          <p className="text-muted-foreground text-xs mt-1">Registre emoções</p>
-        </Link>
-        <Link href="/paciente/historico" className="bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all group">
-          <History className="h-6 w-6 text-primary mb-3" />
-          <h3 className="text-foreground font-medium text-sm">Histórico</h3>
-          <p className="text-muted-foreground text-xs mt-1">Consultas anteriores</p>
-        </Link>
-        <Link href="/paciente/meus-dados" className="bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all group">
-          <User className="h-6 w-6 text-primary mb-3" />
-          <h3 className="text-foreground font-medium text-sm">Meus Dados</h3>
-          <p className="text-muted-foreground text-xs mt-1">Editar perfil</p>
-        </Link>
+      <MoodChart entries={diaryEntries} />
+
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Acesso rápido</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {quickLinks.map((link) => (
+            <Link key={link.href} href={link.href}>
+              <div className="group relative overflow-hidden bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all duration-200 cursor-pointer">
+                <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-gradient-to-br", link.gradient)} />
+                <div className="relative">
+                  <div className={cn(
+                    "flex items-center justify-center w-11 h-11 rounded-xl mb-3 bg-gradient-to-br shadow-md transition-all duration-300 group-hover:scale-110 group-hover:rotate-3",
+                    link.gradient
+                  )}>
+                    <link.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <h4 className="text-foreground font-medium text-sm">{link.label}</h4>
+                  <p className="text-muted-foreground text-xs mt-0.5">{link.desc}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
+}
+
+function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(" ")
 }
