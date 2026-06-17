@@ -15,8 +15,9 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: "echo 'using docker'",
+    command: "npx next dev -p 3000",
     url: "http://localhost:3000",
     reuseExistingServer: true,
+    timeout: 120000,
   },
 })

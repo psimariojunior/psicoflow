@@ -67,7 +67,7 @@ describe("createTransactionSchema", () => {
   it("accepts valid income transaction", () => {
     const result = createTransactionSchema.safeParse({
       description: "Sessão de terapia",
-      type: "RECEITA",
+      type: "INCOME",
       amount: 200,
     })
     expect(result.success).toBe(true)
@@ -85,7 +85,7 @@ describe("createTransactionSchema", () => {
   it("rejects negative amount", () => {
     const result = createTransactionSchema.safeParse({
       description: "Teste",
-      type: "RECEITA",
+      type: "INCOME",
       amount: -50,
     })
     expect(result.success).toBe(false)

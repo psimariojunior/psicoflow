@@ -36,9 +36,9 @@ const t = {
     titleAccent: "3 steps",
     subtitle: "Simple, fast and secure. Start today.",
     steps: [
-      { title: "Book", desc: "Choose the best day and time in the online schedule. No bureaucracy." },
-      { title: "Connect", desc: "At the scheduled time, enter the secure virtual room with one click." },
-      { title: "Transform", desc: "Attend the session with privacy and take the next step in your well-being." },
+      { icon: Calendar, title: "Book", desc: "Choose the best day and time in the online schedule. No bureaucracy." },
+      { icon: Globe, title: "Connect", desc: "At the scheduled time, enter the secure virtual room with one click." },
+      { icon: Heart, title: "Transform", desc: "Attend the session with privacy and take the next step in your well-being." },
     ],
   },
   services: {
