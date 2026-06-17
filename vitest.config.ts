@@ -6,14 +6,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    setupFiles: ["./src/__tests__/setup.ts"],
     globals: true,
-    include: ["src/**/*.test.{ts,tsx}"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "html"],
-      exclude: ["node_modules/", "src/__tests__/"],
-    },
+    setupFiles: ["./src/lib/__tests__/setup.ts"],
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
   },
   resolve: {
     alias: {

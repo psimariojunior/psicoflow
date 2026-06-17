@@ -8,6 +8,7 @@ import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { CommandPalette } from "@/components/command-palette"
 import { KeyboardShortcutsHint } from "@/components/keyboard-shortcuts"
+import { OnboardingTour } from "@/components/onboarding-tour"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -63,6 +64,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </main>
         <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         <KeyboardShortcutsHint />
+        <OnboardingTour />
       </div>
     </div>
   )
