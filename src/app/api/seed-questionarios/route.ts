@@ -38,6 +38,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 
+  const firstPsych = await prisma.user.findFirst({ where: { role: "PSYCHOLOGIST" }, select: { id: true } })
+  if (!firstPsych) {
+    return NextResponse.json({ error: "Nenhum psicólogo encontrado no banco" }, { status: 400 })
+  }
+  const psychId = firstPsych.id
+
   const results: string[] = []
 
   const existingPhq9 = await prisma.questionnaire.findFirst({ where: { type: "PHQ9" } })
@@ -48,7 +54,7 @@ export async function GET(request: Request) {
         title: "PHQ-9 — Questionário de Saúde do Paciente",
         description: "Triagem e monitoramento da gravidade da depressão.",
         isActive: true,
-        psychologistId: "system",
+        psychologistId: psychId,
         questions: { create: phq9Questions.map(q => ({ questionText: q.text, questionOrder: q.order, options, category: q.category })) },
       },
     })
@@ -65,7 +71,7 @@ export async function GET(request: Request) {
         title: "GAD-7 — Escala de Ansiedade Generalizada",
         description: "Triagem e monitoramento da gravidade da ansiedade.",
         isActive: true,
-        psychologistId: "system",
+        psychologistId: psychId,
         questions: { create: gad7Questions.map(q => ({ questionText: q.text, questionOrder: q.order, options, category: q.category })) },
       },
     })
