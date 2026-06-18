@@ -5,16 +5,32 @@ const SIZES = [72, 96, 128, 144, 152, 192, 384, 512]
 const OUT_DIR = 'public'
 const LOGO_PATH = path.join(OUT_DIR, 'logo.png')
 const GREEN = { r: 16, g: 185, b: 129, alpha: 1 }
-const VERSION = 'v3'
+const VERSION = 'v4'
 
 async function main() {
-  // Load logo and convert to a clean square crop first
-  const logoMeta = await sharp(LOGO_PATH).metadata()
-  const size = Math.min(logoMeta.width || 1000, logoMeta.height || 1000)
+  // Trim transparent edges from logo first, then make it square
+  const trimmedLogo = await sharp(LOGO_PATH)
+    .trim({ threshold: 10 })
+    .png()
+    .toBuffer()
+
+  const logoMeta = await sharp(trimmedLogo).metadata()
+  const logoW = logoMeta.width || 800
+  const logoH = logoMeta.height || 800
+  const logoMax = Math.max(logoW, logoH)
+  const logoMin = Math.min(logoW, logoH)
   
-  // Center-crop the logo to square first
-  const squareLogo = await sharp(LOGO_PATH)
-    .resize(800, 800, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  // Create a square version by extending the shorter side with transparency
+  const extendPx = Math.round((logoMax - logoMin) / 2)
+  const squareLogo = await sharp(trimmedLogo)
+    .extend({
+      top: logoW > logoH ? 0 : extendPx,
+      bottom: logoW > logoH ? 0 : extendPx,
+      left: logoH > logoW ? 0 : extendPx,
+      right: logoH > logoW ? 0 : extendPx,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .resize(800, 800)
     .png()
     .toBuffer()
 
@@ -24,8 +40,8 @@ async function main() {
       create: { width: iconSize, height: iconSize, channels: 4, background: GREEN },
     }).png().toBuffer()
 
-    // Logo inside with comfortable padding
-    const padLogo = Math.round(iconSize * 0.18)
+    // Logo inside with tight padding (10% — logo fills 80% of icon)
+    const padLogo = Math.round(iconSize * 0.10)
     const logoInner = iconSize - padLogo * 2
 
     const logoResized = await sharp(squareLogo)
@@ -38,8 +54,8 @@ async function main() {
       .png()
       .toFile(path.join(OUT_DIR, `pwa-${iconSize}-${VERSION}.png`))
 
-    // Maskable
-    const padMask = Math.round(iconSize * 0.22)
+    // Maskable (safe area: 20% padding)
+    const padMask = Math.round(iconSize * 0.20)
     const maskInner = iconSize - padMask * 2
     const logoMasked = await sharp(squareLogo)
       .resize(maskInner, maskInner)
