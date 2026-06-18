@@ -64,8 +64,12 @@ export default function DiarioPage() {
         if (today) {
           setTodayEntry(today)
           setMood(today.mood)
-          setSelectedEmotions(today.emotions ? JSON.parse(today.emotions) : [])
-          setSelectedActivities(today.activities ? JSON.parse(today.activities) : [])
+          try {
+            setSelectedEmotions(today.emotions ? JSON.parse(today.emotions) : [])
+          } catch { setSelectedEmotions([]) }
+          try {
+            setSelectedActivities(today.activities ? JSON.parse(today.activities) : [])
+          } catch { setSelectedActivities([]) }
           setNotes(today.notes || "")
         }
       })

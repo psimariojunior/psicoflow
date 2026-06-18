@@ -102,8 +102,8 @@ export async function POST(request: Request) {
         where: { id: existing.id },
         data: {
           mood: data.mood,
-          emotions: data.emotions ? sanitizeHtml(data.emotions) : existing.emotions,
-          activities: data.activities ? sanitizeHtml(data.activities) : existing.activities,
+          emotions: data.emotions || existing.emotions,
+          activities: data.activities || existing.activities,
           notes: data.notes !== undefined ? sanitizeHtml(data.notes) : existing.notes,
           sleepHours: data.sleepHours !== undefined ? data.sleepHours : existing.sleepHours,
           sleepQuality: data.sleepQuality !== undefined ? data.sleepQuality : existing.sleepQuality,
@@ -117,8 +117,8 @@ export async function POST(request: Request) {
       data: {
         mood: data.mood,
         date: new Date(),
-        emotions: data.emotions ? sanitizeHtml(data.emotions) : null,
-        activities: data.activities ? sanitizeHtml(data.activities) : null,
+        emotions: data.emotions || null,
+        activities: data.activities || null,
         notes: data.notes ? sanitizeHtml(data.notes) : null,
         sleepHours: data.sleepHours ?? null,
         sleepQuality: data.sleepQuality ?? null,
