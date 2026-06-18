@@ -54,7 +54,8 @@ export default function DiarioPage() {
     })
       .then(async (r) => {
         if (!r.ok) throw new Error()
-        const data: DiaryEntry[] = await r.json()
+        const data = await r.json()
+        if (!Array.isArray(data)) { setEntries([]); return }
         setEntries(data)
         const today = data.find((e: DiaryEntry) => {
           const d = new Date(e.date).toISOString().split("T")[0]

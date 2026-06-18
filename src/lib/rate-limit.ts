@@ -70,7 +70,10 @@ export function rateLimitMiddleware(limit = 30, windowMs = 60000) {
   const check = rateLimit(limit, windowMs)
 
   return async (request: Request) => {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+    const rawIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || ""
+    const ip = rawIp || ("anon-" + (request.headers.get("authorization") || "none").slice(7, 12))
     const result = await check(ip)
 
     if (!result.allowed) {

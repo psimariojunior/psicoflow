@@ -6,7 +6,7 @@ import { sanitizeHtml } from "@/lib/security"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { z } from "zod"
 
-const rateLimit = rateLimitMiddleware(10, 60000)
+const rateLimit = rateLimitMiddleware(100, 60000)
 
 const diarySchema = z.object({
   mood: z.number().int().min(1).max(5),
