@@ -216,8 +216,10 @@ export default function DiarioPage() {
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Histórico</h2>
           <div className="space-y-2">
             {entries.map((e) => {
-              const emotions = e.emotions ? JSON.parse(e.emotions) : []
-              const activities = e.activities ? JSON.parse(e.activities) : []
+              let emotions: string[] = []
+              let activities: string[] = []
+              try { emotions = e.emotions ? JSON.parse(e.emotions) : [] } catch {}
+              try { activities = e.activities ? JSON.parse(e.activities) : [] } catch {}
               return (
                 <div key={e.id} className="bg-card rounded-xl p-4 ring-1 ring-border">
                   <div className="flex items-center gap-3 mb-2">

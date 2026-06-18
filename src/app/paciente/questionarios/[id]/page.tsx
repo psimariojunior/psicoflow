@@ -103,7 +103,8 @@ export default function QuestionnaireDetail() {
       <p className="text-muted-foreground">{questionnaire.description}</p>
 
       {questionnaire.questions.map(q => {
-        const options = JSON.parse(q.options || "[]") as { value: number; label: string }[]
+        let options: { value: number; label: string }[] = []
+        try { options = JSON.parse(q.options || "[]") } catch {}
         return (
           <Card key={q.id}>
             <CardHeader>

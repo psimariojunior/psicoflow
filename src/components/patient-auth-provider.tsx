@@ -108,14 +108,17 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  const isPublicPage = pathname === "/paciente/login" || pathname === "/paciente/cadastro" || pathname === "/paciente/recuperar-senha" || pathname === "/paciente/reset-password" || pathname === "/paciente/questionarios" || pathname.startsWith("/paciente/questionarios/") || pathname === "/paciente/anamnese" || pathname === "/paciente/protocolos-crise"
+  const authPages = ["/paciente/login", "/paciente/cadastro", "/paciente/recuperar-senha", "/paciente/reset-password"]
+  const publicPages = ["/paciente/questionarios", "/paciente/anamnese", "/paciente/protocolos-crise"]
+  const isAuthPage = authPages.includes(pathname)
+  const isPublicPage = isAuthPage || publicPages.includes(pathname) || pathname.startsWith("/paciente/questionarios/")
 
   if (!patient && !isPublicPage) {
     router.push("/paciente/login")
     return null
   }
 
-  if (patient && isPublicPage) {
+  if (patient && isAuthPage) {
     router.push("/paciente")
     return null
   }

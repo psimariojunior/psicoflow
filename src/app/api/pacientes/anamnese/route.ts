@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyPatientToken } from "@/lib/patient-auth"
+import { sanitizeHtml } from "@/lib/security"
 
 export const dynamic = "force-dynamic"
 
@@ -40,15 +41,16 @@ export async function POST(request: NextRequest) {
 
     if (!patient) return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
 
+    const s = (v: string) => v ? sanitizeHtml(v) : v
     const data = {
-      complaints: body.complaints,
-      history: body.history,
-      medications: body.medications,
-      allergies: body.allergies,
-      familyHistory: body.familyHistory,
-      lifestyle: body.lifestyle,
-      expectations: body.expectations,
-      previousTherapy: body.previousTherapy,
+      complaints: s(body.complaints),
+      history: s(body.history),
+      medications: s(body.medications),
+      allergies: s(body.allergies),
+      familyHistory: s(body.familyHistory),
+      lifestyle: s(body.lifestyle),
+      expectations: s(body.expectations),
+      previousTherapy: s(body.previousTherapy),
       completed: true,
     }
 
