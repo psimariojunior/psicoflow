@@ -71,6 +71,8 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    setToken(storedToken)
+
     fetch("/api/pacientes/me", {
       headers: { Authorization: `Bearer ${storedToken}` },
     })
@@ -78,12 +80,9 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
         if (!res.ok) throw new Error()
         return res.json()
       })
-      .then((data) => {
-        setToken(storedToken)
-        setPatient(data)
-      })
+      .then((data) => setPatient(data))
       .catch(() => {
-        localStorage.removeItem("patient_token")
+        // Token invalid or server unavailable — keep token and let pages handle 401
       })
       .finally(() => setLoading(false))
   }, [])
