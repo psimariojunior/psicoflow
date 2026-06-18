@@ -52,8 +52,9 @@ export default function DiarioPage() {
     fetch("/api/pacientes/diario", {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then(async (r) => {
+        if (!r.ok) throw new Error()
+        const data: DiaryEntry[] = await r.json()
         setEntries(data)
         const today = data.find((e: DiaryEntry) => {
           const d = new Date(e.date).toISOString().split("T")[0]
