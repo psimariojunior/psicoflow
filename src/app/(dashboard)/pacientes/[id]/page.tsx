@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/utils"
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Pencil, Lock, ExternalLink } from "lucide-react"
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Pencil, Lock, ExternalLink, ClipboardList, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle } from "lucide-react"
 import Link from "next/link"
 
 interface MedicalRecord {
@@ -48,6 +48,8 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
   const [patient, setPatient] = useState<PatientDetail | null>(null)
   const [sessions, setSessions] = useState<unknown[]>([])
   const [financials, setFinancials] = useState<FinancialTransaction[]>([])
+  const [questionnaireResponses, setQuestionnaireResponses] = useState<any[]>([])
+  const [anamnese, setAnamnese] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -65,6 +67,14 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           const data = await transRes.json()
           setFinancials((data.transactions || []).filter((t: FinancialTransaction) => t.patientId === params.id))
         }
+      } catch {}
+      try {
+        const [questRes, anamRes] = await Promise.all([
+          fetch(`/api/pacientes/${params.id}/questionarios`),
+          fetch(`/api/pacientes/${params.id}/anamnese`),
+        ])
+        if (questRes.ok) setQuestionnaireResponses(await questRes.json())
+        if (anamRes.ok) setAnamnese(await anamRes.json())
       } catch {}
       setLoading(false)
     }
@@ -172,6 +182,8 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
             <TabsList>
               <TabsTrigger value="financial"><DollarSign className="mr-2 h-4 w-4" />Financeiro</TabsTrigger>
               <TabsTrigger value="records"><FileText className="mr-2 h-4 w-4" />Prontuários</TabsTrigger>
+              <TabsTrigger value="questionnaires"><ClipboardList className="mr-2 h-4 w-4" />Questionários</TabsTrigger>
+              <TabsTrigger value="anamnese"><Brain className="mr-2 h-4 w-4" />Anamnese</TabsTrigger>
             </TabsList>
 
             <TabsContent value="financial" className="space-y-4">
@@ -234,6 +246,71 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                     </Card>
                   </Link>
                 ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="questionnaires" className="space-y-4">
+              {questionnaireResponses.length === 0 ? (
+                <Card><CardContent className="p-8 text-center text-muted-foreground"><ClipboardList className="mx-auto h-8 w-8 mb-2" /><p>Nenhum questionário respondido</p></CardContent></Card>
+              ) : (
+                questionnaireResponses.map((r: any) => (
+                  <Card key={r.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-medium">{r.questionnaire?.title || "Questionário"}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(r.completedAt).toLocaleDateString("pt-BR")}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold">{r.totalScore}</p>
+                          <Badge variant={r.severity === "Severa" || r.severity === "Moderadamente severa" ? "destructive" : r.severity === "Moderada" ? "warning" : "success"}>{r.severity}</Badge>
+                        </div>
+                      </div>
+                      {r.answers?.length > 0 && (
+                        <div className="space-y-1 mt-3 pt-3 border-t">
+                          {r.answers.map((a: any) => (
+                            <div key={a.id} className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">{a.question?.questionText || "Pergunta"}</span>
+                              <span className="font-medium ml-4">{a.value}/{a.question?.scaleMax || 3}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="anamnese" className="space-y-4">
+              {!anamnese ? (
+                <Card><CardContent className="p-8 text-center text-muted-foreground"><Brain className="mx-auto h-8 w-8 mb-2" /><p>Anamnese não preenchida</p></CardContent></Card>
+              ) : (
+                <Card>
+                  <CardContent className="p-6 space-y-6">
+                    {[
+                      { key: "complaints", label: "Queixa Principal", icon: AlertCircle },
+                      { key: "history", label: "Histórico", icon: Brain },
+                      { key: "medications", label: "Medicações", icon: Pill },
+                      { key: "allergies", label: "Alergias", icon: Heart },
+                      { key: "familyHistory", label: "Histórico Familiar", icon: Users },
+                      { key: "lifestyle", label: "Estilo de Vida", icon: Leaf },
+                      { key: "expectations", label: "Expectativas", icon: Target },
+                      { key: "previousTherapy", label: "Terapia Anterior", icon: Brain },
+                    ].map(({ key, label, icon: Icon }) => (
+                      anamnese[key] ? (
+                        <div key={key}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Icon className="h-4 w-4 text-primary" />
+                            <h4 className="font-medium text-sm">{label}</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{anamnese[key]}</p>
+                        </div>
+                      ) : null
+                    ))}
+                    {anamnese.updatedAt && <p className="text-xs text-muted-foreground">Atualizado em {new Date(anamnese.updatedAt).toLocaleDateString("pt-BR")}</p>}
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
           </Tabs>
