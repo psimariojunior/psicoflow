@@ -1,6 +1,6 @@
-const CACHE = "psicoflow-v4"
-const STATIC_CACHE = "psicoflow-static-v4"
-const IMAGE_CACHE = "psicoflow-images-v4"
+const CACHE = "psicoflow-v5"
+const STATIC_CACHE = "psicoflow-static-v5"
+const IMAGE_CACHE = "psicoflow-images-v5"
 
 const PRECACHE_URLS = [
   "/",
@@ -46,11 +46,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((k) => k !== CACHE && k !== STATIC_CACHE && k !== IMAGE_CACHE)
-          .map((k) => caches.delete(k))
-      )
+      Promise.all(keys.map((k) => caches.delete(k)))
     )
   )
   self.clients.claim()
