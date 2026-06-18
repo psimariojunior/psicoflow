@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Shield, AlertTriangle, Phone, ExternalLink, ChevronDown, ChevronUp, BookOpen, Sparkles } from "lucide-react"
+import { usePatientAuth } from "@/components/patient-auth-provider"
+import { Shield, AlertTriangle, Phone, ExternalLink, ChevronDown, ChevronUp, BookOpen, Sparkles, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Protocol {
@@ -23,16 +25,16 @@ export default function ProtocolosCrisePage() {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [emergencyMode, setEmergencyMode] = useState(false)
+  const { token, loading: authLoading } = usePatientAuth()
 
   useEffect(() => {
-    const tk = localStorage.getItem("patient_token")
-    if (!tk) { setLoading(false); return }
-    fetch("/api/pacientes/protocolos-crise", { headers: { Authorization: `Bearer ${tk}` } })
+    if (authLoading || !token) { setLoading(false); return }
+    fetch("/api/pacientes/protocolos-crise", { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : [])
       .then(setProtocols)
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [token, authLoading])
 
   const toggleExpanded = (id: string) => {
     setExpanded(prev => prev === id ? null : id)
@@ -43,6 +45,16 @@ export default function ProtocolosCrisePage() {
       <div className="space-y-4">
         <div className="h-8 w-48 bg-muted rounded animate-pulse" />
         <div className="h-48 bg-muted rounded animate-pulse" />
+      </div>
+    )
+  }
+
+  if (!token) {
+    return (
+      <div className="text-center py-12">
+        <Lock className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+        <p className="text-muted-foreground">Faça login para acessar seus protocolos.</p>
+        <Button asChild className="mt-4"><Link href="/paciente/login">Entrar</Link></Button>
       </div>
     )
   }

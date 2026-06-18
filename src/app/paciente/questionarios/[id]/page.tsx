@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Loader2, ArrowLeft, Save, CheckCircle2, Brain } from "lucide-react"
+import { usePatientAuth } from "@/components/patient-auth-provider"
+import { Loader2, ArrowLeft, Save, CheckCircle2, Brain, Lock } from "lucide-react"
 
 interface Question {
   id: string
@@ -34,36 +35,47 @@ export default function QuestionnaireDetail() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ totalScore: number; severity: string } | null>(null)
+  const { token, loading: authLoading } = usePatientAuth()
 
   useEffect(() => {
-    const tk = localStorage.getItem("patient_token")
-    if (!tk) { router.push("/paciente/login"); return }
-    fetch(`/api/pacientes/questionarios/${id}`, { headers: { Authorization: `Bearer ${tk}` } })
+    if (authLoading) return
+    if (!token) { setLoading(false); return }
+    fetch(`/api/pacientes/questionarios/${id}`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setQuestionnaire(d); else router.push("/paciente/questionarios") })
       .catch(() => router.push("/paciente/questionarios"))
       .finally(() => setLoading(false))
-  }, [id, router])
+  }, [id, router, token, authLoading])
 
   const handleSubmit = async () => {
     if (!questionnaire) return
+    if (!token) return
     const allAnswered = questionnaire.questions.every(q => answers[q.id] !== undefined)
     if (!allAnswered) return
     setSubmitting(true)
     try {
-      const tk = localStorage.getItem("patient_token")
       const ans = questionnaire.questions.map(q => ({ questionId: q.id, value: answers[q.id] || 0 }))
       const res = await fetch(`/api/pacientes/questionarios/${id}/responder`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${tk}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ answers: ans }),
       })
       if (res.ok) setResult(await res.json())
     } catch (e) { console.error(e) } finally { setSubmitting(false) }
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return <div className="p-4"><Loader2 className="h-8 w-8 animate-spin mx-auto" /></div>
+  }
+
+  if (!token) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-12">
+        <Lock className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+        <p className="text-muted-foreground">Faça login para responder aos questionários.</p>
+        <Button asChild className="mt-4"><Link href="/paciente/login">Entrar</Link></Button>
+      </div>
+    )
   }
 
   if (result) {

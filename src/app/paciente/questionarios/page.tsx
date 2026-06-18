@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Brain, ClipboardList, ArrowRight, CheckCircle2 } from "lucide-react"
+import { usePatientAuth } from "@/components/patient-auth-provider"
+import { Brain, ArrowRight, CheckCircle2, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Questionnaire {
@@ -23,27 +24,37 @@ interface Response {
 }
 
 export default function QuestionariosPage() {
+  const { token, loading: authLoading } = usePatientAuth()
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [responses, setResponses] = useState<Response[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const tk = localStorage.getItem("patient_token")
-    if (!tk) { setLoading(false); return }
+    if (authLoading || !token) { setLoading(false); return }
     Promise.all([
-      fetch("/api/pacientes/questionarios", { headers: { Authorization: `Bearer ${tk}` } }).then(r => r.ok ? r.json() : []),
-      fetch("/api/pacientes/questionarios-respostas", { headers: { Authorization: `Bearer ${tk}` } }).then(r => r.ok ? r.json() : []),
+      fetch("/api/pacientes/questionarios", { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []),
+      fetch("/api/pacientes/questionarios-respostas", { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []),
     ])
       .then(([q, r]) => { setQuestionnaires(q); setResponses(r) })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [token, authLoading])
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 bg-muted rounded animate-pulse" />
         {[1, 2, 3].map(i => <Card key={i} className="animate-pulse"><CardContent className="pt-6"><div className="h-4 w-3/4 bg-muted rounded" /></CardContent></Card>)}
+      </div>
+    )
+  }
+
+  if (!token) {
+    return (
+      <div className="text-center py-12">
+        <Lock className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+        <p className="text-muted-foreground">Faça login para acessar os questionários.</p>
+        <Button asChild className="mt-4"><Link href="/paciente/login">Entrar</Link></Button>
       </div>
     )
   }
@@ -77,10 +88,7 @@ export default function QuestionariosPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                    <span>{q._count.questions} perguntas</span>
-                    {lr && <span>Concluído</span>}
-                  </div>
+                  <div className="text-sm text-muted-foreground mb-4">{q._count.questions} perguntas</div>
                   <Button asChild className="w-full" disabled={!!lr}>
                     <Link href={`/paciente/questionarios/${q.id}`}>
                       <Brain className="mr-2 h-4 w-4" />
@@ -93,27 +101,6 @@ export default function QuestionariosPage() {
           })
         )}
       </div>
-      {responses.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Histórico</h2>
-          {responses.map(r => (
-            <Card key={r.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">{r.questionnaire.title}</h3>
-                    <p className="text-sm text-muted-foreground">{new Date(r.completedAt).toLocaleDateString("pt-BR")}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold">{r.totalScore}</p>
-                    <p className="text-xs text-muted-foreground">{r.severity}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

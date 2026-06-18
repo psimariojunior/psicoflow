@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Loader2, Save, CheckCircle2, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle } from "lucide-react"
+import { usePatientAuth } from "@/components/patient-auth-provider"
+import { Loader2, Save, CheckCircle2, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle, Lock } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface Anamnese {
@@ -43,13 +44,13 @@ export default function AnamnesePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const { token, loading: authLoading } = usePatientAuth()
 
   useEffect(() => {
     async function fetchAnamnese() {
+      if (authLoading || !token) { setLoading(false); return }
       try {
-        const tk = localStorage.getItem("patient_token")
-        if (!tk) { setLoading(false); return }
-        const res = await fetch("/api/pacientes/anamnese", { headers: { Authorization: `Bearer ${tk}` } })
+        const res = await fetch("/api/pacientes/anamnese", { headers: { Authorization: `Bearer ${token}` } })
         if (res.ok) {
           const data = await res.json()
           if (data) setAnamnese(data)
@@ -61,19 +62,19 @@ export default function AnamnesePage() {
       }
     }
     fetchAnamnese()
-  }, [])
+  }, [token, authLoading])
 
   const handleChange = (key: string, value: string) => {
     setAnamnese(prev => ({ ...prev, [key]: value, completed: true }))
   }
 
   const handleSave = async () => {
+    if (!token) { toast.error("Faça login para salvar"); return }
     setSaving(true)
     try {
-      const tk = localStorage.getItem("patient_token")
       const res = await fetch("/api/pacientes/anamnese", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${tk}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(anamnese),
       })
       if (res.ok) {
@@ -92,7 +93,7 @@ export default function AnamnesePage() {
     }
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="max-w-3xl mx-auto space-y-4">
         <div className="h-8 w-48 bg-muted rounded animate-pulse" />
@@ -104,6 +105,16 @@ export default function AnamnesePage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+    )
+  }
+
+  if (!token) {
+    return (
+      <div className="max-w-3xl mx-auto text-center py-12">
+        <Lock className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+        <p className="text-muted-foreground">Faça login para preencher sua anamnese.</p>
+        <Button asChild className="mt-4"><Link href="/paciente/login">Entrar</Link></Button>
       </div>
     )
   }
