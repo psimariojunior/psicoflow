@@ -109,7 +109,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
     )
   }
 
-  const isPublicPage = pathname === "/paciente/login" || pathname === "/paciente/cadastro" || pathname === "/paciente/recuperar-senha" || pathname === "/paciente/reset-password"
+  const isPublicPage = pathname === "/paciente/login" || pathname === "/paciente/cadastro" || pathname === "/paciente/recuperar-senha" || pathname === "/paciente/reset-password" || pathname === "/paciente/questionarios" || pathname.startsWith("/paciente/questionarios/") || pathname === "/paciente/anamnese" || pathname === "/paciente/protocolos-crise"
 
   if (!patient && !isPublicPage) {
     router.push("/paciente/login")

@@ -55,10 +55,15 @@ model User {
   auditLogs         AuditLog[]
   therapyResources  TherapyResource[]
   availabilitySlots AvailabilitySlot[]
-  closedRooms       ClosedRoom[]
+closedRooms       ClosedRoom[]
   sessionTokens     SessionToken[]
   accounts          Account[]
   nextAuthSessions  NextAuthSession[]
+  questionnaires    Questionnaire[]
+  questionnaireResponses QuestionnaireResponse[]
+  anamneses         Anamnesis[]
+  crisisProtocols   CrisisProtocol[]
+  crisisAccesses    CrisisProtocolAccess[]
 }
 
 model Account {
@@ -144,6 +149,9 @@ model Patient {
   therapySessions TherapySession[]
   attachments    Attachment[]
   transactions   FinancialTransaction[]
+  questionnaireResponses QuestionnaireResponse[]
+  anamnesis      Anamnesis?
+  crisisAccesses CrisisProtocolAccess[]
 
   @@index([psychologistId])
 }
@@ -497,6 +505,140 @@ model ClosedRoom {
   psychologistId  String
   psychologist    User     @relation(fields: [psychologistId], references: [id])
 
+  @@index([psychologistId])
+}
+
+enum QuestionnaireType {
+  PHQ9
+  GAD7
+  CUSTOM
+}
+
+model Questionnaire {
+  id          String             @id @default(cuid())
+  type        QuestionnaireType
+  title       String
+  description String?
+  questions   QuestionnaireQuestion[]
+  responses   QuestionnaireResponse[]
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  psychologistId String
+  psychologist   User             @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
+  @@index([type])
+}
+
+model QuestionnaireQuestion {
+  id             String       @id @default(cuid())
+  questionText   String
+  questionOrder  Int
+  options        String?      @default("[]")
+  scaleMin       Int?         @default(0)
+  scaleMax       Int?         @default(4)
+  category       String?
+
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  answers         QuestionnaireAnswer[]
+
+  @@index([questionnaireId])
+}
+
+model QuestionnaireResponse {
+  id             String   @id @default(cuid())
+  totalScore     Int?
+  severity       String?
+  notes          String?
+  completedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  questionnaireId String
+  questionnaire   Questionnaire  @relation(fields: [questionnaireId], references: [id])
+  patientId       String
+  patient         Patient         @relation(fields: [patientId], references: [id])
+  psychologistId  String
+  psychologist    User            @relation(fields: [psychologistId], references: [id])
+  answers         QuestionnaireAnswer[]
+
+  @@index([patientId])
+  @@index([psychologistId])
+  @@index([questionnaireId])
+  @@index([patientId, questionnaireId])
+}
+
+model QuestionnaireAnswer {
+  id         String   @id @default(cuid())
+  value      Int
+  notes      String?
+
+  responseId String
+  response   QuestionnaireResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId String
+  question   QuestionnaireQuestion @relation(fields: [questionId], references: [id])
+
+  @@index([responseId])
+  @@index([questionId])
+}
+
+model Anamnesis {
+  id             String   @id @default(cuid())
+  complaints     String?
+  history        String?
+  medications    String?
+  allergies      String?
+  familyHistory  String?
+  lifestyle      String?
+  expectations   String?
+  previousTherapy String?
+  completed      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  patientId      String   @unique
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+
+  @@index([psychologistId])
+}
+
+model CrisisProtocol {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  content       String
+  category      String?
+  tags          String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  assignedTo     CrisisProtocolAccess[]
+
+  @@index([psychologistId])
+}
+
+model CrisisProtocolAccess {
+  id                String   @id @default(cuid())
+  grantedAt         DateTime @default(now())
+  expiresAt         DateTime?
+  isActive          Boolean  @default(true)
+
+  protocolId        String
+  protocol          CrisisProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  patientId         String
+  patient           Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  psychologistId    String
+  psychologist      User           @relation(fields: [psychologistId], references: [id])
+
+  @@index([patientId])
+  @@index([protocolId])
   @@index([psychologistId])
 }
 

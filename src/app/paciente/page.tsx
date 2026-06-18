@@ -6,7 +6,7 @@ import { usePatientAuth } from "@/components/patient-auth-provider"
 import { MoodChart } from "@/components/patient/mood-chart"
 import { Card } from "@/components/ui/card"
 import { motion } from "framer-motion"
-import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain } from "lucide-react"
+import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain, ClipboardList, FileText, Shield } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -25,6 +25,9 @@ interface DiaryEntry {
 const quickLinks = [
   { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda", desc: "Ver consultas", gradient: "from-blue-500 to-indigo-600" },
   { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-emerald-500 to-teal-600" },
+  { href: "/paciente/questionarios", icon: ClipboardList, label: "Questionários", desc: "PHQ-9, GAD-7", gradient: "from-indigo-500 to-purple-600" },
+  { href: "/paciente/anamnese", icon: FileText, label: "Anamnese", desc: "Histórico clínico", gradient: "from-amber-500 to-orange-600" },
+  { href: "/paciente/protocolos-crise", icon: Shield, label: "Crise", desc: "Protocolos SOS", gradient: "from-red-500 to-rose-600" },
   { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600" },
   { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600" },
 ]
