@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyPatientToken } from "@/lib/patient-auth"
 
+export const dynamic = "force-dynamic"
+
 async function authenticate(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (!authHeader?.startsWith("Bearer ")) return null

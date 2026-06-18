@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyPatientToken } from "@/lib/patient-auth"
 
+export const dynamic = "force-dynamic"
+
 async function authenticate(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (!authHeader?.startsWith("Bearer ")) return null
@@ -38,10 +40,22 @@ export async function POST(request: NextRequest) {
 
     if (!patient) return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 })
 
+    const data = {
+      complaints: body.complaints,
+      history: body.history,
+      medications: body.medications,
+      allergies: body.allergies,
+      familyHistory: body.familyHistory,
+      lifestyle: body.lifestyle,
+      expectations: body.expectations,
+      previousTherapy: body.previousTherapy,
+      completed: true,
+    }
+
     const anamnese = await prisma.anamnesis.upsert({
       where: { patientId: payload.patientId },
-      update: { ...body, completed: true },
-      create: { ...body, patientId: payload.patientId, psychologistId: patient.psychologistId, completed: true },
+      update: data,
+      create: { ...data, patientId: payload.patientId, psychologistId: patient.psychologistId },
     })
 
     return NextResponse.json(anamnese)
