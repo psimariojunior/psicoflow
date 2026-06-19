@@ -22,9 +22,9 @@ import { motion } from "framer-motion"
 
 const quickActions = [
   { label: "Nova Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Agende um novo horário" },
-  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-emerald-500 to-teal-600", desc: "Cadastre um paciente" },
+  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600", desc: "Cadastre um paciente" },
   { label: "Nova Sessão", href: "/sessoes", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre um prontuário" },
-  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-rose-500 to-pink-600", desc: "Inicie uma videochamada" },
+  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-teal-600", desc: "Inicie uma videochamada" },
 ]
 
 const containerVariants = {
@@ -118,7 +118,7 @@ export default function DashboardHome() {
     <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
             Dashboard
           </h2>
           <p className="text-muted-foreground mt-1">Visão geral da sua prática clínica</p>
@@ -128,7 +128,7 @@ export default function DashboardHome() {
             <Download className="mr-2 h-4 w-4" />
             Exportar
           </Button>
-          <Button asChild size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25">
+          <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">
             <Link href="/agenda"><Plus className="mr-2 h-4 w-4" />Nova Consulta</Link>
           </Button>
         </div>
@@ -176,7 +176,7 @@ export default function DashboardHome() {
                     <p className="font-medium text-sm">{action.label}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
                 </div>
               </CardContent>
             </Card>
@@ -208,15 +208,15 @@ export default function DashboardHome() {
         </div>
         <div className="space-y-4">
           <motion.div variants={itemVariants}>
-            <Card className="overflow-hidden border-0 bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-xl">
+            <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="h-5 w-5 text-emerald-200" />
+                  <Sparkles className="h-5 w-5 text-blue-200" />
                   <span className="font-semibold">Meta do Mês</span>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-emerald-100">Progresso</span>
+                    <span className="text-blue-100">Progresso</span>
                     <span className="font-bold text-white">{progressWidth}%</span>
                   </div>
                   <div className="h-3 rounded-full bg-white/20 overflow-hidden">
@@ -226,11 +226,11 @@ export default function DashboardHome() {
                     />
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-emerald-100">Recebido</span>
+                    <span className="text-blue-100">Recebido</span>
                     <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-emerald-100">Meta</span>
+                    <span className="text-blue-100">Meta</span>
                     <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.goal)}</span>
                   </div>
                 </div>
