@@ -45,18 +45,18 @@ export function Header({ onMenuClick, onPaletteOpen }: HeaderProps) {
         scrolled && "shadow-sm"
       )}
     >
-      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onMenuClick} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="relative pl-3 border-l-2 border-emerald-500/30">
+          <div className="relative pl-3 border-l-2 border-blue-500/30">
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-semibold">{greeting}, {session?.user?.name?.split(" ")[0] || "Psicólogo"}</h1>
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
               </span>
             </div>
             <p className="text-xs text-muted-foreground">CRP 04/52274</p>
