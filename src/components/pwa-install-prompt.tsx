@@ -52,7 +52,7 @@ export function PwaInstallPrompt() {
           className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-80"
         >
           <div className="bg-card border rounded-2xl shadow-2xl p-4 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
               <Smartphone className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -69,7 +69,7 @@ export function PwaInstallPrompt() {
             </Button>
             <Button
               size="sm"
-              className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+              className="shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white gap-1.5 shadow-lg shadow-blue-500/20"
               onClick={handleInstall}
             >
               <Download className="h-3.5 w-3.5" />
