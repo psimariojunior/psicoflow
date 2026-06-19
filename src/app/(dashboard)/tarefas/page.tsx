@@ -75,7 +75,17 @@ export default function TarefasPage() {
     }
   }
 
-  useEffect(() => { loadTasks() }, [filterStatus, filterPatient])
+  useEffect(() => {
+    setLoading(true)
+    const params = new URLSearchParams()
+    if (filterStatus) params.set("status", filterStatus)
+    if (filterPatient) params.set("patientId", filterPatient)
+    fetch(`/api/tarefas?${params}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setTasks(d))
+      .catch(() => toast.error("Erro ao carregar tarefas"))
+      .finally(() => setLoading(false))
+  }, [filterStatus, filterPatient])
 
   useEffect(() => {
     fetch("/api/pacientes")
