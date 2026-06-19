@@ -29,6 +29,7 @@ const quickLinks = [
   { href: "/paciente/questionarios", icon: ClipboardList, label: "Questionários", desc: "PHQ-9, GAD-7", gradient: "from-indigo-500 to-purple-600", iconBg: "bg-indigo-100 dark:bg-indigo-900/30" },
   { href: "/paciente/anamnese", icon: FileText, label: "Anamnese", desc: "Histórico clínico", gradient: "from-amber-500 to-orange-600", iconBg: "bg-amber-100 dark:bg-amber-900/30" },
   { href: "/paciente/protocolos-crise", icon: Shield, label: "Crise", desc: "Protocolos SOS", gradient: "from-red-500 to-rose-600", iconBg: "bg-red-100 dark:bg-red-900/30" },
+  { href: "/paciente/consentimento", icon: FileText, label: "Consentimento", desc: "Termo LGPD", gradient: "from-blue-500 to-blue-700", iconBg: "bg-blue-100 dark:bg-blue-900/30" },
   { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600", iconBg: "bg-violet-100 dark:bg-violet-900/30" },
   { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600", iconBg: "bg-rose-100 dark:bg-rose-900/30" },
 ]

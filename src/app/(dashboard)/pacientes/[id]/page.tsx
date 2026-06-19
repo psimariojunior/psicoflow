@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/utils"
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Pencil, Lock, ExternalLink, ClipboardList, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle } from "lucide-react"
+import { cn, getInitials, formatDate, calculateAge, formatCurrency } from "@/lib/utils"
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, DollarSign, Pencil, Lock, ExternalLink, ClipboardList, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle, BookHeart, CheckCircle2, CreditCard, Activity, History } from "lucide-react"
 import Link from "next/link"
 
 interface MedicalRecord {
@@ -35,6 +35,14 @@ interface PatientDetail {
   medicalRecords?: MedicalRecord[]
 }
 
+interface TimelineItem {
+  id: string
+  type: "session" | "diary" | "questionnaire" | "task" | "payment"
+  date: string
+  title: string
+  description: string
+}
+
 interface FinancialTransaction {
   id: string
   description: string
@@ -51,6 +59,8 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
   const [questionnaireResponses, setQuestionnaireResponses] = useState<any[]>([])
   const [anamnese, setAnamnese] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
+  const [timeline, setTimeline] = useState<TimelineItem[]>([])
+  const [timelineLoading, setTimelineLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
@@ -79,6 +89,63 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
       setLoading(false)
     }
     load()
+  }, [params.id])
+
+  useEffect(() => {
+    const items: TimelineItem[] = []
+    async function loadTimeline() {
+      try {
+        const [sessRes, diaryRes, questRes, tasksRes, finRes] = await Promise.all([
+          fetch(`/api/sessoes?pacienteId=${params.id}`),
+          fetch(`/api/diario`),
+          fetch(`/api/pacientes/${params.id}/questionarios`),
+          fetch(`/api/pacientes/${params.id}/tarefas`),
+          fetch(`/api/financeiro`),
+        ])
+        if (sessRes.ok) {
+          const data = await sessRes.json()
+          const sessions = data.data || []
+          for (const s of sessions) {
+            items.push({ id: `sess-${s.id}`, type: "session", date: s.date, title: "Sessão realizada", description: s.type || "Sessão clínica" })
+          }
+        }
+        if (diaryRes.ok) {
+          const entries = await diaryRes.json()
+          for (const e of (Array.isArray(entries) ? entries : [])) {
+            if (e.patientId === params.id) {
+              items.push({ id: `diary-${e.id}`, type: "diary", date: e.date, title: "Registro no diário", description: `Humor: ${e.mood}/5` })
+            }
+          }
+        }
+        if (questRes.ok) {
+          const qs = await questRes.json()
+          for (const q of (Array.isArray(qs) ? qs : [])) {
+            items.push({ id: `quest-${q.id}`, type: "questionnaire", date: q.completedAt || q.createdAt, title: q.questionnaire?.title || "Questionário", description: `Pontuação: ${q.totalScore}` })
+          }
+        }
+        if (tasksRes.ok) {
+          const ts = await tasksRes.json()
+          for (const t of (Array.isArray(ts) ? ts : [])) {
+            if (t.status === "COMPLETED") {
+              items.push({ id: `task-${t.id}`, type: "task", date: t.completedAt || t.assignedAt, title: t.resource?.name || "Tarefa", description: "Tarefa concluída" })
+            }
+          }
+        }
+        if (finRes.ok) {
+          const finData = await finRes.json()
+          const trans = finData.transactions || []
+          for (const t of trans) {
+            if (t.patientId === params.id && t.paymentStatus === "PAID") {
+              items.push({ id: `pay-${t.id}`, type: "payment", date: t.paymentDate || t.createdAt, title: t.description, description: `Valor: R$ ${Number(t.amount).toFixed(2)}` })
+            }
+          }
+        }
+      } catch {}
+      items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      setTimeline(items)
+      setTimelineLoading(false)
+    }
+    loadTimeline()
   }, [params.id])
 
   if (loading) {
@@ -184,6 +251,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
               <TabsTrigger value="records"><FileText className="mr-2 h-4 w-4" />Prontuários</TabsTrigger>
               <TabsTrigger value="questionnaires"><ClipboardList className="mr-2 h-4 w-4" />Questionários</TabsTrigger>
               <TabsTrigger value="anamnese"><Brain className="mr-2 h-4 w-4" />Anamnese</TabsTrigger>
+              <TabsTrigger value="timeline"><History className="mr-2 h-4 w-4" />Linha do Tempo</TabsTrigger>
             </TabsList>
 
             <TabsContent value="financial" className="space-y-4">
@@ -311,6 +379,77 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                     {anamnese.updatedAt && <p className="text-xs text-muted-foreground">Atualizado em {new Date(anamnese.updatedAt).toLocaleDateString("pt-BR")}</p>}
                   </CardContent>
                 </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="timeline" className="space-y-4">
+              {timelineLoading ? (
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-start gap-4 animate-pulse">
+                      <div className="w-3 h-3 rounded-full bg-muted mt-1.5" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-32 bg-muted rounded" />
+                        <div className="h-3 w-48 bg-muted rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : timeline.length === 0 ? (
+                <Card><CardContent className="p-8 text-center text-muted-foreground"><History className="mx-auto h-8 w-8 mb-2" /><p>Nenhum registro encontrado</p></CardContent></Card>
+              ) : (
+                <div className="relative pl-6 space-y-0">
+                  <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border" />
+                  {timeline.map((item, index) => {
+                    const dotColor = {
+                      session: "bg-emerald-500",
+                      diary: "bg-blue-500",
+                      questionnaire: "bg-purple-500",
+                      task: "bg-emerald-500",
+                      payment: "bg-amber-500",
+                    }[item.type]
+                    const Icon = {
+                      session: Activity,
+                      diary: BookHeart,
+                      questionnaire: ClipboardList,
+                      task: CheckCircle2,
+                      payment: CreditCard,
+                    }[item.type]
+                    return (
+                      <div key={item.id} className="relative pb-6 last:pb-0 group">
+                        <div className={cn("absolute -left-[19px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-background z-10", dotColor)} />
+                        <Card className="card-hover transition-all group-hover:shadow-md ml-2">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className={cn("flex items-center justify-center w-8 h-8 rounded-lg shrink-0 mt-0.5", {
+                                "bg-emerald-100 dark:bg-emerald-900/30": item.type === "session",
+                                "bg-blue-100 dark:bg-blue-900/30": item.type === "diary",
+                                "bg-purple-100 dark:bg-purple-900/30": item.type === "questionnaire",
+                                "bg-cyan-100 dark:bg-cyan-900/30": item.type === "task",
+                                "bg-amber-100 dark:bg-amber-900/30": item.type === "payment",
+                              })}>
+                                <Icon className={cn("h-4 w-4", {
+                                  "text-emerald-600": item.type === "session",
+                                  "text-blue-600": item.type === "diary",
+                                  "text-purple-600": item.type === "questionnaire",
+                                  "text-cyan-600": item.type === "task",
+                                  "text-amber-600": item.type === "payment",
+                                })} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="font-medium text-sm">{item.title}</p>
+                                  <span className="text-[11px] text-muted-foreground shrink-0">{new Date(item.date).toLocaleDateString("pt-BR")}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )
+                  })}
+                </div>
               )}
             </TabsContent>
           </Tabs>

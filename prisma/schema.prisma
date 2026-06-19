@@ -64,6 +64,7 @@ closedRooms       ClosedRoom[]
   anamneses         Anamnesis[]
   crisisProtocols   CrisisProtocol[]
   crisisAccesses    CrisisProtocolAccess[]
+  therapyTasks      TherapyTask[]
 }
 
 model Account {
@@ -152,6 +153,7 @@ model Patient {
   questionnaireResponses QuestionnaireResponse[]
   anamnesis      Anamnesis?
   crisisAccesses CrisisProtocolAccess[]
+  therapyTasks   TherapyTask[]
 
   @@index([psychologistId])
 }
@@ -413,6 +415,7 @@ model TherapyResource {
 
   psychologistId String
   psychologist   User     @relation(fields: [psychologistId], references: [id])
+  tasks          TherapyTask[]
 
   @@index([psychologistId])
 }
@@ -454,10 +457,34 @@ model UserPermission {
   user   User   @relation(fields: [userId], references: [id])
 }
 
+model TherapyTask {
+  id            String    @id @default(cuid())
+  status        String    @default("PENDING")
+  notes         String?
+  assignedAt    DateTime  @default(now())
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  resourceId    String
+  resource      TherapyResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  patientId     String
+  patient       Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  psychologistId String
+  psychologist  User            @relation(fields: [psychologistId], references: [id])
+
+  @@index([patientId])
+  @@index([psychologistId])
+  @@index([resourceId])
+  @@index([status])
+}
+
 model ConsentLog {
   id        String   @id @default(cuid())
   type      String
   consent   Boolean
+  content   String?
+  signedAt  DateTime?
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
@@ -502,8 +529,8 @@ model ClosedRoom {
   id              String   @id @default(cuid())
   roomName        String   @unique
   closedAt        DateTime @default(now())
-  psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
 }
