@@ -10,7 +10,7 @@ const MOODS = [
   { value: 1, icon: Angry, label: "Muito ruim", color: "text-red-400", bg: "bg-red-500/10", ring: "ring-red-500/30" },
   { value: 2, icon: Frown, label: "Ruim", color: "text-orange-400", bg: "bg-orange-500/10", ring: "ring-orange-500/30" },
   { value: 3, icon: Meh, label: "Neutro", color: "text-yellow-400", bg: "bg-yellow-500/10", ring: "ring-yellow-500/30" },
-  { value: 4, icon: Smile, label: "Bom", color: "text-primary", bg: "bg-emerald-500/10", ring: "ring-primary/30" },
+  { value: 4, icon: Smile, label: "Bom", color: "text-primary", bg: "bg-blue-500/10", ring: "ring-primary/30" },
   { value: 5, icon: Heart, label: "Ótimo", color: "text-green-400", bg: "bg-green-500/10", ring: "ring-green-500/30" },
 ]
 
@@ -204,7 +204,7 @@ export default function DiarioPage() {
         </div>
 
         <Button onClick={handleSave} disabled={saving || mood === 0}
-          className="w-full h-12 font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-xl shadow-emerald-500/25"
+          className="w-full h-12 font-semibold bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-xl shadow-blue-500/25"
         >
           {saving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Sparkles className="h-5 w-5 mr-2" />}
           {saving ? "Salvando..." : todayEntry ? "Atualizar" : "Salvar"}

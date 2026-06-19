@@ -4,8 +4,8 @@ import path from 'path'
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512]
 const OUT_DIR = 'public'
 const LOGO_PATH = path.join(OUT_DIR, 'logo.png')
-const GREEN = { r: 16, g: 185, b: 129, alpha: 1 }
-const VERSION = 'v4'
+const BLUE = { r: 37, g: 99, b: 235, alpha: 1 }
+const VERSION = 'v5'
 
 async function main() {
   // Trim transparent edges from logo first, then make it square
@@ -37,7 +37,7 @@ async function main() {
   for (const iconSize of SIZES) {
     // Green background
     const bg = await sharp({
-      create: { width: iconSize, height: iconSize, channels: 4, background: GREEN },
+      create: { width: iconSize, height: iconSize, channels: 4, background: BLUE },
     }).png().toBuffer()
 
     // Logo inside with tight padding (10% — logo fills 80% of icon)

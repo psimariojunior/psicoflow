@@ -32,14 +32,14 @@ export function EmptyState({ icon: Icon, title, description, action, className, 
       )}
       {action && (
         action.href ? (
-          <Button asChild className="mt-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105">
+          <Button asChild className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105">
             <Link href={action.href}>
               <Plus className="mr-2 h-4 w-4" />
               {action.label}
             </Link>
           </Button>
         ) : (
-          <Button onClick={action.onClick} className="mt-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105">
+          <Button onClick={action.onClick} className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105">
             <Plus className="mr-2 h-4 w-4" />
             {action.label}
           </Button>

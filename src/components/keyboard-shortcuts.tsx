@@ -36,7 +36,7 @@ export function KeyboardShortcutsHint() {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-4 right-4 z-[60] flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-200"
+        className="fixed bottom-4 right-4 z-[60] flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 transition-all duration-200"
         aria-label="Atalhos de teclado"
         title="Pressione ? para ver atalhos"
       >

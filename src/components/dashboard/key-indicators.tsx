@@ -28,9 +28,9 @@ const items = [
     key: "completionRate" as const,
     label: "Comparecimento",
     icon: Users,
-    color: "from-emerald-500 to-teal-600",
-    bgLight: "bg-emerald-100 dark:bg-emerald-900/30",
-    textLight: "text-emerald-600 dark:text-emerald-400",
+    color: "from-blue-500 to-blue-700",
+    bgLight: "bg-blue-100 dark:bg-blue-900/30",
+    textLight: "text-blue-600 dark:text-blue-400",
     format: (v: number) => `${v}%`,
   },
   {

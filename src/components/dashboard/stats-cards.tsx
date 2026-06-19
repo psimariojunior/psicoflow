@@ -29,9 +29,9 @@ const cards = [
     key: "appointmentsToday" as const,
     label: "Consultas Hoje",
     icon: Calendar,
-    color: "from-emerald-500 to-teal-600",
-    bgLight: "bg-emerald-100 dark:bg-emerald-900/30",
-    textLight: "text-emerald-600 dark:text-emerald-400",
+    color: "from-blue-500 to-blue-700",
+    bgLight: "bg-blue-100 dark:bg-blue-900/30",
+    textLight: "text-blue-600 dark:text-blue-400",
     changeKey: "appointmentChange" as const,
   },
   {
@@ -88,11 +88,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
               </div>
               <div className="mt-3 flex items-center gap-1.5 text-xs">
                 {isPositive ? (
-                  <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                  <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
                 ) : (
                   <TrendingDown className="h-3.5 w-3.5 text-red-500" />
                 )}
-                <span className={isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
+                <span className={isPositive ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}>
                   {isPositive ? "+" : ""}{change}%
                 </span>
                 <span className="text-muted-foreground ml-1">vs. mês anterior</span>

@@ -64,7 +64,7 @@ export default function QuestionariosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Questionários Clínicos</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Questionários Clínicos</h1>
         <p className="text-muted-foreground mt-1">Questionários disponíveis para preenchimento</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -77,14 +77,14 @@ export default function QuestionariosPage() {
           questionnaires.map(q => {
             const lr = lastResp(q.id)
             return (
-              <Card key={q.id} className={cn("transition-all", lr && "ring-2 ring-emerald-500/30")}>
+              <Card key={q.id} className={cn("transition-all", lr && "ring-2 ring-blue-500/30")}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg">{q.title}</CardTitle>
                       <span className={cn("inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1", q.type === "PHQ9" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700")}>{q.type}</span>
                     </div>
-                    {lr && <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />}
+                    {lr && <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />}
                   </div>
                 </CardHeader>
                 <CardContent>

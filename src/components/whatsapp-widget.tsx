@@ -59,13 +59,13 @@ export function WhatsAppWidget() {
             onClick={handleClick}
             className={cn(
               "relative w-14 h-14 rounded-full flex items-center justify-center",
-              "bg-emerald-500 hover:bg-emerald-600 text-white",
-              "shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50",
+              "bg-blue-500 hover:bg-blue-600 text-white",
+              "shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50",
               "transition-all duration-300 hover:scale-105 active:scale-95",
             )}
             aria-label="Fale conosco pelo WhatsApp"
           >
-            <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-20" />
+            <span className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-20" />
             <MessageCircle className="w-7 h-7 relative z-10" />
           </button>
         </motion.div>

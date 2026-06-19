@@ -24,7 +24,7 @@ interface DiaryEntry {
 
 const quickLinks = [
   { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda", desc: "Ver consultas", gradient: "from-blue-500 to-indigo-600" },
-  { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-emerald-500 to-teal-600" },
+  { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-blue-500 to-blue-700" },
   { href: "/paciente/questionarios", icon: ClipboardList, label: "Questionários", desc: "PHQ-9, GAD-7", gradient: "from-indigo-500 to-purple-600" },
   { href: "/paciente/anamnese", icon: FileText, label: "Anamnese", desc: "Histórico clínico", gradient: "from-amber-500 to-orange-600" },
   { href: "/paciente/protocolos-crise", icon: Shield, label: "Crise", desc: "Protocolos SOS", gradient: "from-red-500 to-rose-600" },
@@ -105,12 +105,12 @@ export default function PacienteDashboard() {
           </div>
         </Card>
       ) : nextAppointment ? (
-        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-emerald-200" />
+              <Sparkles className="h-5 w-5 text-blue-200" />
               <h3 className="font-semibold">Próxima Consulta</h3>
               <span className="ml-auto text-xs bg-white/20 px-3 py-1 rounded-full">
                 em {timeUntilAppointment()}
@@ -122,7 +122,7 @@ export default function PacienteDashboard() {
               </div>
               <div className="flex-1 space-y-1.5">
                 <p className="font-medium text-lg">{formatDateTime(nextAppointment.startTime).date}</p>
-                <div className="flex items-center gap-4 text-sm text-emerald-100">
+                <div className="flex items-center gap-4 text-sm text-blue-100">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
                     {formatDateTime(nextAppointment.startTime).time}

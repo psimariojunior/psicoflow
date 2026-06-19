@@ -64,7 +64,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30 ring-4 ring-emerald-500/20 mb-1">
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl shadow-blue-500/30 ring-4 ring-blue-500/20 mb-1">
             <Image src="/logo.png" alt="PsicoFlow" width={80} height={80} className="w-full h-full object-cover" priority />
           </div>
           <h1 className="text-3xl font-bold">Criar Conta</h1>
@@ -137,14 +137,14 @@ export default function RegisterPage() {
                     minLength={8}
                   />
                   <div className="flex gap-2 text-xs">
-                    <span className={formData.password.length >= 8 ? "text-emerald-500" : "text-muted-foreground"}>
+                    <span className={formData.password.length >= 8 ? "text-blue-500" : "text-muted-foreground"}>
                       <CheckCircle2 className="mr-1 inline h-3 w-3" />
                       8+ caracteres
                     </span>
-                    <span className={/[A-Z]/.test(formData.password) ? "text-emerald-500" : "text-muted-foreground"}>
+                    <span className={/[A-Z]/.test(formData.password) ? "text-blue-500" : "text-muted-foreground"}>
                       Maiúscula
                     </span>
-                    <span className={/[0-9]/.test(formData.password) ? "text-emerald-500" : "text-muted-foreground"}>
+                    <span className={/[0-9]/.test(formData.password) ? "text-blue-500" : "text-muted-foreground"}>
                       Número
                     </span>
                   </div>

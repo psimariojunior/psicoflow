@@ -70,7 +70,7 @@ export default function ProtocolosCrisePage() {
     <div className="space-y-6 relative">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
             Protocolos de Crise
           </h1>
           <p className="text-muted-foreground mt-1">Recursos e orientações para momentos de emergência emocional</p>
@@ -81,25 +81,25 @@ export default function ProtocolosCrisePage() {
         </Button>
       </div>
 
-      <Card className="border-emerald-200 bg-emerald-50">
+      <Card className="border-blue-200 bg-blue-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-emerald-600" />
+            <Shield className="h-5 w-5 text-blue-600" />
             Números de Emergência
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2">
             {emergencyNumbers.map((e, i) => (
-              <a key={i} href={`tel:${e.number}`} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-emerald-100 hover:border-emerald-300 transition-all">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+              <a key={i} href={`tel:${e.number}`} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-blue-100 hover:border-blue-300 transition-all">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
                   <Phone className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm">{e.name}</p>
                   <p className="text-xs text-muted-foreground">{e.desc}</p>
                 </div>
-                <span className="text-lg font-bold text-emerald-600">{e.number}</span>
+                <span className="text-lg font-bold text-blue-600">{e.number}</span>
               </a>
             ))}
           </div>
@@ -121,11 +121,11 @@ export default function ProtocolosCrisePage() {
           </Card>
         ) : (
           protocols.map(protocol => (
-            <Card key={protocol.id} className={cn("overflow-hidden transition-all", expanded === protocol.id && "ring-2 ring-emerald-500/30")}>
+            <Card key={protocol.id} className={cn("overflow-hidden transition-all", expanded === protocol.id && "ring-2 ring-blue-500/30")}>
               <CardHeader className="cursor-pointer" onClick={() => toggleExpanded(protocol.id)}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <div>

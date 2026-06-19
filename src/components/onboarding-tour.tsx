@@ -116,7 +116,7 @@ export function OnboardingTour() {
         {/* Progress bar */}
         <div className="h-1 bg-muted">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-700 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -132,7 +132,7 @@ export function OnboardingTour() {
           </button>
 
           {/* Icon */}
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25 mb-5">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/25 mb-5">
             <s.icon className="h-8 w-8 text-white" />
           </div>
 
@@ -155,9 +155,9 @@ export function OnboardingTour() {
                 className={cn(
                   "h-1.5 rounded-full transition-all duration-300",
                   i === step
-                    ? "w-6 bg-emerald-500"
+                    ? "w-6 bg-blue-500"
                     : i < step
-                    ? "w-1.5 bg-emerald-300"
+                    ? "w-1.5 bg-blue-300"
                     : "w-1.5 bg-muted-foreground/20"
                 )}
               />
@@ -190,7 +190,7 @@ export function OnboardingTour() {
                 className={cn(
                   "inline-flex items-center justify-center h-9 px-4 rounded-lg text-sm font-medium text-white shadow-sm transition-all",
                   isLast
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/25"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-blue-500/25"
                     : "bg-primary hover:bg-primary/90"
                 )}
               >

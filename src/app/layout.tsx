@@ -66,13 +66,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon-32.png",
-    apple: "/pwa-192-v4.png",
+    apple: "/pwa-192-v5.png",
   },
   appleWebApp: {
     capable: true,
     title: "PsicoFlow",
     statusBarStyle: "black-translucent",
-    startupImage: ["/pwa-512-v4.png"],
+    startupImage: ["/pwa-512-v5.png"],
   },
   manifest: "/manifest",
   other: {

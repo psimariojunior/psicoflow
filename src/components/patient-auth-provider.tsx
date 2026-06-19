@@ -131,7 +131,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
           <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-emerald-500/20">
+                <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
                   <Image src="/logo.png" alt="PsicoFlow" width={36} height={36} className="w-full h-full object-cover" priority />
                 </div>
                 <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
