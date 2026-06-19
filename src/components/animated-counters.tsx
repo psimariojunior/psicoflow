@@ -42,8 +42,8 @@ function Counter({ end, suffix = "", label, icon }: AnimatedCounterProps) {
       transition={{ duration: 0.5 }}
       className="text-center p-6"
     >
-      {icon && <div className="text-emerald-500 mb-2 flex justify-center">{icon}</div>}
-      <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent tabular-nums">
+      {icon && <div className="text-blue-500 mb-2 flex justify-center">{icon}</div>}
+      <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-blue-500 bg-clip-text text-transparent tabular-nums">
         {count}{suffix}
       </div>
       <div className="text-sm text-muted-foreground mt-1">{label}</div>

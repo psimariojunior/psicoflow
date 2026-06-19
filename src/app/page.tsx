@@ -261,14 +261,9 @@ export default function LandingPage() {
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-3xl blur-2xl -translate-x-4 translate-y-4" />
-                <div className="relative w-72 h-72 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-1">
-                  <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center">
-                    <div className="text-center p-6">
-                      <Award className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                      <h4 className="text-lg font-bold text-slate-900 dark:text-white">Mário Júnior</h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">CRP 04/52274</p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">Gestalt-Terapeuta</p>
-                    </div>
+                <div className="relative w-72 h-72 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-1 shadow-xl shadow-blue-500/20">
+                  <div className="w-full h-full rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
+                    <Image src="/profile.jpg" alt="Mário Júnior - Psicólogo" width={288} height={288} className="w-full h-full object-cover" priority />
                   </div>
                 </div>
               </div>
@@ -329,42 +324,42 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <span className="text-lg font-bold text-white">PsicoFlow</span>
-                  <p className="text-[10px] text-slate-400 leading-none">CRP 04/52274</p>
+                  <p className="text-[10px] text-slate-300 leading-none">CRP 04/52274</p>
                 </div>
               </Link>
-              <p className="text-sm text-slate-400 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
+              <p className="text-sm text-slate-300 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Links</h4>
               <ul className="space-y-2">
-                <li><Link href="/" className="text-sm text-slate-400 hover:text-white transition-colors">Início</Link></li>
-                <li><Link href="/#servicos" className="text-sm text-slate-400 hover:text-white transition-colors">Serviços</Link></li>
-                <li><Link href="/#sobre" className="text-sm text-slate-400 hover:text-white transition-colors">Sobre</Link></li>
-                <li><Link href="/#faq" className="text-sm text-slate-400 hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link href="/termos" className="text-sm text-slate-400 hover:text-white transition-colors">Termos de Uso</Link></li>
-                <li><Link href="/privacidade" className="text-sm text-slate-400 hover:text-white transition-colors">Política de Privacidade</Link></li>
+                <li><Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">Início</Link></li>
+                <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
+                <li><Link href="/#sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
+                <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/termos" className="text-sm text-slate-300 hover:text-white transition-colors">Termos de Uso</Link></li>
+                <li><Link href="/privacidade" className="text-sm text-slate-300 hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Acesso</h4>
               <ul className="space-y-2">
-                <li><Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Psicólogo</Link></li>
-                <li><Link href="/paciente/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Paciente</Link></li>
-                <li><Link href="/paciente/cadastro" className="text-sm text-slate-400 hover:text-white transition-colors">Cadastre-se</Link></li>
-                <li><Link href="/agendar" className="text-sm text-slate-400 hover:text-white transition-colors">Agende Consulta</Link></li>
+                <li><Link href="/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Psicólogo</Link></li>
+                <li><Link href="/paciente/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Paciente</Link></li>
+                <li><Link href="/paciente/cadastro" className="text-sm text-slate-300 hover:text-white transition-colors">Cadastre-se</Link></li>
+                <li><Link href="/agendar" className="text-sm text-slate-300 hover:text-white transition-colors">Agende Consulta</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2 text-sm text-slate-400"><Mail className="h-4 w-4 text-blue-400 shrink-0" />contato@psicoflow.com.br</li>
-                <li className="flex items-center gap-2 text-sm text-slate-400"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99999-8888</li>
-                <li className="flex items-center gap-2 text-sm text-slate-400"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
+                <li className="flex items-center gap-2 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />contato@psicoflow.com.br</li>
+                <li className="flex items-center gap-2 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99999-8888</li>
+                <li className="flex items-center gap-2 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-slate-800">
-            <p className="text-sm text-slate-500 text-center">© {new Date().getFullYear()} PsicoFlow. Todos os direitos reservados. CRP 04/52274 • Psicólogo Responsável</p>
+            <p className="text-sm text-slate-400 text-center">© {new Date().getFullYear()} PsicoFlow. Todos os direitos reservados. CRP 04/52274 • Psicólogo Responsável</p>
           </div>
         </div>
       </footer>

@@ -130,7 +130,7 @@ function AgendarPage() {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-emerald-400 mx-auto mb-4" />
+          <Loader2 className="h-10 w-10 animate-spin text-blue-400 mx-auto mb-4" />
           <p className="text-white/60">Carregando horários disponíveis...</p>
         </div>
       </div>
@@ -142,8 +142,8 @@ function AgendarPage() {
       <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md text-center">
-            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-500/20 mb-6">
-              <CheckCircle className="h-10 w-10 text-emerald-400" />
+            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-blue-500/20 mb-6">
+              <CheckCircle className="h-10 w-10 text-blue-400" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Consulta agendada!</h1>
             <p className="text-white/60 mb-8">
@@ -151,18 +151,18 @@ function AgendarPage() {
             </p>
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6 mb-6 text-left">
               <p className="text-white/80 text-sm mb-1">
-                <User className="h-4 w-4 inline mr-2 text-emerald-400" />
+                  <User className="h-4 w-4 inline mr-2 text-blue-400" />
                 {name}
               </p>
               {email && (
                 <p className="text-white/60 text-sm mb-1">
-                  <Mail className="h-4 w-4 inline mr-2 text-emerald-400" />
+                  <Mail className="h-4 w-4 inline mr-2 text-blue-400" />
                   {email}
                 </p>
               )}
               {phone && (
                 <p className="text-white/60 text-sm">
-                  <Phone className="h-4 w-4 inline mr-2 text-emerald-400" />
+                  <Phone className="h-4 w-4 inline mr-2 text-blue-400" />
                   {phone}
                 </p>
               )}
@@ -171,7 +171,7 @@ function AgendarPage() {
               Você receberá um lembrete por email/WhatsApp próximo ao horário da consulta.
             </p>
             <div className="mt-6 space-y-3">
-              <Link href="/paciente/cadastro" className="block w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-400 text-white font-medium rounded-xl transition-all text-center">
+              <Link href="/paciente/cadastro" className="block w-full py-3 px-4 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-xl transition-all text-center">
                 Criar conta para gerenciar consultas
               </Link>
               <Link href="/" className="block w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl transition-all text-center text-sm">
@@ -189,8 +189,8 @@ function AgendarPage() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-emerald-500/30 to-blue-500/30 mb-4">
-            <Calendar className="h-8 w-8 text-emerald-400" />
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 mb-4">
+            <Calendar className="h-8 w-8 text-blue-400" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Agende sua consulta</h1>
           <p className="text-white/50">Escolha o melhor dia e horário para você</p>
@@ -200,10 +200,10 @@ function AgendarPage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           {["date", "time", "info"].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${step === s ? "bg-emerald-500 text-white" : ["date", "time", "info"].indexOf(step) > i ? "bg-emerald-500/30 text-emerald-300" : "bg-white/10 text-white/40"}`}>
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${step === s ? "bg-blue-500 text-white" : ["date", "time", "info"].indexOf(step) > i ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white/40"}`}>
                 {i + 1}
               </div>
-              {i < 2 && <div className={`h-0.5 w-8 ${["date", "time", "info"].indexOf(step) > i ? "bg-emerald-500/50" : "bg-white/10"}`} />}
+              {i < 2 && <div className={`h-0.5 w-8 ${["date", "time", "info"].indexOf(step) > i ? "bg-blue-500/50" : "bg-white/10"}`} />}
             </div>
           ))}
         </div>
@@ -251,9 +251,9 @@ function AgendarPage() {
                       onClick={() => handleSelectDate(dateStr)}
                       className={`aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all ${
                         isAvailable
-                          ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 cursor-pointer"
+                          ? "bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 cursor-pointer"
                           : "text-white/20 cursor-not-allowed"
-                      } ${isToday ? "ring-1 ring-emerald-500/40" : ""}`}
+                      } ${isToday ? "ring-1 ring-blue-500/40" : ""}`}
                     >
                       {day}
                     </button>
@@ -290,7 +290,7 @@ function AgendarPage() {
                   <button
                     key={slot.time}
                     onClick={() => handleSelectSlot(slot)}
-                    className="bg-white/5 hover:bg-emerald-500/15 text-white/80 hover:text-emerald-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-white/10 hover:ring-emerald-500/30"
+                    className="bg-white/5 hover:bg-blue-500/15 text-white/80 hover:text-blue-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-white/10 hover:ring-blue-500/30"
                   >
                     <Clock className="h-4 w-4 inline mr-1.5" />
                     {slot.time}
@@ -349,7 +349,7 @@ function AgendarPage() {
                 </div>
 
                 <Button
-                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 shadow-xl shadow-emerald-500/25 rounded-xl transition-all"
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 shadow-xl shadow-blue-500/25 rounded-xl transition-all"
                   size="lg"
                   onClick={handleSubmit}
                   disabled={submitting || !name.trim()}
@@ -363,7 +363,7 @@ function AgendarPage() {
         )}
 
         <div className="flex items-center justify-center gap-3 mt-8">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 ring-1 ring-emerald-500/30">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-1 ring-blue-500/30">
             <Image src="/logo.png" alt="PsicoFlow" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <p className="text-center text-xs text-white/20">
