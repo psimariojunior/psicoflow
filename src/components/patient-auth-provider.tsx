@@ -109,7 +109,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
   }
 
   const authPages = ["/paciente/login", "/paciente/cadastro", "/paciente/recuperar-senha", "/paciente/reset-password"]
-  const publicPages = ["/paciente/questionarios", "/paciente/anamnese", "/paciente/protocolos-crise", "/paciente/consentimento"]
+  const publicPages = ["/paciente/questionarios", "/paciente/anamnese", "/paciente/protocolos-crise", "/paciente/consentimento", "/paciente/tarefas"]
   const isAuthPage = authPages.includes(pathname)
   const isPublicPage = isAuthPage || publicPages.includes(pathname) || pathname.startsWith("/paciente/questionarios/")
 

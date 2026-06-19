@@ -17,7 +17,7 @@ const publicApiPrefixes = [
   "/api/agendamentos/public", "/api/pacientes/auth",
   "/api/pacientes/agendamentos", "/api/pacientes/diario",
   "/api/pacientes/me",   "/api/pacientes/invoices", "/api/pacientes/auth/refresh",
-  "/api/pacientes/questionarios", "/api/pacientes/anamnese",
+  "/api/pacientes/questionarios", "/api/pacientes/anamnese", "/api/pacientes/tarefas",
   "/api/pacientes/protocolos-crise",
   "/api/cron", "/api/health", "/api/seed-questionarios", "/api/hermes",
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
