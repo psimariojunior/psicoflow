@@ -34,10 +34,10 @@ interface Task {
   patient: PatientInfo
 }
 
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "outline"; icon: typeof Circle }> = {
-  PENDING: { label: "Pendente", variant: "default", icon: Circle },
-  COMPLETED: { label: "Concluída", variant: "secondary", icon: CheckCircle2 },
-  CANCELLED: { label: "Cancelada", variant: "outline", icon: XCircle },
+const statusConfig = {
+  PENDING: { label: "Pendente", variant: "default" as const, icon: Circle },
+  COMPLETED: { label: "Concluída", variant: "secondary" as const, icon: CheckCircle2 },
+  CANCELLED: { label: "Cancelada", variant: "outline" as const, icon: XCircle },
 }
 
 const containerVariants = {
@@ -65,8 +65,8 @@ export default function TarefasPage() {
     if (filterStatus) params.set("status", filterStatus)
     if (filterPatient) params.set("patientId", filterPatient)
     fetch(`/api/tarefas?${params}`)
-      .then(r => r.ok ? r.json() : { data: [] })
-      .then(d => setTasks(d.data || d || []))
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setTasks(Array.isArray(d) ? d : []))
       .catch(() => toast.error("Erro ao carregar tarefas"))
       .finally(() => setLoading(false))
   }, [filterStatus, filterPatient])
