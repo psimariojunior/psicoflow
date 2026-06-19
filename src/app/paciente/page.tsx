@@ -6,7 +6,8 @@ import { usePatientAuth } from "@/components/patient-auth-provider"
 import { MoodChart } from "@/components/patient/mood-chart"
 import { Card } from "@/components/ui/card"
 import { motion } from "framer-motion"
-import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain, ClipboardList, FileText, Shield } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain, ClipboardList, FileText, Shield, Star, TrendingUp } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -23,13 +24,13 @@ interface DiaryEntry {
 }
 
 const quickLinks = [
-  { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda", desc: "Ver consultas", gradient: "from-blue-500 to-indigo-600" },
-  { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-blue-500 to-blue-700" },
-  { href: "/paciente/questionarios", icon: ClipboardList, label: "Questionários", desc: "PHQ-9, GAD-7", gradient: "from-indigo-500 to-purple-600" },
-  { href: "/paciente/anamnese", icon: FileText, label: "Anamnese", desc: "Histórico clínico", gradient: "from-amber-500 to-orange-600" },
-  { href: "/paciente/protocolos-crise", icon: Shield, label: "Crise", desc: "Protocolos SOS", gradient: "from-red-500 to-rose-600" },
-  { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600" },
-  { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600" },
+  { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda", desc: "Ver consultas", gradient: "from-blue-500 to-indigo-600", iconBg: "bg-blue-100 dark:bg-blue-900/30" },
+  { href: "/paciente/diario", icon: BookHeart, label: "Diário", desc: "Registre emoções", gradient: "from-blue-500 to-blue-700", iconBg: "bg-blue-100 dark:bg-blue-900/30" },
+  { href: "/paciente/questionarios", icon: ClipboardList, label: "Questionários", desc: "PHQ-9, GAD-7", gradient: "from-indigo-500 to-purple-600", iconBg: "bg-indigo-100 dark:bg-indigo-900/30" },
+  { href: "/paciente/anamnese", icon: FileText, label: "Anamnese", desc: "Histórico clínico", gradient: "from-amber-500 to-orange-600", iconBg: "bg-amber-100 dark:bg-amber-900/30" },
+  { href: "/paciente/protocolos-crise", icon: Shield, label: "Crise", desc: "Protocolos SOS", gradient: "from-red-500 to-rose-600", iconBg: "bg-red-100 dark:bg-red-900/30" },
+  { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600", iconBg: "bg-violet-100 dark:bg-violet-900/30" },
+  { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600", iconBg: "bg-rose-100 dark:bg-rose-900/30" },
 ]
 
 export default function PacienteDashboard() {
@@ -46,9 +47,7 @@ export default function PacienteDashboard() {
       fetch("/api/pacientes/diario", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
     ])
       .then(([appts, diary]) => {
-        const upcoming = (appts as Appointment[])
-          .filter((a) => a.status !== "CANCELLED" && new Date(a.startTime) > new Date())
-          .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+        const upcoming = (appts as Appointment[]).filter((a) => a.status !== "CANCELLED" && new Date(a.startTime) > new Date()).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
         setNextAppointment(upcoming[0] || null)
         setSessionCount((appts as Appointment[]).filter((a) => a.status !== "CANCELLED" && new Date(a.startTime) <= new Date()).length)
         setDiaryEntries((diary as DiaryEntry[]) || [])
@@ -59,10 +58,7 @@ export default function PacienteDashboard() {
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso)
-    return {
-      date: d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" }),
-      time: d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-    }
+    return { date: d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" }), time: d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) }
   }
 
   const timeUntilAppointment = () => {
@@ -77,67 +73,42 @@ export default function PacienteDashboard() {
   }
 
   return (
-    <motion.div
-      className="max-w-4xl mx-auto px-4 py-8 space-y-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Olá, {patient?.name?.split(" ")[0]}
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">Olá, {patient?.name?.split(" ")[0]}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">Bem-vindo ao PsicoFlow</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Activity className="h-4 w-4 text-primary" />
+          <TrendingUp className="h-4 w-4 text-blue-500" />
           <span>{sessionCount} sessão{ sessionCount !== 1 ? "s" : "" } realizada{ sessionCount !== 1 ? "s" : "" }</span>
         </div>
       </div>
 
       {loadingAppt ? (
-        <Card className="p-6">
-          <div className="space-y-3">
-            <div className="h-4 w-32 animate-shimmer rounded" />
-            <div className="h-4 w-48 animate-shimmer rounded" />
-            <div className="h-4 w-40 animate-shimmer rounded" />
-          </div>
-        </Card>
+        <Card className="p-6"><div className="space-y-3"><div className="h-4 w-32 animate-shimmer rounded" /><div className="h-4 w-48 animate-shimmer rounded" /><div className="h-4 w-40 animate-shimmer rounded" /></div></Card>
       ) : nextAppointment ? (
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-6 text-white shadow-xl shadow-blue-500/20">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-blue-200" />
               <h3 className="font-semibold">Próxima Consulta</h3>
-              <span className="ml-auto text-xs bg-white/20 px-3 py-1 rounded-full">
-                em {timeUntilAppointment()}
-              </span>
+              <span className="ml-auto text-xs bg-white/15 px-3 py-1 rounded-full backdrop-blur-sm">em {timeUntilAppointment()}</span>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/15">
+              <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/15 backdrop-blur-sm">
                 <CalendarDays className="h-7 w-7" />
               </div>
               <div className="flex-1 space-y-1.5">
                 <p className="font-medium text-lg">{formatDateTime(nextAppointment.startTime).date}</p>
                 <div className="flex items-center gap-4 text-sm text-blue-100">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
-                    {formatDateTime(nextAppointment.startTime).time}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    {nextAppointment.psychologist.name}
-                  </span>
+                  <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{formatDateTime(nextAppointment.startTime).time}</span>
+                  <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" />{nextAppointment.psychologist.name}</span>
                 </div>
               </div>
-              <Link
-                href="/paciente/agenda"
-                className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 transition-all"
-                aria-label="Ver agenda completa"
-              >
+              <Link href="/paciente/agenda" className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 transition-all backdrop-blur-sm" aria-label="Ver agenda completa">
                 <ChevronRight className="h-5 w-5" />
               </Link>
             </div>
@@ -157,16 +128,13 @@ export default function PacienteDashboard() {
 
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Acesso rápido</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {quickLinks.map((link) => (
             <Link key={link.href} href={link.href}>
-              <div className="group relative overflow-hidden bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all duration-200 cursor-pointer">
+              <div className="group relative overflow-hidden bg-card hover:bg-accent rounded-2xl p-5 ring-1 ring-border transition-all duration-200 cursor-pointer hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-0.5">
                 <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-gradient-to-br", link.gradient)} />
                 <div className="relative">
-                  <div className={cn(
-                    "flex items-center justify-center w-11 h-11 rounded-xl mb-3 bg-gradient-to-br shadow-md transition-all duration-300 group-hover:scale-110 group-hover:rotate-3",
-                    link.gradient
-                  )}>
+                  <div className={cn("flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br shadow-md mb-3 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3", link.gradient)}>
                     <link.icon className="h-5 w-5 text-white" />
                   </div>
                   <h4 className="text-foreground font-medium text-sm">{link.label}</h4>
@@ -177,10 +145,6 @@ export default function PacienteDashboard() {
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
-}
-
-function cn(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(" ")
 }
