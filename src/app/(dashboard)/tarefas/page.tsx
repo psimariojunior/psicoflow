@@ -59,30 +59,14 @@ export default function TarefasPage() {
   const [patients, setPatients] = useState<PatientInfo[]>([])
   const [completing, setCompleting] = useState<Set<string>>(new Set())
 
-  async function loadTasks() {
-    try {
-      const params = new URLSearchParams()
-      if (filterStatus) params.set("status", filterStatus)
-      if (filterPatient) params.set("patientId", filterPatient)
-      const res = await fetch(`/api/tarefas?${params}`)
-      if (!res.ok) throw new Error()
-      const data = await res.json()
-      setTasks(Array.isArray(data) ? data : data.data || [])
-    } catch {
-      toast.error("Erro ao carregar tarefas")
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
     setLoading(true)
     const params = new URLSearchParams()
     if (filterStatus) params.set("status", filterStatus)
     if (filterPatient) params.set("patientId", filterPatient)
     fetch(`/api/tarefas?${params}`)
-      .then(r => r.ok ? r.json() : [])
-      .then(d => setTasks(d))
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(d => setTasks(d.data || d || []))
       .catch(() => toast.error("Erro ao carregar tarefas"))
       .finally(() => setLoading(false))
   }, [filterStatus, filterPatient])
@@ -100,7 +84,7 @@ export default function TarefasPage() {
       const res = await fetch(`/api/tarefas/${taskId}`, { method: "PUT" })
       if (!res.ok) throw new Error()
       toast.success("Tarefa concluída com sucesso")
-      loadTasks()
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: "COMPLETED" as const, completedAt: new Date().toISOString() } : t))
     } catch {
       toast.error("Erro ao concluir tarefa")
     } finally {
