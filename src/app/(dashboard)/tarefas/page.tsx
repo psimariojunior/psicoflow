@@ -54,16 +54,16 @@ export default function TarefasPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [filterStatus, setFilterStatus] = useState<string>("")
-  const [filterPatient, setFilterPatient] = useState<string>("")
+  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [filterPatient, setFilterPatient] = useState<string>("all")
   const [patients, setPatients] = useState<PatientInfo[]>([])
   const [completing, setCompleting] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     setLoading(true)
     const params = new URLSearchParams()
-    if (filterStatus) params.set("status", filterStatus)
-    if (filterPatient) params.set("patientId", filterPatient)
+    if (filterStatus && filterStatus !== "all") params.set("status", filterStatus)
+    if (filterPatient && filterPatient !== "all") params.set("patientId", filterPatient)
     fetch(`/api/tarefas?${params}`)
       .then(r => r.ok ? r.json() : [])
       .then(d => setTasks(Array.isArray(d) ? d : []))
@@ -151,19 +151,19 @@ export default function TarefasPage() {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="PENDING">Pendentes</SelectItem>
             <SelectItem value="COMPLETED">Concluídas</SelectItem>
             <SelectItem value="CANCELLED">Canceladas</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={filterPatient} onValueChange={v => setFilterPatient(v)}>
+        <Select value={filterPatient} onValueChange={v => setFilterPatient(v === "all" ? "" : v)}>
           <SelectTrigger className="w-[180px]">
             <User className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Paciente" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             {patients.map(p => (
               <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
             ))}
