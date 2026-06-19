@@ -123,8 +123,25 @@ export default function ReportsPage() {
     }
   }
 
-  useEffect(() => { if (tab === "financeiro") loadFinReport() }, [tab, finPeriod])
-  useEffect(() => { if (tab === "producao") loadProdReport() }, [tab, prodPeriod])
+  useEffect(() => {
+    if (tab !== "financeiro") return
+    setFinLoading(true)
+    fetch(`/api/relatorios?tipo=financeiro&periodo=${finPeriod}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setFinReport(d))
+      .catch(() => toast.error("Erro ao carregar relatório financeiro"))
+      .finally(() => setFinLoading(false))
+  }, [tab, finPeriod])
+
+  useEffect(() => {
+    if (tab !== "producao") return
+    setProdLoading(true)
+    fetch(`/api/relatorios?tipo=producao&periodo=${prodPeriod}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setProdReport(d))
+      .catch(() => toast.error("Erro ao carregar relatório de produção"))
+      .finally(() => setProdLoading(false))
+  }, [tab, prodPeriod])
 
   const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchPatient.toLowerCase())

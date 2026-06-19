@@ -24,6 +24,7 @@ import {
   ClipboardList,
   Sparkles,
   Heart,
+  ListTodo,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -46,6 +47,7 @@ const menuItems = [
   { href: "/sessoes", label: "Sessões", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
+  { href: "/tarefas",        label: "Tarefas",           icon: ListTodo },
   { href: "/notificacoes",   label: "Notificações",     icon: Bell },
   { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },

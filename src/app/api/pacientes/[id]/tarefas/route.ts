@@ -85,6 +85,17 @@ export async function POST(
       },
     })
 
+    await prisma.notification.create({
+      data: {
+        title: "Novo recurso terapêutico",
+        message: `Você recebeu um novo recurso: ${task.resource.name}`,
+        channel: "IN_APP",
+        status: "PENDING",
+        psychologistId,
+        patientId: id,
+      },
+    })
+
     return apiSuccess(task, 201)
   } catch (error) {
     if (isAuthError(error)) return apiError("Não autorizado", 401)
