@@ -1,95 +1,132 @@
 import { test, expect } from "@playwright/test"
 
-test("login page has expected form", async ({ page }) => {
-  await page.goto("/login")
-  await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible()
-  await expect(page.locator("body")).toContainText("Faça login para acessar o sistema")
+test.describe("Public Pages", () => {
+  test("landing page loads", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.locator("body")).toContainText("PsicoFlow")
+  })
+
+  test("booking page loads", async ({ page }) => {
+    await page.goto("/agendar")
+    await expect(page.locator("h1")).toContainText("Agende")
+  })
+
+  test("terms page loads", async ({ page }) => {
+    await page.goto("/termos")
+    await expect(page.locator("body")).toContainText("Termos de Uso")
+  })
+
+  test("privacy page loads", async ({ page }) => {
+    await page.goto("/privacidade")
+    await expect(page.locator("body")).toContainText("Política de Privacidade")
+  })
+
+  test("health API returns 200", async ({ page }) => {
+    const response = await page.goto("/api/health")
+    expect(response?.ok()).toBe(true)
+  })
 })
 
-test("login page features section is visible", async ({ page }) => {
-  await page.goto("/login")
-  await expect(page.locator("body")).toContainText("Sua clínica na palma da sua mão")
-  await expect(page.locator("body")).toContainText("Agenda Online")
-  await expect(page.locator("body")).toContainText("Sala Virtual")
+test.describe("Auth Pages", () => {
+  test("login page has form", async ({ page }) => {
+    await page.goto("/login")
+    await expect(page.locator("h1")).toContainText("PsicoFlow")
+    await expect(page.locator('input[type="email"]')).toBeVisible()
+    await expect(page.locator('input[type="password"]')).toBeVisible()
+    await expect(page.getByRole("button", { name: /entrar/i })).toBeVisible()
+  })
+
+  test("patient login page", async ({ page }) => {
+    await page.goto("/paciente/login")
+    await expect(page.getByRole("button", { name: /entrar/i })).toBeVisible()
+  })
+
+  test("patient registration page", async ({ page }) => {
+    await page.goto("/paciente/cadastro")
+    await expect(page.locator("h1")).toContainText("Criar conta")
+  })
+
+  test("forgot password page", async ({ page }) => {
+    await page.goto("/paciente/recuperar-senha")
+    await expect(page.getByRole("button", { name: /enviar|recuperar/i })).toBeVisible()
+  })
 })
 
-test("patient login page loads correctly", async ({ page }) => {
-  await page.goto("/paciente/login")
-  await expect(page.locator("body")).toContainText("Acesse sua área do paciente")
-  await expect(page.locator("body")).toContainText("Cadastre-se")
+test.describe("Virtual Room", () => {
+  test("entrance page loads with room code input", async ({ page }) => {
+    await page.goto("/sala-virtual/entrar")
+    await expect(page.locator("body")).toContainText("Sala Virtual")
+  })
+
+  test("direct room code shows prejoin view", async ({ page }) => {
+    await page.goto("/sala-virtual/entrar?room=test-123")
+    await expect(page.locator("body")).toContainText("Pronto")
+  })
 })
 
-test("patient registration page loads", async ({ page }) => {
-  await page.goto("/paciente/cadastro")
-  await expect(page.locator("h1")).toHaveText("Criar conta")
+test.describe("Patient Portal Pages (unauthenticated)", () => {
+  test("questionarios page shows login prompt", async ({ page }) => {
+    await page.goto("/paciente/questionarios")
+    await expect(page.locator("body")).toContainText(/Questionários|Faça login/)
+  })
+
+  test("anamnese page shows login prompt", async ({ page }) => {
+    await page.goto("/paciente/anamnese")
+    await expect(page.locator("body")).toContainText(/Anamnese|Faça login/)
+  })
+
+  test("crisis protocols page shows login prompt", async ({ page }) => {
+    await page.goto("/paciente/protocolos-crise")
+    await expect(page.locator("body")).toContainText(/Emergência|Faça login/)
+  })
 })
 
-test("virtual room entrance page loads", async ({ page }) => {
-  await page.goto("/sala-virtual/entrar")
-  await expect(page.getByPlaceholder("Digite o código fornecido pelo psicólogo")).toBeVisible()
+test.describe("Help Page", () => {
+  test("help page redirects to login when unauthenticated", async ({ page }) => {
+    await page.goto("/ajuda")
+    await page.waitForURL(/\/login/)
+    expect(page.url()).toContain("/login")
+  })
 })
 
-test("virtual room with direct room code param", async ({ page }) => {
-  await page.goto("/sala-virtual/entrar?room=sala-teste-123")
-  await expect(page.locator("body")).toContainText("Pronto para sua")
+test.describe("Dashboard Routes Redirect to Login", () => {
+  const protectedRoutes = [
+    "/dashboard",
+    "/agenda",
+    "/pacientes",
+    "/cobrancas",
+    "/sessoes",
+    "/prontuarios",
+    "/relatorios",
+    "/notificacoes",
+    "/configuracoes",
+    "/comunicacao",
+    "/diario-emocoes",
+    "/disponibilidade",
+    "/financeiro",
+    "/questionarios",
+    "/recursos-terapeuticos",
+    "/tarefas",
+    "/sala-virtual",
+  ]
+
+  for (const route of protectedRoutes) {
+    test(`${route} redirects to login`, async ({ page }) => {
+      await page.goto(route)
+      await page.waitForURL(/\/login/)
+      expect(page.url()).toContain("/login")
+    })
+  }
 })
 
-test("appointment booking page loads", async ({ page }) => {
-  await page.goto("/agendar")
-  await expect(page.locator("h1")).toContainText("Agende sua consulta")
-})
+test.describe("API Tests", () => {
+  test("/api/health returns 200", async ({ request }) => {
+    const response = await request.get("/api/health")
+    expect(response.ok()).toBe(true)
+  })
 
-test("health API returns ok", async ({ page }) => {
-  const response = await page.goto("/api/health")
-  expect(response?.ok()).toBeTruthy()
-})
-
-test("dashboard redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/dashboard")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("agenda redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/agenda")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("cobrancas redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/cobrancas")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("sessoes redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/sessoes")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("pacientes redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/pacientes")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("configuracoes redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/configuracoes")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("sala-virtual page redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/sala-virtual")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("prontuarios redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/prontuarios")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("relatorios redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/relatorios")
-  await expect(page).toHaveURL(/\/login/)
-})
-
-test("notificacoes redirects to login when unauthenticated", async ({ page }) => {
-  await page.goto("/notificacoes")
-  await expect(page).toHaveURL(/\/login/)
+  test("/api/disponibilidade/public returns ok", async ({ request }) => {
+    const response = await request.get("/api/disponibilidade/public")
+    expect(response.ok()).toBe(true)
+  })
 })

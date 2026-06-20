@@ -535,6 +535,15 @@ model ClosedRoom {
   @@index([psychologistId])
 }
 
+model BackupLog {
+  id          String   @id @default(cuid())
+  type        String   @default("AUTO")
+  status      String   @default("SUCCESS")
+  summary     String?
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+}
+
 enum QuestionnaireType {
   PHQ9
   GAD7
