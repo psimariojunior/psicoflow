@@ -4,27 +4,27 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 const beckQuestions = [
-  { order: 1, text: "Tristeza" },
-  { order: 2, text: "Pessimismo" },
-  { order: 3, text: "Senso de fracasso" },
-  { order: 4, text: "Insatisfação" },
-  { order: 5, text: "Culpa" },
-  { order: 6, text: "Punição" },
-  { order: 7, text: "Autoestima" },
-  { order: 8, text: "Autocrítica" },
-  { order: 9, text: "Pensamentos suicidas" },
-  { order: 10, text: "Choro" },
-  { order: 11, text: "Irritabilidade" },
-  { order: 12, text: "Interesse social" },
-  { order: 13, text: "Indecisão" },
-  { order: 14, text: "Imagem corporal" },
-  { order: 15, text: "Capacidade de trabalhar" },
-  { order: 16, text: "Sono" },
-  { order: 17, text: "Fadiga" },
-  { order: 18, text: "Apetite" },
-  { order: 19, text: "Peso" },
-  { order: 20, text: "Preocupação com a saúde" },
-  { order: 21, text: "Libido" },
+  { order: 1, text: "Tristeza", options: [{ value: 0, label: "Não me sinto triste" }, { value: 1, label: "Eu me sinto triste" }, { value: 2, label: "Estou sempre triste e não consigo sair disso" }, { value: 3, label: "Estou tão triste que não consigo suportar" }] },
+  { order: 2, text: "Pessimismo", options: [{ value: 0, label: "Não estou desanimado em relação ao futuro" }, { value: 1, label: "Eu me sinto mais desanimado do que antes" }, { value: 2, label: "Não espero que as coisas melhorem" }, { value: 3, label: "Sinto que o futuro é sem esperança" }] },
+  { order: 3, text: "Senso de fracasso", options: [{ value: 0, label: "Não me sinto um fracasso" }, { value: 1, label: "Sinto que tive mais fracassos que outras pessoas" }, { value: 2, label: "Quando olho para trás, vejo muitos fracassos" }, { value: 3, label: "Sinto que sou um fracasso completo" }] },
+  { order: 4, text: "Insatisfação", options: [{ value: 0, label: "Tenho prazer nas coisas como antes" }, { value: 1, label: "Não sinto prazer nas coisas como antes" }, { value: 2, label: "Não tenho mais prazer em nada" }, { value: 3, label: "Estou entediado com tudo" }] },
+  { order: 5, text: "Culpa", options: [{ value: 0, label: "Não me sinto especialmente culpado" }, { value: 1, label: "Eu me sinto culpado muitas vezes" }, { value: 2, label: "Eu me sinto culpado na maior parte do tempo" }, { value: 3, label: "Eu me sinto culpado o tempo todo" }] },
+  { order: 6, text: "Punição", options: [{ value: 0, label: "Não sinto que estou sendo punido" }, { value: 1, label: "Sinto que posso ser punido" }, { value: 2, label: "Espero ser punido" }, { value: 3, label: "Sinto que estou sendo punido" }] },
+  { order: 7, text: "Autoestima", options: [{ value: 0, label: "Sinto o mesmo sobre mim que antes" }, { value: 1, label: "Perdi a confiança em mim mesmo" }, { value: 2, label: "Estou decepcionado comigo mesmo" }, { value: 3, label: "Não gosto de mim" }] },
+  { order: 8, text: "Autocrítica", options: [{ value: 0, label: "Não me critico mais que o normal" }, { value: 1, label: "Sou mais crítico comigo do que antes" }, { value: 2, label: "Eu me critico por todos os meus erros" }, { value: 3, label: "Eu me culpo por tudo de ruim que acontece" }] },
+  { order: 9, text: "Pensamentos suicidas", options: [{ value: 0, label: "Não tenho pensamentos de me matar" }, { value: 1, label: "Tenho pensamentos de me matar, mas não os levaria adiante" }, { value: 2, label: "Gostaria de me matar" }, { value: 3, label: "Eu me mataria se tivesse oportunidade" }] },
+  { order: 10, text: "Choro", options: [{ value: 0, label: "Não choro mais que o normal" }, { value: 1, label: "Choro mais agora do que antes" }, { value: 2, label: "Choro por qualquer coisa" }, { value: 3, label: "Queria chorar mas não consigo" }] },
+  { order: 11, text: "Irritabilidade", options: [{ value: 0, label: "Não estou mais irritado que o normal" }, { value: 1, label: "Estou mais irritado que o normal" }, { value: 2, label: "Estou irritado o tempo todo" }, { value: 3, label: "Não consigo mais me irritar com as coisas" }] },
+  { order: 12, text: "Interesse social", options: [{ value: 0, label: "Tenho interesse nas outras pessoas" }, { value: 1, label: "Estou menos interessado nas pessoas" }, { value: 2, label: "Perdi a maior parte do interesse" }, { value: 3, label: "Perdi todo o interesse pelas pessoas" }] },
+  { order: 13, text: "Indecisão", options: [{ value: 0, label: "Tomo decisões como antes" }, { value: 1, label: "Tenho mais dificuldade em decidir" }, { value: 2, label: "Tenho muita dificuldade em decidir" }, { value: 3, label: "Não consigo mais tomar decisões" }] },
+  { order: 14, text: "Imagem corporal", options: [{ value: 0, label: "Acho minha aparência como antes" }, { value: 1, label: "Estou preocupado por estar parecendo mais velho" }, { value: 2, label: "Sinto que minha aparência mudou para pior" }, { value: 3, label: "Acho que estou feio" }] },
+  { order: 15, text: "Capacidade de trabalhar", options: [{ value: 0, label: "Trabalho tão bem quanto antes" }, { value: 1, label: "Preciso de esforço extra para começar algo" }, { value: 2, label: "Não trabalho tão bem quanto antes" }, { value: 3, label: "Não consigo mais trabalhar" }] },
+  { order: 16, text: "Sono", options: [{ value: 0, label: "Durmo tão bem quanto antes" }, { value: 1, label: "Não durmo tão bem quanto antes" }, { value: 2, label: "Acordo 1-2 horas mais cedo e não consigo voltar a dormir" }, { value: 3, label: "Acordo várias horas mais cedo e não consigo dormir" }] },
+  { order: 17, text: "Fadiga", options: [{ value: 0, label: "Não fico mais cansado que o normal" }, { value: 1, label: "Fico cansado mais facilmente" }, { value: 2, label: "Fico cansado por qualquer coisa" }, { value: 3, label: "Estou cansado demais para fazer qualquer coisa" }] },
+  { order: 18, text: "Apetite", options: [{ value: 0, label: "Meu apetite está como antes" }, { value: 1, label: "Meu apetite não está tão bom" }, { value: 2, label: "Meu apetite está muito pior agora" }, { value: 3, label: "Não tenho mais apetite" }] },
+  { order: 19, text: "Peso", options: [{ value: 0, label: "Não perdi peso recentemente" }, { value: 1, label: "Perdi mais de 2 kg" }, { value: 2, label: "Perdi mais de 5 kg" }, { value: 3, label: "Perdi mais de 7 kg" }] },
+  { order: 20, text: "Preocupação com a saúde", options: [{ value: 0, label: "Não me preocupo mais com minha saúde que o normal" }, { value: 1, label: "Estou preocupado com dores ou problemas de saúde" }, { value: 2, label: "Estou muito preocupado com minha saúde" }, { value: 3, label: "Estou tão preocupado com minha saúde que não consigo pensar em outra coisa" }] },
+  { order: 21, text: "Libido", options: [{ value: 0, label: "Não notei mudança no meu interesse por sexo" }, { value: 1, label: "Estou menos interessado em sexo que antes" }, { value: 2, label: "Estou muito menos interessado em sexo" }, { value: 3, label: "Perdi completamente o interesse por sexo" }] },
 ]
 
 const pssQuestions = [
@@ -93,8 +93,11 @@ export async function GET(request: Request) {
 
   const results: string[] = []
 
-  const existingBeck = await prisma.questionnaire.findFirst({ where: { type: "BECK" } })
-  if (!existingBeck) {
+  const existingBeck = await prisma.questionnaire.findFirst({ where: { type: "BECK" }, include: { _count: { select: { responses: true } } } })
+  if (existingBeck && existingBeck._count.responses === 0) {
+    await prisma.questionnaire.delete({ where: { id: existingBeck.id } })
+  }
+  if (!existingBeck || existingBeck._count.responses === 0) {
     await prisma.questionnaire.create({
       data: {
         type: "BECK",
@@ -106,7 +109,7 @@ export async function GET(request: Request) {
           create: beckQuestions.map(q => ({
             questionText: q.text,
             questionOrder: q.order,
-            options: beckOptions,
+            options: JSON.stringify(q.options || beckOptions),
             scaleMin: 0,
             scaleMax: 3,
           })),
