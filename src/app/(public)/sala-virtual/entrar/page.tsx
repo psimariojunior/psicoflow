@@ -54,6 +54,7 @@ function EntrarSalaForm() {
       streamRef.current?.getTracks().forEach((t) => t.stop())
       streamRef.current = null
       setCameraReady(false)
+      setConnecting(false)
       setWaitingToken(data.token)
       setStep("waiting")
     } catch (e) {
