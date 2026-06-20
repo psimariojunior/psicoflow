@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Loader2, Lightbulb, Music } from "lucide-react"
+import { Loader2, Lightbulb, Music, Volume2, VolumeX } from "lucide-react"
 
 const TIPS = [
   "Respire fundo e foque no momento presente. A terapia é um espaço seu.",
@@ -31,13 +31,55 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const [currentTipIndex, setCurrentTipIndex] = useState(0)
   const [breathPhase, setBreathPhase] = useState(0)
   const [breathProgress, setBreathProgress] = useState(0)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const pianoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const playPianoNote = useCallback((freq: number) => {
+    if (!soundEnabled) return
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext()
+      const ctx = audioCtxRef.current
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = "sine"
+      osc.frequency.value = freq
+      gain.gain.value = 0.08
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start()
+      osc.stop(ctx.currentTime + 0.8)
+    } catch {}
+  }, [soundEnabled])
+
+  const pianoFreqs = [262, 294, 330, 349, 392, 440, 494, 523]
 
   useEffect(() => {
-    const tipInterval = setInterval(() => {
-      setCurrentTipIndex((prev) => (prev + 1) % TIPS.length)
-    }, 8000)
-    return () => clearInterval(tipInterval)
+    let idx = 0
+    pianoIntervalRef.current = setInterval(() => {
+      playPianoNote(pianoFreqs[idx % pianoFreqs.length])
+      idx++
+    }, 600)
+    return () => {
+      if (pianoIntervalRef.current) clearInterval(pianoIntervalRef.current)
+    }
+  }, [soundEnabled])
+
+  useEffect(() => {
+    return () => { audioCtxRef.current?.close() }
   }, [])
+
+  const toggleSound = () => {
+    setSoundEnabled(prev => {
+      if (prev) {
+        if (pianoIntervalRef.current) clearInterval(pianoIntervalRef.current)
+        audioCtxRef.current?.close()
+        audioCtxRef.current = null
+      }
+      return !prev
+    })
+  }
 
   useEffect(() => {
     const phase = BREATHING_PHASES[breathPhase]
@@ -110,6 +152,16 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
             <p className="text-xs text-blue-400/60 font-light tracking-wider uppercase">
               Exercício de respiração
             </p>
+          </div>
+
+          <div className="flex items-center justify-between bg-white/[0.04] rounded-xl px-4 py-2 ring-1 ring-white/[0.06]">
+            <div className="flex items-center gap-2 text-white/50 text-xs">
+              <Music className="h-3.5 w-3.5" />
+              <span>Melodia ambiente</span>
+            </div>
+            <button onClick={toggleSound} className="text-white/50 hover:text-white transition-colors p-1" aria-label={soundEnabled ? "Desativar som" : "Ativar som"}>
+              {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
           </div>
 
           <div className="flex items-start gap-3 bg-white/[0.04] rounded-xl p-4 ring-1 ring-white/[0.06] min-h-[72px]">

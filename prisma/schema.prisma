@@ -223,6 +223,7 @@ model TherapySession {
   moodAfter     Int?
   isRemote      Boolean  @default(false)
   recordingUrl  String?
+  signature     String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
