@@ -3,18 +3,12 @@
 import { useState, useEffect } from "react"
 import { StatsCards } from "@/components/dashboard/stats-cards"
 import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments"
-import { RecentPatients } from "@/components/dashboard/recent-patients"
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
-import { PaymentMethodsPie } from "@/components/dashboard/payment-methods-pie"
-import { KeyIndicators } from "@/components/dashboard/key-indicators"
-import { PatientGrowthChart } from "@/components/dashboard/patient-growth-chart"
-import { ActivityFeed } from "@/components/dashboard/activity-feed"
-import { ExportModal } from "@/components/dashboard/export-modal"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, Activity, Filter } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
@@ -26,16 +20,6 @@ const quickActions = [
   { label: "Nova Sessão", href: "/sessoes", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre um prontuário" },
   { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-blue-700", desc: "Inicie uma videochamada" },
 ]
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
-}
 
 export default function DashboardHome() {
   const [data, setData] = useState<{
@@ -51,7 +35,6 @@ export default function DashboardHome() {
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
-  const [exportOpen, setExportOpen] = useState(false)
   const [period, setPeriod] = useState<"6" | "12" | "all">("12")
 
   useEffect(() => {
@@ -61,7 +44,7 @@ export default function DashboardHome() {
       .then(setData)
       .catch((err) => {
         if (err?.name === "AbortError") return
-        toast.error("Erro ao carregar dados do dashboard")
+        toast.error("Erro ao carregar dados")
         setData(null)
       })
       .finally(() => setLoading(false))
@@ -71,186 +54,177 @@ export default function DashboardHome() {
   useEffect(() => {
     if (!data?.financialSummary) return
     const pct = data.financialSummary.goal > 0
-      ? Math.min(100, Math.round((data.financialSummary.received / data.financialSummary.goal) * 100))
-      : 0
+      ? Math.min(100, Math.round((data.financialSummary.received / data.financialSummary.goal) * 100)) : 0
     const timer = setTimeout(() => setProgressWidth(pct), 200)
     return () => clearTimeout(timer)
   }, [data])
 
   if (loading) {
     return (
-      <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
-        <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
+      <div className="space-y-6">
+        <div className="h-8 w-48 bg-muted rounded animate-pulse" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-card rounded-xl animate-pulse" />)}
-        </div>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-card rounded-xl animate-pulse" />)}
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="h-72 bg-card rounded-xl animate-pulse" />
-              <div className="h-72 bg-card rounded-xl animate-pulse" />
-            </div>
-            <div className="h-64 bg-card rounded-xl animate-pulse" />
+            <div className="h-72 bg-card rounded-xl animate-pulse" />
           </div>
           <div className="space-y-4">
             <div className="h-44 bg-card rounded-xl animate-pulse" />
             <div className="h-64 bg-card rounded-xl animate-pulse" />
           </div>
         </div>
-      </motion.div>
+      </div>
     )
   }
 
   const stats = data?.stats ?? { totalPatients: 0, appointmentsToday: 0, monthlyRevenue: 0, pendingPayments: 0, appointmentChange: 0, revenueChange: 0 }
   const appointments = (data?.appointments ?? []).map((a) => ({ ...a, startTime: new Date(a.startTime) }))
-  const patients = (data?.patients ?? []).map((p) => ({ ...p, createdAt: new Date(p.createdAt) }))
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
   const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
 
   const filteredMonthlyData = (data?.monthlyData ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
-  const filteredPaymentsByMethod = data?.paymentsByMethod ?? []
-  const filteredNewPatients = (data?.newPatientsByMonth ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
 
   return (
-    <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-            Dashboard
-          </h2>
-          <p className="text-muted-foreground mt-1">Visão geral da sua prática clínica</p>
+          <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+          <p className="text-muted-foreground text-sm mt-0.5">Visão geral da sua prática clínica</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
-          </Button>
-          <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">
-            <Link href="/agenda"><Plus className="mr-2 h-4 w-4" />Nova Consulta</Link>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+            {(["6", "12", "all"] as const).map((p) => (
+              <button key={p} onClick={() => setPeriod(p)}
+                className={cn("px-3 py-1.5 text-xs font-medium rounded-md transition-all", period === p ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
+              >{p === "6" ? "6 meses" : p === "12" ? "12 meses" : "Todos"}</button>
+            ))}
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/relatorios"><BarChart3 className="mr-1.5 h-4 w-4" />Relatórios</Link>
           </Button>
         </div>
       </div>
 
-      <motion.div variants={itemVariants}>
-        <StatsCards stats={stats} />
-      </motion.div>
+      <StatsCards stats={stats} />
 
-      <motion.div variants={itemVariants}>
-        <KeyIndicators indicators={indicators} />
-      </motion.div>
-
-      <motion.div variants={itemVariants} className="flex items-center gap-2">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        <span className="text-xs text-muted-foreground mr-1">Período:</span>
-        {(["6", "12", "all"] as const).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
-              period === p
-                ? "bg-primary/10 text-primary ring-1 ring-primary/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent"
-            }`}
-          >
-            {p === "6" ? "6 meses" : p === "12" ? "12 meses" : "Todos"}
-          </button>
-        ))}
-      </motion.div>
-
-      <motion.div variants={itemVariants} className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {quickActions.map((action) => (
           <Link key={action.label} href={action.href}>
-            <Card className="group cursor-pointer overflow-hidden border-0 bg-gradient-to-br from-card to-muted/30 card-hover relative">
-              <div className={cn("absolute inset-0 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500", action.gradient.replace("from-", "bg-gradient-to-br from-"))} />
-              <CardContent className="p-4 relative">
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br transition-all group-hover:scale-110 group-hover:rotate-3 duration-300 shadow-lg", action.gradient
-                  )}>
-                    <action.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{action.label}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+            <div className="group relative overflow-hidden bg-card hover:bg-accent rounded-xl p-4 ring-1 ring-border transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5">
+              <div className={cn("absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-gradient-to-br", action.gradient)} />
+              <div className="relative flex items-center gap-3">
+                <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br shadow-md transition-all group-hover:scale-110 group-hover:rotate-3 duration-300 shrink-0", action.gradient)}>
+                  <action.icon className="h-5 w-5 text-white" />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm">{action.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
+                </div>
+              </div>
+            </div>
           </Link>
         ))}
-      </motion.div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="grid gap-6 md:grid-cols-2">
-            <motion.div variants={itemVariants}>
-              <RevenueChart data={filteredMonthlyData} />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <AppointmentsChart data={filteredMonthlyData} />
-            </motion.div>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <motion.div variants={itemVariants}>
-              <PaymentMethodsPie data={filteredPaymentsByMethod} />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <PatientGrowthChart data={filteredNewPatients} />
-            </motion.div>
-          </div>
-          <motion.div variants={itemVariants}>
-            <UpcomingAppointments appointments={appointments} />
-          </motion.div>
-        </div>
-        <div className="space-y-4">
-          <motion.div variants={itemVariants}>
-            <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="h-5 w-5 text-blue-200" />
-                  <span className="font-semibold">Meta do Mês</span>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-100">Progresso</span>
-                    <span className="font-bold text-white">{progressWidth}%</span>
-                  </div>
-                  <div className="h-3 rounded-full bg-white/20 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-white transition-all duration-1000 ease-out"
-                      style={{ width: `${progressWidth}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-100">Recebido</span>
-                    <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-100">Meta</span>
-                    <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.goal)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <FinancialSummaryCard summary={financialSummary} />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <ActivityFeed activities={[]} />
-          </motion.div>
-        </div>
       </div>
 
-      <motion.div variants={itemVariants}>
-        <RecentPatients patients={patients} />
-      </motion.div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  Receita
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <RevenueChart data={filteredMonthlyData} />
+            </CardContent>
+          </Card>
 
-      <ExportModal open={exportOpen} onOpenChange={setExportOpen} />
-    </motion.div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-blue-500" />
+                  Agendamentos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AppointmentsChart data={filteredMonthlyData} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  Próximas Consultas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <UpcomingAppointments appointments={appointments} />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-blue-200" />
+                <span className="font-semibold text-sm">Meta do Mês</span>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-100">Progresso</span>
+                  <span className="font-bold">{progressWidth}%</span>
+                </div>
+                <div className="h-2.5 rounded-full bg-white/20 overflow-hidden">
+                  <div className="h-full rounded-full bg-white transition-all duration-1000 ease-out" style={{ width: `${progressWidth}%` }} />
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-100">Recebido</span>
+                  <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.received)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-100">Meta</span>
+                  <span className="font-bold">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(financialSummary.goal)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Activity className="h-4 w-4 text-blue-500" />
+                Indicadores
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Ticket Médio", value: new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(indicators.averageTicket), icon: DollarSign },
+                  { label: "Conclusão", value: `${Math.round(indicators.completionRate)}%`, icon: TrendingUp },
+                  { label: "Cancelamento", value: `${Math.round(indicators.cancellationRate)}%`, icon: Activity },
+                  { label: "Ocupação", value: `${Math.round(indicators.occupationRate)}%`, icon: Users },
+                ].map((item) => (
+                  <div key={item.label} className="bg-muted/50 rounded-xl p-3 text-center">
+                    <item.icon className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                    <p className="text-lg font-bold">{item.value}</p>
+                    <p className="text-[10px] text-muted-foreground">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <FinancialSummaryCard summary={financialSummary} />
+        </div>
+      </div>
+    </div>
   )
 }
