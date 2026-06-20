@@ -93,11 +93,9 @@ export async function GET(request: Request) {
 
   const results: string[] = []
 
-  const existingBeck = await prisma.questionnaire.findFirst({ where: { type: "BECK" }, include: { _count: { select: { responses: true } } } })
-  if (existingBeck && existingBeck._count.responses === 0) {
-    await prisma.questionnaire.delete({ where: { id: existingBeck.id } })
-  }
-  if (!existingBeck || existingBeck._count.responses === 0) {
+  const existingBeck = await prisma.questionnaire.findFirst({ where: { type: "BECK" } })
+  if (existingBeck) { await prisma.questionnaire.delete({ where: { id: existingBeck.id } }) }
+  {
     await prisma.questionnaire.create({
       data: {
         type: "BECK",
