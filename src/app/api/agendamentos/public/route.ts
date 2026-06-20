@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         "Confirmação de Consulta - PsicoFlow",
         `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #10b981; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+            <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
             <p style="color: #666; margin: 0;">Confirmação de agendamento</p>
           </div>
           <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       "Novo Agendamento - PsicoFlow",
       `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #10b981; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+          <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
           <p style="color: #666; margin: 0;">Novo agendamento recebido</p>
         </div>
         <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">

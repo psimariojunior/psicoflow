@@ -538,6 +538,10 @@ model ClosedRoom {
 enum QuestionnaireType {
   PHQ9
   GAD7
+  BECK
+  WHOQOL
+  PSS
+  MINI
   CUSTOM
 }
 
