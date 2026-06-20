@@ -24,6 +24,7 @@ import {
   ClipboardList,
   Sparkles,
   Heart,
+  BookOpen,
   ListTodo,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -52,6 +53,7 @@ const menuItems = [
   { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
+  { href: "/ajuda", label: "Ajuda", icon: BookOpen },
 ]
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
