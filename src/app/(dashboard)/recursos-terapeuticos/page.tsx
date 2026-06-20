@@ -71,7 +71,7 @@ export default function RecursosTerapeuticosPage() {
   const [resources, setResources] = useState<TherapyResource[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [filterType, setFilterType] = useState<string>("")
+  const [filterType, setFilterType] = useState<string>("all")
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [assignOpen, setAssignOpen] = useState(false)
@@ -87,7 +87,7 @@ export default function RecursosTerapeuticosPage() {
     try {
       const params = new URLSearchParams()
       if (search) params.set("search", search)
-      if (filterType) params.set("type", filterType)
+      if (filterType && filterType !== "all") params.set("type", filterType)
       const res = await fetch(`/api/recursos-terapeuticos?${params}`)
       if (!res.ok) throw new Error()
       const data = await res.json()
@@ -165,7 +165,7 @@ export default function RecursosTerapeuticosPage() {
       const q = search.toLowerCase()
       if (!r.name.toLowerCase().includes(q) && !(r.description || "").toLowerCase().includes(q) && !(r.tags || "").toLowerCase().includes(q)) return false
     }
-    if (filterType && r.type !== filterType) return false
+    if (filterType && filterType !== "all" && r.type !== filterType) return false
     return true
   })
 
@@ -241,7 +241,7 @@ export default function RecursosTerapeuticosPage() {
             <SelectValue placeholder="Filtrar por tipo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="CBT_EXERCISE">Exercício TCC</SelectItem>
             <SelectItem value="PSYCHOEDUCATION">Psicoeducação</SelectItem>
             <SelectItem value="MEDITATION">Meditação</SelectItem>
