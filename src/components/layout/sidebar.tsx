@@ -46,6 +46,7 @@ const menuItems = [
   { href: "/cobrancas", label: "Cobranças", icon: Receipt },
   { href: "/sala-virtual", label: "Sala Virtual", icon: Video },
   { href: "/sessoes", label: "Sessões", icon: ClipboardList },
+  { href: "/questionarios", label: "Questionários", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
   { href: "/tarefas",        label: "Tarefas",           icon: ListTodo },
