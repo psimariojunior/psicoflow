@@ -65,6 +65,8 @@ closedRooms       ClosedRoom[]
   crisisProtocols   CrisisProtocol[]
   crisisAccesses    CrisisProtocolAccess[]
   therapyTasks      TherapyTask[]
+  receipts          Receipt[]
+  waitingList       WaitingList[]
 }
 
 model Account {
@@ -154,6 +156,8 @@ model Patient {
   anamnesis      Anamnesis?
   crisisAccesses CrisisProtocolAccess[]
   therapyTasks   TherapyTask[]
+  receipts       Receipt[]
+  waitingEntries WaitingList[]
 
   @@index([psychologistId])
 }
@@ -188,6 +192,7 @@ model Appointment {
 
   therapySession TherapySession?
   notifications  Notification[]
+  receipts       Receipt[]
 
   @@index([psychologistId])
   @@index([patientId])
@@ -533,6 +538,58 @@ model ClosedRoom {
   psychologist   User     @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
+}
+
+
+
+model Receipt {
+  id              String   @id @default(cuid())
+  number          String   @unique
+  patientName     String
+  patientDoc      String?
+  description     String
+  amount          Float
+  issueDate       DateTime @default(now())
+  appointmentDate DateTime?
+  paymentMethod   String?
+  status          String   @default("ISSUED")
+  pdfUrl          String?
+  sentAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  psychologistId  String
+  psychologist    User     @relation(fields: [psychologistId], references: [id])
+  patientId       String?
+  patient         Patient?  @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  appointmentId   String?
+  appointment     Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([psychologistId])
+  @@index([patientId])
+  @@index([number])
+}
+
+model WaitingList {
+  id             String   @id @default(cuid())
+  patientName    String
+  patientEmail   String?
+  patientPhone   String?
+  preferredDay   String?
+  preferredTime  String?
+  notes          String?
+  status         String   @default("WAITING")
+  notifiedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  patientId      String?
+  patient        Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  @@index([psychologistId])
+  @@index([status])
 }
 
 model BackupLog {

@@ -53,6 +53,8 @@ const menuItems = [
   { href: "/notificacoes",   label: "Notificações",     icon: Bell },
   { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { href: "/recibos", label: "Recibos", icon: Receipt },
+  { href: "/lista-espera", label: "Lista de Espera", icon: ClipboardList },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
   { href: "/ajuda", label: "Ajuda", icon: BookOpen },
 ]
