@@ -85,10 +85,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 
+  try {
   const firstPsych = await prisma.user.findFirst({ where: { role: "PSYCHOLOGIST" }, select: { id: true } })
-  if (!firstPsych) {
-    return NextResponse.json({ error: "Nenhum psicólogo encontrado no banco" }, { status: 400 })
-  }
+  if (!firstPsych) { return NextResponse.json({ error: "Nenhum psicólogo encontrado" }, { status: 400 }) }
   const psychId = firstPsych.id
 
   const results: string[] = []
@@ -166,4 +165,5 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({ results })
+  } catch (e: any) { return NextResponse.json({ error: e?.message || String(e) }, { status: 500 }) }
 }
