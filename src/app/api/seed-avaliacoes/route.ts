@@ -95,29 +95,25 @@ export async function GET(request: Request) {
 
   const existingBeck = await prisma.questionnaire.findFirst({ where: { type: "BECK" } })
   if (existingBeck) { await prisma.questionnaire.delete({ where: { id: existingBeck.id } }) }
-  {
-    await prisma.questionnaire.create({
-      data: {
-        type: "BECK",
-        title: "Inventário de Depressão de Beck (BDI)",
-        description: "Avaliação da intensidade dos sintomas depressivos. 21 itens, escala 0-3.",
-        isActive: true,
-        psychologistId: psychId,
-        questions: {
-          create: beckQuestions.map(q => ({
-            questionText: q.text,
-            questionOrder: q.order,
-            options: JSON.stringify(q.options || beckOptions),
-            scaleMin: 0,
-            scaleMax: 3,
-          })),
-        },
+  await prisma.questionnaire.create({
+    data: {
+      type: "BECK",
+      title: "Inventário de Depressão de Beck (BDI)",
+      description: "Avaliação da intensidade dos sintomas depressivos. 21 itens, escala 0-3.",
+      isActive: true,
+      psychologistId: psychId,
+      questions: {
+        create: beckQuestions.map(q => ({
+          questionText: q.text,
+          questionOrder: q.order,
+          options: JSON.stringify(q.options || beckOptions),
+          scaleMin: 0,
+          scaleMax: 3,
+        })),
       },
-    })
-    results.push("BECK criado")
-  } else {
-    results.push("BECK já existe")
-  }
+    },
+  })
+  results.push("BECK criado")
 
   const existingPss = await prisma.questionnaire.findFirst({ where: { type: "PSS" } })
   if (!existingPss) {
