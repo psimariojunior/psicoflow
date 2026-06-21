@@ -4,10 +4,11 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
-import { Track } from "livekit-client"
+import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack } from "@livekit/components-react"
+import { Track, LocalParticipant } from "livekit-client"
 import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User } from "lucide-react"
 import toast from "react-hot-toast"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 export default function VirtualRoomPage() {
   const [roomName, setRoomName] = useState(`sala-${Date.now()}`)
@@ -90,7 +91,9 @@ export default function VirtualRoomPage() {
             onDisconnected={() => setToken(null)}
             style={{ height: "100%" }}
           >
-            <PsychologistInCall />
+            <ErrorBoundary>
+              <PsychologistInCall />
+            </ErrorBoundary>
           </LiveKitRoom>
         </div>
       </div>
@@ -158,12 +161,11 @@ export default function VirtualRoomPage() {
 
 function PsychologistInCall() {
   const [callDuration, setCallDuration] = useState(0)
+  const [camOn, setCamOn] = useState(true)
+  const [micOn, setMicOn] = useState(true)
+
   const remoteParticipants = useRemoteParticipants()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const lp = useLocalParticipant()
-  const localParticipant = lp.localParticipant
-  const isCameraEnabled = lp.isCameraEnabled
-  const isMicrophoneEnabled = lp.isMicrophoneEnabled
   const hasRemote = remoteParticipants ? remoteParticipants.length > 0 : false
   const remoteVideoTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.Camera) : null
   const screenTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.ScreenShare) : null
@@ -174,8 +176,8 @@ function PsychologistInCall() {
     return () => clearInterval(id)
   }, [])
 
-  const toggleCam = useCallback(() => localParticipant?.setCameraEnabled(!isCameraEnabled), [isCameraEnabled, localParticipant])
-  const toggleMic = useCallback(() => localParticipant?.setMicrophoneEnabled(!isMicrophoneEnabled), [isMicrophoneEnabled, localParticipant])
+  const toggleCam = () => setCamOn(prev => !prev)
+  const toggleMic = () => setMicOn(prev => !prev)
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
@@ -214,9 +216,14 @@ function PsychologistInCall() {
           <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                <User className="h-6 w-6 text-slate-500" />
+                <Video className={`h-6 w-6 ${camOn ? 'text-blue-400' : 'text-slate-500'}`} />
               </div>
-              <p className="text-xs text-slate-500 font-medium">Câmera local</p>
+              <p className={`text-xs font-medium ${camOn ? 'text-blue-400' : 'text-slate-500'}`}>
+                {camOn ? 'Câmera ativada' : 'Câmera desligada'}
+              </p>
+              <p className={`text-xs mt-1 ${micOn ? 'text-blue-400' : 'text-slate-500'}`}>
+                {micOn ? 'Microfone ativado' : 'Microfone desligado'}
+              </p>
             </div>
           </div>
         </div>
@@ -233,11 +240,11 @@ function PsychologistInCall() {
       </div>
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 md:gap-3 bg-black/50 backdrop-blur-xl rounded-full px-3 md:px-4 py-2 md:py-2.5 ring-1 ring-white/10 shadow-2xl">
-        <Button size="icon" variant={isCameraEnabled ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isCameraEnabled ? <Video className="h-4 w-4 md:h-5 md:w-5" /> : <VideoOff className="h-4 w-4 md:h-5 md:w-5" />}
+        <Button size="icon" variant={camOn ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
+          {camOn ? <Video className="h-4 w-4 md:h-5 md:w-5" /> : <VideoOff className="h-4 w-4 md:h-5 md:w-5" />}
         </Button>
-        <Button size="icon" variant={isMicrophoneEnabled ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isMicrophoneEnabled ? <Mic className="h-4 w-4 md:h-5 md:w-5" /> : <MicOff className="h-4 w-4 md:h-5 md:w-5" />}
+        <Button size="icon" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-10 w-10 md:h-11 md:w-11 hover:scale-105 active:scale-95 transition-transform">
+          {micOn ? <Mic className="h-4 w-4 md:h-5 md:w-5" /> : <MicOff className="h-4 w-4 md:h-5 md:w-5" />}
         </Button>
       </div>
     </div>
