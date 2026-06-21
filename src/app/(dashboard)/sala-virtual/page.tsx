@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, useRemoteParticipants, VideoTrack, useRoomContext } from "@livekit/components-react"
+import { LiveKitRoom, useRemoteParticipants, VideoTrack, useRoomContext, RoomAudioRenderer } from "@livekit/components-react"
 import { Track, RoomEvent, type LocalTrackPublication } from "livekit-client"
 import "@livekit/components-styles"
 import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User } from "lucide-react"
@@ -95,6 +95,7 @@ export default function VirtualRoomPage() {
               style={{ height: "100%" }}
             >
               <ErrorBoundary>
+                <RoomAudioRenderer />
                 <PsychologistInCall />
               </ErrorBoundary>
             </LiveKitRoom>

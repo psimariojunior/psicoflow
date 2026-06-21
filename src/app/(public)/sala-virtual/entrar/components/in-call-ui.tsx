@@ -143,13 +143,9 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
   }, [room])
 
   const toggleMic = useCallback(() => {
-    const pub = room?.localParticipant.getTrackPublication(Track.Source.Microphone)
-    if (pub) {
-      const enabled = !pub.isMuted
-      room?.localParticipant.setMicrophoneEnabled(!enabled)
-      setMicOn(!enabled)
-    }
-  }, [room])
+    room?.localParticipant.setMicrophoneEnabled(!micOn)
+    setMicOn(prev => !prev)
+  }, [room, micOn])
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
