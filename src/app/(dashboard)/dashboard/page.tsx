@@ -6,6 +6,7 @@ import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointmen
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
+import { OnboardingChecklist } from "@/components/onboarding-checklist"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity } from "lucide-react"
@@ -36,6 +37,12 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
   const [period, setPeriod] = useState<"6" | "12" | "all">("12")
+  const [onboardingDone, setOnboardingDone] = useState(true)
+
+  useEffect(() => {
+    const val = localStorage.getItem("psicoflow_onboarding_completed")
+    setOnboardingDone(val === "true")
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -106,6 +113,8 @@ export default function DashboardHome() {
           </Button>
         </div>
       </div>
+
+      {!onboardingDone && <OnboardingChecklist />}
 
       <StatsCards stats={stats} />
 

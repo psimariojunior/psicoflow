@@ -27,6 +27,30 @@ import {
 
 const sections = [
   {
+    id: "primeiros-passos",
+    title: "Primeiros Passos",
+    icon: Sparkles,
+    gradient: "from-emerald-500 to-teal-600",
+    highlight: true,
+    items: [
+      {
+        title: "Como começar a usar o PsicoFlow",
+        content:
+          "Após criar sua conta, comece cadastrando seus pacientes em 'Pacientes > Novo Paciente'. Em seguida, configure seus horários de atendimento em 'Configurações > Disponibilidade' para que os pacientes possam agendar consultas pelo link público.",
+      },
+      {
+        title: "Personalize seu perfil",
+        content:
+          "Acesse 'Configurações' para adicionar sua foto, dados profissionais (CRP), bio e informações de contato. Seu perfil é exibido na página pública de agendamento, então mantenha tudo atualizado.",
+      },
+      {
+        title: "Convide pacientes",
+        content:
+          "Após cadastrar um paciente, envie o link do portal dele por e-mail ou WhatsApp. O paciente poderá acessar prontuários, questionários, recursos terapêuticos e a sala virtual diretamente pelo portal.",
+      },
+    ],
+  },
+  {
     id: "dashboard",
     title: "Dashboard",
     icon: LayoutDashboard,
@@ -74,6 +98,24 @@ const sections = [
         title: "Timeline do paciente",
         content:
           "A timeline exibe uma linha do tempo com todos os eventos do paciente: consultas realizadas, prontuários criados, recursos atribuídos, tarefas concluídas e diário emocional. É uma forma rápida de visualizar a jornada completa do paciente.",
+      },
+    ],
+  },
+  {
+    id: "prontuarios",
+    title: "Prontuários",
+    icon: ClipboardList,
+    gradient: "from-pink-500 to-rose-600",
+    items: [
+      {
+        title: "Como criar um prontuário",
+        content:
+          "Na página do paciente, clique em 'Novo Prontuário'. Preencha as notas da sessão e use o botão 'Gerar com IA' para criar automaticamente um registro SOAP estruturado (Subjetivo, Objetivo, Avaliação, Plano). Salve para registrar na timeline do paciente.",
+      },
+      {
+        title: "Visualizar histórico de prontuários",
+        content:
+          "Acesse a aba 'Prontuários' no perfil do paciente para ver todos os registros anteriores ordenados por data. Clique em qualquer prontuário para expandir e ler o conteúdo completo, incluindo anexos e observações.",
       },
     ],
   },
@@ -259,6 +301,47 @@ const sections = [
         title: "Modelos gratuitos, sem limite",
         content:
           "Diferente de outras plataformas, o Hermes Agent usa modelos gratuitos via OpenRouter. Não há limite de uso nem cobrança adicional. Você pode gerar quantos SOAPs e análises precisar, sem se preocupar com custos.",
+      },
+    ],
+  },
+  {
+    id: "configuracoes",
+    title: "Configurações",
+    icon: LayoutDashboard,
+    gradient: "from-gray-500 to-slate-600",
+    items: [
+      {
+        title: "Perfil profissional",
+        content:
+          "Em 'Configurações', atualize seus dados pessoais, foto, CRP, biografia e informações de contato. Essas informações aparecem na página pública de agendamento e no portal do paciente.",
+      },
+      {
+        title: "Integração com Google Calendar",
+        content:
+          "Conecte sua conta Google Calendar para sincronizar automaticamente suas consultas. As consultas agendadas no PsicoFlow aparecem no seu Google Calendar e vice-versa. Acesse em 'Configurações > Google Calendar'.",
+      },
+      {
+        title: "Disponibilidade e horários",
+        content:
+          "Configure seus horários de atendimento por dia da semana, incluindo pausas e horário de almoço. Os pacientes só enxergam horários disponíveis ao agendar. Você pode bloquear dias específicos para feriados ou férias.",
+      },
+    ],
+  },
+  {
+    id: "planos",
+    title: "Planos e Cobrança",
+    icon: DollarSign,
+    gradient: "from-amber-500 to-yellow-600",
+    items: [
+      {
+        title: "Como funciona a assinatura",
+        content:
+          "O PsicoFlow oferece planos gratuitos e pagos. No plano gratuito, você tem acesso a funcionalidades básicas. Para desbloquear todos os recursos (sala virtual, IA, relatórios avançados), assine um plano pago diretamente em 'Configurações > Planos'.",
+      },
+      {
+        title: "Formas de pagamento",
+        content:
+          "Aceitamos pagamento via cartão de crédito, PIX e boleto bancário processados pela Stripe. Sua assinatura é renovada automaticamente. Você pode cancelar a qualquer momento em 'Configurações > Planos' sem multa.",
       },
     ],
   },

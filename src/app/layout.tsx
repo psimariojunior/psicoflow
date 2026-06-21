@@ -5,6 +5,7 @@ import "./globals.css"
 import { Providers } from "./providers"
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 import { CookieConsent } from "@/components/cookie-consent"
+import { GoogleAnalytics } from "@/components/google-analytics"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -116,21 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             });
           `}
         </Script>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-                  page_path: window.location.pathname,
-                });
-              `}
-            </Script>
-          </>
-        )}
+        <GoogleAnalytics />
         <Script id="pwa-register" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
