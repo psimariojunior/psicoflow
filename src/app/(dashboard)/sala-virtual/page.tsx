@@ -91,9 +91,12 @@ export default function VirtualRoomPage() {
               video={true}
               audio={{ echoCancellation: true, noiseSuppression: true, autoGainControl: true }}
               onDisconnected={() => setToken(null)}
+              onError={(e) => console.error("LiveKit error:", e)}
               style={{ height: "100%" }}
             >
-              <PsychologistInCall />
+              <ErrorBoundary>
+                <PsychologistInCall />
+              </ErrorBoundary>
             </LiveKitRoom>
           </div>
         </div>
@@ -177,22 +180,26 @@ function PsychologistInCall() {
     if (!room) return
 
     const updateLocalCam = () => {
-      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
-      setLocalCamPub((pub as LocalTrackPublication) || null)
+      try {
+        const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+        setLocalCamPub((pub as LocalTrackPublication) || null)
+      } catch {}
     }
 
     const updateRemoteTracks = () => {
-      const remotes = Array.from(room.remoteParticipants.values())
-      let camPub = null
-      let screenPub = null
-      for (const p of remotes) {
-        const cam = p.getTrackPublication(Track.Source.Camera)
-        if (cam && cam.isSubscribed) camPub = { participant: p, source: Track.Source.Camera, publication: cam }
-        const screen = p.getTrackPublication(Track.Source.ScreenShare)
-        if (screen && screen.isSubscribed) screenPub = { participant: p, source: Track.Source.ScreenShare, publication: screen }
-      }
-      setRemoteCamPub(camPub)
-      setRemoteScreenPub(screenPub)
+      try {
+        const remotes = Array.from(room.remoteParticipants.values())
+        let camPub = null
+        let screenPub = null
+        for (const p of remotes) {
+          const cam = p.getTrackPublication(Track.Source.Camera)
+          if (cam && cam.isSubscribed) camPub = { participant: p, source: Track.Source.Camera, publication: cam }
+          const screen = p.getTrackPublication(Track.Source.ScreenShare)
+          if (screen && screen.isSubscribed) screenPub = { participant: p, source: Track.Source.ScreenShare, publication: screen }
+        }
+        setRemoteCamPub(camPub)
+        setRemoteScreenPub(screenPub)
+      } catch {}
     }
 
     updateLocalCam()
