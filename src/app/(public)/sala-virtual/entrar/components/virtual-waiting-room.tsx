@@ -57,7 +57,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     if (isPlayingRef.current || !soundEnabled) return
     isPlayingRef.current = true
 
-    const audio = new Audio("/amazing-grace-violin.wav")
+    const audio = new Audio("/Amazing Grace - Instrumental.mp3")
     audio.loop = true
     audio.volume = 0.6
     audioRef.current = audio
