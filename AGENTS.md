@@ -93,7 +93,7 @@ Professional psychology practice website + management platform. Public landing p
 
 ### Para o cron automático
 1. Criar conta em https://cron-job.org
-2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes?secret=ApvVr8FOWwhgkSEtfZ2uDJ1sRx73XmCl` a cada 30 min
+2. Criar job: `https://psicoflow-iota.vercel.app/api/cron/lembretes?secret=YOUR_CRON_SECRET` a cada 30 min (use o CRON_SECRET configurado no Vercel)
 
 ### Lembretes automáticos agendados (2026-06-10)
 - `prisma/schema.prisma`: Notification ganhou campo `scheduledAt` (DateTime?) para agendamento
