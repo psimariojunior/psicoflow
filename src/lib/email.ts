@@ -67,9 +67,11 @@ async function sendViaSendGrid(to: string, subject: string, html: string): Promi
 const PSYCHOLOGIST_EMAIL = process.env.PSYCHOLOGIST_EMAIL || "psi_mariojunior@hotmail.com"
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<string | null> {
-  if (to === PSYCHOLOGIST_EMAIL && process.env.RESEND_API_KEY) {
-    return sendViaResend(to, subject, html)
-  }
+  // Use Resend for all emails (SaaS mode)
+  const resendError = await sendViaResend(to, subject, html)
+  if (!resendError) return null
+
+  // Fallback to SendGrid if Resend fails
   return sendViaSendGrid(to, subject, html)
 }
 
