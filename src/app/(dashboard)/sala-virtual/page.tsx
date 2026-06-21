@@ -15,7 +15,7 @@ export default function VirtualRoomPage() {
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
 
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
 
   const sanitize = (name: string) => name.replace(/[^a-zA-Z0-9_-]/g, "-")
 
@@ -230,8 +230,8 @@ function PsychologistInCall() {
 
       <div className="absolute top-4 left-4 z-20 text-xs text-white/50 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
         {hasRemote ? (
-          <span className="flex items-center gap-1.5 text-emerald-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="flex items-center gap-1.5 text-blue-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
             {formatTime(callDuration)}
           </span>
         ) : "Aguardando paciente..."}

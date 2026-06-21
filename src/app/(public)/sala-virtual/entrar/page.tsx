@@ -37,7 +37,7 @@ function EntrarSalaForm() {
   const [hd, setHd] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
   const hdRef = useRef(hd)
   hdRef.current = hd
 

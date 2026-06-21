@@ -40,21 +40,48 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     try {
       if (!audioCtxRef.current) audioCtxRef.current = new AudioContext()
       const ctx = audioCtxRef.current
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.type = "sine"
-      osc.frequency.value = freq
-      gain.gain.value = 0.08
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start()
-      osc.stop(ctx.currentTime + 0.8)
+      const now = ctx.currentTime
+
+      // Low-pass filter that opens on attack and closes during decay (piano hammer simulation)
+      const filter = ctx.createBiquadFilter()
+      filter.type = "lowpass"
+      filter.frequency.setValueAtTime(Math.min(freq * 10, 6000), now)
+      filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 3, 800), now + 0.4)
+      filter.Q.setValueAtTime(0.8, now)
+
+      // Master gain with piano-like ADSR envelope
+      const masterGain = ctx.createGain()
+      masterGain.gain.setValueAtTime(0, now)
+      masterGain.gain.linearRampToValueAtTime(0.07, now + 0.008)
+      masterGain.gain.exponentialRampToValueAtTime(0.035, now + 0.15)
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6)
+
+      masterGain.connect(filter)
+      filter.connect(ctx.destination)
+
+      const createOsc = (detune: number, gainVal: number, type: OscillatorType) => {
+        const osc = ctx.createOscillator()
+        const oscGain = ctx.createGain()
+        osc.type = type
+        osc.frequency.value = freq
+        osc.detune.value = detune
+        oscGain.gain.setValueAtTime(gainVal, now)
+        osc.connect(oscGain)
+        oscGain.connect(masterGain)
+        osc.start(now)
+        osc.stop(now + 1.6)
+      }
+
+      createOsc(0, 0.45, "triangle")
+      createOsc(-7, 0.2, "sine")
+      createOsc(7, 0.2, "sine")
+      createOsc(0, 0.1, "sine")
+      createOsc(0, 0.05, "sine")
     } catch {}
   }, [soundEnabled])
 
   useEffect(() => {
-    const notes = [392, 392, 440, 494, 494, 440, 392, 392, 392, 440, 494, 494, 440, 392, 392, 494, 587, 587, 523, 494, 440, 392, 392, 392, 440, 494, 494, 440, 392]
+    const notes = [392, 392, 440, 493.88, 493.88, 440, 392, 392, 392, 440, 493.88, 493.88, 440, 392, 392, 493.88, 587.33, 587.33, 523.25, 493.88, 440, 392, 392, 392, 440, 493.88, 493.88, 440, 392]
     let idx = 0
     pianoIntervalRef.current = setInterval(() => {
       playPianoNote(notes[idx % notes.length])
