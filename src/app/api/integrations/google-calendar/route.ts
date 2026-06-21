@@ -12,9 +12,12 @@ export async function GET(request: NextRequest) {
       select: { googleRefreshToken: true, googleCalendarId: true },
     })
 
+    const configMissing = !process.env.GOOGLE_CALENDAR_CLIENT_ID || !process.env.GOOGLE_CALENDAR_CLIENT_SECRET
+
     return apiSuccess({
       connected: !!user?.googleRefreshToken,
       calendarId: user?.googleCalendarId || null,
+      configMissing,
     })
   } catch (error) {
     logger.error("Google Calendar status error", { error: String(error) })

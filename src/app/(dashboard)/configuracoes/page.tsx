@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle } from "lucide-react"
 import toast from "react-hot-toast"
 
 function GoogleCalendarStatus() {
@@ -20,12 +20,14 @@ function GoogleCalendarStatus() {
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ synced?: number; failed?: number } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [configMissing, setConfigMissing] = useState(false)
 
   useEffect(() => {
     fetch("/api/integrations/google-calendar")
       .then((r) => r.json())
       .then((data) => {
         if (data.connected !== undefined) setConnected(data.connected)
+        if (data.configMissing) setConfigMissing(true)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -68,6 +70,22 @@ function GoogleCalendarStatus() {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" /> Verificando integração...
+      </div>
+    )
+  }
+
+  if (configMissing) {
+    return (
+      <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 p-4">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+          <div>
+            <p className="font-medium text-amber-700 dark:text-amber-300">Integração não configurada</p>
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Configure as variáveis de ambiente <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded text-xs">GOOGLE_CALENDAR_CLIENT_ID</code> e <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded text-xs">GOOGLE_CALENDAR_CLIENT_SECRET</code> no Vercel para ativar a integração.
+            </p>
+          </div>
+        </div>
       </div>
     )
   }

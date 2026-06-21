@@ -130,3 +130,87 @@ test.describe("API Tests", () => {
     expect(response.ok()).toBe(true)
   })
 })
+
+test.describe("Booking Flow (Public)", () => {
+  test("booking page shows form elements", async ({ page }) => {
+    await page.goto("/agendar")
+    await expect(page.locator("form, [class*=form], input, button")).not.toHaveCount(0)
+  })
+
+  test("terms page has content", async ({ page }) => {
+    await page.goto("/termos")
+    await expect(page.locator("h1, h2")).not.toHaveCount(0)
+  })
+
+  test("privacy page has content", async ({ page }) => {
+    await page.goto("/privacidade")
+    await expect(page.locator("h1, h2")).not.toHaveCount(0)
+  })
+})
+
+test.describe("Patient Portal Pages", () => {
+  test("patient login page has form elements", async ({ page }) => {
+    await page.goto("/paciente/login")
+    await expect(page.locator("input[type=email], input[type=password]")).not.toHaveCount(0)
+  })
+
+  test("patient registration page loads", async ({ page }) => {
+    await page.goto("/paciente/cadastro")
+    await expect(page.locator("input")).not.toHaveCount(0)
+  })
+
+  test("patient forgot password page loads", async ({ page }) => {
+    await page.goto("/paciente/recuperar-senha")
+    await expect(page.locator("input[type=email]")).not.toHaveCount(0)
+  })
+})
+
+test.describe("API Health", () => {
+  test("health endpoint returns ok", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/api/health")
+    expect(response.ok()).toBeTruthy()
+  })
+
+  test("disponibilidade public endpoint works", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/api/disponibilidade/public")
+    expect(response.ok()).toBeTruthy()
+  })
+})
+
+test.describe("Static Pages SEO", () => {
+  test("landing page has meta title", async ({ page }) => {
+    await page.goto("/")
+    const title = await page.title()
+    expect(title).toContain("PsicoFlow")
+  })
+
+  test("landing page has og meta tags", async ({ page }) => {
+    await page.goto("/")
+    const ogTitle = await page.locator('meta[property="og:title"]').getAttribute("content")
+    expect(ogTitle).toBeTruthy()
+  })
+
+  test("sitemap loads", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/sitemap.xml")
+    expect(response.ok()).toBeTruthy()
+  })
+
+  test("robots loads", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/robots.txt")
+    expect(response.ok()).toBeTruthy()
+  })
+})
+
+test.describe("PWA Manifest", () => {
+  test("manifest is accessible", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/manifest.webmanifest")
+    expect(response.ok()).toBeTruthy()
+    const json = await response.json()
+    expect(json.name).toContain("PsicoFlow")
+  })
+
+  test("service worker loads", async ({ request }) => {
+    const response = await request.get("http://localhost:3000/sw.js")
+    expect(response.ok()).toBeTruthy()
+  })
+})
