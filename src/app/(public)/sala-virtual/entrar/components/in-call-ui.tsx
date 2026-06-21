@@ -1,66 +1,116 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { VideoTrack, useRemoteParticipants, useRoomContext } from "@livekit/components-react"
-import { Track, RoomEvent, type LocalTrackPublication } from "livekit-client"
+import { useRoomContext } from "@livekit/components-react"
+import { RoomEvent, Track } from "livekit-client"
 import { Button } from "@/components/ui/button"
 import { Video, VideoOff, Mic, MicOff, LogOut, Maximize2, Minimize2, Camera, User } from "lucide-react"
 
 export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const localVideoRef = useRef<HTMLVideoElement>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [callDuration, setCallDuration] = useState(0)
   const [camOn, setCamOn] = useState(true)
   const [micOn, setMicOn] = useState(true)
-  const [localCamPub, setLocalCamPub] = useState<LocalTrackPublication | null>(null)
-  const [remoteCamPub, setRemoteCamPub] = useState<any>(null)
-  const [remoteScreenPub, setRemoteScreenPub] = useState<any>(null)
+  const [hasRemote, setHasRemote] = useState(false)
+  const [remoteName, setRemoteName] = useState("Psicólogo")
 
   const room = useRoomContext()
-  const remoteParticipants = useRemoteParticipants()
-  const hasRemote = remoteParticipants && remoteParticipants.length > 0
-  const localParticipant = room?.localParticipant
 
   useEffect(() => {
     if (!room) return
 
-    const updateLocalCam = () => {
-      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
-      setLocalCamPub((pub as LocalTrackPublication) || null)
-      setCamOn(!!pub && !pub.isMuted)
+    const attachRemoteVideo = () => {
+      try {
+        const remotes = Array.from(room.remoteParticipants.values())
+        if (remotes.length === 0) {
+          setHasRemote(false)
+          return
+        }
+        setHasRemote(true)
+        setRemoteName(remotes[0].name || remotes[0].identity || "Psicólogo")
+
+        const p = remotes[0]
+        const camPub = p.getTrackPublication(Track.Source.Camera)
+        if (camPub?.track && videoRef.current) {
+          camPub.track.attach(videoRef.current)
+        }
+      } catch {}
     }
 
-    const updateRemoteTracks = () => {
-      const remotes = Array.from(room.remoteParticipants.values())
-      let camPub = null
-      let screenPub = null
-      for (const p of remotes) {
-        const cam = p.getTrackPublication(Track.Source.Camera)
-        if (cam && cam.isSubscribed) camPub = { participant: p, source: Track.Source.Camera, publication: cam }
-        const screen = p.getTrackPublication(Track.Source.ScreenShare)
-        if (screen && screen.isSubscribed) screenPub = { participant: p, source: Track.Source.ScreenShare, publication: screen }
+    const detachRemoteVideo = () => {
+      try {
+        if (videoRef.current) {
+          const tracks = videoRef.current.srcObject instanceof MediaStream ? videoRef.current.srcObject.getTracks() : []
+          tracks.forEach(t => t.stop())
+          videoRef.current.srcObject = null
+        }
+        setHasRemote(false)
+      } catch {}
+    }
+
+    const handleParticipantConnected = () => {
+      attachRemoteVideo()
+    }
+
+    const handleParticipantDisconnected = () => {
+      detachRemoteVideo()
+    }
+
+    const handleTrackSubscribed = (track: any, publication: any, participant: any) => {
+      if (track.kind === "video" && participant && !participant.isLocal) {
+        setHasRemote(true)
+        setRemoteName(participant.name || participant.identity || "Psicólogo")
+        if (videoRef.current) {
+          track.attach(videoRef.current)
+        }
       }
-      setRemoteCamPub(camPub)
-      setRemoteScreenPub(screenPub)
     }
 
-    updateLocalCam()
-    updateRemoteTracks()
+    const handleTrackUnsubscribed = (track: any) => {
+      if (track.kind === "video") {
+        if (videoRef.current) {
+          track.detach(videoRef.current)
+        }
+      }
+    }
 
-    room.on(RoomEvent.LocalTrackPublished, updateLocalCam)
-    room.on(RoomEvent.LocalTrackUnpublished, updateLocalCam)
-    room.on(RoomEvent.TrackSubscribed, updateRemoteTracks)
-    room.on(RoomEvent.TrackUnsubscribed, updateRemoteTracks)
-    room.on(RoomEvent.ParticipantConnected, updateRemoteTracks)
-    room.on(RoomEvent.ParticipantDisconnected, updateRemoteTracks)
+    const handleLocalPublished = (publication: any) => {
+      if (publication.source === Track.Source.Camera && publication.track && localVideoRef.current) {
+        publication.track.attach(localVideoRef.current)
+      }
+    }
+
+    const handleLocalUnpublished = (publication: any) => {
+      if (publication.source === Track.Source.Camera && publication.track && localVideoRef.current) {
+        publication.track.detach(localVideoRef.current)
+      }
+    }
+
+    room.on(RoomEvent.ParticipantConnected, handleParticipantConnected)
+    room.on(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
+    room.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+    room.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
+    room.on(RoomEvent.LocalTrackPublished, handleLocalPublished)
+    room.on(RoomEvent.LocalTrackUnpublished, handleLocalUnpublished)
+
+    setTimeout(() => {
+      attachRemoteVideo()
+      const localCam = room.localParticipant.getTrackPublication(Track.Source.Camera)
+      if (localCam?.track && localVideoRef.current) {
+        localCam.track.attach(localVideoRef.current)
+      }
+    }, 500)
 
     return () => {
-      room.off(RoomEvent.LocalTrackPublished, updateLocalCam)
-      room.off(RoomEvent.LocalTrackUnpublished, updateLocalCam)
-      room.off(RoomEvent.TrackSubscribed, updateRemoteTracks)
-      room.off(RoomEvent.TrackUnsubscribed, updateRemoteTracks)
-      room.off(RoomEvent.ParticipantConnected, updateRemoteTracks)
-      room.off(RoomEvent.ParticipantDisconnected, updateRemoteTracks)
+      room.off(RoomEvent.ParticipantConnected, handleParticipantConnected)
+      room.off(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
+      room.off(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+      room.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
+      room.off(RoomEvent.LocalTrackPublished, handleLocalPublished)
+      room.off(RoomEvent.LocalTrackUnpublished, handleLocalUnpublished)
     }
   }, [room])
 
@@ -84,12 +134,22 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
   }, [])
 
   const toggleCam = useCallback(() => {
-    localParticipant?.setCameraEnabled(!camOn)
-  }, [camOn, localParticipant])
+    const pub = room?.localParticipant.getTrackPublication(Track.Source.Camera)
+    if (pub) {
+      const enabled = !pub.isMuted
+      room?.localParticipant.setCameraEnabled(!enabled)
+      setCamOn(!enabled)
+    }
+  }, [room])
 
   const toggleMic = useCallback(() => {
-    localParticipant?.setMicrophoneEnabled(!micOn)
-  }, [micOn, localParticipant])
+    const pub = room?.localParticipant.getTrackPublication(Track.Source.Microphone)
+    if (pub) {
+      const enabled = !pub.isMuted
+      room?.localParticipant.setMicrophoneEnabled(!enabled)
+      setMicOn(!enabled)
+    }
+  }, [room])
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
@@ -97,30 +157,13 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
     return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
   }
 
-  const primaryTrack = remoteScreenPub || remoteCamPub
-
   return (
     <div ref={containerRef} className="relative h-full w-full bg-black">
       <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
           <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-            {primaryTrack ? (
-              <>
-                <VideoTrack trackRef={primaryTrack} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-                <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                  <span className="bg-blue-500/30 backdrop-blur-md text-blue-200 text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-blue-400/30">
-                    {hasRemote ? remoteParticipants[0]?.name || "Psicólogo" : "Psicólogo"}
-                  </span>
-                  {hasRemote && (
-                    <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/80 text-xs px-2.5 py-1 rounded-full">
-                      <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(59,130,246,0.5)]" />
-                      {formatTime(callDuration)}
-                    </span>
-                  )}
-                </div>
-              </>
-            ) : (
+            <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+            {!hasRemote && (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
                 <div className="text-center">
                   <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
@@ -130,27 +173,28 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
                 </div>
               </div>
             )}
+            {hasRemote && (
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
+            )}
+            {hasRemote && (
+              <div className="absolute bottom-2 left-3 flex items-center gap-2">
+                <span className="bg-blue-500/30 backdrop-blur-md text-blue-200 text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-blue-400/30">
+                  {remoteName}
+                </span>
+                <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/80 text-xs px-2.5 py-1 rounded-full">
+                  <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(59,130,246,0.5)]" />
+                  {formatTime(callDuration)}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-            {localCamPub && localParticipant ? (
-              <>
-                <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-                <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                  <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você</span>
-                </div>
-              </>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                <div className="text-center">
-                  <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                    <User className="h-6 w-6 text-slate-500" />
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium">Câmera desligada</p>
-                </div>
-              </div>
-            )}
+            <video ref={localVideoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
+            <div className="absolute bottom-2 left-3 flex items-center gap-2">
+              <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você</span>
+            </div>
           </div>
         </div>
       </div>

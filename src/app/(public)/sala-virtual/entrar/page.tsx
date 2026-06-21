@@ -3,7 +3,7 @@
 import { Suspense, useState, useCallback, useRef, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
-import { LiveKitRoom, RoomAudioRenderer, StartAudio } from "@livekit/components-react"
+import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react"
 import "@livekit/components-styles"
 import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
@@ -155,7 +155,6 @@ function EntrarSalaForm() {
             style={{ height: "100%" }}
           >
             <ErrorBoundary>
-              <StartAudio label="Clique para ativar o áudio" className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 text-white text-lg font-semibold cursor-pointer" />
               <RoomAudioRenderer volume={1} />
               <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
               <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
