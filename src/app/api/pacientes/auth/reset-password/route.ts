@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Token inválido" }, { status: 400 })
     }
 
-    const hashed = await bcrypt.hash(password.trim(), 10)
+    const hashed = await bcrypt.hash(password.trim(), 12)
     await prisma.patient.update({
       where: { id: patient.id },
       data: { password: hashed },

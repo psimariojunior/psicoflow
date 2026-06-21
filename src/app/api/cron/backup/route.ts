@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-const CRON_SECRET = process.env.CRON_SECRET || ""
+const CRON_SECRET = process.env.CRON_SECRET
 
 function isAuthorized(request: Request): boolean {
+  if (!CRON_SECRET) return false
   const url = new URL(request.url)
   const secret = url.searchParams.get("secret") || request.headers.get("x-cron-secret") || ""
   return secret === CRON_SECRET

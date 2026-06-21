@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { verifyPatientToken } from "@/lib/patient-auth"
-import { validate, updatePatientSchema } from "@/lib/validation"
+import { validate, updatePatientSelfSchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
 
 async function authenticate(request: NextRequest) {
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const raw = await request.json()
-    const result = validate(updatePatientSchema, raw)
+    const result = validate(updatePatientSelfSchema, raw)
     if (result.error) return result.error
 
     const data = result.data! as Record<string, unknown>

@@ -36,6 +36,15 @@ export async function GET(request: Request) {
     let name: string
 
     if (isPatient) {
+      const appointment = await prisma.appointment.findFirst({
+        where: {
+          status: { in: ["CONFIRMED", "SCHEDULED"] },
+          endTime: { gte: new Date() },
+        },
+      })
+      if (!appointment) {
+        return apiError("Sala não disponível ou sessão não agendada", 403)
+      }
       identity = `paciente-${room}-${Date.now()}`
       name = searchParams.get("name") || "Paciente"
     } else {

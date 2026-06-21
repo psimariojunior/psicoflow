@@ -60,6 +60,31 @@ export const createDiaryEntrySchema = z.object({
   anxietyLevel: z.number().int().min(1).max(10).optional(),
 })
 
+export const updatePatientSelfSchema = z.object({
+  name: nameSchema.optional(),
+  email: emailSchema.optional().or(z.literal("")),
+  phone: z.string().max(20).optional().or(z.literal("")),
+  cpf: z.string().max(14).optional().or(z.literal("")),
+  dateOfBirth: z.string().optional().or(z.literal("")),
+  gender: z.string().max(20).optional().or(z.literal("")),
+  maritalStatus: z.string().max(20).optional().or(z.literal("")),
+  profession: z.string().max(100).optional().or(z.literal("")),
+  company: z.string().max(100).optional().or(z.literal("")),
+  address: z.string().max(255).optional().or(z.literal("")),
+  neighborhood: z.string().max(100).optional().or(z.literal("")),
+  city: z.string().max(100).optional().or(z.literal("")),
+  state: z.string().max(50).optional().or(z.literal("")),
+  zipCode: z.string().max(10).optional().or(z.literal("")),
+  emergencyContact: z.string().max(100).optional().or(z.literal("")),
+  emergencyPhone: z.string().max(20).optional().or(z.literal("")),
+  healthInsurance: z.string().max(100).optional().or(z.literal("")),
+  insuranceNumber: z.string().max(50).optional().or(z.literal("")),
+  referredBy: z.string().max(100).optional().or(z.literal("")),
+  howFound: z.string().max(100).optional().or(z.literal("")),
+  observations: z.string().max(2000).optional().or(z.literal("")),
+  privacyConsent: z.boolean().optional(),
+})
+
 export const updatePatientSchema = z.object({
   name: nameSchema.optional(),
   email: emailSchema.optional().or(z.literal("")),

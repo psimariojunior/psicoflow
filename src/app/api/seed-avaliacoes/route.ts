@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
+import crypto from "crypto"
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))
+}
 
 const prisma = new PrismaClient()
 
@@ -81,7 +87,7 @@ const miniOptions = JSON.stringify([
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  if (searchParams.get("secret") !== "ApvVr8FOWwhgkSEtfZ2uDJ1sRx73XmCl") {
+  if (!safeCompare(searchParams.get("secret") || "", process.env.CRON_SECRET || "")) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 

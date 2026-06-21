@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-const VM_API = "http://137.131.184.53:8899"
-const API_SECRET = "psicoflow-hermes-2026"
+const VM_API = process.env.HERMES_API_URL || "http://137.131.184.53:8899"
+const API_SECRET = process.env.HERMES_API_SECRET
+if (!API_SECRET) throw new Error("HERMES_API_SECRET não configurada")
 
 async function callVM(endpoint: string, body: any) {
   try {
