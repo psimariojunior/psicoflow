@@ -21,17 +21,7 @@ const BREATHING_PHASES = [
   { text: "Expire", duration: 4000, scale: 1 },
 ]
 
-// Amazing Grace melody (violin): note + duration (seconds) - slow, lyrical tempo
-const AMAZING_GRACE = [
-  { freq: 392, dur: 1.2 }, { freq: 392, dur: 0.6 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
-  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
-  { freq: 392, dur: 0.6 }, { freq: 392, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
-  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
-  { freq: 392, dur: 0.6 }, { freq: 493.88, dur: 1.0 }, { freq: 587.33, dur: 1.6 }, { freq: 587.33, dur: 0.8 },
-  { freq: 523.25, dur: 1.0 }, { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
-  { freq: 392, dur: 0.6 }, { freq: 392, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
-  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 2.0 },
-]
+// Amazing Grace violin melody - played from /amazing-grace-violin.wav
 
 interface VirtualWaitingRoomProps {
   patientName: string
@@ -45,6 +35,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const [breathProgress, setBreathProgress] = useState(0)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const audioCtxRef = useRef<AudioContext | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const isPlayingRef = useRef(false)
 
   useEffect(() => {
@@ -60,118 +51,25 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     }
   }, [soundEnabled])
 
-  const playNote = useCallback((freq: number, duration: number) => {
-    if (!soundEnabled) return
-    try {
-      const ctx = audioCtxRef.current
-      if (!ctx) return
-      if (ctx.state === "suspended") ctx.resume()
-      const now = ctx.currentTime
-      const sustainEnd = now + duration * 0.75
-      const releaseEnd = now + duration
-
-      // Master chain: compressor -> destination
-      const compressor = ctx.createDynamicsCompressor()
-      compressor.threshold.value = -30
-      compressor.ratio.value = 4
-      compressor.attack.value = 0.01
-      compressor.release.value = 0.3
-      compressor.connect(ctx.destination)
-
-      const masterGain = ctx.createGain()
-      masterGain.gain.setValueAtTime(0, now)
-      masterGain.gain.linearRampToValueAtTime(0.18, now + 0.08)
-      masterGain.gain.setValueAtTime(0.18, sustainEnd)
-      masterGain.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
-      masterGain.connect(compressor)
-
-      // Reverb via convolver (simple impulse)
-      const convolver = ctx.createConvolver()
-      const reverbLen = ctx.sampleRate * 1.5
-      const reverbBuf = ctx.createBuffer(2, reverbLen, ctx.sampleRate)
-      for (let ch = 0; ch < 2; ch++) {
-        const data = reverbBuf.getChannelData(ch)
-        for (let i = 0; i < reverbLen; i++) {
-          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.5)
-        }
-      }
-      convolver.buffer = reverbBuf
-      const reverbGain = ctx.createGain()
-      reverbGain.gain.value = 0.25
-      convolver.connect(reverbGain)
-      reverbGain.connect(masterGain)
-
-      // Vibrato LFO
-      const vibratoOsc = ctx.createOscillator()
-      const vibratoGain = ctx.createGain()
-      vibratoOsc.frequency.value = 5.5
-      vibratoGain.gain.value = 4.5
-      vibratoOsc.connect(vibratoGain)
-      vibratoOsc.start(now)
-      vibratoOsc.stop(releaseEnd)
-
-      // Sawtooth for string harmonics (main oscillator)
-      const addHarmonic = (partial: number, gain: number) => {
-        const osc = ctx.createOscillator()
-        osc.type = "sawtooth"
-        osc.frequency.value = freq * partial
-        vibratoGain.connect(osc.frequency)
-
-        const g = ctx.createGain()
-        g.gain.setValueAtTime(gain, now)
-        g.gain.exponentialRampToValueAtTime(gain * 1.3, now + 0.15)
-        g.gain.setValueAtTime(gain * 1.3, sustainEnd - 0.1)
-        g.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
-
-        osc.connect(g)
-        g.connect(masterGain)
-        g.connect(convolver)
-        osc.start(now)
-        osc.stop(releaseEnd)
-      }
-
-      // Violin harmonic spectrum (sawtooth-based)
-      addHarmonic(1, 0.12)
-      addHarmonic(2, 0.08)
-      addHarmonic(3, 0.05)
-      addHarmonic(4, 0.03)
-      addHarmonic(5, 0.018)
-      addHarmonic(6, 0.01)
-
-      // Soft noise for bow texture
-      const noiseLen = ctx.sampleRate * duration
-      const noiseBuf = ctx.createBuffer(1, noiseLen, ctx.sampleRate)
-      const noiseData = noiseBuf.getChannelData(0)
-      for (let i = 0; i < noiseLen; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * 0.5
-      }
-      const noiseSrc = ctx.createBufferSource()
-      noiseSrc.buffer = noiseBuf
-      const noiseFilter = ctx.createBiquadFilter()
-      noiseFilter.type = "bandpass"
-      noiseFilter.frequency.value = freq * 3
-      noiseFilter.Q.value = 2
-      const noiseGain = ctx.createGain()
-      noiseGain.gain.setValueAtTime(0.008, now)
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
-      noiseSrc.connect(noiseFilter)
-      noiseFilter.connect(noiseGain)
-      noiseGain.connect(masterGain)
-      noiseSrc.start(now)
-      noiseSrc.stop(releaseEnd)
-    } catch {}
-  }, [soundEnabled])
+  const playNote = useCallback((_freq: number, _duration: number) => {}, [])
 
   useEffect(() => {
-    if (isPlayingRef.current) return
+    if (isPlayingRef.current || !soundEnabled) return
     isPlayingRef.current = true
-    let totalDelay = 0
-    AMAZING_GRACE.forEach(({ freq, dur }) => {
-      setTimeout(() => playNote(freq, dur), totalDelay * 1000)
-      totalDelay += dur * 0.92
-    })
-    return () => { isPlayingRef.current = false }
-  }, [soundEnabled, playNote])
+
+    const audio = new Audio("/amazing-grace-violin.wav")
+    audio.loop = true
+    audio.volume = 0.6
+    audioRef.current = audio
+
+    audio.play().catch(() => {})
+
+    return () => {
+      audio.pause()
+      audio.src = ""
+      isPlayingRef.current = false
+    }
+  }, [soundEnabled])
 
   useEffect(() => {
     const tipInterval = setInterval(() => {
@@ -198,7 +96,14 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const scale = 1 + (currentPhase.scale - 1) * breathProgress
 
   const toggleSound = () => {
-    setSoundEnabled(prev => !prev)
+    setSoundEnabled(prev => {
+      const next = !prev
+      if (audioRef.current) {
+        if (next) audioRef.current.play().catch(() => {})
+        else audioRef.current.pause()
+      }
+      return next
+    })
   }
 
   return (
