@@ -157,15 +157,17 @@ export default function VirtualRoomPage() {
 }
 
 function PsychologistInCall() {
+  const [callDuration, setCallDuration] = useState(0)
   const remoteParticipants = useRemoteParticipants()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const { localParticipant, isCameraEnabled, isMicrophoneEnabled, cameraTrack } = useLocalParticipant()
-  const [callDuration, setCallDuration] = useState(0)
-
-  const remoteVideoTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.Camera)
-  const screenTrack = cameraTracks.find(t => !t.participant.isLocal && t.source === Track.Source.ScreenShare)
+  const lp = useLocalParticipant()
+  const localParticipant = lp.localParticipant
+  const isCameraEnabled = lp.isCameraEnabled
+  const isMicrophoneEnabled = lp.isMicrophoneEnabled
+  const hasRemote = remoteParticipants ? remoteParticipants.length > 0 : false
+  const remoteVideoTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.Camera) : null
+  const screenTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.ScreenShare) : null
   const primaryTrack = screenTrack || remoteVideoTrack
-  const hasRemote = remoteParticipants.length > 0
 
   useEffect(() => {
     const id = setInterval(() => setCallDuration(t => t + 1), 1000)
@@ -209,24 +211,14 @@ function PsychologistInCall() {
         </div>
 
         <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-          {cameraTrack && isCameraEnabled ? (
-            <>
-              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: cameraTrack }} className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-              <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-white/20 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/30">Você (Psicólogo)</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
+            <div className="text-center">
+              <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
+                <User className="h-6 w-6 text-slate-500" />
               </div>
-            </>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-              <div className="text-center">
-                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                  <User className="h-6 w-6 text-slate-500" />
-                </div>
-                <p className="text-xs text-slate-500 font-medium">Câmera desligada</p>
-              </div>
+              <p className="text-xs text-slate-500 font-medium">Câmera local</p>
             </div>
-          )}
+          </div>
         </div>
         </div>
       </div>
