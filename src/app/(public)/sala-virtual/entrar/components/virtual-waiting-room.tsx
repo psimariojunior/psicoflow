@@ -21,16 +21,16 @@ const BREATHING_PHASES = [
   { text: "Expire", duration: 4000, scale: 1 },
 ]
 
-// Amazing Grace melody: note + duration (seconds)
+// Amazing Grace melody (violin): note + duration (seconds) - slow, lyrical tempo
 const AMAZING_GRACE = [
-  { freq: 392, dur: 0.45 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
-  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
-  { freq: 392, dur: 0.3 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
-  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
-  { freq: 392, dur: 0.3 }, { freq: 493.88, dur: 0.45 }, { freq: 587.33, dur: 0.4 }, { freq: 587.33, dur: 0.45 },
-  { freq: 523.25, dur: 0.45 }, { freq: 493.88, dur: 0.4 }, { freq: 440, dur: 0.45 }, { freq: 392, dur: 0.7 },
-  { freq: 392, dur: 0.3 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
-  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
+  { freq: 392, dur: 1.2 }, { freq: 392, dur: 0.6 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
+  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
+  { freq: 392, dur: 0.6 }, { freq: 392, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
+  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
+  { freq: 392, dur: 0.6 }, { freq: 493.88, dur: 1.0 }, { freq: 587.33, dur: 1.6 }, { freq: 587.33, dur: 0.8 },
+  { freq: 523.25, dur: 1.0 }, { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 1.6 },
+  { freq: 392, dur: 0.6 }, { freq: 392, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 493.88, dur: 1.8 },
+  { freq: 493.88, dur: 0.8 }, { freq: 440, dur: 1.0 }, { freq: 392, dur: 2.0 },
 ]
 
 interface VirtualWaitingRoomProps {
@@ -67,54 +67,98 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
       if (!ctx) return
       if (ctx.state === "suspended") ctx.resume()
       const now = ctx.currentTime
+      const sustainEnd = now + duration * 0.75
+      const releaseEnd = now + duration
+
+      // Master chain: compressor -> destination
+      const compressor = ctx.createDynamicsCompressor()
+      compressor.threshold.value = -30
+      compressor.ratio.value = 4
+      compressor.attack.value = 0.01
+      compressor.release.value = 0.3
+      compressor.connect(ctx.destination)
 
       const masterGain = ctx.createGain()
-      const compressor = ctx.createDynamicsCompressor()
-      compressor.threshold.value = -24
-      compressor.ratio.value = 12
-      compressor.attack.value = 0.003
-      compressor.release.value = 0.25
-
       masterGain.gain.setValueAtTime(0, now)
-      masterGain.gain.linearRampToValueAtTime(0.25, now + 0.003)
-      masterGain.gain.exponentialRampToValueAtTime(0.09, now + 0.12)
-      masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.9)
+      masterGain.gain.linearRampToValueAtTime(0.18, now + 0.08)
+      masterGain.gain.setValueAtTime(0.18, sustainEnd)
+      masterGain.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
+      masterGain.connect(compressor)
 
-      const addPartial = (partial: number, gain: number, detuneHz: number) => {
+      // Reverb via convolver (simple impulse)
+      const convolver = ctx.createConvolver()
+      const reverbLen = ctx.sampleRate * 1.5
+      const reverbBuf = ctx.createBuffer(2, reverbLen, ctx.sampleRate)
+      for (let ch = 0; ch < 2; ch++) {
+        const data = reverbBuf.getChannelData(ch)
+        for (let i = 0; i < reverbLen; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.5)
+        }
+      }
+      convolver.buffer = reverbBuf
+      const reverbGain = ctx.createGain()
+      reverbGain.gain.value = 0.25
+      convolver.connect(reverbGain)
+      reverbGain.connect(masterGain)
+
+      // Vibrato LFO
+      const vibratoOsc = ctx.createOscillator()
+      const vibratoGain = ctx.createGain()
+      vibratoOsc.frequency.value = 5.5
+      vibratoGain.gain.value = 4.5
+      vibratoOsc.connect(vibratoGain)
+      vibratoOsc.start(now)
+      vibratoOsc.stop(releaseEnd)
+
+      // Sawtooth for string harmonics (main oscillator)
+      const addHarmonic = (partial: number, gain: number) => {
         const osc = ctx.createOscillator()
-        osc.type = "triangle"
+        osc.type = "sawtooth"
         osc.frequency.value = freq * partial
-        osc.detune.value = detuneHz
+        vibratoGain.connect(osc.frequency)
+
         const g = ctx.createGain()
         g.gain.setValueAtTime(gain, now)
-        g.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.7)
+        g.gain.exponentialRampToValueAtTime(gain * 1.3, now + 0.15)
+        g.gain.setValueAtTime(gain * 1.3, sustainEnd - 0.1)
+        g.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
+
         osc.connect(g)
         g.connect(masterGain)
+        g.connect(convolver)
         osc.start(now)
-        osc.stop(now + duration)
+        osc.stop(releaseEnd)
       }
 
-      addPartial(1, 0.5, -2)
-      addPartial(2, 0.12, 0)
-      addPartial(3, 0.06, 3)
-      addPartial(4, 0.03, -1)
-      addPartial(5, 0.02, 2)
-      addPartial(6, 0.015, 0)
+      // Violin harmonic spectrum (sawtooth-based)
+      addHarmonic(1, 0.12)
+      addHarmonic(2, 0.08)
+      addHarmonic(3, 0.05)
+      addHarmonic(4, 0.03)
+      addHarmonic(5, 0.018)
+      addHarmonic(6, 0.01)
 
+      // Soft noise for bow texture
+      const noiseLen = ctx.sampleRate * duration
+      const noiseBuf = ctx.createBuffer(1, noiseLen, ctx.sampleRate)
+      const noiseData = noiseBuf.getChannelData(0)
+      for (let i = 0; i < noiseLen; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * 0.5
+      }
+      const noiseSrc = ctx.createBufferSource()
+      noiseSrc.buffer = noiseBuf
+      const noiseFilter = ctx.createBiquadFilter()
+      noiseFilter.type = "bandpass"
+      noiseFilter.frequency.value = freq * 3
+      noiseFilter.Q.value = 2
       const noiseGain = ctx.createGain()
-      noiseGain.gain.setValueAtTime(0.03, now)
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
-      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate)
-      const data = noiseBuffer.getChannelData(0)
-      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
-      const noise = ctx.createBufferSource()
-      noise.buffer = noiseBuffer
-      noise.connect(noiseGain)
+      noiseGain.gain.setValueAtTime(0.008, now)
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, releaseEnd)
+      noiseSrc.connect(noiseFilter)
+      noiseFilter.connect(noiseGain)
       noiseGain.connect(masterGain)
-      noise.start(now)
-
-      masterGain.connect(compressor)
-      compressor.connect(ctx.destination)
+      noiseSrc.start(now)
+      noiseSrc.stop(releaseEnd)
     } catch {}
   }, [soundEnabled])
 
@@ -124,7 +168,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     let totalDelay = 0
     AMAZING_GRACE.forEach(({ freq, dur }) => {
       setTimeout(() => playNote(freq, dur), totalDelay * 1000)
-      totalDelay += dur * 0.85
+      totalDelay += dur * 0.92
     })
     return () => { isPlayingRef.current = false }
   }, [soundEnabled, playNote])
@@ -216,7 +260,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
           <div className="flex items-center justify-between bg-white/[0.04] rounded-xl px-4 py-2 ring-1 ring-white/[0.06]">
             <div className="flex items-center gap-2 text-white/50 text-xs">
               <Music className="h-3.5 w-3.5" />
-              <span>Amazing Grace — Piano</span>
+              <span>Amazing Grace — Violino</span>
             </div>
             <button onClick={toggleSound} className="text-white/50 hover:text-white transition-colors p-1" aria-label={soundEnabled ? "Desativar som" : "Ativar som"}>
               {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
