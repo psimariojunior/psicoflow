@@ -14,6 +14,9 @@ export default function VirtualRoomPage() {
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
+  const [origin, setOrigin] = useState("")
+
+  useEffect(() => { setOrigin(window.location.origin) }, [])
 
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
 
@@ -59,7 +62,7 @@ export default function VirtualRoomPage() {
     setRoomName(`sala-${Date.now()}`)
   }, [roomName])
 
-  const patientLink = `${window.location.origin}/sala-virtual/entrar?room=${encodeURIComponent(sanitize(roomName))}`
+  const patientLink = origin ? `${origin}/sala-virtual/entrar?room=${encodeURIComponent(sanitize(roomName))}` : ""
 
   if (token) {
     return (

@@ -38,45 +38,35 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const playPianoNote = useCallback((freq: number) => {
     if (!soundEnabled) return
     try {
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext()
-      const ctx = audioCtxRef.current
+      const ctx = audioCtxRef.current || new AudioContext()
+      audioCtxRef.current = ctx
+      if (ctx.state === "suspended") ctx.resume()
       const now = ctx.currentTime
 
-      // Low-pass filter that opens on attack and closes during decay (piano hammer simulation)
-      const filter = ctx.createBiquadFilter()
-      filter.type = "lowpass"
-      filter.frequency.setValueAtTime(Math.min(freq * 10, 6000), now)
-      filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 3, 800), now + 0.4)
-      filter.Q.setValueAtTime(0.8, now)
+      const envelope = ctx.createGain()
+      envelope.gain.setValueAtTime(0, now)
+      envelope.gain.linearRampToValueAtTime(0.2, now + 0.005)
+      envelope.gain.exponentialRampToValueAtTime(0.08, now + 0.2)
+      envelope.gain.exponentialRampToValueAtTime(0.001, now + 1.5)
 
-      // Master gain with piano-like ADSR envelope
-      const masterGain = ctx.createGain()
-      masterGain.gain.setValueAtTime(0, now)
-      masterGain.gain.linearRampToValueAtTime(0.07, now + 0.008)
-      masterGain.gain.exponentialRampToValueAtTime(0.035, now + 0.15)
-      masterGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6)
+      const osc = ctx.createOscillator()
+      osc.type = "triangle"
+      osc.frequency.value = freq
+      osc.connect(envelope)
+      envelope.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + 1.5)
 
-      masterGain.connect(filter)
-      filter.connect(ctx.destination)
-
-      const createOsc = (detune: number, gainVal: number, type: OscillatorType) => {
-        const osc = ctx.createOscillator()
-        const oscGain = ctx.createGain()
-        osc.type = type
-        osc.frequency.value = freq
-        osc.detune.value = detune
-        oscGain.gain.setValueAtTime(gainVal, now)
-        osc.connect(oscGain)
-        oscGain.connect(masterGain)
-        osc.start(now)
-        osc.stop(now + 1.6)
-      }
-
-      createOsc(0, 0.45, "triangle")
-      createOsc(-7, 0.2, "sine")
-      createOsc(7, 0.2, "sine")
-      createOsc(0, 0.1, "sine")
-      createOsc(0, 0.05, "sine")
+      const osc2 = ctx.createOscillator()
+      osc2.type = "sine"
+      osc2.frequency.value = freq * 2
+      const g2 = ctx.createGain()
+      g2.gain.setValueAtTime(0.04, now)
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.8)
+      osc2.connect(g2)
+      g2.connect(ctx.destination)
+      osc2.start(now)
+      osc2.stop(now + 0.8)
     } catch {}
   }, [soundEnabled])
 
@@ -93,8 +83,17 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   }, [playPianoNote])
 
   useEffect(() => {
-    return () => { audioCtxRef.current?.close() }
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    ctx.resume()
+    audioCtxRef.current = ctx
+    return () => { ctx.close() }
   }, [])
+
+  useEffect(() => {
+    if (soundEnabled && audioCtxRef.current?.state === "suspended") {
+      audioCtxRef.current.resume()
+    }
+  }, [soundEnabled])
 
   const toggleSound = () => {
     setSoundEnabled(prev => {
