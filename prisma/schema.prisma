@@ -18,55 +18,61 @@ enum AppointmentStatus {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  password      String
-  role          String   @default("PSYCHOLOGIST")
-  phone         String?
-  avatarUrl     String?
-  crp           String?
-  specialty     String?
-  bio           String?
-  pixKey        String?
-  paymentInfo   String?
-  emailVerified DateTime?
-  googleRefreshToken String?
-  googleCalendarId   String?
+  id                     String    @id @default(cuid())
+  name                   String
+  email                  String    @unique
+  password               String
+  role                   String    @default("PSYCHOLOGIST")
+  phone                  String?
+  avatarUrl              String?
+  crp                    String?
+  specialty              String?
+  bio                    String?
+  pixKey                 String?
+  paymentInfo            String?
+  emailVerified          DateTime?
+  googleRefreshToken     String?
+  googleCalendarId       String?
   stripeConnectAccountId String?
-  twoFactorEnabled Boolean @default(false)
-  twoFactorSecret String?
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  plan                   String    @default("trial")
+  planExpiresAt          DateTime?
+  stripeSubscriptionId   String?
+  stripeCustomerId       String?
+  subscriptionStatus     String    @default("active")
+  twoFactorEnabled       Boolean   @default(false)
+  twoFactorSecret        String?
+  active                 Boolean   @default(true)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
-  patients          Patient[]
-  appointments      Appointment[]    @relation("PsychologistAppointments")
-  medicalRecords    MedicalRecord[]
-  transactions      FinancialTransaction[]
-  notifications     Notification[]
-  therapySessions   TherapySession[]
-  invoices          Invoice[]
-  emotionDiaries    EmotionDiary[]
-  sentMessages      Message[]        @relation("SenderMessages")
-  receivedMessages  Message[]        @relation("ReceiverMessages")
-  permissions       UserPermission?
-  consentLogs       ConsentLog[]
-  auditLogs         AuditLog[]
-  therapyResources  TherapyResource[]
-  availabilitySlots AvailabilitySlot[]
-closedRooms       ClosedRoom[]
-  sessionTokens     SessionToken[]
-  accounts          Account[]
-  nextAuthSessions  NextAuthSession[]
-  questionnaires    Questionnaire[]
+  patients               Patient[]
+  subscription           Subscription?
+  appointments           Appointment[]           @relation("PsychologistAppointments")
+  medicalRecords         MedicalRecord[]
+  transactions           FinancialTransaction[]
+  notifications          Notification[]
+  therapySessions        TherapySession[]
+  invoices               Invoice[]
+  emotionDiaries         EmotionDiary[]
+  sentMessages           Message[]               @relation("SenderMessages")
+  receivedMessages       Message[]               @relation("ReceiverMessages")
+  permissions            UserPermission?
+  consentLogs            ConsentLog[]
+  auditLogs              AuditLog[]
+  therapyResources       TherapyResource[]
+  availabilitySlots      AvailabilitySlot[]
+  closedRooms            ClosedRoom[]
+  sessionTokens          SessionToken[]
+  accounts               Account[]
+  nextAuthSessions       NextAuthSession[]
+  questionnaires         Questionnaire[]
   questionnaireResponses QuestionnaireResponse[]
-  anamneses         Anamnesis[]
-  crisisProtocols   CrisisProtocol[]
-  crisisAccesses    CrisisProtocolAccess[]
-  therapyTasks      TherapyTask[]
-  receipts          Receipt[]
-  waitingList       WaitingList[]
+  anamneses              Anamnesis[]
+  crisisProtocols        CrisisProtocol[]
+  crisisAccesses         CrisisProtocolAccess[]
+  therapyTasks           TherapyTask[]
+  receipts               Receipt[]
+  waitingList            WaitingList[]
 }
 
 model Account {
@@ -109,86 +115,86 @@ model VerificationToken {
 }
 
 model Patient {
-  id             String   @id @default(cuid())
-  name           String
-  email          String?
-  phone          String?
-  password       String?
-  lastLoginAt    DateTime?
-  cpf            String?
-  rg             String?
-  dateOfBirth    DateTime?
-  gender         String?
-  maritalStatus  String?
-  profession     String?
-  company        String?
-  address        String?
-  neighborhood   String?
-  city           String?
-  state          String?
-  zipCode        String?
+  id               String    @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  password         String?
+  lastLoginAt      DateTime?
+  cpf              String?
+  rg               String?
+  dateOfBirth      DateTime?
+  gender           String?
+  maritalStatus    String?
+  profession       String?
+  company          String?
+  address          String?
+  neighborhood     String?
+  city             String?
+  state            String?
+  zipCode          String?
   emergencyContact String?
-  emergencyPhone String?
-  healthInsurance String?
-  insuranceNumber String?
-  referredBy     String?
-  howFound       String?
-  observations   String?
-  active         Boolean  @default(true)
-  photoUrl       String?
-  privacyConsent Boolean  @default(false)
+  emergencyPhone   String?
+  healthInsurance  String?
+  insuranceNumber  String?
+  referredBy       String?
+  howFound         String?
+  observations     String?
+  active           Boolean   @default(true)
+  photoUrl         String?
+  privacyConsent   Boolean   @default(false)
   stripeCustomerId String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User   @relation(fields: [psychologistId], references: [id])
 
-  appointments   Appointment[]
-  medicalRecords MedicalRecord[]
-  invoices       Invoice[]
-  emotionDiaries EmotionDiary[]
-  consentLogs    ConsentLog[]
-  therapySessions TherapySession[]
-  attachments    Attachment[]
-  transactions   FinancialTransaction[]
+  appointments           Appointment[]
+  medicalRecords         MedicalRecord[]
+  invoices               Invoice[]
+  emotionDiaries         EmotionDiary[]
+  consentLogs            ConsentLog[]
+  therapySessions        TherapySession[]
+  attachments            Attachment[]
+  transactions           FinancialTransaction[]
   questionnaireResponses QuestionnaireResponse[]
-  anamnesis      Anamnesis?
-  crisisAccesses CrisisProtocolAccess[]
-  therapyTasks   TherapyTask[]
-  receipts       Receipt[]
-  waitingEntries WaitingList[]
+  anamnesis              Anamnesis?
+  crisisAccesses         CrisisProtocolAccess[]
+  therapyTasks           TherapyTask[]
+  receipts               Receipt[]
+  waitingEntries         WaitingList[]
 
   @@index([psychologistId])
 }
 
 model Appointment {
-  id             String   @id @default(cuid())
-  title          String?
-  startTime      DateTime
-  endTime        DateTime
-  status         AppointmentStatus   @default(SCHEDULED)
-  type           String?
-  modality       String?  @default("presential")
-  onlineRoomUrl  String?
-  notes          String?
-  cancelReason   String?
-  color          String?
-  isRecurring    Boolean  @default(false)
-  recurringRule  String?
-  price          Float?
-  paid           Boolean  @default(false)
-  paymentMethod  String?
-  googleEventId  String?
-  stripePaymentIntentId String?
+  id                      String            @id @default(cuid())
+  title                   String?
+  startTime               DateTime
+  endTime                 DateTime
+  status                  AppointmentStatus @default(SCHEDULED)
+  type                    String?
+  modality                String?           @default("presential")
+  onlineRoomUrl           String?
+  notes                   String?
+  cancelReason            String?
+  color                   String?
+  isRecurring             Boolean           @default(false)
+  recurringRule           String?
+  price                   Float?
+  paid                    Boolean           @default(false)
+  paymentMethod           String?
+  googleEventId           String?
+  stripePaymentIntentId   String?
   stripeCheckoutSessionId String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
 
   psychologistId String
-  psychologist   User     @relation("PsychologistAppointments", fields: [psychologistId], references: [id])
+  psychologist   User    @relation("PsychologistAppointments", fields: [psychologistId], references: [id])
   patientId      String
-  patient        Patient  @relation(fields: [patientId], references: [id])
+  patient        Patient @relation(fields: [patientId], references: [id])
 
   therapySession TherapySession?
   notifications  Notification[]
@@ -202,58 +208,58 @@ model Appointment {
 }
 
 model TherapySession {
-  id            String   @id @default(cuid())
-  status        AppointmentStatus   @default(SCHEDULED)
-  date          DateTime @default(now())
+  id            String            @id @default(cuid())
+  status        AppointmentStatus @default(SCHEDULED)
+  date          DateTime          @default(now())
   startedAt     DateTime?
   endedAt       DateTime?
   duration      Int?
-  pausedSeconds Int?     @default(0)
+  pausedSeconds Int?              @default(0)
 
   // SOAP clinical notes
-  subjective    String?
-  objective     String?
-  assessment    String?
-  plan          String?
+  subjective String?
+  objective  String?
+  assessment String?
+  plan       String?
 
-  type          String?
-  notes         String?
-  tags          String?
-  moodBefore    Int?
-  moodAfter     Int?
-  isRemote      Boolean  @default(false)
-  recordingUrl  String?
-  signature     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  type         String?
+  notes        String?
+  tags         String?
+  moodBefore   Int?
+  moodAfter    Int?
+  isRemote     Boolean  @default(false)
+  recordingUrl String?
+  signature    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  appointmentId String?  @unique
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-  patientId     String
-  patient       Patient  @relation(fields: [patientId], references: [id])
+  appointmentId  String?      @unique
+  appointment    Appointment? @relation(fields: [appointmentId], references: [id])
+  patientId      String
+  patient        Patient      @relation(fields: [patientId], references: [id])
   psychologistId String
-  psychologist  User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User         @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
   @@index([patientId])
 }
 
 model MedicalRecord {
-  id            String   @id @default(cuid())
-  type          String   @default("SESSION_NOTE")
-  title         String
-  content       String
-  isConfidential Boolean @default(false)
-  signature     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(cuid())
+  type           String   @default("SESSION_NOTE")
+  title          String
+  content        String
+  isConfidential Boolean  @default(false)
+  signature      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  patientId     String
-  patient       Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  patient        Patient @relation(fields: [patientId], references: [id])
   psychologistId String
-  psychologist  User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User    @relation(fields: [psychologistId], references: [id])
 
-  attachments   Attachment[]
+  attachments Attachment[]
 
   @@index([psychologistId])
   @@index([patientId])
@@ -277,29 +283,29 @@ model Attachment {
 }
 
 model FinancialTransaction {
-  id              String   @id @default(cuid())
-  description     String
-  type            String
-  category        String?
-  amount          Float
-  discount        Float?   @default(0)
-  dueDate         DateTime?
-  paymentDate     DateTime?
-  paymentMethod   String?
-  paymentStatus   String   @default("PENDING")
-  recurring       Boolean  @default(false)
-  recurrenceRule  String?
-  notes           String?
-  receiptUrl      String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(cuid())
+  description    String
+  type           String
+  category       String?
+  amount         Float
+  discount       Float?    @default(0)
+  dueDate        DateTime?
+  paymentDate    DateTime?
+  paymentMethod  String?
+  paymentStatus  String    @default("PENDING")
+  recurring      Boolean   @default(false)
+  recurrenceRule String?
+  notes          String?
+  receiptUrl     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
-  patientId       String?
-  patient         Patient? @relation(fields: [patientId], references: [id])
-  invoiceId       String?
-  invoice         Invoice? @relation(fields: [invoiceId], references: [id])
+  psychologistId String
+  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  patientId      String?
+  patient        Patient? @relation(fields: [patientId], references: [id])
+  invoiceId      String?
+  invoice        Invoice? @relation(fields: [invoiceId], references: [id])
 
   @@index([psychologistId])
   @@index([patientId])
@@ -307,58 +313,58 @@ model FinancialTransaction {
 }
 
 model Invoice {
-  id              String   @id @default(cuid())
-  number          String   @unique
-  series          String   @default("1")
-  status          String   @default("PENDING")
-  description     String
-  amount          Float
-  taxAmount       Float?   @default(0)
-  totalAmount     Float
-  issueDate       DateTime @default(now())
-  dueDate         DateTime
-  paidDate        DateTime?
-  paymentMethod   String?
-  notes           String?
-  pdfUrl          String?
-  xmlUrl          String?
-  qrCodeUrl       String?
+  id                      String    @id @default(cuid())
+  number                  String    @unique
+  series                  String    @default("1")
+  status                  String    @default("PENDING")
+  description             String
+  amount                  Float
+  taxAmount               Float?    @default(0)
+  totalAmount             Float
+  issueDate               DateTime  @default(now())
+  dueDate                 DateTime
+  paidDate                DateTime?
+  paymentMethod           String?
+  notes                   String?
+  pdfUrl                  String?
+  xmlUrl                  String?
+  qrCodeUrl               String?
   stripeCheckoutSessionId String?
-  stripePaymentIntentId String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  stripePaymentIntentId   String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
-  psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
-  patientId       String
-  patient         Patient  @relation(fields: [patientId], references: [id])
+  psychologistId String
+  psychologist   User    @relation(fields: [psychologistId], references: [id])
+  patientId      String
+  patient        Patient @relation(fields: [patientId], references: [id])
 
-  transactions    FinancialTransaction[]
+  transactions FinancialTransaction[]
 
   @@index([psychologistId])
   @@index([patientId])
 }
 
 model Notification {
-  id              String   @id @default(cuid())
-  title           String
-  message         String
-  channel         String
-  status          String   @default("PENDING")
-  sentAt          DateTime?
-  readAt          DateTime?
-  externalId      String?
-  errorMessage    String?
-  scheduledAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String    @id @default(cuid())
+  title        String
+  message      String
+  channel      String
+  status       String    @default("PENDING")
+  sentAt       DateTime?
+  readAt       DateTime?
+  externalId   String?
+  errorMessage String?
+  scheduledAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
-  recipientId     String?
-  patientId       String?
-  appointmentId   String?
-  appointment     Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  psychologistId String
+  psychologist   User         @relation(fields: [psychologistId], references: [id])
+  recipientId    String?
+  patientId      String?
+  appointmentId  String?
+  appointment    Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@index([psychologistId])
   @@index([patientId])
@@ -376,9 +382,9 @@ model Message {
   createdAt DateTime @default(now())
 
   senderId   String
-  sender     User     @relation("SenderMessages", fields: [senderId], references: [id])
+  sender     User   @relation("SenderMessages", fields: [senderId], references: [id])
   receiverId String
-  receiver   User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+  receiver   User   @relation("ReceiverMessages", fields: [receiverId], references: [id])
 
   @@index([senderId])
   @@index([receiverId])
@@ -397,10 +403,10 @@ model EmotionDiary {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  patientId     String
-  patient       Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  patient        Patient @relation(fields: [patientId], references: [id])
   psychologistId String
-  psychologist  User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User    @relation(fields: [psychologistId], references: [id])
 
   @@index([patientId])
   @@index([psychologistId])
@@ -420,7 +426,7 @@ model TherapyResource {
   updatedAt   DateTime @updatedAt
 
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User          @relation(fields: [psychologistId], references: [id])
   tasks          TherapyTask[]
 
   @@index([psychologistId])
@@ -436,48 +442,48 @@ model AvailabilitySlot {
   updatedAt DateTime @updatedAt
 
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User   @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
 }
 
 model UserPermission {
-  id        String   @id @default(cuid())
-  canViewPatients   Boolean @default(true)
-  canEditPatients   Boolean @default(true)
-  canDeletePatients Boolean @default(false)
-  canViewAgenda     Boolean @default(true)
-  canEditAgenda     Boolean @default(true)
-  canViewFinancial  Boolean @default(false)
-  canEditFinancial  Boolean @default(false)
-  canViewRecords    Boolean @default(true)
-  canEditRecords    Boolean @default(false)
-  canSendNotifications Boolean @default(false)
-  canViewReports    Boolean @default(false)
-  canManageUsers    Boolean @default(false)
-  canManageSettings Boolean @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  canViewPatients      Boolean  @default(true)
+  canEditPatients      Boolean  @default(true)
+  canDeletePatients    Boolean  @default(false)
+  canViewAgenda        Boolean  @default(true)
+  canEditAgenda        Boolean  @default(true)
+  canViewFinancial     Boolean  @default(false)
+  canEditFinancial     Boolean  @default(false)
+  canViewRecords       Boolean  @default(true)
+  canEditRecords       Boolean  @default(false)
+  canSendNotifications Boolean  @default(false)
+  canViewReports       Boolean  @default(false)
+  canManageUsers       Boolean  @default(false)
+  canManageSettings    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 }
 
 model TherapyTask {
-  id            String    @id @default(cuid())
-  status        String    @default("PENDING")
-  notes         String?
-  assignedAt    DateTime  @default(now())
-  completedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  status      String    @default("PENDING")
+  notes       String?
+  assignedAt  DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  resourceId    String
-  resource      TherapyResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
-  patientId     String
-  patient       Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  resourceId     String
+  resource       TherapyResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  patientId      String
+  patient        Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
   psychologistId String
-  psychologist  User            @relation(fields: [psychologistId], references: [id])
+  psychologist   User            @relation(fields: [psychologistId], references: [id])
 
   @@index([patientId])
   @@index([psychologistId])
@@ -486,19 +492,19 @@ model TherapyTask {
 }
 
 model ConsentLog {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   type      String
   consent   Boolean
   content   String?
   signedAt  DateTime?
   ipAddress String?
   userAgent String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
-  patientId     String
-  patient       Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  patient        Patient @relation(fields: [patientId], references: [id])
   psychologistId String
-  psychologist  User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User    @relation(fields: [psychologistId], references: [id])
 
   @@index([patientId])
   @@index([psychologistId])
@@ -532,39 +538,37 @@ model SessionToken {
 }
 
 model ClosedRoom {
-  id              String   @id @default(cuid())
-  roomName        String   @unique
-  closedAt        DateTime @default(now())
+  id             String   @id @default(cuid())
+  roomName       String   @unique
+  closedAt       DateTime @default(now())
   psychologistId String
   psychologist   User     @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
 }
 
-
-
 model Receipt {
-  id              String   @id @default(cuid())
-  number          String   @unique
+  id              String    @id @default(cuid())
+  number          String    @unique
   patientName     String
   patientDoc      String?
   description     String
   amount          Float
-  issueDate       DateTime @default(now())
+  issueDate       DateTime  @default(now())
   appointmentDate DateTime?
   paymentMethod   String?
-  status          String   @default("ISSUED")
+  status          String    @default("ISSUED")
   pdfUrl          String?
   sentAt          DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  psychologistId  String
-  psychologist    User     @relation(fields: [psychologistId], references: [id])
-  patientId       String?
-  patient         Patient?  @relation(fields: [patientId], references: [id], onDelete: SetNull)
-  appointmentId   String?
-  appointment     Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  psychologistId String
+  psychologist   User         @relation(fields: [psychologistId], references: [id])
+  patientId      String?
+  patient        Patient?     @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  appointmentId  String?
+  appointment    Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@index([psychologistId])
   @@index([patientId])
@@ -572,17 +576,17 @@ model Receipt {
 }
 
 model WaitingList {
-  id             String   @id @default(cuid())
-  patientName    String
-  patientEmail   String?
-  patientPhone   String?
-  preferredDay   String?
-  preferredTime  String?
-  notes          String?
-  status         String   @default("WAITING")
-  notifiedAt     DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String    @id @default(cuid())
+  patientName   String
+  patientEmail  String?
+  patientPhone  String?
+  preferredDay  String?
+  preferredTime String?
+  notes         String?
+  status        String    @default("WAITING")
+  notifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   psychologistId String
   psychologist   User     @relation(fields: [psychologistId], references: [id])
@@ -594,12 +598,12 @@ model WaitingList {
 }
 
 model BackupLog {
-  id          String   @id @default(cuid())
-  type        String   @default("AUTO")
-  status      String   @default("SUCCESS")
-  summary     String?
-  fileUrl     String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  type      String   @default("AUTO")
+  status    String   @default("SUCCESS")
+  summary   String?
+  fileUrl   String?
+  createdAt DateTime @default(now())
 }
 
 enum QuestionnaireType {
@@ -613,53 +617,53 @@ enum QuestionnaireType {
 }
 
 model Questionnaire {
-  id          String             @id @default(cuid())
+  id          String                  @id @default(cuid())
   type        QuestionnaireType
   title       String
   description String?
   questions   QuestionnaireQuestion[]
   responses   QuestionnaireResponse[]
-  isActive    Boolean            @default(true)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
 
   psychologistId String
-  psychologist   User             @relation(fields: [psychologistId], references: [id])
+  psychologist   User   @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
   @@index([type])
 }
 
 model QuestionnaireQuestion {
-  id             String       @id @default(cuid())
-  questionText   String
-  questionOrder  Int
-  options        String?      @default("[]")
-  scaleMin       Int?         @default(0)
-  scaleMax       Int?         @default(4)
-  category       String?
+  id            String  @id @default(cuid())
+  questionText  String
+  questionOrder Int
+  options       String? @default("[]")
+  scaleMin      Int?    @default(0)
+  scaleMax      Int?    @default(4)
+  category      String?
 
   questionnaireId String
-  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  questionnaire   Questionnaire         @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
   answers         QuestionnaireAnswer[]
 
   @@index([questionnaireId])
 }
 
 model QuestionnaireResponse {
-  id             String   @id @default(cuid())
-  totalScore     Int?
-  severity       String?
-  notes          String?
-  completedAt    DateTime @default(now())
-  createdAt      DateTime @default(now())
+  id          String   @id @default(cuid())
+  totalScore  Int?
+  severity    String?
+  notes       String?
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   questionnaireId String
-  questionnaire   Questionnaire  @relation(fields: [questionnaireId], references: [id])
+  questionnaire   Questionnaire         @relation(fields: [questionnaireId], references: [id])
   patientId       String
-  patient         Patient         @relation(fields: [patientId], references: [id])
+  patient         Patient               @relation(fields: [patientId], references: [id])
   psychologistId  String
-  psychologist    User            @relation(fields: [psychologistId], references: [id])
+  psychologist    User                  @relation(fields: [psychologistId], references: [id])
   answers         QuestionnaireAnswer[]
 
   @@index([patientId])
@@ -669,9 +673,9 @@ model QuestionnaireResponse {
 }
 
 model QuestionnaireAnswer {
-  id         String   @id @default(cuid())
-  value      Int
-  notes      String?
+  id    String  @id @default(cuid())
+  value Int
+  notes String?
 
   responseId String
   response   QuestionnaireResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
@@ -682,61 +686,78 @@ model QuestionnaireAnswer {
   @@index([questionId])
 }
 
-model Anamnesis {
-  id             String   @id @default(cuid())
-  complaints     String?
-  history        String?
-  medications    String?
-  allergies      String?
-  familyHistory  String?
-  lifestyle      String?
-  expectations   String?
-  previousTherapy String?
-  completed      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeSubscriptionId String    @unique
+  stripePriceId        String?
+  plan                 String    @default("pro")
+  status               String    @default("active")
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  patientId      String   @unique
-  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([stripeSubscriptionId])
+}
+
+model Anamnesis {
+  id              String   @id @default(cuid())
+  complaints      String?
+  history         String?
+  medications     String?
+  allergies       String?
+  familyHistory   String?
+  lifestyle       String?
+  expectations    String?
+  previousTherapy String?
+  completed       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patientId      String  @unique
+  patient        Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User    @relation(fields: [psychologistId], references: [id])
 
   @@index([psychologistId])
 }
 
 model CrisisProtocol {
-  id            String   @id @default(cuid())
-  title         String
-  description   String?
-  content       String
-  category      String?
-  tags          String?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  content     String
+  category    String?
+  tags        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id])
+  psychologist   User                   @relation(fields: [psychologistId], references: [id])
   assignedTo     CrisisProtocolAccess[]
 
   @@index([psychologistId])
 }
 
 model CrisisProtocolAccess {
-  id                String   @id @default(cuid())
-  grantedAt         DateTime @default(now())
-  expiresAt         DateTime?
-  isActive          Boolean  @default(true)
+  id        String    @id @default(cuid())
+  grantedAt DateTime  @default(now())
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
 
-  protocolId        String
-  protocol          CrisisProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
-  patientId         String
-  patient           Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  psychologistId    String
-  psychologist      User           @relation(fields: [psychologistId], references: [id])
+  protocolId     String
+  protocol       CrisisProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  patientId      String
+  patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  psychologistId String
+  psychologist   User           @relation(fields: [psychologistId], references: [id])
 
   @@index([patientId])
   @@index([protocolId])
   @@index([psychologistId])
 }
-

@@ -157,6 +157,18 @@ export default function SettingsPage() {
     paymentInfo: "",
   })
   const [loading, setLoading] = useState(true)
+  const [subInfo, setSubInfo] = useState<{
+    plan: string
+    planExpiresAt: string | null
+    subscriptionStatus: string
+    stripeCustomerId: string | null
+    subscription: {
+      cancelAtPeriodEnd: boolean
+      currentPeriodEnd: string | null
+    } | null
+  } | null>(null)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [upgradeLoading, setUpgradeLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/configuracoes")
@@ -175,7 +187,52 @@ export default function SettingsPage() {
       })
       .catch(() => toast.error("Erro ao carregar configurações"))
       .finally(() => setLoading(false))
+
+    fetch("/api/subscription/status")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.plan) setSubInfo(data)
+      })
+      .catch(() => {})
   }, [])
+
+  const handlePortal = async () => {
+    setPortalLoading(true)
+    try {
+      const res = await fetch("/api/subscription/portal", { method: "POST" })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error || "Erro ao abrir portal")
+      }
+    } catch {
+      toast.error("Erro ao conectar com o servidor")
+    } finally {
+      setPortalLoading(false)
+    }
+  }
+
+  const handleUpgrade = async () => {
+    setUpgradeLoading(true)
+    try {
+      const res = await fetch("/api/subscription/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: "pro" }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error || "Erro ao criar checkout")
+      }
+    } catch {
+      toast.error("Erro ao conectar com o servidor")
+    } finally {
+      setUpgradeLoading(false)
+    }
+  }
 
   const handleSave = async () => {
     try {
@@ -519,10 +576,54 @@ export default function SettingsPage() {
               <CardDescription>Convide outros profissionais para sua clínica</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg border p-4">
-                <p className="text-sm font-medium">Seu plano atual: Profissional</p>
-                <p className="text-xs text-muted-foreground">Limite: 1 usuário</p>
-                <Button variant="outline" size="sm" className="mt-2">Fazer Upgrade</Button>
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">
+                      Seu plano atual:{" "}
+                      <span className="text-emerald-600 dark:text-emerald-400 capitalize">
+                        {subInfo?.plan || "trial"}
+                      </span>
+                    </p>
+                    {subInfo?.plan === "trial" && subInfo.planExpiresAt && (
+                      <p className="text-xs text-muted-foreground">
+                        Trial expira em {new Date(subInfo.planExpiresAt).toLocaleDateString("pt-BR")}
+                      </p>
+                    )}
+                    {subInfo?.subscription?.cancelAtPeriodEnd && subInfo.subscription?.currentPeriodEnd && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        Cancelamento agendado para {new Date(subInfo.subscription.currentPeriodEnd).toLocaleDateString("pt-BR")}
+                      </p>
+                    )}
+                  </div>
+                  {subInfo?.subscriptionStatus && (
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      subInfo.subscriptionStatus === "active" || subInfo.subscriptionStatus === "trialing"
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                        : subInfo.subscriptionStatus === "past_due"
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                        : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                    }`}>
+                      {subInfo.subscriptionStatus === "active" ? "Ativo" :
+                       subInfo.subscriptionStatus === "trialing" ? "Trial" :
+                       subInfo.subscriptionStatus === "past_due" ? "Pagamento pendente" :
+                       subInfo.subscriptionStatus}
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  {subInfo?.stripeCustomerId ? (
+                    <Button variant="outline" size="sm" onClick={handlePortal} disabled={portalLoading}>
+                      {portalLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Gerenciar Assinatura
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={handleUpgrade} disabled={upgradeLoading}>
+                      {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Fazer Upgrade
+                    </Button>
+                  )}
+                </div>
               </div>
               <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Salvar</Button>
             </CardContent>
