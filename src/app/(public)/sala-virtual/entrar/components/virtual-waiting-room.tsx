@@ -21,6 +21,18 @@ const BREATHING_PHASES = [
   { text: "Expire", duration: 4000, scale: 1 },
 ]
 
+// Amazing Grace melody: note + duration (seconds)
+const AMAZING_GRACE = [
+  { freq: 392, dur: 0.45 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
+  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
+  { freq: 392, dur: 0.3 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
+  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
+  { freq: 392, dur: 0.3 }, { freq: 493.88, dur: 0.45 }, { freq: 587.33, dur: 0.4 }, { freq: 587.33, dur: 0.45 },
+  { freq: 523.25, dur: 0.45 }, { freq: 493.88, dur: 0.4 }, { freq: 440, dur: 0.45 }, { freq: 392, dur: 0.7 },
+  { freq: 392, dur: 0.3 }, { freq: 392, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 493.88, dur: 0.45 },
+  { freq: 493.88, dur: 0.45 }, { freq: 440, dur: 0.5 }, { freq: 392, dur: 0.7 },
+]
+
 interface VirtualWaitingRoomProps {
   patientName: string
   connecting: boolean
@@ -33,54 +45,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const [breathProgress, setBreathProgress] = useState(0)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const audioCtxRef = useRef<AudioContext | null>(null)
-  const pianoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const playPianoNote = useCallback((freq: number) => {
-    if (!soundEnabled) return
-    try {
-      const ctx = audioCtxRef.current || new AudioContext()
-      audioCtxRef.current = ctx
-      if (ctx.state === "suspended") ctx.resume()
-      const now = ctx.currentTime
-
-      const envelope = ctx.createGain()
-      envelope.gain.setValueAtTime(0, now)
-      envelope.gain.linearRampToValueAtTime(0.2, now + 0.005)
-      envelope.gain.exponentialRampToValueAtTime(0.08, now + 0.2)
-      envelope.gain.exponentialRampToValueAtTime(0.001, now + 1.5)
-
-      const osc = ctx.createOscillator()
-      osc.type = "triangle"
-      osc.frequency.value = freq
-      osc.connect(envelope)
-      envelope.connect(ctx.destination)
-      osc.start(now)
-      osc.stop(now + 1.5)
-
-      const osc2 = ctx.createOscillator()
-      osc2.type = "sine"
-      osc2.frequency.value = freq * 2
-      const g2 = ctx.createGain()
-      g2.gain.setValueAtTime(0.04, now)
-      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.8)
-      osc2.connect(g2)
-      g2.connect(ctx.destination)
-      osc2.start(now)
-      osc2.stop(now + 0.8)
-    } catch {}
-  }, [soundEnabled])
-
-  useEffect(() => {
-    const notes = [392, 392, 440, 493.88, 493.88, 440, 392, 392, 392, 440, 493.88, 493.88, 440, 392, 392, 493.88, 587.33, 587.33, 523.25, 493.88, 440, 392, 392, 392, 440, 493.88, 493.88, 440, 392]
-    let idx = 0
-    pianoIntervalRef.current = setInterval(() => {
-      playPianoNote(notes[idx % notes.length])
-      idx++
-    }, 500)
-    return () => {
-      if (pianoIntervalRef.current) clearInterval(pianoIntervalRef.current)
-    }
-  }, [playPianoNote])
+  const isPlayingRef = useRef(false)
 
   useEffect(() => {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
@@ -95,16 +60,81 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     }
   }, [soundEnabled])
 
-  const toggleSound = () => {
-    setSoundEnabled(prev => {
-      if (prev) {
-        if (pianoIntervalRef.current) clearInterval(pianoIntervalRef.current)
-        audioCtxRef.current?.close()
-        audioCtxRef.current = null
+  const playNote = useCallback((freq: number, duration: number) => {
+    if (!soundEnabled) return
+    try {
+      const ctx = audioCtxRef.current
+      if (!ctx) return
+      if (ctx.state === "suspended") ctx.resume()
+      const now = ctx.currentTime
+
+      const masterGain = ctx.createGain()
+      const compressor = ctx.createDynamicsCompressor()
+      compressor.threshold.value = -24
+      compressor.ratio.value = 12
+      compressor.attack.value = 0.003
+      compressor.release.value = 0.25
+
+      masterGain.gain.setValueAtTime(0, now)
+      masterGain.gain.linearRampToValueAtTime(0.25, now + 0.003)
+      masterGain.gain.exponentialRampToValueAtTime(0.09, now + 0.12)
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.9)
+
+      const addPartial = (partial: number, gain: number, detuneHz: number) => {
+        const osc = ctx.createOscillator()
+        osc.type = "triangle"
+        osc.frequency.value = freq * partial
+        osc.detune.value = detuneHz
+        const g = ctx.createGain()
+        g.gain.setValueAtTime(gain, now)
+        g.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.7)
+        osc.connect(g)
+        g.connect(masterGain)
+        osc.start(now)
+        osc.stop(now + duration)
       }
-      return !prev
+
+      addPartial(1, 0.5, -2)
+      addPartial(2, 0.12, 0)
+      addPartial(3, 0.06, 3)
+      addPartial(4, 0.03, -1)
+      addPartial(5, 0.02, 2)
+      addPartial(6, 0.015, 0)
+
+      const noiseGain = ctx.createGain()
+      noiseGain.gain.setValueAtTime(0.03, now)
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate)
+      const data = noiseBuffer.getChannelData(0)
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
+      const noise = ctx.createBufferSource()
+      noise.buffer = noiseBuffer
+      noise.connect(noiseGain)
+      noiseGain.connect(masterGain)
+      noise.start(now)
+
+      masterGain.connect(compressor)
+      compressor.connect(ctx.destination)
+    } catch {}
+  }, [soundEnabled])
+
+  useEffect(() => {
+    if (isPlayingRef.current) return
+    isPlayingRef.current = true
+    let totalDelay = 0
+    AMAZING_GRACE.forEach(({ freq, dur }) => {
+      setTimeout(() => playNote(freq, dur), totalDelay * 1000)
+      totalDelay += dur * 0.85
     })
-  }
+    return () => { isPlayingRef.current = false }
+  }, [soundEnabled, playNote])
+
+  useEffect(() => {
+    const tipInterval = setInterval(() => {
+      setCurrentTipIndex((prev) => (prev + 1) % TIPS.length)
+    }, 8000)
+    return () => clearInterval(tipInterval)
+  }, [])
 
   useEffect(() => {
     const phase = BREATHING_PHASES[breathPhase]
@@ -122,6 +152,10 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
 
   const currentPhase = BREATHING_PHASES[breathPhase]
   const scale = 1 + (currentPhase.scale - 1) * breathProgress
+
+  const toggleSound = () => {
+    setSoundEnabled(prev => !prev)
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-[#0a1120] to-slate-900">
@@ -182,7 +216,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
           <div className="flex items-center justify-between bg-white/[0.04] rounded-xl px-4 py-2 ring-1 ring-white/[0.06]">
             <div className="flex items-center gap-2 text-white/50 text-xs">
               <Music className="h-3.5 w-3.5" />
-              <span>Melodia ambiente</span>
+              <span>Amazing Grace — Piano</span>
             </div>
             <button onClick={toggleSound} className="text-white/50 hover:text-white transition-colors p-1" aria-label={soundEnabled ? "Desativar som" : "Ativar som"}>
               {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
