@@ -20,12 +20,24 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [showTrialBanner, setShowTrialBanner] = useState(true)
   const [trialInfo, setTrialInfo] = useState<{ plan: string; expiresAt: string } | null>(null)
+  const [trialExpired, setTrialExpired] = useState(false)
+  const [trialExpiredReason, setTrialExpiredReason] = useState("")
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
     if (status === "authenticated") {
+      fetch("/api/subscription/check-access")
+        .then(r => r.json())
+        .then(data => {
+          if (!data.allowed) {
+            setTrialExpired(true)
+            setTrialExpiredReason(data.reason || "Acesso expirado")
+          }
+        })
+        .catch(() => {})
+
       fetch("/api/subscription/status")
         .then(r => r.json())
         .then(data => {
@@ -47,6 +59,32 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col items-center gap-2">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="text-sm text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (trialExpired) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-red-50/40 to-slate-50/60 dark:from-slate-950 dark:to-slate-900">
+        <div className="mx-auto max-w-md text-center p-8">
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Trial Expirado</h1>
+          <p className="text-muted-foreground mb-1">{trialExpiredReason}</p>
+          <p className="text-sm text-muted-foreground mb-6">
+            Para continuar usando o PsicoFlow, escolha um plano que melhor se adapta às suas necessidades.
+          </p>
+          <Button
+            size="lg"
+            onClick={() => router.push("/pricing?expired=true")}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
+          >
+            Escolher Plano <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </div>
     )
