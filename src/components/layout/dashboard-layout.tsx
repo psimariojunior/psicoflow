@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { redirect } from "next/navigation"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
@@ -11,13 +11,31 @@ import { KeyboardShortcutsHint } from "@/components/keyboard-shortcuts"
 import { OnboardingTour } from "@/components/onboarding-tour"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
+import { AlertTriangle, X, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [showTrialBanner, setShowTrialBanner] = useState(true)
+  const [trialInfo, setTrialInfo] = useState<{ plan: string; expiresAt: string } | null>(null)
   const { data: session, status } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetch("/api/subscription/status")
+        .then(r => r.json())
+        .then(data => {
+          if (data.plan === "trial" || data.plan === "free") {
+            setTrialInfo({ plan: data.plan, expiresAt: data.expiresAt || "" })
+          }
+        })
+        .catch(() => {})
+    }
+  }, [status])
 
   if (status === "unauthenticated") {
     redirect("/login")
@@ -50,6 +68,31 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       >
         <Header onMenuClick={() => setMobileOpen(true)} onPaletteOpen={() => setPaletteOpen(true)} />
         <main className="p-4 lg:p-6">
+          {showTrialBanner && trialInfo && (
+            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    {trialInfo.plan === "trial" ? "Você está no período de trial gratuito" : "Plano gratuito ativo"}
+                  </p>
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    {trialInfo.expiresAt
+                      ? `Expira em ${new Date(trialInfo.expiresAt).toLocaleDateString("pt-BR")}`
+                      : "Escolha um plano para ter acesso completo"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={() => router.push("/pricing")} className="bg-amber-600 hover:bg-amber-700 text-white">
+                  Escolher Plano <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+                <button onClick={() => setShowTrialBanner(false)} className="text-amber-600 hover:text-amber-800 dark:text-amber-400">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}

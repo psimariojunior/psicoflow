@@ -51,8 +51,8 @@ export default function RegisterPage() {
         return
       }
 
-      toast.success("Conta criada com sucesso!")
-      router.push("/login")
+      toast.success("Conta criada com sucesso! Escolha seu plano.")
+      router.push("/pricing")
     } catch {
       toast.error("Erro ao cadastrar")
     } finally {
