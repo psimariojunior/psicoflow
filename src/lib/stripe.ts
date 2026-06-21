@@ -9,7 +9,6 @@ export function getStripe(): Stripe {
       throw new Error("STRIPE_SECRET_KEY not configured")
     }
     _stripe = new Stripe(key, {
-      apiVersion: "2026-05-27.dahlia",
       typescript: true,
     })
   }

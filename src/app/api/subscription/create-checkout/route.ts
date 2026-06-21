@@ -8,9 +8,9 @@ const checkoutSchema = z.object({
   plan: z.enum(["pro", "clinica"]),
 })
 
-const PRICES: Record<string, { amount: number; name: string }> = {
-  pro: { amount: 9700, name: "PsicoFlow Pro" },
-  clinica: { amount: 19700, name: "PsicoFlow Clínica" },
+const PRICES: Record<string, string> = {
+  pro: "price_1TkpZ9KOBHid1iO0ki42h5Pb",
+  clinica: "price_1TkpZ9KOBHid1iO0EDp5OoTz",
 }
 
 export async function POST(request: NextRequest) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { plan } = parsed.data
-    const priceConfig = PRICES[plan]
+    const priceId = PRICES[plan]
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -59,15 +59,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ["card"],
       line_items: [
         {
-          price_data: {
-            currency: "brl",
-            product_data: {
-              name: priceConfig.name,
-              description: `Assinatura ${priceConfig.name} - PsicoFlow`,
-            },
-            unit_amount: priceConfig.amount,
-            recurring: { interval: "month" },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
