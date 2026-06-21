@@ -53,24 +53,17 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     } catch {}
   }, [soundEnabled])
 
-  // Amazing Grace melody notes (frequencies in Hz)
-  const amazingGraceNotes = [
-    392, 392, 440, 494, 494, 440, 392,  // G G A B B A G
-    392, 392, 440, 494, 494, 440, 392,  // G G A B B A G
-    392, 494, 587, 587, 523, 494, 440, 392, // G B D D C B A G
-    392, 392, 440, 494, 494, 440, 392,  // G G A B B A G
-  ]
-
   useEffect(() => {
+    const notes = [392, 392, 440, 494, 494, 440, 392, 392, 392, 440, 494, 494, 440, 392, 392, 494, 587, 587, 523, 494, 440, 392, 392, 392, 440, 494, 494, 440, 392]
     let idx = 0
     pianoIntervalRef.current = setInterval(() => {
-      playPianoNote(amazingGraceNotes[idx % amazingGraceNotes.length])
+      playPianoNote(notes[idx % notes.length])
       idx++
     }, 500)
     return () => {
       if (pianoIntervalRef.current) clearInterval(pianoIntervalRef.current)
     }
-  }, [soundEnabled])
+  }, [playPianoNote])
 
   useEffect(() => {
     return () => { audioCtxRef.current?.close() }
