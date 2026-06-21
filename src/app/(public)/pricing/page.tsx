@@ -58,6 +58,10 @@ export default function PricingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
       })
+      if (res.status === 401 || res.redirected) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent("/pricing")}`
+        return
+      }
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
