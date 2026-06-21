@@ -20,7 +20,7 @@ export default function VirtualRoomPage() {
 
   useEffect(() => { setOrigin(window.location.origin) }, [])
 
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-sx5sdgua.livekit.cloud"
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-0khxxf01.livekit.cloud"
 
   const sanitize = (name: string) => name.replace(/[^a-zA-Z0-9_-]/g, "-")
 
