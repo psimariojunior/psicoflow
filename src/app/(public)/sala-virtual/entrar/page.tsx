@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react"
 import { LiveKitRoom, RoomAudioRenderer, StartAudio } from "@livekit/components-react"
 import "@livekit/components-styles"
 import toast from "react-hot-toast"
-import { AudioSubscriber } from "./components/audio-subscriber"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { ParticipantWatcher } from "./components/participant-watcher"
 import { InCallUI } from "./components/in-call-ui"
 import { PrejoinView } from "./components/prejoin-view"
@@ -143,23 +143,26 @@ function EntrarSalaForm() {
 
   if (token) {
     return (
-      <div className="h-screen relative bg-black">
-        <LiveKitRoom
-          token={token}
-          serverUrl={livekitUrl}
-          connect={true}
-          video={cameraOn}
-          audio={micOn ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false}
-          onDisconnected={handleDisconnected}
-          style={{ height: "100%" }}
-        >
-          <StartAudio label="Clique para ativar o áudio" className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 text-white text-lg font-semibold cursor-pointer" />
-          <RoomAudioRenderer volume={1} />
-          <AudioSubscriber />
-          <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
-          <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
-        </LiveKitRoom>
-      </div>
+      <ErrorBoundary>
+        <div className="h-screen relative bg-black">
+          <LiveKitRoom
+            token={token}
+            serverUrl={livekitUrl}
+            connect={true}
+            video={cameraOn}
+            audio={micOn ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false}
+            onDisconnected={handleDisconnected}
+            style={{ height: "100%" }}
+          >
+            <ErrorBoundary>
+              <StartAudio label="Clique para ativar o áudio" className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 text-white text-lg font-semibold cursor-pointer" />
+              <RoomAudioRenderer volume={1} />
+              <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
+              <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
+            </ErrorBoundary>
+          </LiveKitRoom>
+        </div>
+      </ErrorBoundary>
     )
   }
 

@@ -16,7 +16,7 @@
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate || true"
+    "postinstall": "node scripts/patch-next-auth.mjs && prisma generate || true"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.21",

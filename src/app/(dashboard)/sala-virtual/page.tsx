@@ -4,8 +4,9 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
-import { Track } from "livekit-client"
+import { LiveKitRoom, useRemoteParticipants, VideoTrack, useRoomContext } from "@livekit/components-react"
+import { Track, RoomEvent, type LocalTrackPublication } from "livekit-client"
+import "@livekit/components-styles"
 import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User } from "lucide-react"
 import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
@@ -67,36 +68,36 @@ export default function VirtualRoomPage() {
 
   if (token) {
     return (
-      <div className="h-[calc(100vh-4rem)] flex flex-col">
-        <div className="flex items-center gap-2 px-4 py-2 bg-background border-b shrink-0">
-          <span className="text-sm font-medium flex-1">Sala: {roomName}</span>
-          <Button variant="outline" size="sm" onClick={() => {
-            navigator.clipboard.writeText(patientLink)
-            toast.success("Link copiado!")
-          }}>
-            <Copy className="mr-2 h-4 w-4" /> Copiar Link
-          </Button>
-          <Button variant="destructive" size="sm" onClick={handleEndRoom} disabled={ending}>
-            {ending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
-            {ending ? "Encerrando..." : "Encerrar Sala"}
-          </Button>
-        </div>
-        <div className="flex-1">
-          <LiveKitRoom
-            token={token}
-            serverUrl={livekitUrl}
-            connect={true}
-            video={true}
-            audio={{ echoCancellation: true, noiseSuppression: true, autoGainControl: true }}
-            onDisconnected={() => setToken(null)}
-            style={{ height: "100%" }}
-          >
-            <ErrorBoundary>
+      <ErrorBoundary>
+        <div className="h-[calc(100vh-4rem)] flex flex-col">
+          <div className="flex items-center gap-2 px-4 py-2 bg-background border-b shrink-0">
+            <span className="text-sm font-medium flex-1">Sala: {roomName}</span>
+            <Button variant="outline" size="sm" onClick={() => {
+              navigator.clipboard.writeText(patientLink)
+              toast.success("Link copiado!")
+            }}>
+              <Copy className="mr-2 h-4 w-4" /> Copiar Link
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleEndRoom} disabled={ending}>
+              {ending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
+              {ending ? "Encerrando..." : "Encerrar Sala"}
+            </Button>
+          </div>
+          <div className="flex-1">
+            <LiveKitRoom
+              token={token}
+              serverUrl={livekitUrl}
+              connect={true}
+              video={true}
+              audio={{ echoCancellation: true, noiseSuppression: true, autoGainControl: true }}
+              onDisconnected={() => setToken(null)}
+              style={{ height: "100%" }}
+            >
               <PsychologistInCall />
-            </ErrorBoundary>
-          </LiveKitRoom>
+            </LiveKitRoom>
+          </div>
         </div>
-      </div>
+      </ErrorBoundary>
     )
   }
 
@@ -163,14 +164,56 @@ function PsychologistInCall() {
   const [callDuration, setCallDuration] = useState(0)
   const [camOn, setCamOn] = useState(true)
   const [micOn, setMicOn] = useState(true)
+  const [localCamPub, setLocalCamPub] = useState<LocalTrackPublication | null>(null)
+  const [remoteCamPub, setRemoteCamPub] = useState<any>(null)
+  const [remoteScreenPub, setRemoteScreenPub] = useState<any>(null)
 
+  const room = useRoomContext()
   const remoteParticipants = useRemoteParticipants()
-  const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
-  const localParticipant = useLocalParticipant()
-  const hasRemote = remoteParticipants ? remoteParticipants.length > 0 : false
-  const remoteVideoTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.Camera) : null
-  const screenTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.ScreenShare) : null
-  const primaryTrack = screenTrack || remoteVideoTrack
+  const hasRemote = remoteParticipants && remoteParticipants.length > 0
+  const localParticipant = room?.localParticipant
+
+  useEffect(() => {
+    if (!room) return
+
+    const updateLocalCam = () => {
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+      setLocalCamPub((pub as LocalTrackPublication) || null)
+    }
+
+    const updateRemoteTracks = () => {
+      const remotes = Array.from(room.remoteParticipants.values())
+      let camPub = null
+      let screenPub = null
+      for (const p of remotes) {
+        const cam = p.getTrackPublication(Track.Source.Camera)
+        if (cam && cam.isSubscribed) camPub = { participant: p, source: Track.Source.Camera, publication: cam }
+        const screen = p.getTrackPublication(Track.Source.ScreenShare)
+        if (screen && screen.isSubscribed) screenPub = { participant: p, source: Track.Source.ScreenShare, publication: screen }
+      }
+      setRemoteCamPub(camPub)
+      setRemoteScreenPub(screenPub)
+    }
+
+    updateLocalCam()
+    updateRemoteTracks()
+
+    room.on(RoomEvent.LocalTrackPublished, updateLocalCam)
+    room.on(RoomEvent.LocalTrackUnpublished, updateLocalCam)
+    room.on(RoomEvent.TrackSubscribed, updateRemoteTracks)
+    room.on(RoomEvent.TrackUnsubscribed, updateRemoteTracks)
+    room.on(RoomEvent.ParticipantConnected, updateRemoteTracks)
+    room.on(RoomEvent.ParticipantDisconnected, updateRemoteTracks)
+
+    return () => {
+      room.off(RoomEvent.LocalTrackPublished, updateLocalCam)
+      room.off(RoomEvent.LocalTrackUnpublished, updateLocalCam)
+      room.off(RoomEvent.TrackSubscribed, updateRemoteTracks)
+      room.off(RoomEvent.TrackUnsubscribed, updateRemoteTracks)
+      room.off(RoomEvent.ParticipantConnected, updateRemoteTracks)
+      room.off(RoomEvent.ParticipantDisconnected, updateRemoteTracks)
+    }
+  }, [room])
 
   useEffect(() => {
     const id = setInterval(() => setCallDuration(t => t + 1), 1000)
@@ -178,13 +221,11 @@ function PsychologistInCall() {
   }, [])
 
   const toggleCam = () => {
-    const p = (localParticipant as any)?.localParticipant || (localParticipant as any)
-    if (p?.setCameraEnabled) p.setCameraEnabled(!camOn)
+    localParticipant?.setCameraEnabled(!camOn)
     setCamOn(prev => !prev)
   }
   const toggleMic = () => {
-    const p = (localParticipant as any)?.localParticipant || (localParticipant as any)
-    if (p?.setMicrophoneEnabled) p.setMicrophoneEnabled(!micOn)
+    localParticipant?.setMicrophoneEnabled(!micOn)
     setMicOn(prev => !prev)
   }
 
@@ -193,6 +234,8 @@ function PsychologistInCall() {
     const sec = s % 60
     return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
   }
+
+  const primaryTrack = remoteScreenPub || remoteCamPub
 
   return (
     <div className="relative w-full h-full bg-black">
@@ -222,19 +265,29 @@ function PsychologistInCall() {
         </div>
 
         <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                <Video className={`h-6 w-6 ${camOn ? 'text-blue-400' : 'text-slate-500'}`} />
+          {localCamPub && localParticipant ? (
+            <>
+              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
+              <div className="absolute bottom-2 left-3 flex items-center gap-2">
+                <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você</span>
               </div>
-              <p className={`text-xs font-medium ${camOn ? 'text-blue-400' : 'text-slate-500'}`}>
-                {camOn ? 'Câmera ativada' : 'Câmera desligada'}
-              </p>
-              <p className={`text-xs mt-1 ${micOn ? 'text-blue-400' : 'text-slate-500'}`}>
-                {micOn ? 'Microfone ativado' : 'Microfone desligado'}
-              </p>
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
+                  <Video className={`h-6 w-6 ${camOn ? 'text-blue-400' : 'text-slate-500'}`} />
+                </div>
+                <p className={`text-xs font-medium ${camOn ? 'text-blue-400' : 'text-slate-500'}`}>
+                  {camOn ? 'Câmera ativada' : 'Câmera desligada'}
+                </p>
+                <p className={`text-xs mt-1 ${micOn ? 'text-blue-400' : 'text-slate-500'}`}>
+                  {micOn ? 'Microfone ativado' : 'Microfone desligado'}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
         </div>
       </div>
