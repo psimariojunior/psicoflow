@@ -4,8 +4,8 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack } from "@livekit/components-react"
-import { Track, LocalParticipant } from "livekit-client"
+import { LiveKitRoom, useRemoteParticipants, useTracks, VideoTrack, useLocalParticipant } from "@livekit/components-react"
+import { Track } from "livekit-client"
 import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User } from "lucide-react"
 import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
@@ -166,6 +166,7 @@ function PsychologistInCall() {
 
   const remoteParticipants = useRemoteParticipants()
   const cameraTracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare])
+  const localParticipant = useLocalParticipant()
   const hasRemote = remoteParticipants ? remoteParticipants.length > 0 : false
   const remoteVideoTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.Camera) : null
   const screenTrack = cameraTracks ? cameraTracks.find((t: any) => !t.participant.isLocal && t.source === Track.Source.ScreenShare) : null
@@ -176,8 +177,16 @@ function PsychologistInCall() {
     return () => clearInterval(id)
   }, [])
 
-  const toggleCam = () => setCamOn(prev => !prev)
-  const toggleMic = () => setMicOn(prev => !prev)
+  const toggleCam = () => {
+    const p = (localParticipant as any)?.localParticipant || (localParticipant as any)
+    if (p?.setCameraEnabled) p.setCameraEnabled(!camOn)
+    setCamOn(prev => !prev)
+  }
+  const toggleMic = () => {
+    const p = (localParticipant as any)?.localParticipant || (localParticipant as any)
+    if (p?.setMicrophoneEnabled) p.setMicrophoneEnabled(!micOn)
+    setMicOn(prev => !prev)
+  }
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
