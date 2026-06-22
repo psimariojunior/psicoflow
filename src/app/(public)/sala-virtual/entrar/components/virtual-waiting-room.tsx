@@ -83,17 +83,6 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const currentPhase = BREATHING_PHASES[breathPhase]
   const scale = 1 + (currentPhase.scale - 1) * breathProgress
 
-  const toggleSound = () => {
-    setSoundEnabled(prev => {
-      const next = !prev
-      if (audioRef.current) {
-        if (next) audioRef.current.play().catch(() => {})
-        else audioRef.current.pause()
-      }
-      return next
-    })
-  }
-
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-[#0a1120] to-slate-900 relative">
       {/* Audio activation overlay */}
