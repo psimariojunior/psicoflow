@@ -1,26 +1,26 @@
-import { blogPosts, getBlogPost } from "@/lib/blog-data"
+"use client"
+
+import { useState, useEffect } from "react"
+import { blogPosts, getBlogPost, type BlogPost } from "@/lib/blog-data"
 import Link from "next/link"
-import { ArrowLeft, Calendar, Clock, BookOpen, Share2 } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { notFound } from "next/navigation"
 
-export const dynamic = "force-dynamic"
+export default function BlogPostPage({ params }: { params: { slug: string } }) {
+  const [post, setPost] = useState<BlogPost | null>(null)
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const post = getBlogPost(slug)
-  if (!post) return { title: "Post não encontrado" }
-  return {
-    title: `${post.title} | PsicoFlow Blog`,
-    description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt },
+  useEffect(() => {
+    const found = getBlogPost(params.slug)
+    setPost(found || null)
+  }, [params.slug])
+
+  if (!post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    )
   }
-}
-
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const post = getBlogPost(slug)
-  if (!post) notFound()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-blue-50/30 dark:to-blue-950/10">
@@ -43,24 +43,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div className="prose prose-blue dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           <div className="border-t pt-6 mt-8">
-            <ShareButton />
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Gostou? Compartilhe com outros psicólogos.</p>
+              <button
+                onClick={() => navigator.clipboard.writeText(window.location.href)}
+                className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                <Share2 className="mr-2 h-4 w-4" /> Copiar Link
+              </button>
+            </div>
           </div>
         </article>
       </div>
-    </div>
-  )
-}
-
-function ShareButton() {
-  return (
-    <div className="flex items-center justify-between">
-      <p className="text-sm text-muted-foreground">Gostou? Compartilhe com outros psicólogos.</p>
-      <button
-        onClick={() => navigator.clipboard.writeText(window.location.href)}
-        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
-      >
-        <Share2 className="mr-2 h-4 w-4" /> Copiar Link
-      </button>
     </div>
   )
 }
