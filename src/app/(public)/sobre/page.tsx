@@ -12,8 +12,8 @@ export default function SobrePage() {
 
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mx-auto flex items-center justify-center text-white text-4xl font-bold shadow-xl">
-              MJ
+            <div className="w-32 h-32 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-blue-500/20">
+              <img src="/profile.jpg" alt="Mário Júnior" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight">Mário Júnior</h1>
             <p className="text-lg text-muted-foreground">Fundador do PsicoFlow</p>
