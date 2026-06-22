@@ -43,7 +43,8 @@ const steps = [
 const navLinks = [
   { label: "Início", href: "/" },
   { label: "Serviços", href: "/#servicos" },
-  { label: "Sobre", href: "/#sobre" },
+  { label: "Sobre", href: "/sobre" },
+  { label: "Blog", href: "/blog" },
   { label: "Agendamento", href: "/agendar" },
   { label: "FAQ", href: "/#faq" },
 ]
@@ -243,31 +244,24 @@ export default function LandingPage() {
 
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28 bg-gradient-to-br from-blue-50/50 to-slate-50/50 dark:from-slate-900/50 dark:to-slate-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Sobre</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">Conheça o <span className="text-blue-500">profissional</span></h2>
-              <div className="space-y-4 text-slate-600 dark:text-slate-400 leading-relaxed">
-                <p>Sou <strong className="text-slate-900 dark:text-white">Mário Júnior</strong>, psicólogo clínico (CRP 04/52274), formado em Psicologia com pós-graduação em Neuropsicologia. Minha abordagem é a Gestalt-Terapia, centrada na pessoa e na relação, com foco no aqui e agora.</p>
-                <p>Acredito em um atendimento humanizado e acolhedor, onde cada pessoa encontra um espaço seguro para se conhecer melhor, superar desafios e desenvolver todo o seu potencial.</p>
-              </div>
-              <div className="flex flex-wrap gap-3 mt-6">
-                {["Terapia Individual", "Terapia de Casal", "Online", "Presencial"].map((item) => (
-                  <Badge key={item} variant="secondary" className="px-3 py-1.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{item}</Badge>
-                ))}
-              </div>
-              <Link href="/agendar"><Button size="lg" className="mt-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-3xl blur-2xl -translate-x-4 translate-y-4" />
-                <div className="relative w-72 h-72 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-1 shadow-xl shadow-blue-500/20">
-                  <div className="w-full h-full rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                    <Image src="/profile.jpg" alt="Mário Júnior - Psicólogo" width={288} height={288} className="w-full h-full object-cover" priority />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+          <div className="max-w-xl mx-auto text-center">
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Sobre</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">Conheça o <span className="text-blue-500">fundador</span></h2>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mx-auto flex items-center justify-center text-white text-2xl font-bold shadow-xl mb-6">MJ</div>
+            <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+              <strong className="text-slate-900 dark:text-white">Mário Júnior</strong> — Psicólogo clínico (CRP 04/52274), Gestalt-Terapia. 
+              Criou o PsicoFlow para simplificar a gestão de consultórios e permitir que profissionais foquem no que importa: seus pacientes.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {["Terapia Individual", "Terapia de Casal", "Online"].map((item) => (
+                <Badge key={item} variant="secondary" className="px-3 py-1.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{item}</Badge>
+              ))}
+            </div>
+            <Link href="/sobre">
+              <Button variant="outline" size="lg" className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+                Saiba Mais <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </motion.section>
@@ -334,9 +328,9 @@ export default function LandingPage() {
               <ul className="space-y-2">
                 <li><Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">Início</Link></li>
                 <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
-                <li><Link href="/#sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
-                <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
                 <li><Link href="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
+                <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
                 <li><Link href="/termos" className="text-sm text-slate-300 hover:text-white transition-colors">Termos de Uso</Link></li>
                 <li><Link href="/privacidade" className="text-sm text-slate-300 hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
