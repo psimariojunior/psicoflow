@@ -521,12 +521,12 @@ export default function AjudaPage() {
               <div>
                 <p className="text-xs text-muted-foreground">WhatsApp</p>
                 <a
-                  href="https://wa.me/5511999999999"
+                  href="https://wa.me/5531992863861"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
                 >
-                  (11) 99999-9999
+                  (31) 99286-3861
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>

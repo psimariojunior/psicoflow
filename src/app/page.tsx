@@ -347,8 +347,8 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />contato@psicoflow.com.br</li>
-                <li className="flex items-center gap-2 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99999-8888</li>
+                <li className="flex items-center gap-2 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />psi_mariojunior@hotmail.com</li>
+                <li className="flex items-center gap-2 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99286-3861</li>
                 <li className="flex items-center gap-2 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
             </div>
