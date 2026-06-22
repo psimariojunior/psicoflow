@@ -122,7 +122,7 @@ export const updateSettingsSchema = z.object({
   bio: z.string().max(2000).optional().or(z.literal("")),
   pixKey: z.string().max(100).optional().or(z.literal("")),
   paymentInfo: z.string().max(2000).optional().or(z.literal("")),
-  avatarUrl: z.string().max(10000).optional().or(z.literal("")),
+    avatarUrl: z.string().max(100000).optional().or(z.literal("")),
 })
 
 export const changePasswordSchema = z.object({

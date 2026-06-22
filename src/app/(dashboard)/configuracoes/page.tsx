@@ -277,8 +277,8 @@ export default function SettingsPage() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem deve ter no máximo 2MB")
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 5MB")
       return
     }
     if (!file.type.startsWith("image/")) {
@@ -287,11 +287,19 @@ export default function SettingsPage() {
     }
     setAvatarLoading(true)
     try {
-      const reader = new FileReader()
+      // Resize image to 200x200 for avatar
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")!
+      const img = new window.Image()
       const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = reject
-        reader.readAsDataURL(file)
+        img.onload = () => {
+          canvas.width = 200
+          canvas.height = 200
+          ctx.drawImage(img, 0, 0, 200, 200)
+          resolve(canvas.toDataURL("image/jpeg", 0.8))
+        }
+        img.onerror = reject
+        img.src = URL.createObjectURL(file)
       })
       const res = await fetch("/api/configuracoes", {
         method: "PUT",
