@@ -56,13 +56,13 @@ export default function SobrePage() {
             <h2>Contato</h2>
             <p>Quer saber mais ou tem sugestões? Entre em contato:</p>
             <div className="flex flex-col gap-3 not-prose">
-              <a href="mailto:contato@psicoflow.com.br" className="inline-flex items-center gap-2 text-primary hover:underline">
+              <a href="mailto:psi_mariojunior@hotmail.com" className="inline-flex items-center gap-2 text-primary hover:underline">
                 <Mail className="h-4 w-4" />
-                contato@psicoflow.com.br
+                psi_mariojunior@hotmail.com
               </a>
-              <a href="https://wa.me/5531999998888" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
+              <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
                 <MessageSquare className="h-4 w-4" />
-                (31) 99999-8888
+                (31) 99286-3861
               </a>
               <span className="inline-flex items-center gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
