@@ -59,6 +59,17 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
     })
   }, [])
 
+  // Stop audio when component unmounts (when entering the room)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ""
+        audioRef.current = null
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTipIndex((prev) => (prev + 1) % TIPS.length)

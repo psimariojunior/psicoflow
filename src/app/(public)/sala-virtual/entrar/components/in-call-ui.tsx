@@ -32,11 +32,17 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
         setHasRemote(true)
         setRemoteName(remotes[0].name || remotes[0].identity || "Psicólogo")
 
-        const p = remotes[0]
-        const camPub = p.getTrackPublication(Track.Source.Camera)
-        if (camPub?.track && videoRef.current) {
-          camPub.track.attach(videoRef.current)
+        // Retry attaching track with delay to ensure DOM is ready
+        const tryAttach = (attempt = 0) => {
+          const p = remotes[0]
+          const camPub = p.getTrackPublication(Track.Source.Camera)
+          if (camPub?.track && videoRef.current) {
+            camPub.track.attach(videoRef.current)
+          } else if (attempt < 5) {
+            setTimeout(() => tryAttach(attempt + 1), 200)
+          }
         }
+        requestAnimationFrame(() => tryAttach())
       } catch {}
     }
 
@@ -52,7 +58,8 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
     }
 
     const handleParticipantConnected = () => {
-      attachRemoteVideo()
+      // Delay to allow track subscription
+      setTimeout(() => attachRemoteVideo(), 500)
     }
 
     const handleParticipantDisconnected = () => {
@@ -63,9 +70,12 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
       if (track.kind === "video" && participant && !participant.isLocal) {
         setHasRemote(true)
         setRemoteName(participant.name || participant.identity || "Psicólogo")
-        if (videoRef.current) {
-          track.attach(videoRef.current)
-        }
+        // Delay attachment to ensure DOM is ready
+        requestAnimationFrame(() => {
+          if (videoRef.current) {
+            track.attach(videoRef.current)
+          }
+        })
       }
     }
 
