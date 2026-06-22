@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Heart, Shield, Award, Mail, MessageSquare } from "lucide-react"
+import { ArrowLeft, Heart, Shield, Award, Mail, MessageSquare, Phone, MapPin } from "lucide-react"
 
 export default function SobrePage() {
   return (
@@ -55,15 +55,19 @@ export default function SobrePage() {
 
             <h2>Contato</h2>
             <p>Quer saber mais ou tem sugestões? Entre em contato:</p>
-            <div className="flex flex-col gap-2 not-prose">
-              <a href="mailto:psi_mariojunior@hotmail.com" className="inline-flex items-center gap-2 text-primary hover:underline">
+            <div className="flex flex-col gap-3 not-prose">
+              <a href="mailto:contato@psicoflow.com.br" className="inline-flex items-center gap-2 text-primary hover:underline">
                 <Mail className="h-4 w-4" />
-                psi_mariojunior@hotmail.com
+                contato@psicoflow.com.br
               </a>
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
+              <a href="https://wa.me/5531999998888" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
                 <MessageSquare className="h-4 w-4" />
-                WhatsApp
+                (31) 99999-8888
               </a>
+              <span className="inline-flex items-center gap-2 text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                Belo Horizonte, MG
+              </span>
             </div>
           </div>
         </div>
