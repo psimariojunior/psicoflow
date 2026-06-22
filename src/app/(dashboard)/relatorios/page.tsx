@@ -163,6 +163,33 @@ export default function ReportsPage() {
     </Card>
   )
 
+  const reportCards = [
+    {
+      title: "Relatório de Pacientes",
+      description: "Lista completa de pacientes com dados de contato, CPF e histórico de consultas.",
+      icon: Users,
+      url: "/api/relatorios/pacientes",
+      color: "text-blue-600",
+      bg: "bg-blue-600/10",
+    },
+    {
+      title: "Relatório Financeiro",
+      description: "Receitas, despesas, saldo, categorias e métodos de pagamento do mês.",
+      icon: DollarSign,
+      url: "/api/relatorios/financeiro",
+      color: "text-emerald-600",
+      bg: "bg-emerald-600/10",
+    },
+    {
+      title: "Relatório de Agenda",
+      description: "Consultas por status, distribuição por paciente e agenda do mês.",
+      icon: Calendar,
+      url: "/api/relatorios/agenda",
+      color: "text-violet-600",
+      bg: "bg-violet-600/10",
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -173,6 +200,33 @@ export default function ReportsPage() {
         <Button variant="outline" onClick={() => window.print()}>
           <Download className="mr-2 h-4 w-4" />Exportar PDF
         </Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {reportCards.map((card) => (
+          <Card key={card.title} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl", card.bg)}>
+                  <card.icon className={cn("h-6 w-6", card.color)} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm">{card.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{card.description}</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 w-full"
+                    onClick={() => window.open(card.url, "_blank")}
+                  >
+                    <FileText className="mr-2 h-3.5 w-3.5" />
+                    Gerar Relatório
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
