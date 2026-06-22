@@ -288,7 +288,7 @@ function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRo
       <div className="absolute inset-0">
         {primaryTrack ? (
           <>
-            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-cover" />
+            <VideoTrack trackRef={primaryTrack} className="w-full h-full object-contain" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
           </>
         ) : (
