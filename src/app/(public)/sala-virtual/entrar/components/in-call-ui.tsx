@@ -163,7 +163,7 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
     <div ref={containerRef} className="relative h-full w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Main video - psychologist */}
       <div className="absolute inset-0">
-        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-contain" />
         {!hasRemote && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-4 animate-pulse">
@@ -205,7 +205,7 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
       <div className="absolute bottom-24 right-3 z-20 md:bottom-24 md:right-4">
         <div className="relative w-20 h-15 md:w-36 md:h-28 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
           {localVideoRef && (
-            <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+            <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-contain scale-x-[-1]" />
           )}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-6 pointer-events-none" />
           <div className="absolute bottom-0.5 left-1.5">

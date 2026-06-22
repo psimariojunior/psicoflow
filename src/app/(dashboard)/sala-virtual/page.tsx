@@ -324,7 +324,7 @@ function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRo
         <div className="relative w-20 h-15 md:w-48 md:h-36 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
           {localCamPub && localParticipant ? (
             <>
-              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="w-full h-full object-cover scale-x-[-1]" />
+              <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="w-full h-full object-contain scale-x-[-1]" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-8 pointer-events-none" />
               <div className="absolute bottom-1 left-2">
                 <span className="text-[10px] text-white/80 font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">Você</span>
