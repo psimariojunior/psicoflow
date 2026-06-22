@@ -116,7 +116,7 @@ export default function DashboardHome() {
 
       {!onboardingDone && <OnboardingChecklist />}
 
-      <StatsCards stats={stats} />
+      <div data-tour="dashboard-stats"><StatsCards stats={stats} /></div>
 
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {quickActions.map((action) => (
