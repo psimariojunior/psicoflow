@@ -308,20 +308,20 @@ function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRo
 
       {/* Remote participant name + connection status */}
       {hasRemote && (
-        <div className="absolute top-4 left-4 z-20 flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-4 py-2 rounded-xl border border-white/10 shadow-lg">
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-white/10 shadow-lg">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
-            <span className="text-sm font-medium">{remoteName}</span>
+            <span className="text-xs md:text-sm font-medium">{remoteName}</span>
           </div>
-          <div className="bg-black/40 backdrop-blur-xl text-white/70 px-3 py-2 rounded-xl border border-white/10">
-            <span className="text-xs font-mono">{formatTime(callDuration)}</span>
+          <div className="bg-black/40 backdrop-blur-xl text-white/70 px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border border-white/10">
+            <span className="text-[10px] md:text-xs font-mono">{formatTime(callDuration)}</span>
           </div>
         </div>
       )}
 
       {/* Local video - picture in picture */}
-      <div className="absolute top-4 right-4 z-20">
-        <div className="relative w-32 h-24 md:w-48 md:h-36 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+      <div className="absolute top-3 right-3 z-20 md:top-4 md:right-4">
+        <div className="relative w-20 h-15 md:w-48 md:h-36 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
           {localCamPub && localParticipant ? (
             <>
               <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="w-full h-full object-cover scale-x-[-1]" />
