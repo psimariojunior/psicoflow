@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useRoomContext } from "@livekit/components-react"
 import { RoomEvent, Track } from "livekit-client"
 import { Button } from "@/components/ui/button"
-import { Video, VideoOff, Mic, MicOff, LogOut, Maximize2, Minimize2, Camera, User } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, LogOut, Maximize2, Minimize2, Camera, User, Phone } from "lucide-react"
 
 export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -134,13 +134,9 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
   }, [])
 
   const toggleCam = useCallback(() => {
-    const pub = room?.localParticipant.getTrackPublication(Track.Source.Camera)
-    if (pub) {
-      const enabled = !pub.isMuted
-      room?.localParticipant.setCameraEnabled(!enabled)
-      setCamOn(!enabled)
-    }
-  }, [room])
+    room?.localParticipant.setCameraEnabled(!camOn)
+    setCamOn(prev => !prev)
+  }, [room, camOn])
 
   const toggleMic = useCallback(() => {
     room?.localParticipant.setMicrophoneEnabled(!micOn)
@@ -154,76 +150,111 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full bg-black">
-      <div className="flex items-center justify-center w-full h-full p-1 md:p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-full max-w-6xl gap-px md:gap-2">
-          <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-            <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
-            {!hasRemote && (
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                <div className="text-center">
-                  <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mx-auto mb-3">
-                    <User className="h-6 w-6 text-slate-500" />
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium">Aguardando psicólogo...</p>
-                </div>
+    <div ref={containerRef} className="relative h-full w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Main video - psychologist */}
+      <div className="absolute inset-0">
+        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+        {!hasRemote && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center space-y-4 animate-pulse">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-2 border-blue-500/30 flex items-center justify-center mx-auto">
+                <User className="h-10 w-10 text-blue-400/60" />
               </div>
-            )}
-            {hasRemote && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-            )}
-            {hasRemote && (
-              <div className="absolute bottom-2 left-3 flex items-center gap-2">
-                <span className="bg-blue-500/30 backdrop-blur-md text-blue-200 text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-blue-400/30">
-                  {remoteName}
-                </span>
-                <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/80 text-xs px-2.5 py-1 rounded-full">
-                  <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(59,130,246,0.5)]" />
-                  {formatTime(callDuration)}
-                </span>
+              <div>
+                <p className="text-blue-300/80 text-sm font-medium">Aguardando psicólogo</p>
+                <p className="text-blue-400/40 text-xs mt-1">O profissional entrará em breve</p>
               </div>
-            )}
-          </div>
-
-          <div className="relative min-h-0 h-full bg-slate-900 rounded-xl md:rounded-2xl overflow-hidden">
-            <video ref={localVideoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-16 pointer-events-none" />
-            <div className="absolute bottom-2 left-3 flex items-center gap-2">
-              <span className="bg-black/50 backdrop-blur-md text-white text-xs md:text-sm font-medium px-3 py-1 rounded-full border border-white/20">Você</span>
             </div>
+          </div>
+        )}
+        {hasRemote && <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />}
+      </div>
+
+      {/* Remote participant name + connection status */}
+      {hasRemote && (
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-4 py-2 rounded-xl border border-white/10 shadow-lg">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
+            <span className="text-sm font-medium">{remoteName}</span>
+          </div>
+          <div className="bg-black/40 backdrop-blur-xl text-white/70 px-3 py-2 rounded-xl border border-white/10">
+            <span className="text-xs font-mono">{formatTime(callDuration)}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Room name */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
+          <Camera className="h-3 w-3 text-blue-400" />
+          <span className="text-[11px] font-medium">{roomName}</span>
+        </div>
+      </div>
+
+      {/* Local video - picture in picture */}
+      <div className="absolute bottom-24 right-4 z-20">
+        <div className="relative w-24 h-18 md:w-36 md:h-28 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+          {localVideoRef && (
+            <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+          )}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-6 pointer-events-none" />
+          <div className="absolute bottom-0.5 left-1.5">
+            <span className="text-[9px] text-white/80 font-medium bg-black/40 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Você</span>
           </div>
         </div>
       </div>
 
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-lg text-white/80 text-xs px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
-        <Camera className="h-3 w-3 text-blue-400" />
-        {roomName}
-      </div>
+      {/* Bottom controls */}
+      <div className="absolute bottom-0 left-0 right-0 z-30">
+        <div className="flex items-center justify-center gap-3 pb-6 md:pb-8">
+          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/10 shadow-2xl">
+            <button
+              onClick={toggleCam}
+              className={`relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                camOn 
+                  ? 'bg-white/10 hover:bg-white/20 text-white' 
+                  : 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
+              }`}
+              aria-label="Alternar câmera"
+            >
+              {camOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+              {!camOn && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black" />}
+            </button>
 
-      <div className="absolute top-4 right-4 z-20">
-        {hasRemote && (
-          <span className="flex items-center gap-1.5 bg-blue-500/20 backdrop-blur-md text-blue-300 text-xs px-3 py-1.5 rounded-full border border-blue-400/20">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Conectado
-          </span>
-        )}
-      </div>
+            <button
+              onClick={toggleMic}
+              className={`relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                micOn 
+                  ? 'bg-white/10 hover:bg-white/20 text-white' 
+                  : 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
+              }`}
+              aria-label="Alternar microfone"
+            >
+              {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+              {!micOn && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black" />}
+            </button>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 md:gap-3 bg-black/50 backdrop-blur-xl rounded-full px-3 md:px-4 py-2 md:py-2.5 ring-1 ring-white/10 shadow-2xl">
-        <Button size="icon" aria-label="Alternar câmera" variant={camOn ? "secondary" : "destructive"} onClick={toggleCam} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {camOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
-        </Button>
-        <Button size="icon" aria-label="Alternar microfone" variant={micOn ? "secondary" : "destructive"} onClick={toggleMic} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
-        </Button>
-        <div className="w-px h-6 bg-white/10" />
-        <Button size="icon" aria-label="Alternar tela cheia" variant="secondary" onClick={toggleFullscreen} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
-        </Button>
-        <div className="w-px h-6 bg-white/10" />
-        <Button variant="destructive" size="icon" aria-label="Sair da sala" onClick={onLeave} className="rounded-full h-11 w-11 hover:scale-105 active:scale-95 transition-transform">
-          <LogOut className="h-5 w-5" />
-        </Button>
+            <div className="w-px h-8 bg-white/10 mx-1" />
+
+            <button
+              onClick={toggleFullscreen}
+              className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+              aria-label="Alternar tela cheia"
+            >
+              {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+            </button>
+
+            <div className="w-px h-8 bg-white/10 mx-1" />
+
+            <button
+              onClick={onLeave}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 shadow-lg shadow-red-600/25"
+            >
+              <Phone className="h-4 w-4 rotate-[135deg]" />
+              Sair
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
