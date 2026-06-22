@@ -1,13 +1,11 @@
 import { blogPosts, getBlogPost } from "@/lib/blog-data"
 import Link from "next/link"
-import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, BookOpen, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 
-export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }))
-}
+export const dynamic = "force-dynamic"
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getBlogPost(params.slug)

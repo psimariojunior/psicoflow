@@ -1,7 +1,9 @@
 import { blogPosts } from "@/lib/blog-data"
 import Link from "next/link"
-import { Calendar, Clock, ArrowRight } from "lucide-react"
+import { Calendar, Clock, ArrowRight, BookOpen } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+
+export const dynamic = "force-dynamic"
 
 export default function BlogPage() {
   return (
