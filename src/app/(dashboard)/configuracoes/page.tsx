@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,10 +9,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera } from "lucide-react"
 import toast from "react-hot-toast"
 
 function GoogleCalendarStatus() {
@@ -155,8 +155,13 @@ export default function SettingsPage() {
     bio: "",
     pixKey: "",
     paymentInfo: "",
+    avatarUrl: "",
   })
   const [loading, setLoading] = useState(true)
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" })
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [subInfo, setSubInfo] = useState<{
     plan: string
     planExpiresAt: string | null
@@ -183,6 +188,7 @@ export default function SettingsPage() {
           bio: data.bio || "",
           pixKey: data.pixKey || "",
           paymentInfo: data.paymentInfo || "",
+          avatarUrl: data.avatarUrl || "",
         })
       })
       .catch(() => toast.error("Erro ao carregar configurações"))
@@ -231,6 +237,75 @@ export default function SettingsPage() {
       toast.error("Erro ao conectar com o servidor")
     } finally {
       setUpgradeLoading(false)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!passwords.current || !passwords.new) {
+      toast.error("Preencha a senha atual e a nova senha")
+      return
+    }
+    if (passwords.new.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres")
+      return
+    }
+    if (passwords.new !== passwords.confirm) {
+      toast.error("As senhas não coincidem")
+      return
+    }
+    setPasswordLoading(true)
+    try {
+      const res = await fetch("/api/configuracoes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.new }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || "Erro ao alterar senha")
+        return
+      }
+      toast.success("Senha alterada com sucesso!")
+      setPasswords({ current: "", new: "", confirm: "" })
+    } catch {
+      toast.error("Erro ao alterar senha")
+    } finally {
+      setPasswordLoading(false)
+    }
+  }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 2MB")
+      return
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("O arquivo deve ser uma imagem")
+      return
+    }
+    setAvatarLoading(true)
+    try {
+      const reader = new FileReader()
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const res = await fetch("/api/configuracoes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: base64 }),
+      })
+      if (!res.ok) throw new Error()
+      setProfile(prev => ({ ...prev, avatarUrl: base64 }))
+      toast.success("Foto atualizada com sucesso!")
+    } catch {
+      toast.error("Erro ao enviar foto")
+    } finally {
+      setAvatarLoading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
   }
 
@@ -304,11 +379,26 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 mb-6">
                 <Avatar className="h-20 w-20">
+                  <AvatarImage src={profile.avatarUrl || undefined} alt={profile.name} />
                   <AvatarFallback className="bg-primary/10 text-primary text-2xl">
                     {getInitials(profile.name)}
                   </AvatarFallback>
                 </Avatar>
-                <Button variant="outline">Alterar Foto</Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={avatarLoading}
+                >
+                  {avatarLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+                  Alterar Foto
+                </Button>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
@@ -397,18 +487,21 @@ export default function SettingsPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Senha atual</Label>
-                    <Input type="password" />
+                    <Input type="password" value={passwords.current} onChange={(e) => setPasswords({...passwords, current: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label>Nova senha</Label>
-                    <Input type="password" />
+                    <Input type="password" value={passwords.new} onChange={(e) => setPasswords({...passwords, new: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label>Confirmar nova senha</Label>
-                    <Input type="password" />
+                    <Input type="password" value={passwords.confirm} onChange={(e) => setPasswords({...passwords, confirm: e.target.value})} />
                   </div>
                 </div>
-                <Button variant="outline">Alterar Senha</Button>
+                <Button variant="outline" onClick={handleChangePassword} disabled={passwordLoading}>
+                  {passwordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Alterar Senha
+                </Button>
               </div>
 
               <Separator />
