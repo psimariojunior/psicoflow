@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Heart, Shield, Award, Mail } from "lucide-react"
+import { ArrowLeft, Heart, Shield, Award, Mail, MessageSquare } from "lucide-react"
 
 export default function SobrePage() {
   return (
@@ -55,10 +55,16 @@ export default function SobrePage() {
 
             <h2>Contato</h2>
             <p>Quer saber mais ou tem sugestões? Entre em contato:</p>
-            <a href="mailto:contato@psicoflow.com.br" className="inline-flex items-center gap-2 text-primary hover:underline">
-              <Mail className="h-4 w-4" />
-              contato@psicoflow.com.br
-            </a>
+            <div className="flex flex-col gap-2 not-prose">
+              <a href="mailto:psi_mariojunior@hotmail.com" className="inline-flex items-center gap-2 text-primary hover:underline">
+                <Mail className="h-4 w-4" />
+                psi_mariojunior@hotmail.com
+              </a>
+              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
+                <MessageSquare className="h-4 w-4" />
+                WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </div>
