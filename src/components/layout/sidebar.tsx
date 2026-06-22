@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import {
@@ -28,6 +28,7 @@ import {
   BookOpen,
   ListTodo,
   LogOut,
+  Shield,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -63,6 +64,12 @@ const menuItems = [
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "ADMIN"
+
+  const allMenuItems = isAdmin
+    ? [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
+    : menuItems
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-background dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 border-r relative">
@@ -93,7 +100,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
 
       <ScrollArea className="flex-1 py-2 relative">
         <nav className="flex flex-col gap-1 px-3">
-          {menuItems.map((item) => {
+          {allMenuItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
               <Link
