@@ -24,7 +24,7 @@ const publicApiPrefixes = [
   "/api/recibos", "/api/lista-espera",
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
-  "/api/pagamentos/public-checkout", "/api/setup",
+  "/api/pagamentos/public-checkout", "/api/setup/promote-me",
 ]
 
 const staticPrefixes = ["/_next", "/static"]

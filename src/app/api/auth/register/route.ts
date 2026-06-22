@@ -45,13 +45,17 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
+    // Auto-promote first user to ADMIN
+    const adminCount = await prisma.user.count({ where: { role: "ADMIN" } })
+    const userRole = adminCount === 0 ? "ADMIN" : "PSYCHOLOGIST"
+
     const user = await prisma.user.create({
       data: {
         name: sanitizedName,
         email,
         password: hashedPassword,
         crp: crp || null,
-        role: "PSYCHOLOGIST",
+        role: userRole,
         permissions: {
           create: {},
         },
