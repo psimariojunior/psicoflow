@@ -127,6 +127,12 @@ export default function LoginPage() {
               Não tem conta? Cadastre-se
             </Link>
           </p>
+
+          <p className="text-center mt-4">
+            <Link href="/sala-virtual/entrar" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Clique aqui para acessar a sala virtual
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import {
@@ -26,6 +27,7 @@ import {
   Heart,
   BookOpen,
   ListTodo,
+  LogOut,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -131,20 +133,39 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
 
       <div className="border-t p-4 relative">
         {!collapsed ? (
-          <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-500/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-blue-200" />
-              <p className="text-sm font-semibold">CRP 04/52274</p>
+          <div className="space-y-3">
+            <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-4 w-4 text-blue-200" />
+                <p className="text-sm font-semibold">CRP 04/52274</p>
+              </div>
+              <p className="text-xs text-blue-100/80 leading-relaxed">
+                Mário Júnior · Gestalt-Terapia
+              </p>
             </div>
-            <p className="text-xs text-blue-100/80 leading-relaxed">
-              Mário Júnior · Gestalt-Terapia
-            </p>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="text-sm font-medium">Sair</span>
+            </Button>
           </div>
         ) : (
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20">
               <Heart className="h-5 w-5 text-white" />
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => signOut({ callbackUrl: "/" })}
+              title="Sair"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         )}
       </div>
