@@ -60,6 +60,7 @@ const menuItems = [
   { href: "/lista-espera", label: "Lista de Espera", icon: ClipboardList },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
   { href: "/ajuda", label: "Ajuda", icon: BookOpen },
+  { href: "/blog", label: "Blog", icon: BookOpen },
 ]
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {

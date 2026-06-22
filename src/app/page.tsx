@@ -336,6 +336,7 @@ export default function LandingPage() {
                 <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
                 <li><Link href="/#sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
                 <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/termos" className="text-sm text-slate-300 hover:text-white transition-colors">Termos de Uso</Link></li>
                 <li><Link href="/privacidade" className="text-sm text-slate-300 hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
