@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 export async function GET() {
   try {
     const psychologists = await prisma.user.findMany({
-      where: { role: "PSYCHOLOGIST", active: true },
+      where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] }, active: true },
       select: {
         id: true,
         name: true,
