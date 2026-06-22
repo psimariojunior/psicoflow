@@ -14,8 +14,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { id } = await params
 
-    const questionnaire = await prisma.questionnaire.findUnique({
-      where: { id },
+    const questionnaire = await prisma.questionnaire.findFirst({
+      where: { id, psychologistId: session.user.id },
       include: {
         questions: {
           orderBy: { questionOrder: "asc" },

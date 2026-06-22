@@ -16,8 +16,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const body = await req.json()
     const { answers, notes } = body
 
-    const questionnaire = await prisma.questionnaire.findUnique({
-      where: { id },
+    const questionnaire = await prisma.questionnaire.findFirst({
+      where: { id, psychologistId: session.user.id },
       include: { questions: true },
     })
 
