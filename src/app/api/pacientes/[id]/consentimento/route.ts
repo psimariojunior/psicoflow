@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

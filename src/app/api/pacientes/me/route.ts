@@ -5,6 +5,8 @@ import { verifyPatientToken } from "@/lib/patient-auth"
 import { validate, updatePatientSelfSchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
 
+export const dynamic = "force-dynamic"
+
 async function authenticate(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (!authHeader?.startsWith("Bearer ")) return null

@@ -5,6 +5,8 @@ import { sendWhatsAppMessage } from "@/lib/whatsapp"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const rateLimit = rateLimitMiddleware(10, 60000)
 
 function checkAuth(request: Request): { authorized: boolean; url: URL } {

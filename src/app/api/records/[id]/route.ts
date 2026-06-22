@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const updateRecordSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   content: z.string().max(10000).optional(),

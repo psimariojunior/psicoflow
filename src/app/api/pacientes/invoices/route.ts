@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { verifyPatientToken } from "@/lib/patient-auth"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(request: Request) {
   try {
     const authHeader = request.headers.get("authorization")

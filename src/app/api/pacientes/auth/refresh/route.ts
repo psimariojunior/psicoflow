@@ -3,6 +3,8 @@ import { verifyPatientToken, signPatientToken } from "@/lib/patient-auth"
 import { logger } from "@/lib/logger"
 import { apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(request: NextRequest) {
   try {
     const auth = request.headers.get("authorization")

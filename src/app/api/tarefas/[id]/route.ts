@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

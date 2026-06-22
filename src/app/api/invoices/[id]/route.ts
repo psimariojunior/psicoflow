@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const updateInvoiceSchema = z.object({
   status: z.enum(["PENDING", "PAID", "OVERDUE", "CANCELLED", "REFUNDED"]).optional(),
   paymentMethod: z.string().max(100).optional(),

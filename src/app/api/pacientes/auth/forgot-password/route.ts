@@ -6,6 +6,8 @@ import { sendPasswordResetEmail } from "@/lib/email"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { validate, forgotPasswordSchema } from "@/lib/validation"
 
+export const dynamic = "force-dynamic"
+
 function getSecret(): Uint8Array {
   const key = process.env.ENCRYPTION_KEY
   if (!key) throw new Error("ENCRYPTION_KEY não configurada")

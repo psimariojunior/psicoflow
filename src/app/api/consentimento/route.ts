@@ -6,6 +6,8 @@ import { verifyPatientToken } from "@/lib/patient-auth"
 import { apiError, apiSuccess } from "@/lib/api-helpers"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const consentSchema = z.object({
   type: z.string().min(1, "Tipo é obrigatório").max(100),
   content: z.string().max(5000).optional().or(z.literal("")),

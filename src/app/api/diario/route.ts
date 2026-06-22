@@ -5,6 +5,8 @@ import { validate, createDiaryEntrySchema } from "@/lib/validation"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const psychologistId = await requireAuth()

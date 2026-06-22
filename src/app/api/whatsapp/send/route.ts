@@ -5,6 +5,8 @@ import { sendTextMessage, sendAppointmentReminderWhatsApp } from "@/lib/whatsapp
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const sendSchema = z.object({
   patientId: z.string().optional(),
   phone: z.string().min(10),

@@ -5,6 +5,8 @@ import { validate, updatePatientSchema } from "@/lib/validation"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 import { logger } from "@/lib/logger"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

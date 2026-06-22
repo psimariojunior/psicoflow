@@ -6,6 +6,8 @@ import { logAudit, sanitizeHtml } from "@/lib/security"
 import { validate, createPatientSchema } from "@/lib/validation"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(request: NextRequest) {
   try {
     const psychologistId = await requireAuth()

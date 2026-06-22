@@ -5,6 +5,8 @@ import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const createAttachmentSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").max(255),
   type: z.string().min(1, "Tipo é obrigatório").max(100),

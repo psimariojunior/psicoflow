@@ -8,6 +8,8 @@ import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { validateOrigin } from "@/lib/csrf"
 import { sanitizeHtml } from "@/lib/security"
 
+export const dynamic = "force-dynamic"
+
 const publicBookingSchema = z.object({
   name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres").max(120, "Nome muito longo"),
   email: z.string().email("Email inválido").max(255).optional().or(z.literal("")),

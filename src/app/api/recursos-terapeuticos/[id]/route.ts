@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const updateResourceSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().max(2000).optional().or(z.literal("")),

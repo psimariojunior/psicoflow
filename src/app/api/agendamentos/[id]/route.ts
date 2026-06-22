@@ -8,6 +8,8 @@ import { syncAppointmentToCalendar } from "@/lib/google-calendar"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const updateAppointmentSchema = z.object({
   status: z.enum(["SCHEDULED", "CONFIRMED", "CANCELLED", "COMPLETED", "DELETE"]).optional(),
   startTime: z.string().optional(),

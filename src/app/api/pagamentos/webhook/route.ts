@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { getStripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe"
 import type Stripe from "stripe"
 
+export const dynamic = "force-dynamic"
+
 function getSubPeriodStart(sub: Stripe.Subscription): number | null {
   const item = sub.items.data[0]
   return item?.current_period_start ?? null

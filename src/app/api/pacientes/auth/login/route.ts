@@ -7,6 +7,8 @@ import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { validateOrigin } from "@/lib/csrf"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const loginSchema = z.object({
   email: z.string().email("Email inválido").max(255),
   password: z.string().min(1, "Senha é obrigatória").max(128),

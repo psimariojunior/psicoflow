@@ -8,6 +8,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { logger } from "@/lib/logger"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const notificationSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(200),
   message: z.string().min(1, "Mensagem é obrigatória").max(2000),

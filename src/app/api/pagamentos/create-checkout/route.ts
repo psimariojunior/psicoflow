@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { getStripe } from "@/lib/stripe"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(request: NextRequest) {
   try {
     const psychologistId = await requireAuth()

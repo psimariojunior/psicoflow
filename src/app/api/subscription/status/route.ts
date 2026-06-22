@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { isPlanActive } from "@/lib/plan"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const userId = await requireAuth()

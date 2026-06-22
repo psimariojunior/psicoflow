@@ -4,6 +4,8 @@ import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { getStripe } from "@/lib/stripe"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const checkoutSchema = z.object({
   plan: z.enum(["pro", "clinica"]),
 })

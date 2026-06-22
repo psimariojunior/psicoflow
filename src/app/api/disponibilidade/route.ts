@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const psychologistId = await requireAuth()

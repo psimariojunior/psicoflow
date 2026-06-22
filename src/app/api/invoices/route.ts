@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const createInvoiceSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória").max(500),
   amount: z.number().positive("Valor deve ser positivo"),

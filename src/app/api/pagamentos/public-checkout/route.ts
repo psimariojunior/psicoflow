@@ -7,6 +7,8 @@ import { validateOrigin } from "@/lib/csrf"
 import { apiError, apiSuccess } from "@/lib/api-helpers"
 import { verifyPatientToken } from "@/lib/patient-auth"
 
+export const dynamic = "force-dynamic"
+
 async function getPatientFromToken(request: NextRequest): Promise<string | null> {
   const auth = request.headers.get("authorization")
   if (!auth?.startsWith("Bearer ")) return null

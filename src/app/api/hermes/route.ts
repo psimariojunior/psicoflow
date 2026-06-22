@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
+export const dynamic = "force-dynamic"
+
 const VM_API = process.env.HERMES_API_URL || "http://137.131.184.53:8899"
 const API_SECRET = process.env.HERMES_API_SECRET
 if (!API_SECRET) throw new Error("HERMES_API_SECRET não configurada")

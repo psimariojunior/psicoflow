@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess, isAuthError } from "@/lib/api-helpers"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const assignTaskSchema = z.object({
   resourceId: z.string().min(1, "ResourceId é obrigatório"),
   notes: z.string().max(2000).optional().or(z.literal("")),

@@ -5,6 +5,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiSuccess, apiError } from "@/lib/api-helpers"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const createSessionSchema = z.object({
   patientId: z.string(),
   date: z.string().optional(),

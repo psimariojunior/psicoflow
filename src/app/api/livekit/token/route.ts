@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { apiError } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const rateLimit = rateLimitMiddleware(10, 60000)
 
 export async function GET(request: Request) {

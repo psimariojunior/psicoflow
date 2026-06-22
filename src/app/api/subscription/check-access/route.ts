@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { checkPlanAccess } from "@/lib/check-plan"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const userId = await requireAuth()

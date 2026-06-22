@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 const CRON_SECRET = process.env.CRON_SECRET
 
 function isAuthorized(request: Request): boolean {

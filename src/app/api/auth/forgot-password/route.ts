@@ -6,6 +6,8 @@ import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { validate, forgotPasswordSchema } from "@/lib/validation"
 import crypto from "crypto"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(request: Request) {
   const limit = rateLimitMiddleware(5, 60000)
   const blocked = await limit(request)

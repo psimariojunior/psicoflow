@@ -6,6 +6,8 @@ import { logAudit, sanitizeHtml } from "@/lib/security"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { sendEmail } from "@/lib/email"
 
+export const dynamic = "force-dynamic"
+
 const registerSchema = z.object({
   name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres").max(120, "Nome muito longo"),
   email: z.string().email("Email inválido").max(255),

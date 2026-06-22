@@ -6,6 +6,8 @@ import { logger } from "@/lib/logger"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 const updateSessionSchema = z.object({
   action: z.enum(["start", "pause", "resume", "end"]).optional(),
   subjective: z.string().max(10000).optional(),

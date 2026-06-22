@@ -6,6 +6,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { z } from "zod"
 
+export const dynamic = "force-dynamic"
+
 const rateLimit = rateLimitMiddleware(100, 60000)
 
 const diarySchema = z.object({

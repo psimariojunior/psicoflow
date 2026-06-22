@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { getStripe } from "@/lib/stripe"
 
+export const dynamic = "force-dynamic"
+
 export async function POST() {
   try {
     const userId = await requireAuth()

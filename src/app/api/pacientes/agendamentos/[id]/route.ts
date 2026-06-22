@@ -8,6 +8,8 @@ import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 
+export const dynamic = "force-dynamic"
+
 const rateLimit = rateLimitMiddleware(10, 60000)
 
 const cancelSchema = z.object({

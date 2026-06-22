@@ -4,6 +4,8 @@ import { logger } from "@/lib/logger"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { sendEmail } from "@/lib/email"
 
+export const dynamic = "force-dynamic"
+
 export async function POST(
   _request: NextRequest,
   { params }: { params: { id: string } }

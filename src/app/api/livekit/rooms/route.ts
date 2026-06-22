@@ -2,6 +2,8 @@ import { RoomServiceClient } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 
+export const dynamic = "force-dynamic"
+
 function getLiveKitConfig() {
   const raw = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
   const host = raw.replace("wss://", "https://").replace(/\/+$/, "")
