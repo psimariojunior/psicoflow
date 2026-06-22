@@ -1,10 +1,7 @@
-"use client"
-
 import { blogPosts, getBlogPost } from "@/lib/blog-data"
 import Link from "next/link"
 import { ArrowLeft, Calendar, Clock, BookOpen, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 
 export const dynamic = "force-dynamic"
@@ -44,19 +41,24 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           <div className="prose prose-blue dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           <div className="border-t pt-6 mt-8">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Gostou? Compartilhe com outros psicólogos.
-              </p>
-              <Button variant="outline" size="sm" onClick={() => {
-                navigator.clipboard.writeText(window.location.href)
-              }}>
-                <Share2 className="mr-2 h-4 w-4" /> Copiar Link
-              </Button>
-            </div>
+            <ShareButton />
           </div>
         </article>
       </div>
+    </div>
+  )
+}
+
+function ShareButton() {
+  return (
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-muted-foreground">Gostou? Compartilhe com outros psicólogos.</p>
+      <button
+        onClick={() => navigator.clipboard.writeText(window.location.href)}
+        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+      >
+        <Share2 className="mr-2 h-4 w-4" /> Copiar Link
+      </button>
     </div>
   )
 }
