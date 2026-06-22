@@ -10,7 +10,7 @@ const publicPages = [
 ]
 
 const publicPrefixes = [
-  "/reset-password", "/sala-virtual/entrar", "/agendar", "/paciente",
+  "/reset-password", "/sala-virtual/entrar", "/agendar", "/paciente", "/blog",
 ]
 
 const publicApiPrefixes = [
