@@ -1,3 +1,5 @@
+"use client"
+
 import { blogPosts, getBlogPost } from "@/lib/blog-data"
 import Link from "next/link"
 import { ArrowLeft, Calendar, Clock, BookOpen, Share2 } from "lucide-react"
