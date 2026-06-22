@@ -33,43 +33,31 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   const [currentTipIndex, setCurrentTipIndex] = useState(0)
   const [breathPhase, setBreathPhase] = useState(0)
   const [breathProgress, setBreathProgress] = useState(0)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const audioCtxRef = useRef<AudioContext | null>(null)
+  const [soundEnabled, setSoundEnabled] = useState(false)
+  const [audioStarted, setAudioStarted] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const isPlayingRef = useRef(false)
 
-  useEffect(() => {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    ctx.resume()
-    audioCtxRef.current = ctx
-    return () => { ctx.close() }
-  }, [])
-
-  useEffect(() => {
-    if (soundEnabled && audioCtxRef.current?.state === "suspended") {
-      audioCtxRef.current.resume()
-    }
-  }, [soundEnabled])
-
-  const playNote = useCallback((_freq: number, _duration: number) => {}, [])
-
-  useEffect(() => {
-    if (isPlayingRef.current || !soundEnabled) return
-    isPlayingRef.current = true
-
-    const audio = new Audio("/Amazing Grace - Instrumental.mp3")
+  const startAudio = useCallback(() => {
+    if (audioStarted) return
+    setAudioStarted(true)
+    setSoundEnabled(true)
+    const audio = new Audio("/amazing-grace.mp3")
     audio.loop = true
-    audio.volume = 0.6
+    audio.volume = 0.5
     audioRef.current = audio
-
     audio.play().catch(() => {})
+  }, [audioStarted])
 
-    return () => {
-      audio.pause()
-      audio.src = ""
-      isPlayingRef.current = false
-    }
-  }, [soundEnabled])
+  const toggleSound = useCallback(() => {
+    setSoundEnabled(prev => {
+      const next = !prev
+      if (audioRef.current) {
+        if (next) audioRef.current.play().catch(() => {})
+        else audioRef.current.pause()
+      }
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     const tipInterval = setInterval(() => {
@@ -107,7 +95,25 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-[#0a1120] to-slate-900">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-[#0a1120] to-slate-900 relative">
+      {/* Audio activation overlay */}
+      {!audioStarted && (
+        <div 
+          className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-pointer"
+          onClick={startAudio}
+        >
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-blue-500/20 border-2 border-blue-400/40 flex items-center justify-center mx-auto animate-pulse">
+              <Volume2 className="h-8 w-8 text-blue-400" />
+            </div>
+            <div>
+              <p className="text-white font-medium">Clique para ativar o som</p>
+              <p className="text-white/50 text-sm mt-1">Amazing Grace — Violino</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute top-1/4 -left-48 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
@@ -191,7 +197,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
           <Button
             className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
             size="lg"
-            onClick={onEnterRoom}
+            onClick={() => { startAudio(); onEnterRoom(); }}
             disabled={connecting}
           >
             {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Music className="mr-2 h-5 w-5" />}
