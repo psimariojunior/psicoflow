@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563EB">
+  <title>PsicoFlow - Offline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 48px 32px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .icon {
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 40px;
+    }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    p { font-size: 15px; opacity: 0.9; margin-bottom: 24px; line-height: 1.5; }
+    .btn {
+      display: inline-block;
+      background: white;
+      color: #2563eb;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .features { margin-top: 32px; text-align: left; }
+    .features p { font-size: 13px; opacity: 0.7; margin-bottom: 8px; }
+    .features span { display: block; font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>Você está offline</h1>
+    <p>Verifique sua conexão com a internet e tente novamente.</p>
+    <button class="btn" onclick="window.location.reload()">Tentar Novamente</button>
+    <div class="features">
+      <p>Enquanto offline você pode:</p>
+      <span>✓ Acessar dados salvos em cache</span>
+      <span>✓ Navegar entre páginas visitadas</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -12,6 +12,11 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "cap:build": "npx cap sync android && cd android && ./gradlew assembleDebug",
+    "cap:build:release": "npx cap sync android && cd android && ./gradlew assembleRelease",
+    "cap:build:bundle": "npx cap sync android && cd android && ./gradlew bundleRelease",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
@@ -19,6 +24,9 @@
     "postinstall": "node scripts/patch-next-auth.mjs && prisma generate || true"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
     "@livekit/components-react": "^2.9.21",
     "@livekit/components-styles": "^1.2.0",
     "@next-auth/prisma-adapter": "^1.0.7",

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PsicoFlow</string>
+    <string name="title_activity_main">PsicoFlow</string>
+    <string name="package_name">com.psicoflow.app</string>
+    <string name="custom_url_scheme">com.psicoflow.app</string>
+</resources>

@@ -1,13 +1,10 @@
-const CACHE = "psicoflow-v5"
-const STATIC_CACHE = "psicoflow-static-v5"
-const IMAGE_CACHE = "psicoflow-images-v5"
+const CACHE = "psicoflow-v6"
+const STATIC_CACHE = "psicoflow-static-v6"
+const IMAGE_CACHE = "psicoflow-images-v6"
 
 const PRECACHE_URLS = [
   "/",
-  "/agendar",
-  "/termos",
-  "/privacidade",
-  "/manifest.webmanifest",
+  "/offline.html",
   "/favicon.svg",
   "/favicon-32.png",
   "/pwa-72-v5.png",
@@ -36,24 +33,17 @@ self.addEventListener("install", (event) => {
       caches.open(CACHE).then((cache) => cache.addAll(PRECACHE_URLS)),
       caches.open(STATIC_CACHE),
       caches.open(IMAGE_CACHE),
-    ]).catch(() => {
-      // Silently fail if precaching fails (offline first install)
-    })
+    ]).catch(() => {})
   )
   self.skipWaiting()
 })
 
 self.addEventListener("activate", (event) => {
+  const keepCaches = [CACHE, STATIC_CACHE, IMAGE_CACHE]
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => caches.delete(k)))
-    ).then(() => {
-      self.clients.claim()
-      // Force-reload all open tabs
-      return self.clients.matchAll().then((clients) => {
-        clients.forEach((client) => client.navigate(client.url))
-      })
-    })
+      Promise.all(keys.filter((k) => !keepCaches.includes(k)).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
   )
 })
 
@@ -62,39 +52,32 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url)
 
   if (request.method !== "GET") return
-
-  // API calls: network only
   if (isApi(url.pathname)) return
 
-  // _next/ static: cache-first with long TTL
   if (isNextStatic(url.pathname)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE))
     return
   }
 
-  // Dashboard/patient pages: network-first with offline fallback
   if (isDashboardPage(url.pathname) || request.mode === "navigate") {
-    event.respondWith(networkFirstWithFallback(request))
+    event.respondWith(networkFirstWithOffline(request))
     return
   }
 
-  // Images: cache-first
   if (isImage(url.pathname)) {
     event.respondWith(cacheFirst(request, IMAGE_CACHE))
     return
   }
 
-  // Fonts: cache-first
   if (isFont(url.pathname)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE))
     return
   }
 
-  // Everything else: stale-while-revalidate
   event.respondWith(staleWhileRevalidate(request))
 })
 
-async function networkFirstWithFallback(request) {
+async function networkFirstWithOffline(request) {
   try {
     const response = await fetch(request)
     if (response.status === 200) {
@@ -105,8 +88,7 @@ async function networkFirstWithFallback(request) {
   } catch {
     const cached = await caches.match(request)
     if (cached) return cached
-    // Fallback to root page
-    return caches.match("/")
+    return caches.match("/offline.html")
   }
 }
 

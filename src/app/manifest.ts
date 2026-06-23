@@ -27,7 +27,16 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/pwa-512-v5.png", sizes: "512x512", type: "image/png", purpose: "any" },
       { src: "/pwa-512-v5-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
+    shortcuts: [
+      { name: "Agendar Consulta", url: "/agendar", icons: [{ src: "/pwa-96-v5.png", sizes: "96x96" }] },
+      { name: "Sala Virtual", url: "/sala-virtual", icons: [{ src: "/pwa-96-v5.png", sizes: "96x96" }] },
+    ],
     prefer_related_applications: false,
     display_override: ["standalone", "window-controls-overlay"],
+    handle_links: "preferred",
+    launch_handler: { client_mode: "navigate-existing" },
+    screenshots: [
+      { src: "/og-image.png", sizes: "1200x630", type: "image/png", form_factor: "wide", label: "PsicoFlow Dashboard" },
+    ],
   }
 }
