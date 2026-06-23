@@ -1,185 +1,100 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { X, ChevronRight, ChevronLeft, Check, MousePointer2 } from "lucide-react"
+import { X, ChevronRight, ChevronLeft, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface TourStep {
-  title: string
-  desc: string
-  href?: string
-  selector?: string
-  tip: string
-}
-
-const steps: TourStep[] = [
+const steps = [
   {
-    title: "Menu de Navegação",
-    desc: "Por aqui você acessa todas as funcionalidades da plataforma.",
-    selector: "nav[data-tour]",
-    tip: "→ Clique nos itens para navegar",
+    badge: "Passo 1 de 7",
+    title: "Bem-vindo ao PsicoFlow!",
+    desc: "Vamos te mostrar como usar a plataforma. Cada passo te leva até a funcionalidade correspondente.",
+    visual: "welcome",
   },
   {
-    title: "Estatísticas Rápidas",
-    desc: "Veja seus números principais: pacientes, consultas de hoje e receita mensal.",
-    selector: "[data-tour='stats']",
-    tip: "→ Dados atualizados em tempo real",
-  },
-  {
-    title: "Ações Rápidas",
-    desc: "Atalhos para as funções mais usadas. Clique direto para acessar.",
-    selector: "[data-tour='quick']",
-    tip: "→ Nova consulta, paciente, sala virtual",
-  },
-  {
-    title: "Cadastre Pacientes",
-    desc: "Vá em Pacientes → Novo Paciente. Preencha nome, email e telefone para começar.",
+    badge: "Passo 2 de 7",
+    title: "Cadastre seu primeiro paciente",
+    desc: "Acesse 'Pacientes' no menu lateral e clique em 'Novo Paciente'. Preencha nome, email e telefone.",
+    visual: "patients",
     href: "/pacientes",
-    tip: "→ Primeiro passo para usar a plataforma",
   },
   {
-    title: "Agende Consultas",
-    desc: "Selecione o paciente, data e horário. A consulta aparece na agenda automaticamente.",
+    badge: "Passo 3 de 7",
+    title: "Agende uma consulta",
+    desc: "Vá em 'Agenda' e selecione o paciente, data e horário. A consulta aparece automaticamente na agenda do dia.",
+    visual: "calendar",
     href: "/agenda",
-    tip: "→ Gerencie toda sua agenda aqui",
   },
   {
-    title: "Sala Virtual",
-    desc: "Crie salas de videochamada seguras e criptografadas para atender seus pacientes.",
+    badge: "Passo 4 de 7",
+    title: "Inicie uma videochamada",
+    desc: "Acesse 'Sala Virtual', crie uma sala e compartilhe o link com o paciente. A chamada é criptografada e segura.",
+    visual: "video",
     href: "/sala-virtual",
-    tip: "→ Compartilhe o link com o paciente",
   },
   {
-    title: "Prontuários",
-    desc: "Registre observações e acompanhe o histórico de cada paciente.",
+    badge: "Passo 5 de 7",
+    title: "Registre a sessão",
+    desc: "Após a consulta, registre suas observações no prontuário do paciente. Mantenha o histórico organizado.",
+    visual: "records",
     href: "/prontuarios",
-    tip: "→ Organize suas sessões",
   },
   {
-    title: "Configurações",
-    desc: "Configure perfil, foto, CRP, lembretes e integrações.",
+    badge: "Passo 6 de 7",
+    title: "Configure seu perfil",
+    desc: "Complete seus dados profissionais, foto, CRP e informações de contato para que os pacientes possam te encontrar.",
+    visual: "settings",
     href: "/configuracoes",
-    tip: "→ Complete seu perfil profissional",
   },
   {
-    title: "Tudo Pronto!",
-    desc: "Explore relatórios, finanças, questionários e mais no menu lateral.",
-    tip: "→ Boa prática!",
+    badge: "Passo 7 de 7",
+    title: "Tudo pronto!",
+    desc: "Explore relatórios, finanças, questionários e muito mais. O PsicoFlow foi feito para simplificar sua prática clínica.",
+    visual: "done",
   },
 ]
 
-const KEY = "psicoflow-tour-v9"
+const visualColors: Record<string, string> = {
+  welcome: "from-blue-500 to-blue-700",
+  patients: "from-emerald-500 to-emerald-700",
+  calendar: "from-violet-500 to-violet-700",
+  video: "from-cyan-500 to-cyan-700",
+  records: "from-amber-500 to-amber-700",
+  settings: "from-rose-500 to-rose-700",
+  done: "from-blue-500 to-blue-700",
+}
+
+const KEY = "psicoflow-tour-v10"
 
 export function OnboardingTour() {
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(0)
-  const [rect, setRect] = useState<{ top: number; left: number; w: number; h: number } | null>(null)
-  const [tooltip, setTooltip] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const [visible, setVisible] = useState(false)
-  const [fadeDir, setFadeDir] = useState<"in" | "out">("in")
-  const timerRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
     if (!localStorage.getItem(KEY) && pathname === "/dashboard") {
-      const t = setTimeout(() => setOpen(true), 600)
+      const t = setTimeout(() => { setOpen(true); setTimeout(() => setVisible(true), 100) }, 600)
       return () => clearTimeout(t)
     }
   }, [pathname])
 
-  useEffect(() => () => timerRef.current.forEach(clearTimeout), [])
-
-  const clearAll = () => { timerRef.current.forEach(clearTimeout); timerRef.current = [] }
-
-  const positionTooltip = useCallback((r: { top: number; left: number; w: number; h: number }) => {
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    const tw = 340
-    const th = 200
-    const g = 24
-
-    // For sidebar (left side): center vertically on screen
-    if (r.left < 300) {
-      const top = Math.max(g, Math.min(Math.round(vh / 2 - th / 2), vh - th - g))
-      const left = r.left + r.w + g
-      setTooltip({ top, left: left + tw > vw - g ? r.left - tw - g : left })
-      return
-    }
-
-    // For center content: right of element
-    let top = Math.round(r.top + r.h / 2 - th / 2)
-    let left = r.left + r.w + g
-    if (left + tw > vw - g) left = r.left - tw - g
-    if (left < g) left = Math.round((vw - tw) / 2)
-    if (top < g) top = g
-    if (top + th > vh - g) top = vh - th - g
-    setTooltip({ top, left })
-  }, [])
-
-  const findElement = useCallback((attempt: number) => {
-    clearAll()
-    const s = steps[step]
-    if (!s.selector) { setRect(null); return }
-
-    const el = document.querySelector(s.selector)
-    if (el) {
-      const r = el.getBoundingClientRect()
-      if (r.width > 10 && r.height > 10) {
-        setRect({ top: r.top, left: r.left, w: r.width, h: r.height })
-        positionTooltip({ top: r.top, left: r.left, w: r.width, h: r.height })
-        return
-      }
-    }
-    if (attempt < 40) {
-      const t = setTimeout(() => findElement(attempt + 1), 150)
-      timerRef.current.push(t)
-    } else {
-      setRect(null)
-    }
-  }, [step, positionTooltip])
-
-  useEffect(() => {
-    if (!open) return
-    const t = setTimeout(() => findElement(0), 100)
-    timerRef.current.push(t)
-    return () => clearAll()
-  }, [open, step, pathname, findElement])
-
-  useEffect(() => {
-    if (!open || !rect) return
-    const onScroll = () => {
-      const el = document.querySelector(steps[step].selector || "")
-      if (el) {
-        const r = el.getBoundingClientRect()
-        setRect({ top: r.top, left: r.left, w: r.width, h: r.height })
-        positionTooltip({ top: r.top, left: r.left, w: r.width, h: r.height })
-      }
-    }
-    window.addEventListener("scroll", onScroll, true)
-    return () => window.removeEventListener("scroll", onScroll, true)
-  }, [open, rect, step, positionTooltip])
-
-  const finish = () => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0); setRect(null); clearAll() }
-
-  const go = (n: number, dir: "n" | "p") => {
-    setFadeDir("out")
+  const finish = () => {
     setVisible(false)
-    clearAll()
+    setTimeout(() => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0) }, 300)
+  }
+
+  const goTo = (n: number) => {
+    setVisible(false)
     setTimeout(() => {
       setStep(n)
       setVisible(true)
-      setFadeDir("in")
       const s = steps[n]
       if (s.href && s.href !== pathname) router.push(s.href)
     }, 250)
   }
-
-  const next = () => step < steps.length - 1 ? go(step + 1, "n") : finish()
-  const prev = () => step > 0 && go(step - 1, "p")
-
-  useEffect(() => { if (open) { const t = setTimeout(() => setVisible(true), 100); timerRef.current.push(t) } }, [open])
 
   if (!open) return null
   const s = steps[step]
@@ -187,28 +102,63 @@ export function OnboardingTour() {
   const last = step === steps.length - 1
 
   return (
-    <div className="fixed inset-0 z-[90]" onClick={finish}>
-      <div className="fixed inset-0 bg-black/50" />
-      {rect && (
-        <div className="fixed z-[91] pointer-events-none" style={{ top: rect.top - 8, left: rect.left - 8, width: rect.w + 16, height: rect.h + 16, border: "2px solid #3b82f6", borderRadius: "10px", boxShadow: "0 0 0 9999px rgba(0,0,0,0.5), 0 0 16px rgba(59,130,246,0.5)" }} />
-      )}
-      <div onClick={e => e.stopPropagation()} className="fixed z-[95]" style={{ top: tooltip.top, left: tooltip.left, width: 340, opacity: visible ? 1 : 0, transform: `translateY(${fadeDir === "in" ? 0 : 10}px)`, transition: "all 0.3s ease" }}>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">
-          <div className="h-1 bg-slate-100 dark:bg-slate-800"><div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${pct}%` }} /></div>
-          <div className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-full">{step + 1}/{steps.length}</span>
-              <button onClick={finish} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><X className="h-3.5 w-3.5" /></button>
+    <div className="fixed inset-0 z-[90] flex items-center justify-center" onClick={finish}>
+      <div className="fixed inset-0 bg-black/40" />
+      <div onClick={e => e.stopPropagation()} className="relative z-[91] w-full max-w-lg mx-4">
+        <div
+          className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 ease-out"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? "scale(1)" : "scale(0.95)" }}
+        >
+          {/* Visual Header */}
+          <div className={`relative h-40 bg-gradient-to-br ${visualColors[s.visual]} flex items-center justify-center overflow-hidden`}>
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGciPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2LTJoMTJ6TTM2IDE4djJIMjR2LTJoMTJ6TTM4IDMwdjJIMjZ2LTJoMTJ6TTM4IDI0djJIMjZ2LTJoMTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+            <div className="relative text-center text-white">
+              <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
+                <span className="text-4xl">{s.visual === "welcome" ? "👋" : s.visual === "patients" ? "👥" : s.visual === "calendar" ? "📅" : s.visual === "video" ? "🎥" : s.visual === "records" ? "📋" : s.visual === "settings" ? "⚙️" : "🚀"}</span>
+              </div>
+              <p className="text-sm font-medium text-white/80">{s.badge}</p>
             </div>
-            <h4 className="font-bold text-base mb-1">{s.title}</h4>
-            <p className="text-[13px] text-slate-500 leading-relaxed mb-1">{s.desc}</p>
-            <p className="text-[11px] text-blue-500 font-medium mb-4">{s.tip}</p>
+            <button onClick={finish} className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Progress */}
+          <div className="h-1 bg-slate-100 dark:bg-slate-800">
+            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${pct}%` }} />
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold mb-2">{s.title}</h3>
+            <p className="text-sm text-slate-500 leading-relaxed mb-6">{s.desc}</p>
+
+            {/* Step indicators */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {steps.map((_, i) => (
+                <div key={i} className={cn(
+                  "h-2 rounded-full transition-all duration-300",
+                  i === step ? "w-8 bg-blue-600" : i < step ? "w-2 bg-blue-300" : "w-2 bg-slate-200 dark:bg-slate-700"
+                )} />
+              ))}
+            </div>
+
+            {/* Actions */}
             <div className="flex items-center justify-between">
-              <button onClick={finish} className="text-[11px] text-slate-400 hover:text-slate-600">Pular</button>
-              <div className="flex gap-1.5">
-                {step > 0 && <button onClick={prev} className="h-8 px-3 rounded-lg text-[11px] font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Voltar</button>}
-                <button onClick={next} className={cn("h-8 px-4 rounded-lg text-[11px] font-semibold text-white shadow-md transition", last ? "bg-emerald-600 hover:bg-emerald-500" : "bg-blue-600 hover:bg-blue-500")}>
-                  {last ? <span className="flex items-center gap-1"><Check className="h-3 w-3" />Concluir</span> : <span className="flex items-center gap-1">Próximo<ChevronRight className="h-3 w-3" /></span>}
+              <button onClick={finish} className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
+                Pular tour
+              </button>
+              <div className="flex gap-2">
+                {step > 0 && (
+                  <button onClick={() => goTo(step - 1)} className="h-10 px-4 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-1">
+                    <ChevronLeft className="h-4 w-4" /> Voltar
+                  </button>
+                )}
+                <button onClick={() => last ? finish() : goTo(step + 1)} className={cn(
+                  "h-10 px-6 rounded-xl text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl flex items-center gap-1.5",
+                  last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600"
+                )}>
+                  {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}
                 </button>
               </div>
             </div>
