@@ -88,7 +88,16 @@ export default function QuestionariosPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg">{q.title}</CardTitle>
-                      <span className={cn("inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1", q.type === "PHQ9" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700")}>{q.type}</span>
+                      <span className={cn("inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1",
+                        q.type === "PHQ9" ? "bg-blue-100 text-blue-700" :
+                        q.type === "GAD7" ? "bg-purple-100 text-purple-700" :
+                        q.type === "BAI" ? "bg-orange-100 text-orange-700" :
+                        q.type === "BDI" ? "bg-indigo-100 text-indigo-700" :
+                        q.type === "PSS" ? "bg-teal-100 text-teal-700" :
+                        q.type === "ISI" ? "bg-slate-200 text-slate-700" :
+                        q.type === "WHOQOL" ? "bg-emerald-100 text-emerald-700" :
+                        "bg-gray-100 text-gray-700"
+                      )}>{q.type}</span>
                     </div>
                     {lr && <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />}
                   </div>

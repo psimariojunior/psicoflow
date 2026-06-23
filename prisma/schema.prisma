@@ -661,9 +661,12 @@ model BackupLog {
 enum QuestionnaireType {
   PHQ9
   GAD7
+  BAI
+  BDI
   BECK
   WHOQOL
   PSS
+  ISI
   MINI
   CUSTOM
 }
