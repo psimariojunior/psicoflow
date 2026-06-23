@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const { name, email, phone, password, cpf, rg, dateOfBirth, gender, maritalStatus, profession, company, address, neighborhood, city, state, zipCode, emergencyContact, emergencyPhone, healthInsurance, insuranceNumber, referredBy, howFound, observations } = parse.data
 
     const psychologist = await prisma.user.findFirst({
-      where: { role: "PSYCHOLOGIST", active: true },
+      where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] }, active: true },
       orderBy: { createdAt: "asc" },
     })
 
