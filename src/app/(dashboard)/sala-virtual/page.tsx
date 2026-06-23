@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, useRemoteParticipants, VideoTrack, useRoomContext, RoomAudioRenderer } from "@livekit/components-react"
 import { Track, RoomEvent, type LocalTrackPublication } from "livekit-client"
 import "@livekit/components-styles"
-import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User, Shield, Zap } from "lucide-react"
+import { Video, VideoOff, Mic, MicOff, Loader2, Link2, Copy, LogOut, User, Shield, Zap, Pause, Play, FileText, Clock } from "lucide-react"
 import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
 
@@ -17,6 +18,8 @@ export default function VirtualRoomPage() {
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
   const [origin, setOrigin] = useState("")
+  const [liveDuration, setLiveDuration] = useState(0)
+  const [endedSession, setEndedSession] = useState<{ duration: number } | null>(null)
 
   useEffect(() => { setOrigin(window.location.origin) }, [])
 
@@ -60,9 +63,10 @@ export default function VirtualRoomPage() {
       return
     }
     setEnding(false)
+    setEndedSession({ duration: liveDuration })
     setToken(null)
     setRoomName(`sala-${Date.now()}`)
-  }, [roomName])
+  }, [roomName, liveDuration])
 
   const patientLink = origin ? `${origin}/sala-virtual/entrar?room=${encodeURIComponent(sanitize(roomName))}` : ""
 
@@ -90,18 +94,61 @@ export default function VirtualRoomPage() {
               connect={true}
               video={true}
               audio={{ echoCancellation: true, noiseSuppression: true, autoGainControl: true }}
-              onDisconnected={() => setToken(null)}
+              onDisconnected={() => { setEndedSession({ duration: liveDuration }); setToken(null) }}
               onError={(e) => console.error("LiveKit error:", e)}
               style={{ height: "100%" }}
             >
               <ErrorBoundary>
                 <RoomAudioRenderer />
-                <PsychologistInCall roomName={roomName} onEndRoom={handleEndRoom} />
+                <PsychologistInCall roomName={roomName} onEndRoom={handleEndRoom} onDurationChange={setLiveDuration} />
               </ErrorBoundary>
             </LiveKitRoom>
           </div>
         </div>
       </ErrorBoundary>
+    )
+  }
+
+  if (endedSession) {
+    const mins = Math.floor(endedSession.duration / 60)
+    const secs = endedSession.duration % 60
+    const durationLabel = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-6 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-xl shadow-emerald-500/30 mx-auto">
+            <Clock className="h-8 w-8 text-white" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight">Sessão encerrada</h2>
+            <p className="text-muted-foreground">
+              Duração total: <span className="font-mono font-semibold text-foreground">{durationLabel}</span>
+            </p>
+          </div>
+          <div className="rounded-xl border bg-card p-5 space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 text-sm font-medium">
+                <FileText className="h-4 w-4 text-primary" />
+                Deseja registrar esta sessão no prontuário?
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Documente as observações clínicas enquanto os detalhes estão frescos.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button asChild className="w-full">
+                <Link href="/prontuarios/novo">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Criar Prontuário
+                </Link>
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setEndedSession(null)}>
+                Voltar para a Sala Virtual
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
@@ -200,8 +247,9 @@ export default function VirtualRoomPage() {
   )
 }
 
-function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRoom: () => void }) {
+function PsychologistInCall({ roomName, onEndRoom, onDurationChange }: { roomName: string; onEndRoom: () => void; onDurationChange?: (duration: number) => void }) {
   const [callDuration, setCallDuration] = useState(0)
+  const [paused, setPaused] = useState(false)
   const [camOn, setCamOn] = useState(true)
   const [micOn, setMicOn] = useState(true)
   const [localCamPub, setLocalCamPub] = useState<LocalTrackPublication | null>(null)
@@ -260,9 +308,16 @@ function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRo
   }, [room])
 
   useEffect(() => {
-    const id = setInterval(() => setCallDuration(t => t + 1), 1000)
+    if (paused) return
+    const id = setInterval(() => {
+      setCallDuration(t => {
+        const next = t + 1
+        onDurationChange?.(next)
+        return next
+      })
+    }, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [paused, onDurationChange])
 
   const toggleCam = () => {
     localParticipant?.setCameraEnabled(!camOn)
@@ -306,18 +361,26 @@ function PsychologistInCall({ roomName, onEndRoom }: { roomName: string; onEndRo
         )}
       </div>
 
-      {/* Remote participant name + connection status */}
-      {hasRemote && (
-        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 md:gap-3">
+      {/* Timer + remote participant info */}
+      <div className="absolute top-3 left-3 z-20 flex items-center gap-2 md:gap-3">
+        {hasRemote && (
           <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-white/10 shadow-lg">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
             <span className="text-xs md:text-sm font-medium">{remoteName}</span>
           </div>
-          <div className="bg-black/40 backdrop-blur-xl text-white/70 px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border border-white/10">
-            <span className="text-[10px] md:text-xs font-mono">{formatTime(callDuration)}</span>
-          </div>
+        )}
+        <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white/70 px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border border-white/10">
+          <button
+            onClick={() => setPaused(p => !p)}
+            className="flex items-center justify-center transition-colors hover:text-white"
+            aria-label={paused ? "Retomar timer" : "Pausar timer"}
+          >
+            {paused ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
+          </button>
+          <span className={`text-[10px] md:text-xs font-mono ${paused ? "text-amber-400" : ""}`}>{formatTime(callDuration)}</span>
+          {paused && <span className="text-[9px] text-amber-400 font-medium">PAUSADO</span>}
         </div>
-      )}
+      </div>
 
       {/* Local video - picture in picture */}
       <div className="absolute top-3 right-3 z-20 md:top-4 md:right-4">

@@ -12,11 +12,12 @@ import { OnboardingChecklist } from "@/components/onboarding-checklist"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity, CalendarDays, Sun, Moon } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity, CalendarDays, Sun, Moon, Cake } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn, formatTime } from "@/lib/utils"
 import { motion } from "framer-motion"
+import { QuickNotesFab } from "@/components/dashboard/quick-notes-fab"
 
 interface ActivityItem {
   id: string
@@ -47,6 +48,7 @@ export default function DashboardHome() {
     paymentsByMethod: { name: string; value: number }[]
     newPatientsByMonth: { month: string; count: number }[]
     appointmentsPerMonth: { month: string; count: number }[]
+    birthdays: { id: string; name: string; day: number; age: number; phone: string | null }[]
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [progressWidth, setProgressWidth] = useState(0)
@@ -108,6 +110,7 @@ export default function DashboardHome() {
   const recentActivity = data?.recentActivity ?? []
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
   const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
+  const birthdays = data?.birthdays ?? []
 
   const filteredMonthlyData = (data?.monthlyData ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
 
@@ -238,6 +241,49 @@ export default function DashboardHome() {
             </CardContent>
           </Card>
 
+          {/* Aniversariantes do mês */}
+          <Card className="lg:col-span-1">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Cake className="h-4 w-4 text-pink-500" />
+                Aniversariantes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {birthdays.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <Cake className="h-6 w-6 text-muted-foreground/40 mb-2" />
+                  <p className="text-xs text-muted-foreground">Nenhum aniversário este mês</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {birthdays.slice(0, 6).map((b) => {
+                    const isToday = b.day === new Date().getDate()
+                    return (
+                      <div key={b.id} className="flex items-center gap-3 rounded-lg border p-2.5 transition-colors hover:bg-accent/50">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pink-500/10 text-sm font-bold text-pink-600 dark:text-pink-400">
+                          {b.day}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{b.name}</p>
+                          <p className="text-xs text-muted-foreground">Faz {b.age} anos</p>
+                        </div>
+                        {isToday && (
+                          <Badge variant="success" className="text-[10px]">Hoje!</Badge>
+                        )}
+                      </div>
+                    )
+                  })}
+                  {birthdays.length > 6 && (
+                    <p className="pt-1 text-center text-[11px] text-muted-foreground">
+                      +{birthdays.length - 6} aniversariantes
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Pacientes Recentes */}
           <RecentPatients patients={recentPatients} />
 
@@ -343,6 +389,8 @@ export default function DashboardHome() {
           <FinancialSummaryCard summary={financialSummary} />
         </div>
       </div>
+
+      <QuickNotesFab />
     </div>
   )
 }

@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet } from "lucide-react"
 import toast from "react-hot-toast"
 
 function GoogleCalendarStatus() {
@@ -174,6 +174,15 @@ export default function SettingsPage() {
   } | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
   const [upgradeLoading, setUpgradeLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState<"csv" | "json" | null>(null)
+  const [lastExport, setLastExport] = useState<{ at: string; format: string } | null>(null)
+
+  useEffect(() => {
+    const raw = localStorage.getItem("psicoflow_last_export")
+    if (raw) {
+      try { setLastExport(JSON.parse(raw)) } catch {}
+    }
+  }, [])
 
   useEffect(() => {
     fetch("/api/configuracoes")
@@ -331,6 +340,33 @@ export default function SettingsPage() {
     }
   }
 
+  const handleExport = async (format: "csv" | "json") => {
+    setExportLoading(format)
+    try {
+      const res = await fetch(`/api/export?format=${format}`)
+      if (!res.ok) throw new Error()
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      const disp = res.headers.get("Content-Disposition") || ""
+      const match = disp.match(/filename="([^"]+)"/)
+      a.download = match ? match[1] : `psicoflow-backup.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      const entry = { at: new Date().toISOString(), format }
+      localStorage.setItem("psicoflow_last_export", JSON.stringify(entry))
+      setLastExport(entry)
+      toast.success(`Exportação ${format.toUpperCase()} concluída!`)
+    } catch {
+      toast.error("Erro ao exportar dados")
+    } finally {
+      setExportLoading(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -376,6 +412,7 @@ export default function SettingsPage() {
           <TabsTrigger value="schedule"><Globe className="mr-2 h-4 w-4" />Agenda</TabsTrigger>
           <TabsTrigger value="financial"><CreditCard className="mr-2 h-4 w-4" />Pagamentos</TabsTrigger>
           <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Equipe</TabsTrigger>
+          <TabsTrigger value="export"><Download className="mr-2 h-4 w-4" />Exportação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4 space-y-6">
@@ -727,6 +764,83 @@ export default function SettingsPage() {
                 </div>
               </div>
               <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Salvar</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="export" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Exportação de Dados</CardTitle>
+              <CardDescription>Baixe uma cópia de segurança de todos os seus dados</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+                  <div className="space-y-1">
+                    <p className="font-medium text-amber-700 dark:text-amber-300">Aviso de LGPD</p>
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                      Os dados exportados contêm informações pessoais e sensíveis de pacientes protegidos
+                      pela Lei Geral de Proteção de Dados (LGPD). Mantenha o arquivo em local seguro e
+                      restrito. O compartilhamento indevido pode gerar sanções legais.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start gap-2 p-4"
+                  onClick={() => handleExport("csv")}
+                  disabled={exportLoading !== null}
+                >
+                  <div className="flex w-full items-center gap-2">
+                    {exportLoading === "csv" ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
+                    )}
+                    <span className="font-medium">Exportar CSV</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-left">
+                    Planilha compatível com Excel e Google Sheets
+                  </p>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start gap-2 p-4"
+                  onClick={() => handleExport("json")}
+                  disabled={exportLoading !== null}
+                >
+                  <div className="flex w-full items-center gap-2">
+                    {exportLoading === "json" ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <FileJson className="h-5 w-5 text-blue-500" />
+                    )}
+                    <span className="font-medium">Exportar JSON</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-left">
+                    Backup estruturado para restauração completa
+                  </p>
+                </Button>
+              </div>
+
+              {lastExport && (
+                <div className="flex items-center gap-2 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  Última exportação ({lastExport.format.toUpperCase()}):{" "}
+                  {new Date(lastExport.at).toLocaleString("pt-BR")}
+                </div>
+              )}
+
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <p className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> Pacientes, consultas e sessões</p>
+                <p className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> Transações financeiras e faturas</p>
+                <p className="flex items-center gap-1.5"><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> Dados restritos ao seu usuário</p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

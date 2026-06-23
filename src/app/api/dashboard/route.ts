@@ -42,6 +42,7 @@ export async function GET() {
       completedAppointments,
       totalAppointments,
       appointmentStatuses,
+      birthdayPatients,
     ] = await Promise.all([
       prisma.patient.count({ where: { psychologistId, active: true } }),
       prisma.appointment.count({
@@ -148,6 +149,14 @@ export async function GET() {
         by: ["status"],
         where: { psychologistId },
         _count: true,
+      }),
+      prisma.patient.findMany({
+        where: {
+          psychologistId,
+          active: true,
+          dateOfBirth: { not: null },
+        },
+        select: { id: true, name: true, dateOfBirth: true, phone: true },
       }),
     ])
 
@@ -275,6 +284,19 @@ export async function GET() {
         appointmentChange: Math.round(appointmentChange * 10) / 10,
         revenueChange: Math.round(revenueChange * 10) / 10,
       },
+      birthdays: birthdayPatients
+        .filter((p) => {
+          if (!p.dateOfBirth) return false
+          const brt = new Date(p.dateOfBirth.getTime() - 3 * 3600000)
+          return brt.getUTCMonth() === currentMonth
+        })
+        .map((p) => {
+          const brt = new Date(p.dateOfBirth!.getTime() - 3 * 3600000)
+          const day = brt.getUTCDate()
+          const age = currentYear - brt.getUTCFullYear()
+          return { id: p.id, name: p.name, day, age, phone: p.phone }
+        })
+        .sort((a, b) => a.day - b.day),
       monthlyData,
       appointments: recentAppointments.map(mapApt),
       todaysAppointments: todaysAppointments.map(mapApt),
