@@ -18,7 +18,7 @@ const options4 = JSON.stringify([
   { value: 3, label: "Quase todos os dias" },
 ])
 
-const options5 = JSON.stringify([
+const optionsPss = JSON.stringify([
   { value: 0, label: "Nunca" },
   { value: 1, label: "Raramente" },
   { value: 2, label: "Às vezes" },
@@ -31,6 +31,22 @@ const optionsBai = JSON.stringify([
   { value: 1, label: "Leve" },
   { value: 2, label: "Moderado" },
   { value: 3, label: "Grave" },
+])
+
+const optionsIsi = JSON.stringify([
+  { value: 0, label: "Nenhum" },
+  { value: 1, label: "Leve" },
+  { value: 2, label: "Moderado" },
+  { value: 3, label: "Grave" },
+  { value: 4, label: "Muito grave" },
+])
+
+const optionsWhoqol = JSON.stringify([
+  { value: 1, label: "Muito ruim" },
+  { value: 2, label: "Ruim" },
+  { value: 3, label: "Nem bom nem ruim" },
+  { value: 4, label: "Bom" },
+  { value: 5, label: "Muito bom" },
 ])
 
 interface QuestionDef { order: number; text: string; category: string }
@@ -74,61 +90,61 @@ const questionnaireDefs: {
     description: "Mede a gravidade dos sintomas de ansiedade em adultos e adolescentes.",
     category: "Ansiedade", options: optionsBai,
     questions: [
-      { order: 1, text: "Dormência ou formigamento", category: "Ansiedade" },
-      { order: 2, text: "Sentir-se calor", category: "Ansiedade" },
-      { order: 3, text: "Tremores nas pernas", category: "Ansiedade" },
-      { order: 4, text: "Não conseguir relaxar", category: "Ansiedade" },
-      { order: 5, text: "Medo que aconteça o pior", category: "Ansiedade" },
-      { order: 6, text: "Tontura ou vertigem", category: "Ansiedade" },
-      { order: 7, text: "Palpitação ou aceleração cardíaca", category: "Ansiedade" },
-      { order: 8, text: "Falta de equilíbrio", category: "Ansiedade" },
-      { order: 9, text: "Assustado(a)", category: "Ansiedade" },
-      { order: 10, text: "Nervoso(a)", category: "Ansiedade" },
-      { order: 11, text: "Sensação de sufocação", category: "Ansiedade" },
-      { order: 12, text: "Dores ou desconforto no peito", category: "Ansiedade" },
-      { order: 13, text: "Passos tropieçam ao andar", category: "Ansiedade" },
-      { order: 14, text: "Fadiga ou cansaço", category: "Ansiedade" },
-      { order: 15, text: "Ficar ao lado de pessoas nervosas", category: "Ansiedade" },
-      { order: 16, text: "Perder o apetite", category: "Ansiedade" },
-      { order: 17, text: "Indigestão ou desconforto abdominal", category: "Ansiedade" },
-      { order: 18, text: "Frequência respiratória aumentada", category: "Ansiedade" },
-      { order: 19, text: "Sudorese (não devida ao calor)", category: "Ansiedade" },
-      { order: 20, text: "Mãos frias e suadas", category: "Ansiedade" },
-      { order: 21, text: "Rosto envergonhado", category: "Ansiedade" },
+      { order: 1, text: "Dormência ou formigamento — sinto dormência ou formigamento no corpo", category: "Ansiedade" },
+      { order: 2, text: "Sentir-se calor — sinto ondas de calor ou sudorese", category: "Ansiedade" },
+      { order: 3, text: "Tremores nas mãos — minhas mãos tremem ou balançam", category: "Ansiedade" },
+      { order: 4, text: "Dificuldade para relaxar — tenho dificuldade em relaxar", category: "Ansiedade" },
+      { order: 5, text: "Medo — tenho medo de que coisas ruins aconteçam", category: "Ansiedade" },
+      { order: 6, text: "Vertigem ou tontura — sinto tontura ou vertigem", category: "Ansiedade" },
+      { order: 7, text: "Palpitação ou aceleração cardíaca — sinto o coração acelerado ou batendo forte", category: "Ansiedade" },
+      { order: 8, text: "Falta de equilíbrio — sinto que vou cair ou que não estou firme", category: "Ansiedade" },
+      { order: 9, text: "Assustado(a) — fico assustado(a) facilmente", category: "Ansiedade" },
+      { order: 10, text: "Nervosismo — sinto os nervos à flor da pele", category: "Ansiedade" },
+      { order: 11, text: "Ofegante — tenho dificuldade para respirar ou sinto falta de ar", category: "Ansiedade" },
+      { order: 12, text: "Morte — tenho medo de morrer", category: "Ansiedade" },
+      { order: 13, text: "Pânico — sinto pânico ou medo intenso", category: "Ansiedade" },
+      { order: 14, text: "Engasgo ou sufocamento — sinto que vou engasgar ou me sufocar", category: "Ansiedade" },
+      { order: 15, text: "Dor no peito — sinto dor ou desconforto no peito", category: "Ansiedade" },
+      { order: 16, text: "Inquietação — sinto o corpo muito agitado ou inquieto", category: "Ansiedade" },
+      { order: 17, text: "Fraqueza — sinto fraqueza ou cansaço nas pernas", category: "Ansiedade" },
+      { order: 18, text: "Indigestão — sinto enjoo ou desconforto no estômago", category: "Ansiedade" },
+      { order: 19, text: "Suor — sinto sudorese excessiva (sem estar quente ou fazendo exercício)", category: "Ansiedade" },
+      { order: 20, text: "Vermelhidão — fico vermelho(a) ou sinto calor no rosto", category: "Ansiedade" },
+      { order: 21, text: "Dificuldade para dormir — tenho dificuldade para pegar no sono ou durmo mal", category: "Ansiedade" },
     ],
   },
   {
     type: "BDI", title: "BDI-II — Inventário de Depressão de Beck",
     description: "Mede a gravidade dos sintomas depressivos em adultos e adolescentes.",
-    category: "Depressão", options: options4,
+    category: "Depressão", options: optionsBai,
     questions: [
-      { order: 1, text: "Tristeza", category: "Depressão" },
-      { order: 2, text: "Pessimismo", category: "Depressão" },
-      { order: 3, text: "Sentimento de fracasso", category: "Depressão" },
-      { order: 4, text: "Perda de prazer", category: "Depressão" },
-      { order: 5, text: "Culpa", category: "Depressão" },
-      { order: 6, text: "Punição", category: "Depressão" },
-      { order: 7, text: "Ódio contra si mesmo", category: "Depressão" },
-      { order: 8, text: "Autocrítica", category: "Depressão" },
-      { order: 9, text: "Ideação suicida", category: "Depressão" },
-      { order: 10, text: "Choro", category: "Depressão" },
-      { order: 11, text: "Agitação", category: "Depressão" },
-      { order: 12, text: "Perda de interesse", category: "Depressão" },
-      { order: 13, text: "Indecisão", category: "Depressão" },
-      { order: 14, text: "Desvalorização", category: "Depressão" },
-      { order: 15, text: "Falta de energia", category: "Depressão" },
-      { order: 16, text: "Alteração no sono", category: "Depressão" },
-      { order: 17, text: "Irritabilidade", category: "Depressão" },
-      { order: 18, text: "Alteração no apetite", category: "Depressão" },
-      { order: 19, text: "Dificuldade de concentração", category: "Depressão" },
-      { order: 20, text: "Cansaço", category: "Depressão" },
-      { order: 21, text: "Perda de interesse sexual", category: "Depressão" },
+      { order: 1, text: "Tristeza — me sinto para baixo, triste ou sem esperança", category: "Depressão" },
+      { order: 2, text: "Pessimismo — não vejo sentido nas coisas nem acredito que as coisas vão melhorar", category: "Depressão" },
+      { order: 3, text: "Sentimento de fracasso — sinto que fracassei ou que decepcione a mim mesmo(a)", category: "Depressão" },
+      { order: 4, text: "Perda de prazer — não tenho prazer em fazer as coisas que costumo gostar", category: "Depressão" },
+      { order: 5, text: "Culpa — me sinto culpado(a) ou me punishment pelas coisas que fiz ou deixei de fazer", category: "Depressão" },
+      { order: 6, text: "Sentimento de punição — sinto que devo ser punido(a) pelas coisas que fiz", category: "Depressão" },
+      { order: 7, text: "Ódio contra si mesmo — me critico muito e tenho raiva de mim mesmo(a)", category: "Depressão" },
+      { order: 8, text: "Autocrítica — me julgo severamente pelas minhas falas ou erros", category: "Depressão" },
+      { order: 9, text: "Ideação suicida — penso em me machucar ou que seria melhor estar morto(a)", category: "Depressão" },
+      { order: 10, text: "Choro — choro mais do que o habitual ou sinto vontade de chorar sem motivo", category: "Depressão" },
+      { order: 11, text: "Agitação — tenho dificuldade em ficar parado(a) ou me sinto muito inquieto(a)", category: "Depressão" },
+      { order: 12, text: "Perda de interesse — perdi interesse nas coisas que antes me davam prazer", category: "Depressão" },
+      { order: 13, text: "Indecisão — tenho dificuldade para tomar decisões ou me concentrar", category: "Depressão" },
+      { order: 14, text: "Desvalorização — me sinto sem valor ou inútil", category: "Depressão" },
+      { order: 15, text: "Falta de energia — me sinto cansado(a) demais para fazer qualquer coisa", category: "Depressão" },
+      { order: 16, text: "Alteração no sono — durmo muito mais ou muito menos que o normal", category: "Depressão" },
+      { order: 17, text: "Irritabilidade — fico mais irritado(a) ou impaciente com os outros", category: "Depressão" },
+      { order: 18, text: "Alteração no apetite — como muito mais ou muito menos que o normal", category: "Depressão" },
+      { order: 19, text: "Dificuldade de concentração — tenho dificuldade para prestar atenção nas coisas", category: "Depressão" },
+      { order: 20, text: "Cansaço — me sinto extremamente cansado(a) ou sem energia", category: "Depressão" },
+      { order: 21, text: "Perda de interesse sexual — perdi interesse em atividades sexuais", category: "Depressão" },
     ],
   },
   {
     type: "PSS", title: "PSS-10 — Escala de Estresse Percebido",
     description: "Mede o grau de estresse percebido nas últimas 4 semanas.",
-    category: "Estresse", options: options5,
+    category: "Estresse", options: optionsPss,
     questions: [
       { order: 1, text: "Ficar nervoso(a) ou aborrecido(a) com coisas inesperadas", category: "Estresse" },
       { order: 2, text: "Sentir que não consegue controlar as coisas importantes da vida", category: "Estresse" },
@@ -145,7 +161,7 @@ const questionnaireDefs: {
   {
     type: "ISI", title: "ISI — Índice de Gravidade da Insônia",
     description: "Avalia a natureza, gravidade e impacto da insônia.",
-    category: "Sono", options: options5,
+    category: "Sono", options: optionsIsi,
     questions: [
       { order: 1, text: "Dificuldade para adormecer no horário desejado", category: "Sono" },
       { order: 2, text: "Dificuldade para manter o sono durante a noite", category: "Sono" },
@@ -153,40 +169,40 @@ const questionnaireDefs: {
       { order: 4, text: "Satisfação com o padrão de sono atual", category: "Sono" },
       { order: 5, text: "Preocupação com o sono", category: "Sono" },
       { order: 6, text: "Interferência do sono nas atividades diurnas", category: "Sono" },
-      { order: 7, text: "Notar os efeitos do problema de sono nas others", category: "Sono" },
+      { order: 7, text: "Quanto os problemas de sono afetam sua qualidade de vida", category: "Sono" },
     ],
   },
   {
     type: "WHOQOL", title: "WHOQOL-Bref — Qualidade de Vida",
     description: "Avalia a qualidade de vida em 4 domínios: físico, psicológico, relações e ambiente.",
-    category: "Qualidade de Vida", options: options5,
+    category: "Qualidade de Vida", options: optionsWhoqol,
     questions: [
       { order: 1, text: "Como você avalia sua qualidade de vida?", category: "Físico" },
-      { order: 2, text: "Satisfação com sua saúde", category: "Físico" },
-      { order: 3, text: "Satisfação com o quanto você consegue realizar atividades cotidianas", category: "Físico" },
-      { order: 4, text: "Satisfação com sua capacidade de trabalho", category: "Físico" },
-      { order: 5, text: "Satisfação consigo mesmo", category: "Psicológico" },
-      { order: 6, text: "Satisfação com seus relacionamentos pessoais", category: "Relacionamentos" },
-      { order: 7, text: "Satisfação com seu apoio social", category: "Relacionamentos" },
-      { order: 8, text: "Satisfação com as condições do seu local de moradia", category: "Ambiente" },
-      { order: 9, text: "Satisfação com seu acesso a serviços de saúde", category: "Ambiente" },
-      { order: 10, text: "Satisfação com suas condições financeiras", category: "Ambiente" },
-      { order: 11, text: "Satisfação com informações disponíveis para suas necessidades", category: "Ambiente" },
-      { order: 12, text: "Satisfação com o transporte disponível", category: "Ambiente" },
-      { order: 13, text: "Satisfação com a segurança do seu dia a dia", category: "Ambiente" },
-      { order: 14, text: "Satisfação com o estado do seu ambiente natural", category: "Ambiente" },
-      { order: 15, text: "Satisfação com sua aparência física", category: "Psicológico" },
-      { order: 16, text: "Satisfação com sua energia para o dia a dia", category: "Físico" },
-      { order: 17, text: "Satisfação com sua capacidade de pensar e tomar decisões", category: "Psicológico" },
-      { order: 18, text: "Satisfação com sua felicidade", category: "Psicológico" },
-      { order: 19, text: "Satisfação com sua satisfação sexual", category: "Físico" },
-      { order: 20, text: "Satisfação com a satisfação que recebe de seus amigos", category: "Relacionamentos" },
-      { order: 21, text: "Satisfação com as condições do seu dia a dia", category: "Ambiente" },
-      { order: 22, text: "Satisfação com a possibilidade de fazer coisas do seu interesse", category: "Físico" },
-      { order: 23, text: "Satisfação com sua capacidade de desempenhar suas tarefas diárias", category: "Físico" },
-      { order: 24, text: "Satisfação com sua saúde para cumprir suas necessidades", category: "Físico" },
-      { order: 25, text: "Satisfação com sua vida sexual", category: "Físico" },
-      { order: 26, text: "Satisfação com o apoio que recebe de seus familiares", category: "Relacionamentos" },
+      { order: 2, text: "Quão satisfeito(a) você está com sua saúde?", category: "Físico" },
+      { order: 3, text: "Quão satisfeito(a) você está com sua capacidade de realizar as atividades do dia a dia?", category: "Físico" },
+      { order: 4, text: "Quão satisfeito(a) você está com sua capacidade de trabalhar?", category: "Físico" },
+      { order: 5, text: "Quão satisfeito(a) você está consigo mesmo(a)?", category: "Psicológico" },
+      { order: 6, text: "Quão satisfeito(a) você está com seus relacionamentos pessoais?", category: "Relacionamentos" },
+      { order: 7, text: "Quão satisfeito(a) você está com o apoio que recebe das pessoas ao seu redor?", category: "Relacionamentos" },
+      { order: 8, text: "Quão satisfeito(a) você está com as condições do seu local de moradia?", category: "Ambiente" },
+      { order: 9, text: "Quão satisfeito(a) você está com seu acesso a serviços de saúde?", category: "Ambiente" },
+      { order: 10, text: "Quão satisfeito(a) você está com suas condições financeiras?", category: "Ambiente" },
+      { order: 11, text: "Quão satisfeito(a) você está com as informações disponíveis para suas necessidades cotidianas?", category: "Ambiente" },
+      { order: 12, text: "Quão satisfeito(a) você está com o transporte disponível?", category: "Ambiente" },
+      { order: 13, text: "Quão satisfeito(a) você está com a segurança do seu dia a dia?", category: "Ambiente" },
+      { order: 14, text: "Quão satisfeito(a) você está com o estado do seu ambiente natural (clima, natureza)?", category: "Ambiente" },
+      { order: 15, text: "Quão satisfeito(a) você está com sua aparência física?", category: "Psicológico" },
+      { order: 16, text: "Quão satisfeito(a) você está com sua energia para o dia a dia?", category: "Físico" },
+      { order: 17, text: "Quão satisfeito(a) você está com sua capacidade de pensar e tomar decisões?", category: "Psicológico" },
+      { order: 18, text: "Quão satisfeito(a) você está com sua felicidade?", category: "Psicológico" },
+      { order: 19, text: "Quão satisfeito(a) você está com sua satisfação sexual?", category: "Físico" },
+      { order: 20, text: "Quão satisfeito(a) você está com a satisfação que recebe de seus amigos?", category: "Relacionamentos" },
+      { order: 21, text: "Quão satisfeito(a) você está com as condições do seu dia a dia?", category: "Ambiente" },
+      { order: 22, text: "Quão satisfeito(a) você está com a possibilidade de fazer coisas do seu interesse?", category: "Físico" },
+      { order: 23, text: "Quão satisfeito(a) você está com sua capacidade de desempenhar suas tarefas diárias?", category: "Físico" },
+      { order: 24, text: "Quão satisfeito(a) você está com sua saúde para cumprir suas necessidades?", category: "Físico" },
+      { order: 25, text: "Quão satisfeito(a) você está com sua vida sexual?", category: "Físico" },
+      { order: 26, text: "Quão satisfeito(a) você está com o apoio que recebe de seus familiares?", category: "Relacionamentos" },
     ],
   },
 ]
@@ -202,12 +218,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Nenhum psicólogo encontrado no banco" }, { status: 400 })
   }
   const psychId = firstPsych.id
+  const force = searchParams.get("force") === "true"
 
   const results: string[] = []
 
   for (const def of questionnaireDefs) {
     const existing = await prisma.questionnaire.findFirst({ where: { type: def.type } })
-    if (!existing) {
+    if (existing) {
+      if (force) {
+        await prisma.questionnaireResponse.deleteMany({ where: { questionnaireId: existing.id } })
+        await prisma.questionnaireQuestion.deleteMany({ where: { questionnaireId: existing.id } })
+        await prisma.questionnaire.delete({ where: { id: existing.id } })
+        await prisma.questionnaire.create({
+          data: {
+            type: def.type,
+            title: def.title,
+            description: def.description,
+            isActive: true,
+            psychologistId: psychId,
+            questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: def.options, category: q.category })) },
+          },
+        })
+        results.push(`${def.type} recriado (force)`)
+      } else {
+        results.push(`${def.type} já existe`)
+      }
+    } else {
       await prisma.questionnaire.create({
         data: {
           type: def.type,
@@ -219,8 +255,6 @@ export async function GET(request: Request) {
         },
       })
       results.push(`${def.type} criado`)
-    } else {
-      results.push(`${def.type} já existe`)
     }
   }
 
