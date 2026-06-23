@@ -99,22 +99,34 @@ export function OnboardingTour() {
     const viewportW = window.innerWidth
     const viewportH = window.innerHeight
 
-    // Default: right of element, vertically centered
-    let top = rect.top + rect.height / 2 - tooltipH / 2
-    let left = rect.right + margin
+    // For sidebar items (left side of screen), always center tooltip vertically in viewport
+    // For dashboard items (center/right), position relative to element
+    const isSidebar = rect.left < 280
 
-    // If off right edge, try left
+    let top: number
+    let left: number
+
+    if (isSidebar) {
+      // Sidebar: center tooltip in the middle of the viewport
+      top = (viewportH - tooltipH) / 2
+      left = rect.right + margin
+    } else {
+      // Dashboard: position next to element
+      top = rect.top + rect.height / 2 - tooltipH / 2
+      left = rect.right + margin
+    }
+
+    // If off right edge, try left side
     if (left + tooltipW > viewportW - margin) {
       left = rect.left - tooltipW - margin
     }
 
-    // If still off screen, center below
+    // If still off screen, center horizontally
     if (left < margin) {
       left = (viewportW - tooltipW) / 2
-      top = rect.bottom + margin
     }
 
-    // Keep in viewport vertically
+    // Final viewport bounds check
     if (top < margin) top = margin
     if (top + tooltipH > viewportH - margin) top = viewportH - tooltipH - margin
 
