@@ -77,7 +77,7 @@ export default function PacienteDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Olá, {patient?.name?.split(" ")[0]}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">Bem-vindo ao PsicoFlow</p>
@@ -100,18 +100,18 @@ export default function PacienteDashboard() {
               <h3 className="font-semibold">Próxima Consulta</h3>
               <span className="ml-auto text-xs bg-white/15 px-3 py-1 rounded-full backdrop-blur-sm">em {timeUntilAppointment()}</span>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/15 backdrop-blur-sm">
-                <CalendarDays className="h-7 w-7" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/15 backdrop-blur-sm shrink-0">
+                <CalendarDays className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 min-w-0 space-y-1.5">
                 <p className="font-medium text-lg">{formatDateTime(nextAppointment.startTime).date}</p>
-                <div className="flex items-center gap-4 text-sm text-blue-100">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-blue-100">
                   <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{formatDateTime(nextAppointment.startTime).time}</span>
                   <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" />{nextAppointment.psychologist.name}</span>
                 </div>
               </div>
-              <Link href="/paciente/agenda" className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 transition-all backdrop-blur-sm" aria-label="Ver agenda completa">
+              <Link href="/paciente/agenda" className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 transition-all backdrop-blur-sm shrink-0" aria-label="Ver agenda completa">
                 <ChevronRight className="h-5 w-5" />
               </Link>
             </div>

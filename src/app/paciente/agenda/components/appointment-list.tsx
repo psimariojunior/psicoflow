@@ -73,7 +73,7 @@ export function AppointmentList({
           <div className="space-y-3">
             {upcoming.map((a) => (
               <div key={a.id} className="bg-card hover:bg-accent rounded-xl p-4 ring-1 ring-border transition-all">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Calendar className="h-6 w-6 text-primary" />
                   </div>
@@ -84,7 +84,7 @@ export function AppointmentList({
                       {formatTime(a.startTime)} — {formatTime(a.endTime)}
                     </p>
                   </div>
-                  <div className="text-xs text-primary bg-primary/10 px-3 py-1 rounded-full">
+                  <div className="text-xs text-primary bg-primary/10 px-3 py-1 rounded-full hidden sm:block">
                     {a.modality === "online" ? "Online" : "Presencial"}
                   </div>
                   <Dialog open={cancelTarget === a.id} onOpenChange={(open) => { if (!open) { setCancelTarget(null); setCancelReason("") } }}>

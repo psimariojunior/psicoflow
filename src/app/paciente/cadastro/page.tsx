@@ -134,7 +134,7 @@ export default function CadastroPage() {
                   <Label htmlFor="cpf">CPF</Label>
                   <Input id="cpf" value={cpf} onChange={(e) => setCpf(maskCpf(e.target.value))} placeholder="000.000.000-00" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="dateOfBirth">Data de Nascimento</Label>
                     <Input id="dateOfBirth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
@@ -168,7 +168,7 @@ export default function CadastroPage() {
                   <Label htmlFor="phone">Telefone</Label>
                   <Input id="phone" value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="(11) 99999-8888" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Senha *</Label>
                     <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className={passwordsMismatch ? "animate-shake" : ""} />
@@ -192,7 +192,7 @@ export default function CadastroPage() {
                   <Label htmlFor="address">Endereço</Label>
                   <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua, número" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="neighborhood">Bairro</Label>
                     <Input id="neighborhood" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Bairro" />

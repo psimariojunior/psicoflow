@@ -99,7 +99,7 @@ export default function MeusDadosPage() {
             <Label htmlFor="name" className="text-foreground">Nome completo</Label>
             <Input id="name" value={form.name} onChange={(e) => handleChange("name", e.target.value)}  />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cpf" className="text-foreground">CPF</Label>
               <Input id="cpf" value={form.cpf} onChange={(e) => handleChange("cpf", maskCpf(e.target.value))}  />
@@ -146,7 +146,7 @@ export default function MeusDadosPage() {
 
         <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
           <h2 className="text-lg font-semibold text-foreground">Contato</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">Email</Label>
               <Input id="email" type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)}  />
@@ -168,7 +168,7 @@ export default function MeusDadosPage() {
             <Label htmlFor="address" className="text-foreground">Endereço</Label>
             <Input id="address" value={form.address} onChange={(e) => handleChange("address", e.target.value)}  />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="neighborhood" className="text-foreground">Bairro</Label>
               <Input id="neighborhood" value={form.neighborhood} onChange={(e) => handleChange("neighborhood", e.target.value)}  />
@@ -195,7 +195,7 @@ export default function MeusDadosPage() {
 
         <div className="bg-card rounded-2xl p-6 ring-1 ring-border space-y-4">
           <h2 className="text-lg font-semibold text-foreground">Emergência</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="emergencyContact" className="text-foreground">Contato de Emergência</Label>
               <Input id="emergencyContact" value={form.emergencyContact} onChange={(e) => handleChange("emergencyContact", e.target.value)}  />

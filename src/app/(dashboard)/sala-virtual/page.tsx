@@ -384,7 +384,7 @@ function PsychologistInCall({ roomName, onEndRoom, onDurationChange }: { roomNam
 
       {/* Local video - picture in picture */}
       <div className="absolute top-3 right-3 z-20 md:top-4 md:right-4">
-        <div className="relative w-20 h-15 md:w-48 md:h-36 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+        <div className="relative w-20 h-[60px] md:w-48 md:h-36 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
           {localCamPub && localParticipant ? (
             <>
               <VideoTrack trackRef={{ participant: localParticipant, source: Track.Source.Camera, publication: localCamPub }} className="w-full h-full object-contain scale-x-[-1]" />

@@ -33,10 +33,5 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     prefer_related_applications: false,
     display_override: ["standalone", "window-controls-overlay"],
-    handle_links: "preferred",
-    launch_handler: { client_mode: "navigate-existing" },
-    screenshots: [
-      { src: "/og-image.png", sizes: "1200x630", type: "image/png", form_factor: "wide", label: "PsicoFlow Dashboard" },
-    ],
   }
 }

@@ -356,19 +356,19 @@ export default function AgendaPage() {
 
       <Card>
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" onClick={prevMonth}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h3 className="text-lg font-semibold min-w-[200px] text-center">
+              <h3 className="text-lg font-semibold min-w-0 text-center flex-1">
                 {months[month]} {year}
               </h3>
               <Button variant="outline" size="icon" onClick={nextMonth}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button variant={view === "day" ? "default" : "outline"} size="sm" onClick={() => setView("day")}>Dia</Button>
               <Button variant={view === "week" ? "default" : "outline"} size="sm" onClick={() => setView("week")}>Semana</Button>
               <Button variant={view === "month" ? "default" : "outline"} size="sm" onClick={() => setView("month")}>Mês</Button>

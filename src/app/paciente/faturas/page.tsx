@@ -119,7 +119,7 @@ export default function PatientInvoicesPage() {
                       <span className="text-foreground font-medium">{inv.description}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Fatura {inv.number}</p>
-                    <div className="flex items-center gap-4 text-sm">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm">
                       <span className="text-foreground">
                         <strong>Vencimento:</strong> {formatDate(inv.dueDate)}
                       </span>

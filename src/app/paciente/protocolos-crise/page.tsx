@@ -68,14 +68,14 @@ export default function ProtocolosCrisePage() {
 
   return (
     <div className="space-y-6 relative">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
             Protocolos de Crise
           </h1>
           <p className="text-muted-foreground mt-1">Recursos e orientações para momentos de emergência emocional</p>
         </div>
-        <Button variant={emergencyMode ? "destructive" : "outline"} onClick={() => setEmergencyMode(v => !v)}>
+        <Button variant={emergencyMode ? "destructive" : "outline"} onClick={() => setEmergencyMode(v => !v)} className="shrink-0">
           <AlertTriangle className="h-4 w-4 mr-2" />
           {emergencyMode ? "Fechar Emergência" : "Modo Emergência"}
         </Button>
@@ -143,7 +143,7 @@ export default function ProtocolosCrisePage() {
                   <Separator />
                   <CardContent className="pt-4">
                     {protocol.content.split("\n").map((line, idx) => <p key={idx} className="mb-2 text-sm">{line}</p>)}
-                    <div className="flex gap-2 mt-4 pt-4 border-t">
+                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
                       <Button asChild variant="outline" size="sm"><a href="tel:188"><Phone className="h-4 w-4 mr-1" />CVV 188</a></Button>
                       <Button asChild variant="outline" size="sm"><a href="tel:192"><AlertTriangle className="h-4 w-4 mr-1" />SAMU 192</a></Button>
                       <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(protocol.content)}><ExternalLink className="h-4 w-4 mr-1" />Copiar</Button>
