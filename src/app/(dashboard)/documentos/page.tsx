@@ -24,19 +24,27 @@ import {
 } from "@/components/ui/select"
 import {
   Plus,
-  FileType,
+  FileType2,
   Trash2,
   Pencil,
   FileText,
+  Send,
+  ClipboardList,
+  FileQuestion,
   Printer,
+  Copy,
   Sparkles,
   Loader2,
   Search,
-  AlertCircle,
+  Files,
+  Layers,
+  CalendarClock,
+  ChevronDown,
+  ChevronUp,
+  Wand2,
 } from "lucide-react"
 import toast from "react-hot-toast"
-import { formatDate } from "@/lib/utils"
-import { cn } from "@/lib/utils"
+import { formatDate, cn } from "@/lib/utils"
 
 interface DocumentTemplate {
   id: string
@@ -66,6 +74,49 @@ const PLACEHOLDERS = [
   "{profissao}", "{endereco}", "{cidade}", "{estado}", "{email}",
   "{telefone}", "{data_extenso}",
 ]
+
+type CategoryKey = "declaracao" | "encaminhamento" | "relatorio" | "geral"
+
+const CATEGORY_CONFIG: Record<string, {
+  label: string
+  icon: typeof FileText
+  gradient: string
+  badgeCls: string
+  ring: string
+}> = {
+  declaracao: {
+    label: "Declaração",
+    icon: FileText,
+    gradient: "from-blue-500 to-indigo-600",
+    badgeCls: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200",
+    ring: "ring-blue-200/60 dark:ring-blue-800/40",
+  },
+  encaminhamento: {
+    label: "Encaminhamento",
+    icon: Send,
+    gradient: "from-violet-500 to-purple-600",
+    badgeCls: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-200",
+    ring: "ring-violet-200/60 dark:ring-violet-800/40",
+  },
+  relatorio: {
+    label: "Relatório",
+    icon: ClipboardList,
+    gradient: "from-amber-500 to-orange-600",
+    badgeCls: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+    ring: "ring-amber-200/60 dark:ring-amber-800/40",
+  },
+  geral: {
+    label: "Geral",
+    icon: FileQuestion,
+    gradient: "from-slate-500 to-slate-700",
+    badgeCls: "bg-slate-100 text-slate-700 dark:bg-slate-800/60 dark:text-slate-200",
+    ring: "ring-slate-200/60 dark:ring-slate-800/40",
+  },
+}
+
+function categoryConfig(cat: string) {
+  return CATEGORY_CONFIG[cat as CategoryKey] ?? CATEGORY_CONFIG.geral
+}
 
 const DEFAULT_TEMPLATES: Omit<DocumentTemplate, "id" | "createdAt" | "updatedAt">[] = [
   {
@@ -189,12 +240,22 @@ function printDocument(title: string, content: string) {
   win.document.close()
 }
 
+async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    toast.success("Documento copiado para a área de transferência")
+  } catch {
+    toast.error("Não foi possível copiar o documento")
+  }
+}
+
 export default function DocumentosPage() {
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [patients, setPatients] = useState<Patient[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [crp, setCrp] = useState("")
+  const [placeholdersOpen, setPlaceholdersOpen] = useState(false)
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [editing, setEditing] = useState<DocumentTemplate | null>(null)
@@ -213,6 +274,19 @@ export default function DocumentosPage() {
     ),
     [templates, search]
   )
+
+  const categoriesCount = useMemo(
+    () => new Set(templates.map((t) => t.category)).size,
+    [templates]
+  )
+
+  const lastUpdate = useMemo(() => {
+    if (!templates.length) return null
+    return templates.reduce((acc, t) => {
+      const ts = new Date(t.updatedAt || t.createdAt).getTime()
+      return ts > acc ? ts : acc
+    }, 0)
+  }, [templates])
 
   useEffect(() => {
     Promise.all([
@@ -333,102 +407,269 @@ export default function DocumentosPage() {
     )
   }
 
+  const stats = [
+    {
+      label: "Modelos",
+      value: templates.length,
+      icon: Files,
+      color: "from-blue-500 to-indigo-600",
+    },
+    {
+      label: "Categorias",
+      value: categoriesCount,
+      icon: Layers,
+      color: "from-violet-500 to-purple-600",
+    },
+    {
+      label: "Última atualização",
+      value: lastUpdate ? formatDate(new Date(lastUpdate)) : "—",
+      icon: CalendarClock,
+      color: "from-amber-500 to-orange-600",
+      isText: true,
+    },
+  ]
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Documentos</h2>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Modelos profissionais com preenchimento automático por paciente
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {templates.length === 0 && (
-            <Button variant="outline" onClick={loadDefaults} disabled={saving}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Carregar modelos padrão
+    <div className="space-y-8 pb-12">
+      {/* Hero header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-700 to-indigo-900 p-8 sm:p-10 text-white shadow-xl shadow-violet-500/10">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-xl bg-white/15 p-2.5 backdrop-blur-sm">
+                <FileType2 className="h-7 w-7" />
+              </div>
+              <Badge variant="info" className="bg-white/20 text-white border-none text-xs">
+                Modelos profissionais
+              </Badge>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+              Documentos
+            </h1>
+            <p className="text-violet-100 text-base sm:text-lg max-w-2xl">
+              Modelos profissionais com preenchimento automático por paciente — declarações,
+              encaminhamentos e relatórios prontos para impressão.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {templates.length === 0 && (
+              <Button
+                variant="secondary"
+                onClick={loadDefaults}
+                disabled={saving}
+                className="bg-white/15 text-white border border-white/20 hover:bg-white/25 backdrop-blur-sm"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Carregar modelos padrão
+              </Button>
+            )}
+            <Button
+              onClick={openCreate}
+              className="bg-white text-violet-700 hover:bg-violet-50 shadow-lg shadow-violet-900/20"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Modelo
             </Button>
-          )}
-          <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Modelo
-          </Button>
+          </div>
         </div>
       </div>
 
-      <Card className="border-dashed">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <FileType className="h-4 w-4" />
-            <span>Placeholders disponíveis:</span>
+      {/* Stats row */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {stats.map((s) => {
+          const Icon = s.icon
+          return (
+            <Card key={s.label} className="overflow-hidden border-0 shadow-sm">
+              <CardContent className="flex items-center gap-4 p-5">
+                <div className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shrink-0 text-white shadow-md",
+                  s.color
+                )}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                    {s.label}
+                  </p>
+                  <p className={cn("font-semibold text-foreground truncate", s.isText ? "text-base" : "text-2xl")}>
+                    {s.value}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* Search + collapsible placeholders */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar modelo por nome ou categoria..."
+            className="pl-9"
+          />
+        </div>
+        <button
+          onClick={() => setPlaceholdersOpen((v) => !v)}
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
+          aria-expanded={placeholdersOpen}
+        >
+          <FileType2 className="h-4 w-4" />
+          Placeholders disponíveis
+          {placeholdersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {placeholdersOpen && (
+        <Card className="border-dashed border-violet-200/60 dark:border-violet-800/40 bg-violet-50/40 dark:bg-violet-950/10">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground mb-3">
+              Use estes marcadores no conteúdo do documento. Eles serão substituídos
+              automaticamente pelos dados do paciente selecionado na geração.
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {PLACEHOLDERS.map((p) => (
-                <Badge key={p} variant="secondary" className="font-mono text-[11px]">
+                <Badge
+                  key={p}
+                  variant="secondary"
+                  className="font-mono text-[11px] bg-white dark:bg-slate-800 border border-violet-100 dark:border-violet-900/40"
+                >
                   {p}
                 </Badge>
               ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar modelo..."
-          className="pl-9"
-        />
-      </div>
-
+      {/* Templates grid OR empty state */}
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <AlertCircle className="h-10 w-10 text-muted-foreground/50 mb-3" />
-            <p className="text-sm text-muted-foreground">
-              {templates.length === 0
-                ? "Nenhum modelo cadastrado. Crie um novo ou carregue os modelos padrão."
-                : "Nenhum modelo encontrado para a busca."}
+        <Card className="overflow-hidden border-0 shadow-sm">
+          <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 blur-2xl rounded-full" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-xl shadow-violet-500/30">
+                <FileText className="h-10 w-10" />
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              Comece criando seu primeiro modelo
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md mb-8">
+              Você pode carregar um conjunto de modelos padrão prontos para uso ou
+              criar um documento totalmente personalizado do zero.
             </p>
+            <div className="flex flex-col sm:flex-row gap-3 mb-10">
+              <Button
+                onClick={loadDefaults}
+                disabled={saving}
+                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Carregar modelos padrão
+              </Button>
+              <Button variant="outline" onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" />
+                Criar do zero
+              </Button>
+            </div>
+
+            <div className="w-full max-w-2xl">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-3">
+                Os modelos padrão incluem
+              </p>
+              <div className="grid gap-3 sm:grid-cols-3 text-left">
+                {DEFAULT_TEMPLATES.map((t) => {
+                  const cfg = categoryConfig(t.category)
+                  const Icon = cfg.icon
+                  return (
+                    <div
+                      key={t.name}
+                      className="rounded-xl border border-border/60 bg-muted/30 p-3"
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className={cn(
+                          "flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm",
+                          cfg.gradient
+                        )}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <Badge variant="secondary" className={cn("text-[10px]", cfg.badgeCls)}>
+                          {cfg.label}
+                        </Badge>
+                      </div>
+                      <p className="text-sm font-medium text-foreground leading-tight">{t.name}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((t) => (
-            <Card key={t.id} className="group flex flex-col hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 shrink-0">
-                      <FileText className="h-5 w-5" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((t) => {
+            const cfg = categoryConfig(t.category)
+            const Icon = cfg.icon
+            return (
+              <Card
+                key={t.id}
+                className={cn(
+                  "group flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/5 border-border/60 ring-1 ring-transparent hover:ring-violet-200/50",
+                )}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      "flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br shrink-0 text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300",
+                      cfg.gradient
+                    )}>
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div className="min-w-0">
-                      <CardTitle className="text-base truncate">{t.name}</CardTitle>
-                      <Badge variant="secondary" className="mt-1 text-[10px]">{t.category}</Badge>
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-base leading-snug line-clamp-2">{t.name}</CardTitle>
+                      <Badge variant="secondary" className={cn("mt-1.5 text-[10px]", cfg.badgeCls)}>
+                        {cfg.label}
+                      </Badge>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <p className="text-xs text-muted-foreground line-clamp-4 whitespace-pre-line flex-1">
-                  {t.content}
-                </p>
-                <div className="mt-4 flex items-center gap-2">
-                  <Button size="sm" className="flex-1" onClick={() => openGenerate(t)}>
-                    <Printer className="mr-1.5 h-3.5 w-3.5" />
-                    Gerar
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => openEdit(t)}>
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive/10" onClick={() => removeTemplate(t)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="relative flex-1 mb-4">
+                    <p className="text-xs text-muted-foreground line-clamp-2 whitespace-pre-line leading-relaxed">
+                      {t.content}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      className="flex-1 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20"
+                      onClick={() => openGenerate(t)}
+                    >
+                      <Wand2 className="mr-1.5 h-3.5 w-3.5" />
+                      Gerar
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => openEdit(t)} aria-label="Editar modelo">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                      onClick={() => removeTemplate(t)}
+                      aria-label="Remover modelo"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       )}
 
@@ -454,12 +695,18 @@ export default function DocumentosPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tpl-category">Categoria</Label>
-                <Input
-                  id="tpl-category"
+                <Select
                   value={form.category}
-                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  placeholder="geral"
-                />
+                  onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
+                >
+                  <SelectTrigger id="tpl-category"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="declaracao">Declaração</SelectItem>
+                    <SelectItem value="encaminhamento">Encaminhamento</SelectItem>
+                    <SelectItem value="relatorio">Relatório</SelectItem>
+                    <SelectItem value="geral">Geral</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="space-y-2">
@@ -486,38 +733,86 @@ export default function DocumentosPage() {
 
       {/* Generate Dialog */}
       <Dialog open={generateOpen} onOpenChange={setGenerateOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Gerar Documento</DialogTitle>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b">
+            <DialogTitle className="flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-violet-600" />
+              Gerar Documento
+            </DialogTitle>
             <DialogDescription>
               {generateTemplate?.name} — selecione um paciente para preenchimento automático.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Paciente</Label>
-              <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
-                <SelectTrigger><SelectValue placeholder="Selecione um paciente (opcional)" /></SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {patients.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-0 overflow-hidden">
+            {/* Left column — options */}
+            <div className="p-6 space-y-5 overflow-y-auto max-h-[60vh] lg:max-h-[65vh] border-b lg:border-b-0 lg:border-r">
+              <div className="space-y-2">
+                <Label>Paciente</Label>
+                <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione um paciente (opcional)" /></SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {patients.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  Sem paciente selecionado, os placeholders permanecem visíveis para conferência.
+                </p>
+              </div>
+
+              {generateTemplate && (
+                <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-1.5">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                    Modelo
+                  </p>
+                  <p className="text-sm font-medium text-foreground">{generateTemplate.name}</p>
+                  <Badge variant="secondary" className={cn("text-[10px]", categoryConfig(generateTemplate.category).badgeCls)}>
+                    {categoryConfig(generateTemplate.category).label}
+                  </Badge>
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>Pré-visualização</Label>
-              <div className="rounded-lg border bg-muted/30 p-6 max-h-[50vh] overflow-y-auto">
-                <pre className="whitespace-pre-wrap font-serif text-sm leading-relaxed text-foreground">
+
+            {/* Right column — preview */}
+            <div className="bg-muted/30 p-6 overflow-y-auto max-h-[60vh] lg:max-h-[65vh]">
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Pré-visualização
+                </Label>
+                <span className="text-[11px] text-muted-foreground">Documento real</span>
+              </div>
+              <div className="bg-white shadow-lg shadow-slate-300/40 rounded-sm mx-auto max-w-[520px] px-10 py-12 min-h-[420px]">
+                <div className="text-center mb-6 pb-4 border-b-2 border-slate-200">
+                  <p className="font-serif text-base font-bold uppercase tracking-widest text-slate-800">
+                    {generateTemplate?.name}
+                  </p>
+                </div>
+                <pre className="whitespace-pre-wrap font-serif text-[13px] leading-relaxed text-slate-700">
                   {preview}
                 </pre>
+                <div className="mt-10 pt-3 border-t border-slate-200 text-center">
+                  <p className="font-serif text-[10px] text-slate-400">
+                    Gerado por PsicoFlow • {formatDate(new Date())}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="px-6 py-4 border-t bg-background">
             <Button variant="outline" onClick={() => setGenerateOpen(false)}>Fechar</Button>
             <Button
+              variant="outline"
+              onClick={() => copyToClipboard(preview)}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copiar
+            </Button>
+            <Button
               onClick={() => generateTemplate && printDocument(generateTemplate.name, preview)}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20"
             >
               <Printer className="mr-2 h-4 w-4" />
               Imprimir / PDF
