@@ -342,12 +342,20 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     try {
+      const toSend = {
+        ...profile,
+        sessionPrice: profile.sessionPrice === "" || profile.sessionPrice === null ? null : Number(profile.sessionPrice),
+      }
       const res = await fetch("/api/configuracoes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(toSend),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        console.error("Save error:", err)
+        throw new Error()
+      }
       toast.success("Configurações salvas com sucesso!")
     } catch {
       toast.error("Erro ao salvar configurações")
