@@ -1,71 +1,187 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { X, ChevronRight, ChevronLeft, Check } from "lucide-react"
+import { X, ChevronRight, ChevronLeft, Check, MousePointer2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const steps = [
+interface Step {
+  badge: string
+  title: string
+  desc: string
+  details: string[]
+  href?: string
+  highlight?: string
+  color: string
+}
+
+const steps: Step[] = [
   {
-    badge: "Passo 1 de 7",
-    title: "Bem-vindo ao PsicoFlow!",
-    desc: "Vamos te mostrar como usar a plataforma. Cada passo te leva até a funcionalidade correspondente.",
-    visual: "welcome",
+    badge: "Boas-vindas",
+    title: "Menu de Navegação",
+    desc: "Este é o menu lateral. Por aqui você acessa todas as funcionalidades.",
+    details: [
+      "Dashboard — visão geral do consultório",
+      "Pacientes — cadastro e histórico",
+      "Agenda — agendamento de consultas",
+      "Sala Virtual — videochamadas seguras",
+      "Prontuários — registros clínicos",
+      "Financeiro — receitas e despesas",
+      "Configurações — perfil e integrações",
+    ],
+    highlight: "nav[data-tour]",
+    color: "blue",
   },
   {
-    badge: "Passo 2 de 7",
-    title: "Cadastre seu primeiro paciente",
-    desc: "Acesse 'Pacientes' no menu lateral e clique em 'Novo Paciente'. Preencha nome, email e telefone.",
-    visual: "patients",
+    badge: "Estatísticas",
+    title: "Painel de Controle",
+    desc: "Aqui você vê os principais indicadores do seu consultório.",
+    details: [
+      "Total de pacientes cadastrados",
+      "Consultas agendadas para hoje",
+      "Receita mensal acumulada",
+      "Pagamentos pendentes",
+      "Gráficos de evolução mensal",
+    ],
+    highlight: "[data-tour='stats']",
+    color: "emerald",
+  },
+  {
+    badge: "Ações Rápidas",
+    title: "Atalhos para Ações Comuns",
+    desc: "Acesse diretamente as funcionalidades mais usadas sem navegar pelo menu.",
+    details: [
+      "Nova Consulta — agendar rapidamente",
+      "Novo Paciente — cadastrar em segundos",
+      "Sala Virtual — iniciar videochamada",
+      "Prontuário — registrar sessão",
+    ],
+    highlight: "[data-tour='quick']",
+    color: "violet",
+  },
+  {
+    badge: "Pacientes",
+    title: "Gerencie seus Pacientes",
+    desc: "Cadastre, edite e acompanhe todos os seus pacientes.",
+    details: [
+      "Cadastre com nome, email, telefone e CPF",
+      "Veja histórico de consultas de cada paciente",
+      "Acesse prontuários e diário de emoções",
+      "Envie tarefas e questionários",
+      "Acompanhe progresso com gráficos",
+    ],
     href: "/pacientes",
+    color: "cyan",
   },
   {
-    badge: "Passo 3 de 7",
-    title: "Agende uma consulta",
-    desc: "Vá em 'Agenda' e selecione o paciente, data e horário. A consulta aparece automaticamente na agenda do dia.",
-    visual: "calendar",
+    badge: "Agenda",
+    title: "Agendamento de Consultas",
+    desc: "Organize sua agenda de forma visual e intuitiva.",
+    details: [
+      "Visualize consultas em formato calendário",
+      "Clique em um horário para agendar",
+      "Confirme ou cancele consultas",
+      "Envie lembretes automáticos",
+      "Sincronize com Google Calendar",
+    ],
     href: "/agenda",
+    color: "violet",
   },
   {
-    badge: "Passo 4 de 7",
-    title: "Inicie uma videochamada",
-    desc: "Acesse 'Sala Virtual', crie uma sala e compartilhe o link com o paciente. A chamada é criptografada e segura.",
-    visual: "video",
+    badge: "Sala Virtual",
+    title: "Videochamadas Seguras",
+    desc: "Atenda seus pacientes por videochamada criptografada.",
+    details: [
+      "Crie salas com nome personalizado",
+      "Compartilhe link seguro com o paciente",
+      "Sala de espera com música relaxante",
+      "Controles de câmera e microfone",
+      "Qualidade adaptativa à internet",
+    ],
     href: "/sala-virtual",
+    color: "cyan",
   },
   {
-    badge: "Passo 5 de 7",
-    title: "Registre a sessão",
-    desc: "Após a consulta, registre suas observações no prontuário do paciente. Mantenha o histórico organizado.",
-    visual: "records",
+    badge: "Prontuários",
+    title: "Registros Clínicos",
+    desc: "Documente cada sessão de forma organizada e segura.",
+    details: [
+      "Registre observações por sessão",
+      "Assinatura digital do prontuário",
+      "Histórico completo do paciente",
+      "Relatórios exportáveis em PDF",
+      "Dados criptografados e seguros",
+    ],
     href: "/prontuarios",
+    color: "amber",
   },
   {
-    badge: "Passo 6 de 7",
-    title: "Configure seu perfil",
-    desc: "Complete seus dados profissionais, foto, CRP e informações de contato para que os pacientes possam te encontrar.",
-    visual: "settings",
+    badge: "Financeiro",
+    title: "Controle Financeiro",
+    desc: "Gerencie receitas, despesas e pagamentos.",
+    details: [
+      "Registre entradas e saídas",
+      "Emita recibos para pacientes",
+      "Acompanhe inadimplência",
+      "Gráficos de receita mensal",
+      "Relatórios financeiros exportáveis",
+    ],
+    href: "/financeiro",
+    color: "emerald",
+  },
+  {
+    badge: "Relatórios",
+    title: "Relatórios e Análises",
+    desc: "Gere relatórios detalhados do seu consultório.",
+    details: [
+      "Relatório de pacientes",
+      "Relatório financeiro",
+      "Relatório de agenda",
+      "Exporte em formato imprimível",
+      "Dados para tomada de decisão",
+    ],
+    href: "/relatorios",
+    color: "blue",
+  },
+  {
+    badge: "Configurações",
+    title: "Personalize sua Conta",
+    desc: "Configure perfil, integrações e preferências.",
+    details: [
+      "Foto e dados profissionais (CRP)",
+      "Integração com Google Calendar",
+      "Configuração de lembretes",
+      "Chave PIX para pagamentos",
+      "Informações de contato",
+    ],
     href: "/configuracoes",
+    color: "rose",
   },
   {
-    badge: "Passo 7 de 7",
-    title: "Tudo pronto!",
-    desc: "Explore relatórios, finanças, questionários e muito mais. O PsicoFlow foi feito para simplificar sua prática clínica.",
-    visual: "done",
+    badge: "Concluído",
+    title: "Tudo Pronto!",
+    desc: "Você conhece todas as principais funcionalidades do PsicoFlow.",
+    details: [
+      "Cadastre seus primeiros pacientes",
+      "Agende consultas e teste a videochamada",
+      "Explore questionários e protocolos de crise",
+      "Acompanhe seus relatórios regularmente",
+      "Entre em contato se precisar de ajuda",
+    ],
+    color: "blue",
   },
 ]
 
-const visualColors: Record<string, string> = {
-  welcome: "from-blue-500 to-blue-700",
-  patients: "from-emerald-500 to-emerald-700",
-  calendar: "from-violet-500 to-violet-700",
-  video: "from-cyan-500 to-cyan-700",
-  records: "from-amber-500 to-amber-700",
-  settings: "from-rose-500 to-rose-700",
-  done: "from-blue-500 to-blue-700",
+const colorMap: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  blue: { bg: "bg-blue-50 dark:bg-blue-950/30", text: "text-blue-700 dark:text-blue-300", border: "border-blue-200 dark:border-blue-800", dot: "bg-blue-500" },
+  emerald: { bg: "bg-emerald-50 dark:bg-emerald-950/30", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800", dot: "bg-emerald-500" },
+  violet: { bg: "bg-violet-50 dark:bg-violet-950/30", text: "text-violet-700 dark:text-violet-300", border: "border-violet-200 dark:border-violet-800", dot: "bg-violet-500" },
+  cyan: { bg: "bg-cyan-50 dark:bg-cyan-950/30", text: "text-cyan-700 dark:text-cyan-300", border: "border-cyan-200 dark:border-cyan-800", dot: "bg-cyan-500" },
+  amber: { bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800", dot: "bg-amber-500" },
+  rose: { bg: "bg-rose-50 dark:bg-rose-950/30", text: "text-rose-700 dark:text-rose-300", border: "border-rose-200 dark:border-rose-800", dot: "bg-rose-500" },
 }
 
-const KEY = "psicoflow-tour-v10"
+const KEY = "psicoflow-tour-v11"
 
 export function OnboardingTour() {
   const [open, setOpen] = useState(false)
@@ -81,10 +197,7 @@ export function OnboardingTour() {
     }
   }, [pathname])
 
-  const finish = () => {
-    setVisible(false)
-    setTimeout(() => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0) }, 300)
-  }
+  const finish = () => { setVisible(false); setTimeout(() => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0) }, 300) }
 
   const goTo = (n: number) => {
     setVisible(false)
@@ -100,68 +213,83 @@ export function OnboardingTour() {
   const s = steps[step]
   const pct = ((step + 1) / steps.length) * 100
   const last = step === steps.length - 1
+  const c = colorMap[s.color]
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center" onClick={finish}>
-      <div className="fixed inset-0 bg-black/40" />
-      <div onClick={e => e.stopPropagation()} className="relative z-[91] w-full max-w-lg mx-4">
-        <div
-          className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 ease-out"
-          style={{ opacity: visible ? 1 : 0, transform: visible ? "scale(1)" : "scale(0.95)" }}
-        >
-          {/* Visual Header */}
-          <div className={`relative h-40 bg-gradient-to-br ${visualColors[s.visual]} flex items-center justify-center overflow-hidden`}>
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGciPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2LTJoMTJ6TTM2IDE4djJIMjR2LTJoMTJ6TTM4IDMwdjJIMjZ2LTJoMTJ6TTM4IDI0djJIMjZ2LTJoMTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
-            <div className="relative text-center text-white">
-              <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
-                <span className="text-4xl">{s.visual === "welcome" ? "👋" : s.visual === "patients" ? "👥" : s.visual === "calendar" ? "📅" : s.visual === "video" ? "🎥" : s.visual === "records" ? "📋" : s.visual === "settings" ? "⚙️" : "🚀"}</span>
+    <div className="fixed inset-0 z-[90]">
+      {/* Subtle overlay - just dims slightly */}
+      <div className="fixed inset-0 bg-black/20" onClick={finish} />
+
+      {/* Spotlight highlight */}
+      {s.highlight && (
+        <div className="fixed z-[91] pointer-events-none" style={{ boxShadow: "0 0 0 4px rgba(59,130,246,0.3), 0 0 0 9999px rgba(0,0,0,0.25)" }}>
+          <style>{`
+            ${s.highlight} { position: relative; z-index: 92; }
+          `}</style>
+        </div>
+      )}
+
+      {/* Bottom tour panel - always visible, doesn't cover content */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-[95] transition-all duration-300 ease-out"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)" }}
+      >
+        <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-2xl">
+          <div className="max-w-4xl mx-auto px-6 py-5">
+            <div className="flex items-start gap-6">
+              {/* Left: Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", c.bg, c.text)}>{s.badge}</span>
+                  <span className="text-[11px] text-slate-400">{step + 1} de {steps.length}</span>
+                </div>
+                <h3 className="text-lg font-bold mb-1">{s.title}</h3>
+                <p className="text-sm text-slate-500 mb-3">{s.desc}</p>
+                <ul className="space-y-1">
+                  {s.details.map((d, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
+                      <span className={cn("w-1.5 h-1.5 rounded-full mt-1.5 shrink-0", c.dot)} />
+                      {d}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-sm font-medium text-white/80">{s.badge}</p>
-            </div>
-            <button onClick={finish} className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
 
-          {/* Progress */}
-          <div className="h-1 bg-slate-100 dark:bg-slate-800">
-            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${pct}%` }} />
-          </div>
+              {/* Right: Navigation */}
+              <div className="flex flex-col items-end gap-3 shrink-0">
+                {/* Progress dots */}
+                <div className="flex items-center gap-1.5">
+                  {steps.map((_, i) => (
+                    <div key={i} className={cn(
+                      "h-1.5 rounded-full transition-all duration-300",
+                      i === step ? "w-6" : "w-1.5",
+                      i === step ? c.dot : i < step ? "bg-slate-300 dark:bg-slate-600" : "bg-slate-200 dark:bg-slate-700"
+                    )} />
+                  ))}
+                </div>
 
-          {/* Content */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold mb-2">{s.title}</h3>
-            <p className="text-sm text-slate-500 leading-relaxed mb-6">{s.desc}</p>
-
-            {/* Step indicators */}
-            <div className="flex items-center justify-center gap-2 mb-6">
-              {steps.map((_, i) => (
-                <div key={i} className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  i === step ? "w-8 bg-blue-600" : i < step ? "w-2 bg-blue-300" : "w-2 bg-slate-200 dark:bg-slate-700"
-                )} />
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-between">
-              <button onClick={finish} className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                Pular tour
-              </button>
-              <div className="flex gap-2">
-                {step > 0 && (
-                  <button onClick={() => goTo(step - 1)} className="h-10 px-4 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-1">
-                    <ChevronLeft className="h-4 w-4" /> Voltar
+                {/* Buttons */}
+                <div className="flex items-center gap-2">
+                  <button onClick={finish} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Pular</button>
+                  {step > 0 && (
+                    <button onClick={() => goTo(step - 1)} className="h-9 px-3 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-1">
+                      <ChevronLeft className="h-3.5 w-3.5" /> Voltar
+                    </button>
+                  )}
+                  <button onClick={() => last ? finish() : goTo(step + 1)} className={cn(
+                    "h-9 px-5 rounded-lg text-xs font-semibold text-white shadow-md transition-all flex items-center gap-1.5",
+                    last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500"
+                  )}>
+                    {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}
                   </button>
-                )}
-                <button onClick={() => last ? finish() : goTo(step + 1)} className={cn(
-                  "h-10 px-6 rounded-xl text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl flex items-center gap-1.5",
-                  last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600"
-                )}>
-                  {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}
-                </button>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1 bg-slate-100 dark:bg-slate-800">
+            <div className={cn("h-full transition-all duration-500 bg-gradient-to-r", c.bg.replace("bg-", "from-").replace(" dark:bg-", " dark:from-"))} style={{ width: `${pct}%` }} />
           </div>
         </div>
       </div>
