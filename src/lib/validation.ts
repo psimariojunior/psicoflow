@@ -125,6 +125,11 @@ export const updateSettingsSchema = z.object({
       avatarUrl: z.string().max(100000).optional().or(z.literal("")),
       sessionDuration: z.number().int().min(10).max(180).optional(),
       sessionInterval: z.number().int().min(0).max(60).optional(),
+      publicName: z.string().max(200).optional().or(z.literal("")),
+      publicBio: z.string().max(2000).optional().or(z.literal("")),
+      sessionPrice: z.number().int().min(0).max(100000).optional().nullable(),
+      welcomeMessage: z.string().max(1000).optional().or(z.literal("")),
+      clinicAddress: z.string().max(500).optional().or(z.literal("")),
     })
 
 export const changePasswordSchema = z.object({

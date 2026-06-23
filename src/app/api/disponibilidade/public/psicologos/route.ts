@@ -13,6 +13,11 @@ export async function GET() {
         specialty: true,
         bio: true,
         avatarUrl: true,
+        publicName: true,
+        publicBio: true,
+        sessionPrice: true,
+        welcomeMessage: true,
+        clinicAddress: true,
       },
     })
     return NextResponse.json(psychologists)

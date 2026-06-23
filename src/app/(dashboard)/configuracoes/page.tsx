@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet, Eye } from "lucide-react"
 import toast from "react-hot-toast"
 
 function GoogleCalendarStatus() {
@@ -158,6 +158,11 @@ export default function SettingsPage() {
     avatarUrl: "",
     sessionDuration: 50,
     sessionInterval: 10,
+    publicName: "",
+    publicBio: "",
+    sessionPrice: "" as string | number,
+    welcomeMessage: "",
+    clinicAddress: "",
   })
   const [loading, setLoading] = useState(true)
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" })
@@ -202,6 +207,11 @@ export default function SettingsPage() {
             avatarUrl: data.avatarUrl || "",
             sessionDuration: data.sessionDuration || 50,
             sessionInterval: data.sessionInterval || 10,
+            publicName: data.publicName || "",
+            publicBio: data.publicBio || "",
+            sessionPrice: data.sessionPrice ?? "",
+            welcomeMessage: data.welcomeMessage || "",
+            clinicAddress: data.clinicAddress || "",
           })
       })
       .catch(() => toast.error("Erro ao carregar configurações"))
@@ -410,6 +420,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="profile">
         <TabsList className="flex-wrap">
           <TabsTrigger value="profile"><User className="mr-2 h-4 w-4" />Perfil</TabsTrigger>
+          <TabsTrigger value="public"><Eye className="mr-2 h-4 w-4" />Perfil Público</TabsTrigger>
           <TabsTrigger value="notifications"><Bell className="mr-2 h-4 w-4" />Notificações</TabsTrigger>
           <TabsTrigger value="security"><Lock className="mr-2 h-4 w-4" />Segurança</TabsTrigger>
           <TabsTrigger value="appearance"><Palette className="mr-2 h-4 w-4" />Aparência</TabsTrigger>
@@ -478,6 +489,79 @@ export default function SettingsPage() {
               <Button onClick={handleSave}>
                 <Save className="mr-2 h-4 w-4" /> Salvar Alterações
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="public" className="mt-4 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Perfil Público</CardTitle>
+              <CardDescription>Configure o que os pacientes veem ao agendar uma consulta</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Nome de exibição</Label>
+                  <Input placeholder="Como os pacientes te veem" value={profile.publicName} onChange={(e) => setProfile({...profile, publicName: e.target.value})} />
+                  <p className="text-xs text-muted-foreground">Se vazio, usa o nome da conta</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Valor da sessão (R$)</Label>
+                  <Input type="number" min="0" step="0.01" placeholder="Ex: 150" value={profile.sessionPrice} onChange={(e) => setProfile({...profile, sessionPrice: e.target.value})} />
+                  <p className="text-xs text-muted-foreground">Deixe vazio para não mostrar preço</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Mensagem de boas-vindas</Label>
+                <Textarea rows={3} placeholder="Mensagem que aparece para o paciente ao agendar" value={profile.welcomeMessage} onChange={(e) => setProfile({...profile, welcomeMessage: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <Label>Biografia pública</Label>
+                <Textarea rows={4} placeholder="Descrição que aparece no card de agendamento" value={profile.publicBio} onChange={(e) => setProfile({...profile, publicBio: e.target.value})} />
+                <p className="text-xs text-muted-foreground">Se vazio, usa a biografia do perfil</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Endereço / Local de atendimento</Label>
+                <Input placeholder="Ex: Rua Exemplo, 123 - Belo Horizonte/MG" value={profile.clinicAddress} onChange={(e) => setProfile({...profile, clinicAddress: e.target.value})} />
+              </div>
+              <Button onClick={handleSave}>
+                <Save className="mr-2 h-4 w-4" /> Salvar Perfil Público
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Pré-visualização</CardTitle>
+              <CardDescription>Assim seu perfil aparece para os pacientes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 ring-1 ring-white/10 max-w-md">
+                <div className="flex items-start gap-4 mb-4">
+                  {profile.avatarUrl ? (
+                    <img src={profile.avatarUrl} alt="" className="h-16 w-16 rounded-full object-cover ring-2 ring-white/10" />
+                  ) : (
+                    <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center ring-2 ring-white/10 shrink-0">
+                      <User className="h-8 w-8 text-blue-400" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-semibold text-white">{profile.publicName || profile.name || "Seu nome"}</h3>
+                    {profile.specialty && <p className="text-blue-400/80 text-sm">{profile.specialty}</p>}
+                    {profile.sessionPrice && <p className="text-green-400 text-sm font-medium mt-1">R$ {Number(profile.sessionPrice).toFixed(2)}</p>}
+                  </div>
+                </div>
+                {(profile.publicBio || profile.bio) && (
+                  <p className="text-white/50 text-sm mb-3 line-clamp-3">{profile.publicBio || profile.bio}</p>
+                )}
+                {profile.welcomeMessage && (
+                  <p className="text-blue-300/70 text-sm italic mb-3">&ldquo;{profile.welcomeMessage}&rdquo;</p>
+                )}
+                {profile.clinicAddress && (
+                  <p className="text-white/30 text-xs">{profile.clinicAddress}</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

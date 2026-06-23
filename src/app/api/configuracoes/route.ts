@@ -13,7 +13,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: psychologistId },
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true },
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true, publicName: true, publicBio: true, sessionPrice: true, welcomeMessage: true, clinicAddress: true },
     })
 
     if (!user) {
@@ -64,7 +64,7 @@ export async function PUT(request: Request) {
     if (result.error) return result.error
 
     const data = result.data! as Record<string, unknown>
-    const textFields = ["name", "specialty", "bio", "paymentInfo"] as const
+    const textFields = ["name", "specialty", "bio", "paymentInfo", "publicName", "publicBio", "welcomeMessage", "clinicAddress"] as const
     for (const field of textFields) {
       if (typeof data[field] === "string") {
         data[field] = sanitizeHtml(data[field] as string)
@@ -74,7 +74,7 @@ export async function PUT(request: Request) {
     const user = await prisma.user.update({
       where: { id: psychologistId },
       data,
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true },
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true, publicName: true, publicBio: true, sessionPrice: true, welcomeMessage: true, clinicAddress: true },
     })
 
     return apiSuccess(user)

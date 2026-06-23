@@ -12,6 +12,11 @@ interface Psychologist {
   specialty: string | null
   bio: string | null
   avatarUrl: string | null
+  publicName: string | null
+  publicBio: string | null
+  sessionPrice: number | null
+  welcomeMessage: string | null
+  clinicAddress: string | null
 }
 
 function AgendarPage() {
@@ -77,13 +82,16 @@ function AgendarPage() {
                 )}
                 <div className="min-w-0">
                   <h2 className="text-lg font-semibold text-white group-hover:text-blue-300 transition-colors truncate">
-                    {psy.name}
+                    {psy.publicName || psy.name}
                   </h2>
                   {psy.specialty && (
                     <p className="text-blue-400/80 text-sm mt-0.5">{psy.specialty}</p>
                   )}
-                  {psy.bio && (
-                    <p className="text-white/40 text-sm mt-2 line-clamp-2">{psy.bio}</p>
+                  {psy.sessionPrice && (
+                    <p className="text-green-400 text-sm font-medium mt-1">R$ {psy.sessionPrice.toFixed(2)}</p>
+                  )}
+                  {(psy.publicBio || psy.bio) && (
+                    <p className="text-white/40 text-sm mt-2 line-clamp-2">{psy.publicBio || psy.bio}</p>
                   )}
                 </div>
               </Link>

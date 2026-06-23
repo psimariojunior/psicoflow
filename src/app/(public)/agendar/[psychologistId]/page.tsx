@@ -26,6 +26,13 @@ interface PsychologistInfo {
   id: string
   name: string
   specialty: string | null
+  bio: string | null
+  avatarUrl: string | null
+  publicName: string | null
+  publicBio: string | null
+  sessionPrice: number | null
+  welcomeMessage: string | null
+  clinicAddress: string | null
 }
 
 const DAY_NAMES_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
@@ -169,7 +176,7 @@ function BookingPage() {
               {selectedDate && formatDateBR(selectedDate)} às {selectedSlot?.time}
             </p>
             {psychologist && (
-              <p className="text-blue-400/80 text-sm mb-8">com {psychologist.name}</p>
+              <p className="text-blue-400/80 text-sm mb-8">com {psychologist.publicName || psychologist.name}</p>
             )}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6 mb-6 text-left">
               <p className="text-white/80 text-sm mb-1">
@@ -215,10 +222,21 @@ function BookingPage() {
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Agende sua consulta</h1>
           {psychologist ? (
-            <p className="text-white/50">
-              com <span className="text-blue-400/80">{psychologist.name}</span>
-              {psychologist.specialty && <span className="text-white/40"> &mdash; {psychologist.specialty}</span>}
-            </p>
+            <>
+              <p className="text-white/50">
+                com <span className="text-blue-400/80">{psychologist.publicName || psychologist.name}</span>
+                {psychologist.specialty && <span className="text-white/40"> &mdash; {psychologist.specialty}</span>}
+              </p>
+              {psychologist.sessionPrice && (
+                <p className="text-green-400 text-sm font-medium mt-1">R$ {psychologist.sessionPrice.toFixed(2)}</p>
+              )}
+              {psychologist.welcomeMessage && (
+                <p className="text-blue-300/60 text-sm mt-2 italic max-w-md mx-auto">&ldquo;{psychologist.welcomeMessage}&rdquo;</p>
+              )}
+              {psychologist.clinicAddress && (
+                <p className="text-white/30 text-xs mt-2">{psychologist.clinicAddress}</p>
+              )}
+            </>
           ) : (
             <p className="text-white/50">Escolha o melhor dia e horário para você</p>
           )}
@@ -341,7 +359,7 @@ function BookingPage() {
                   {selectedDate && formatDateBR(selectedDate)} às {selectedSlot.time}
                 </p>
                 {psychologist && (
-                  <p className="text-blue-400/80 text-sm mt-1">com {psychologist.name}</p>
+                  <p className="text-blue-400/80 text-sm mt-1">com {psychologist.publicName || psychologist.name}</p>
                 )}
               </div>
 

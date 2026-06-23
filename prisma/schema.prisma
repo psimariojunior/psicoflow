@@ -30,6 +30,11 @@ model User {
   bio                    String?
   pixKey                 String?
   paymentInfo            String?
+  publicName             String?
+  publicBio              String?
+  sessionPrice           Int?
+  welcomeMessage         String?
+  clinicAddress          String?
   sessionDuration        Int      @default(50)
   sessionInterval        Int      @default(10)
   emailVerified          DateTime?
