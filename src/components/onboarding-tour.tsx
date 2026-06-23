@@ -106,27 +106,39 @@ export function OnboardingTour() {
       setHighlightRect(rect)
 
       const position = currentStep.position || "right"
+      const tooltipWidth = 320
+      const tooltipHeight = 200
+      const margin = 16
+      const viewportW = window.innerWidth
+      const viewportH = window.innerHeight
+
       let top = 0
       let left = 0
 
       switch (position) {
         case "right":
-          top = rect.top + rect.height / 2
-          left = rect.right + 16
+          top = rect.top + rect.height / 2 - tooltipHeight / 2
+          left = rect.right + margin
           break
         case "left":
-          top = rect.top + rect.height / 2
-          left = rect.left - 340
+          top = rect.top + rect.height / 2 - tooltipHeight / 2
+          left = rect.left - tooltipWidth - margin
           break
         case "top":
-          top = rect.top - 16
-          left = rect.left + rect.width / 2 - 160
+          top = rect.top - tooltipHeight - margin
+          left = rect.left + rect.width / 2 - tooltipWidth / 2
           break
         case "bottom":
-          top = rect.bottom + 16
-          left = rect.left + rect.width / 2 - 160
+          top = rect.bottom + margin
+          left = rect.left + rect.width / 2 - tooltipWidth / 2
           break
       }
+
+      // Keep within viewport bounds
+      if (top < margin) top = margin
+      if (top + tooltipHeight > viewportH - margin) top = viewportH - tooltipHeight - margin
+      if (left < margin) left = margin
+      if (left + tooltipWidth > viewportW - margin) left = viewportW - tooltipWidth - margin
 
       setTooltipStyle({ top, left })
     }
