@@ -1,209 +1,153 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { X, ChevronRight, ChevronLeft, Check, MousePointer2 } from "lucide-react"
+import { X, ChevronRight, ChevronLeft, Check, Lightbulb } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Step {
-  badge: string
+  page: string
   title: string
-  desc: string
-  details: string[]
+  intro: string
+  points: { label: string; text: string }[]
   href?: string
-  highlight?: string
-  color: string
 }
 
 const steps: Step[] = [
   {
-    badge: "Boas-vindas",
-    title: "Menu de Navegação",
-    desc: "Este é o menu lateral. Por aqui você acessa todas as funcionalidades.",
-    details: [
-      "Dashboard — visão geral do consultório",
-      "Pacientes — cadastro e histórico",
-      "Agenda — agendamento de consultas",
-      "Sala Virtual — videochamadas seguras",
-      "Prontuários — registros clínicos",
-      "Financeiro — receitas e despesas",
-      "Configurações — perfil e integrações",
+    page: "Dashboard",
+    title: "Seu painel principal",
+    intro: "Aqui você tem uma visão completa do seu consultório em tempo real.",
+    points: [
+      { label: "Cards superiores", text: "Mostram total de pacientes, consultas de hoje, receita do mês e pagamentos pendentes" },
+      { label: "Ações rápidas", text: "Atalhos para criar consulta, cadastrar paciente, iniciar videochamada e abrir prontuário" },
+      { label: "Gráficos", text: "Evolução de receita e agendamentos ao longo dos meses" },
+      { label: "Meta do mês", text: "Acompanhe se está atingindo sua meta de faturamento" },
     ],
-    highlight: "nav[data-tour]",
-    color: "blue",
   },
   {
-    badge: "Estatísticas",
-    title: "Painel de Controle",
-    desc: "Aqui você vê os principais indicadores do seu consultório.",
-    details: [
-      "Total de pacientes cadastrados",
-      "Consultas agendadas para hoje",
-      "Receita mensal acumulada",
-      "Pagamentos pendentes",
-      "Gráficos de evolução mensal",
-    ],
-    highlight: "[data-tour='stats']",
-    color: "emerald",
-  },
-  {
-    badge: "Ações Rápidas",
-    title: "Atalhos para Ações Comuns",
-    desc: "Acesse diretamente as funcionalidades mais usadas sem navegar pelo menu.",
-    details: [
-      "Nova Consulta — agendar rapidamente",
-      "Novo Paciente — cadastrar em segundos",
-      "Sala Virtual — iniciar videochamada",
-      "Prontuário — registrar sessão",
-    ],
-    highlight: "[data-tour='quick']",
-    color: "violet",
-  },
-  {
-    badge: "Pacientes",
-    title: "Gerencie seus Pacientes",
-    desc: "Cadastre, edite e acompanhe todos os seus pacientes.",
-    details: [
-      "Cadastre com nome, email, telefone e CPF",
-      "Veja histórico de consultas de cada paciente",
-      "Acesse prontuários e diário de emoções",
-      "Envie tarefas e questionários",
-      "Acompanhe progresso com gráficos",
+    page: "Pacientes",
+    title: "Gerencie seus pacientes",
+    intro: "Cadastre e acompanhe todos os seus pacientes em um só lugar.",
+    points: [
+      { label: "Lista de pacientes", text: "Veja todos os pacientes cadastrados com foto, contato e status" },
+      { label: "Novo paciente", text: "Cadastre com nome, email, telefone, CPF e data de nascimento" },
+      { label: "Perfil do paciente", text: "Acesse histórico completo, prontuários, questionários e diário emocional" },
+      { label: "Timeline", text: "Linha do tempo com todas as atividades do paciente em ordem cronológica" },
     ],
     href: "/pacientes",
-    color: "cyan",
   },
   {
-    badge: "Agenda",
-    title: "Agendamento de Consultas",
-    desc: "Organize sua agenda de forma visual e intuitiva.",
-    details: [
-      "Visualize consultas em formato calendário",
-      "Clique em um horário para agendar",
-      "Confirme ou cancele consultas",
-      "Envie lembretes automáticos",
-      "Sincronize com Google Calendar",
+    page: "Agenda",
+    title: "Sua agenda de consultas",
+    intro: "Organize seus horários de forma visual e intuitiva.",
+    points: [
+      { label: "Calendário", text: "Visualize consultas por dia, semana ou mês" },
+      { label: "Agendar", text: "Clique em um horário livre para criar uma consulta" },
+      { label: "Status", text: "Confirme, cancele ou marque falta com um clique" },
+      { label: "Lembretes", text: "Envio automático por email e WhatsApp 24h e 1h antes" },
     ],
     href: "/agenda",
-    color: "violet",
   },
   {
-    badge: "Sala Virtual",
-    title: "Videochamadas Seguras",
-    desc: "Atenda seus pacientes por videochamada criptografada.",
-    details: [
-      "Crie salas com nome personalizado",
-      "Compartilhe link seguro com o paciente",
-      "Sala de espera com música relaxante",
-      "Controles de câmera e microfone",
-      "Qualidade adaptativa à internet",
+    page: "Sala Virtual",
+    title: "Videochamadas seguras",
+    intro: "Atenda seus pacientes online com qualidade profissional.",
+    points: [
+      { label: "Criar sala", text: "Gere uma sala única e copie o link para enviar ao paciente" },
+      { label: "Sala de espera", text: "Paciente aguarda com música relaxante e exercício de respiração" },
+      { label: "Controles", text: "Ligue/desligue câmera e microfone durante a chamada" },
+      { label: "Segurança", text: "Conexão criptografada via LiveKit Cloud com servidor no Brasil" },
     ],
     href: "/sala-virtual",
-    color: "cyan",
   },
   {
-    badge: "Prontuários",
-    title: "Registros Clínicos",
-    desc: "Documente cada sessão de forma organizada e segura.",
-    details: [
-      "Registre observações por sessão",
-      "Assinatura digital do prontuário",
-      "Histórico completo do paciente",
-      "Relatórios exportáveis em PDF",
-      "Dados criptografados e seguros",
+    page: "Prontuários",
+    title: "Registros clínicos digitais",
+    intro: "Documente cada sessão de forma organizada e segura.",
+    points: [
+      { label: "Novo prontuário", text: "Registre observações da sessão com formato SOAP" },
+      { label: "Assinatura digital", text: "Assine o prontuário digitalmente após encerrar a sessão" },
+      { label: "Histórico", text: "Todos os prontuários do paciente em ordem cronológica" },
+      { label: "IA integrada", text: "Gere automaticamente notas SOAP com inteligência artificial" },
     ],
     href: "/prontuarios",
-    color: "amber",
   },
   {
-    badge: "Financeiro",
-    title: "Controle Financeiro",
-    desc: "Gerencie receitas, despesas e pagamentos.",
-    details: [
-      "Registre entradas e saídas",
-      "Emita recibos para pacientes",
-      "Acompanhe inadimplência",
-      "Gráficos de receita mensal",
-      "Relatórios financeiros exportáveis",
+    page: "Financeiro",
+    title: "Controle financeiro completo",
+    intro: "Gerencie receitas, despesas e pagamentos do consultório.",
+    points: [
+      { label: "Receitas e despesas", text: "Registre todas as entradas e saídas financeiras" },
+      { label: "Faturas", text: "Gere faturas para pacientes com pagamento via Stripe" },
+      { label: "Recibos", text: "Emita recibos profissionais automaticamente" },
+      { label: "Gráficos", text: "Acompanhe a evolução financeira mês a mês" },
     ],
     href: "/financeiro",
-    color: "emerald",
   },
   {
-    badge: "Relatórios",
-    title: "Relatórios e Análises",
-    desc: "Gere relatórios detalhados do seu consultório.",
-    details: [
-      "Relatório de pacientes",
-      "Relatório financeiro",
-      "Relatório de agenda",
-      "Exporte em formato imprimível",
-      "Dados para tomada de decisão",
+    page: "Relatórios",
+    title: "Relatórios e análises",
+    intro: "Gere documentos profissionais para tomada de decisão.",
+    points: [
+      { label: "Relatório de pacientes", text: "Lista completa com dados e histórico de consultas" },
+      { label: "Relatório financeiro", text: "Resumo de receitas, despesas e métodos de pagamento" },
+      { label: "Relatório de agenda", text: "Estatísticas de consultas por status e período" },
+      { label: "Exportar", text: "Imima diretamente do navegador em formato PDF" },
     ],
     href: "/relatorios",
-    color: "blue",
   },
   {
-    badge: "Configurações",
-    title: "Personalize sua Conta",
-    desc: "Configure perfil, integrações e preferências.",
-    details: [
-      "Foto e dados profissionais (CRP)",
-      "Integração com Google Calendar",
-      "Configuração de lembretes",
-      "Chave PIX para pagamentos",
-      "Informações de contato",
+    page: "Configurações",
+    title: "Personalize sua conta",
+    intro: "Configure seu perfil e integrações com outros serviços.",
+    points: [
+      { label: "Perfil", text: "Foto, nome, CRP, especialidade e biografia profissional" },
+      { label: "Google Calendar", text: "Sincronize consultas com seu calendário do Google" },
+      { label: "Lembretes", text: "Configure envio automático por email e WhatsApp" },
+      { label: "Pagamentos", text: "Configure chave PIX e integração com Stripe" },
     ],
     href: "/configuracoes",
-    color: "rose",
   },
   {
-    badge: "Concluído",
-    title: "Tudo Pronto!",
-    desc: "Você conhece todas as principais funcionalidades do PsicoFlow.",
-    details: [
-      "Cadastre seus primeiros pacientes",
-      "Agende consultas e teste a videochamada",
-      "Explore questionários e protocolos de crise",
-      "Acompanhe seus relatórios regularmente",
-      "Entre em contato se precisar de ajuda",
+    page: "Conclusão",
+    title: "Tudo pronto!",
+    intro: "Você conhece as principais funcionalidades do PsicoFlow.",
+    points: [
+      { label: "Primeiros passos", text: "Cadastre um paciente, agende uma consulta e teste a videochamada" },
+      { label: "Questionários", text: "Aplique PHQ-9, GAD-7 e outros testes com seus pacientes" },
+      { label: "Protocolos de crise", text: "Tenha acesso a protocolos de atendimento em emergências" },
+      { label: "Suporte", text: "Acesse a página de Ajuda no menu lateral quando precisar" },
     ],
-    color: "blue",
   },
 ]
 
-const colorMap: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-  blue: { bg: "bg-blue-50 dark:bg-blue-950/30", text: "text-blue-700 dark:text-blue-300", border: "border-blue-200 dark:border-blue-800", dot: "bg-blue-500" },
-  emerald: { bg: "bg-emerald-50 dark:bg-emerald-950/30", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800", dot: "bg-emerald-500" },
-  violet: { bg: "bg-violet-50 dark:bg-violet-950/30", text: "text-violet-700 dark:text-violet-300", border: "border-violet-200 dark:border-violet-800", dot: "bg-violet-500" },
-  cyan: { bg: "bg-cyan-50 dark:bg-cyan-950/30", text: "text-cyan-700 dark:text-cyan-300", border: "border-cyan-200 dark:border-cyan-800", dot: "bg-cyan-500" },
-  amber: { bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800", dot: "bg-amber-500" },
-  rose: { bg: "bg-rose-50 dark:bg-rose-950/30", text: "text-rose-700 dark:text-rose-300", border: "border-rose-200 dark:border-rose-800", dot: "bg-rose-500" },
-}
-
-const KEY = "psicoflow-tour-v11"
+const KEY = "psicoflow-tour-v12"
 
 export function OnboardingTour() {
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(0)
-  const [visible, setVisible] = useState(false)
+  const [anim, setAnim] = useState<"in" | "out">("in")
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
     if (!localStorage.getItem(KEY) && pathname === "/dashboard") {
-      const t = setTimeout(() => { setOpen(true); setTimeout(() => setVisible(true), 100) }, 600)
+      const t = setTimeout(() => setOpen(true), 500)
       return () => clearTimeout(t)
     }
   }, [pathname])
 
-  const finish = () => { setVisible(false); setTimeout(() => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0) }, 300) }
+  const finish = () => {
+    setAnim("out")
+    setTimeout(() => { localStorage.setItem(KEY, "true"); setOpen(false); setStep(0) }, 300)
+  }
 
-  const goTo = (n: number) => {
-    setVisible(false)
+  const go = (n: number) => {
+    setAnim("out")
     setTimeout(() => {
       setStep(n)
-      setVisible(true)
+      setAnim("in")
       const s = steps[n]
       if (s.href && s.href !== pathname) router.push(s.href)
     }, 250)
@@ -213,86 +157,95 @@ export function OnboardingTour() {
   const s = steps[step]
   const pct = ((step + 1) / steps.length) * 100
   const last = step === steps.length - 1
-  const c = colorMap[s.color]
 
   return (
-    <div className="fixed inset-0 z-[90]">
-      {/* Subtle overlay - just dims slightly */}
-      <div className="fixed inset-0 bg-black/20" onClick={finish} />
-
-      {/* Spotlight highlight */}
-      {s.highlight && (
-        <div className="fixed z-[91] pointer-events-none" style={{ boxShadow: "0 0 0 4px rgba(59,130,246,0.3), 0 0 0 9999px rgba(0,0,0,0.25)" }}>
-          <style>{`
-            ${s.highlight} { position: relative; z-index: 92; }
-          `}</style>
-        </div>
-      )}
-
-      {/* Bottom tour panel - always visible, doesn't cover content */}
+    <>
+      {/* Floating guide card - bottom right, doesn't block content */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-[95] transition-all duration-300 ease-out"
-        style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)" }}
+        className="fixed bottom-6 right-6 z-[95] w-[380px] max-w-[calc(100vw-3rem)]"
+        style={{
+          opacity: anim === "in" ? 1 : 0,
+          transform: anim === "in" ? "translateY(0) scale(1)" : "translateY(12px) scale(0.98)",
+          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
       >
-        <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-2xl">
-          <div className="max-w-4xl mx-auto px-6 py-5">
-            <div className="flex items-start gap-6">
-              {/* Left: Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", c.bg, c.text)}>{s.badge}</span>
-                  <span className="text-[11px] text-slate-400">{step + 1} de {steps.length}</span>
-                </div>
-                <h3 className="text-lg font-bold mb-1">{s.title}</h3>
-                <p className="text-sm text-slate-500 mb-3">{s.desc}</p>
-                <ul className="space-y-1">
-                  {s.details.map((d, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
-                      <span className={cn("w-1.5 h-1.5 rounded-full mt-1.5 shrink-0", c.dot)} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          {/* Header with gradient */}
+          <div className="relative h-2 bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500" />
 
-              {/* Right: Navigation */}
-              <div className="flex flex-col items-end gap-3 shrink-0">
-                {/* Progress dots */}
-                <div className="flex items-center gap-1.5">
-                  {steps.map((_, i) => (
-                    <div key={i} className={cn(
-                      "h-1.5 rounded-full transition-all duration-300",
-                      i === step ? "w-6" : "w-1.5",
-                      i === step ? c.dot : i < step ? "bg-slate-300 dark:bg-slate-600" : "bg-slate-200 dark:bg-slate-700"
-                    )} />
-                  ))}
-                </div>
-
-                {/* Buttons */}
-                <div className="flex items-center gap-2">
-                  <button onClick={finish} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Pular</button>
-                  {step > 0 && (
-                    <button onClick={() => goTo(step - 1)} className="h-9 px-3 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-1">
-                      <ChevronLeft className="h-3.5 w-3.5" /> Voltar
-                    </button>
-                  )}
-                  <button onClick={() => last ? finish() : goTo(step + 1)} className={cn(
-                    "h-9 px-5 rounded-lg text-xs font-semibold text-white shadow-md transition-all flex items-center gap-1.5",
-                    last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500"
-                  )}>
-                    {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}
-                  </button>
-                </div>
+          {/* Close + progress */}
+          <div className="flex items-center justify-between px-5 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950/50 flex items-center justify-center">
+                <Lightbulb className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               </div>
+              <span className="text-xs font-semibold text-slate-400">{step + 1} / {steps.length}</span>
             </div>
+            <button onClick={finish} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {/* Page badge */}
+          <div className="px-5 mt-2">
+            <span className="inline-block text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
+              {s.page}
+            </span>
+          </div>
+
+          {/* Title + intro */}
+          <div className="px-5 mt-2">
+            <h3 className="text-base font-bold leading-tight">{s.title}</h3>
+            <p className="text-[13px] text-slate-500 mt-1">{s.intro}</p>
+          </div>
+
+          {/* Points - what to look at on this page */}
+          <div className="px-5 mt-3 space-y-2">
+            {s.points.map((p, i) => (
+              <div key={i} className="flex items-start gap-2.5" style={{ opacity: anim === "in" ? 1 : 0, transition: `opacity 0.3s ease ${i * 80}ms` }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-[7px] shrink-0" />
+                <div className="flex-1">
+                  <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">{p.label}</span>
+                  <span className="text-[12px] text-slate-500 ml-1">— {p.text}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 bg-slate-100 dark:bg-slate-800">
-            <div className={cn("h-full transition-all duration-500 bg-gradient-to-r", c.bg.replace("bg-", "from-").replace(" dark:bg-", " dark:from-"))} style={{ width: `${pct}%` }} />
+          <div className="px-5 mt-4">
+            <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between px-5 py-4">
+            <button onClick={finish} className="text-[12px] text-slate-400 hover:text-slate-600 transition-colors">
+              Pular tour
+            </button>
+            <div className="flex items-center gap-2">
+              {step > 0 && (
+                <button onClick={() => go(step - 1)} className="h-8 px-3 rounded-lg text-[12px] font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-1">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Voltar
+                </button>
+              )}
+              <button
+                onClick={() => last ? finish() : go(step + 1)}
+                className={cn(
+                  "h-8 px-5 rounded-lg text-[12px] font-semibold text-white shadow-md transition-all flex items-center gap-1.5",
+                  last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500"
+                )}
+              >
+                {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Subtle dim - just 15% so user can still see everything */}
+      <div className="fixed inset-0 z-[80] bg-black/5 pointer-events-none" />
+    </>
   )
 }
