@@ -94,7 +94,7 @@ export async function GET(request: Request) {
   }
 
   try {
-  const firstPsych = await prisma.user.findFirst({ where: { role: "PSYCHOLOGIST" }, select: { id: true } })
+  const firstPsych = await prisma.user.findFirst({ where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] } }, select: { id: true } })
   if (!firstPsych) { return NextResponse.json({ error: "Nenhum psicólogo encontrado" }, { status: 400 }) }
   const psychId = firstPsych.id
 

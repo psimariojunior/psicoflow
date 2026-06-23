@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     let psychologistIdFinal = psychologistId
     if (!psychologistIdFinal) {
       const firstPsych = await prisma.user.findFirst({
-        where: { role: "PSYCHOLOGIST", active: true },
+        where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] }, active: true },
         orderBy: { createdAt: "asc" },
       })
       if (!firstPsych) {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       psychologistIdFinal = firstPsych.id
     } else {
       const psychExists = await prisma.user.findUnique({
-        where: { id: psychologistIdFinal, role: "PSYCHOLOGIST" },
+        where: { id: psychologistIdFinal, role: { in: ["PSYCHOLOGIST", "ADMIN"] } },
       })
       if (!psychExists) {
         return NextResponse.json({ error: "Psicólogo não encontrado" }, { status: 404 })

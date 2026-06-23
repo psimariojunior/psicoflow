@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (error) return error
 
     const psychologist = await prisma.user.findFirst({
-      where: { id: parsed!.psychologistId, role: "PSYCHOLOGIST", active: true },
+      where: { id: parsed!.psychologistId, role: { in: ["PSYCHOLOGIST", "ADMIN"] }, active: true },
       select: { id: true },
     })
     if (!psychologist) return apiError("Psicólogo não encontrado", 404)

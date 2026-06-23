@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 
-  const firstPsych = await prisma.user.findFirst({ where: { role: "PSYCHOLOGIST" }, select: { id: true } })
+  const firstPsych = await prisma.user.findFirst({ where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] } }, select: { id: true } })
   if (!firstPsych) {
     return NextResponse.json({ error: "Nenhum psicólogo encontrado no banco" }, { status: 400 })
   }

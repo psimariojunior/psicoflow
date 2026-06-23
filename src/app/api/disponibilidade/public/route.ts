@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     let psychologistIdFinal = psychologistId
     if (!psychologistIdFinal) {
       const firstPsychologist = await prisma.user.findFirst({
-        where: { role: "PSYCHOLOGIST", active: true },
+        where: { role: { in: ["PSYCHOLOGIST", "ADMIN"] }, active: true },
         orderBy: { createdAt: "asc" },
       })
       if (!firstPsychologist) {
