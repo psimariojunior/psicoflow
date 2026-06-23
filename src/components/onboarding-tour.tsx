@@ -122,13 +122,15 @@ const steps: Step[] = [
   },
 ]
 
-const KEY = "psicoflow-tour-v12"
+const KEY = "psicoflow-tour-v13"
+const STEP_KEY = "psicoflow-tour-step-v13"
+const ACTIVE_KEY = "psicoflow-tour-active-v13"
 
 export function OnboardingTour() {
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("psicoflow-tour-step")
+      const saved = sessionStorage.getItem(STEP_KEY)
       return saved ? parseInt(saved) : 0
     }
     return 0
@@ -138,27 +140,27 @@ export function OnboardingTour() {
   const router = useRouter()
 
   useEffect(() => {
-    if (!localStorage.getItem(KEY) && !sessionStorage.getItem("psicoflow-tour-active")) {
+    if (!localStorage.getItem(KEY) && !sessionStorage.getItem(ACTIVE_KEY)) {
       if (pathname === "/dashboard") {
-        sessionStorage.setItem("psicoflow-tour-active", "true")
+        sessionStorage.setItem(ACTIVE_KEY, "true")
         const t = setTimeout(() => setOpen(true), 500)
         return () => clearTimeout(t)
       }
-    } else if (sessionStorage.getItem("psicoflow-tour-active") === "true" && !localStorage.getItem(KEY)) {
+    } else if (sessionStorage.getItem(ACTIVE_KEY) === "true" && !localStorage.getItem(KEY)) {
       setOpen(true)
     }
   }, [pathname])
 
   useEffect(() => {
-    if (open) sessionStorage.setItem("psicoflow-tour-step", String(step))
+    if (open) sessionStorage.setItem(STEP_KEY, String(step))
   }, [step, open])
 
   const finish = () => {
     setAnim("out")
     setTimeout(() => {
       localStorage.setItem(KEY, "true")
-      sessionStorage.removeItem("psicoflow-tour-active")
-      sessionStorage.removeItem("psicoflow-tour-step")
+      sessionStorage.removeItem(ACTIVE_KEY)
+      sessionStorage.removeItem(STEP_KEY)
       setOpen(false)
       setStep(0)
     }, 300)
