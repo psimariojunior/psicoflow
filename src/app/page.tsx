@@ -44,6 +44,7 @@ const navLinks = [
   { label: "Início", href: "/" },
   { label: "Serviços", href: "/#servicos" },
   { label: "Sobre", href: "/sobre" },
+  { label: "Avaliações", href: "/avaliacoes" },
   { label: "Blog", href: "/blog" },
   { label: "Agendamento", href: "/agendar" },
   { label: "FAQ", href: "/#faq" },
@@ -53,6 +54,9 @@ export default function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [reviews, setReviews] = useState<{ id: string; patientName: string; rating: number; comment: string; createdAt: string }[]>([])
+  const [reviewsAvg, setReviewsAvg] = useState(0)
+  const [reviewsTotal, setReviewsTotal] = useState(0)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -62,6 +66,17 @@ export default function LandingPage() {
   }, [])
 
   useEffect(() => { setMenuOpen(false) }, [pathname])
+
+  useEffect(() => {
+    fetch("/api/avaliacoes")
+      .then((r) => r.json())
+      .then((data) => {
+        setReviews(data.reviews || [])
+        setReviewsAvg(data.average || 0)
+        setReviewsTotal(data.total || 0)
+      })
+      .catch(() => {})
+  }, [])
 
   const stagger = {
     hidden: { opacity: 0 },
@@ -266,6 +281,53 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
+      {reviewsTotal > 0 && (
+        <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="avaliacoes" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Avaliações</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">O que dizem <span className="text-blue-500">nossos pacientes</span></h2>
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className={cn("h-6 w-6", i <= Math.round(reviewsAvg) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
+                  ))}
+                </div>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">{reviewsAvg.toFixed(1)}</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">· {reviewsTotal} {reviewsTotal === 1 ? "avaliação" : "avaliações"}</span>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {reviews.slice(0, 3).map((r, i) => (
+                <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }}>
+                  <Card className="p-6 h-full border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+                    <Quote className="h-8 w-8 text-blue-200 dark:text-blue-900 mb-3" />
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-4 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900 dark:text-white text-sm">{r.patientName}</p>
+                        <div className="flex items-center gap-0.5 mt-1">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <Star key={i} className={cn("h-3.5 w-3.5", i <= r.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <Link href="/avaliacoes">
+                <Button variant="outline" size="lg" className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+                  Ver todas as avaliações <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </motion.section>
+      )}
+
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="faq" className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -329,6 +391,7 @@ export default function LandingPage() {
                 <li><Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">Início</Link></li>
                 <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
                 <li><Link href="/sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
+                <li><Link href="/avaliacoes" className="text-sm text-slate-300 hover:text-white transition-colors">Avaliações</Link></li>
                 <li><Link href="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
                 <li><Link href="/termos" className="text-sm text-slate-300 hover:text-white transition-colors">Termos de Uso</Link></li>

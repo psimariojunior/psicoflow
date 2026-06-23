@@ -73,6 +73,37 @@ model User {
   therapyTasks           TherapyTask[]
   receipts               Receipt[]
   waitingList            WaitingList[]
+  documentTemplates      DocumentTemplate[]
+  reviews                Review[]
+}
+
+model DocumentTemplate {
+  id             String   @id @default(cuid())
+  psychologistId String
+  name           String
+  category       String   @default("geral")
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  psychologist User @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+
+  @@index([psychologistId])
+}
+
+model Review {
+  id             String   @id @default(cuid())
+  psychologistId String
+  patientName    String
+  rating         Int
+  comment        String
+  approved       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  psychologist User @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+
+  @@index([psychologistId])
+  @@index([approved])
 }
 
 model Account {

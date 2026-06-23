@@ -141,3 +141,26 @@ export const createTransactionSchema = z.object({
   patientId: z.string().optional(),
   notes: z.string().optional(),
 })
+
+export const createDocumentTemplateSchema = z.object({
+  name: z.string().min(2, "Nome é obrigatório").max(120),
+  category: z.string().max(60).optional().or(z.literal("")),
+  content: z.string().min(1, "Conteúdo é obrigatório").max(20000),
+})
+
+export const updateDocumentTemplateSchema = z.object({
+  name: z.string().min(2).max(120).optional(),
+  category: z.string().max(60).optional().or(z.literal("")),
+  content: z.string().min(1).max(20000).optional(),
+})
+
+export const createReviewSchema = z.object({
+  psychologistId: z.string().min(1, "Psicólogo é obrigatório"),
+  patientName: z.string().min(2, "Nome é obrigatório").max(120),
+  rating: z.number().int().min(1, "Avaliação mínima é 1").max(5, "Avaliação máxima é 5"),
+  comment: z.string().min(5, "Comentário deve ter ao menos 5 caracteres").max(1000),
+})
+
+export const updateReviewSchema = z.object({
+  approved: z.boolean().optional(),
+})

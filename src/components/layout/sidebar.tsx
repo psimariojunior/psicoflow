@@ -29,6 +29,7 @@ import {
   ListTodo,
   LogOut,
   Shield,
+  FileType,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -51,6 +52,7 @@ const menuItems = [
   { href: "/sessoes", label: "Sessões", icon: ClipboardList },
   { href: "/questionarios", label: "Questionários", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
+  { href: "/documentos", label: "Documentos", icon: FileType },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
   { href: "/tarefas",        label: "Tarefas",           icon: ListTodo },
   { href: "/notificacoes",   label: "Notificações",     icon: Bell },

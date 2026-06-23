@@ -6,7 +6,7 @@ const LIVEKIT_WS = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psico
 const publicPages = [
   "/", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest",
   "/termos", "/privacidade", "/login", "/register", "/recuperar-senha",
-  "/pricing", "/blog", "/sobre",
+  "/pricing", "/blog", "/sobre", "/avaliacoes",
 ]
 
 const publicPrefixes = [
@@ -25,6 +25,7 @@ const publicApiPrefixes = [
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
   "/api/pagamentos/public-checkout", "/api/setup/promote-me",
+  "/api/avaliacoes",
 ]
 
 const staticPrefixes = ["/_next", "/static"]

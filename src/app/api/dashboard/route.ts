@@ -15,6 +15,8 @@ export async function GET() {
     const startOfLastMonth = new Date(Date.UTC(currentYear, currentMonth - 1, 1))
     const startOfToday = new Date(Date.UTC(currentYear, currentMonth, brtNow.getUTCDate()))
     const endOfToday = new Date(startOfToday.getTime() + 86400000)
+    const endOfTomorrow = new Date(endOfToday.getTime() + 86400000)
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000)
     const startOfYear = new Date(Date.UTC(currentYear, 0, 1))
     const sixMonthsAgo = new Date(Date.UTC(currentYear, currentMonth - 5, 1))
 
@@ -26,7 +28,11 @@ export async function GET() {
       pendingPayments,
       overduePayments,
       recentAppointments,
+      todaysAppointments,
+      tomorrowsAppointments,
       recentPatients,
+      recentAuditLogs,
+      recentPayments,
       financialSummary,
       allAppointments,
       monthlyRevenueData,
@@ -63,10 +69,33 @@ export async function GET() {
         orderBy: { startTime: "asc" },
         take: 5,
       }),
+      prisma.appointment.findMany({
+        where: { psychologistId, startTime: { gte: startOfToday, lt: endOfToday }, status: { notIn: ["CANCELLED"] } },
+        include: { patient: { select: { id: true, name: true } } },
+        orderBy: { startTime: "asc" },
+        take: 20,
+      }),
+      prisma.appointment.findMany({
+        where: { psychologistId, startTime: { gte: endOfToday, lt: endOfTomorrow }, status: { notIn: ["CANCELLED"] } },
+        include: { patient: { select: { id: true, name: true } } },
+        orderBy: { startTime: "asc" },
+        take: 20,
+      }),
       prisma.patient.findMany({
         where: { psychologistId },
         orderBy: { createdAt: "desc" },
         take: 5,
+      }),
+      prisma.auditLog.findMany({
+        where: { userId: psychologistId, createdAt: { gte: sevenDaysAgo } },
+        orderBy: { createdAt: "desc" },
+        take: 15,
+      }),
+      prisma.financialTransaction.findMany({
+        where: { psychologistId, type: "INCOME", paymentStatus: "PAID", paymentDate: { gte: sevenDaysAgo } },
+        include: { patient: { select: { name: true } } },
+        orderBy: { paymentDate: "desc" },
+        take: 10,
       }),
       Promise.all([
         prisma.financialTransaction.aggregate({
@@ -181,6 +210,62 @@ export async function GET() {
       if (idx >= 0) newPatientsByMonth[idx].count++
     }
 
+    const mapApt = (apt: { id: string; startTime: Date; status: string; modality: string | null; patient: { name: string } }) => ({
+      id: apt.id,
+      patientName: apt.patient.name,
+      startTime: apt.startTime,
+      status: apt.status,
+      modality: apt.modality || "presential",
+    })
+
+    type ActivityItem = {
+      id: string
+      type: "appointment" | "patient" | "payment" | "session" | "system"
+      description: string
+      timestamp: string
+      amount?: number
+    }
+    const activity: ActivityItem[] = []
+
+    for (const p of recentPatients) {
+      activity.push({
+        id: `pat-${p.id}`,
+        type: "patient",
+        description: `Novo paciente cadastrado: ${p.name}`,
+        timestamp: p.createdAt.toISOString(),
+      })
+    }
+    for (const apt of todaysAppointments) {
+      activity.push({
+        id: `apt-${apt.id}`,
+        type: "appointment",
+        description: `Consulta agendada: ${apt.patient.name}`,
+        timestamp: apt.createdAt ? apt.createdAt.toISOString() : apt.startTime.toISOString(),
+      })
+    }
+    for (const tx of recentPayments) {
+      activity.push({
+        id: `pay-${tx.id}`,
+        type: "payment",
+        description: `Pagamento recebido${tx.patient ? ` de ${tx.patient.name}` : ""}`,
+        timestamp: tx.paymentDate ? tx.paymentDate.toISOString() : tx.createdAt.toISOString(),
+        amount: tx.amount,
+      })
+    }
+    for (const log of recentAuditLogs) {
+      if (log.action === "CREATE" && log.entity === "Patient") continue
+      if (log.details) {
+        activity.push({
+          id: `log-${log.id}`,
+          type: "system",
+          description: log.details,
+          timestamp: log.createdAt.toISOString(),
+        })
+      }
+    }
+    activity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    const recentActivity = activity.slice(0, 10)
+
     return apiSuccess({
       stats: {
         totalPatients,
@@ -191,13 +276,9 @@ export async function GET() {
         revenueChange: Math.round(revenueChange * 10) / 10,
       },
       monthlyData,
-      appointments: recentAppointments.map((apt) => ({
-        id: apt.id,
-        patientName: apt.patient.name,
-        startTime: apt.startTime,
-        status: apt.status,
-        modality: apt.modality || "presential",
-      })),
+      appointments: recentAppointments.map(mapApt),
+      todaysAppointments: todaysAppointments.map(mapApt),
+      tomorrowsAppointments: tomorrowsAppointments.map(mapApt),
       patients: recentPatients.map((p) => ({
         id: p.id,
         name: p.name,
@@ -205,6 +286,7 @@ export async function GET() {
         phone: p.phone,
         createdAt: p.createdAt,
       })),
+      recentActivity,
       financialSummary: {
         totalRevenue: income,
         totalExpenses: expense,

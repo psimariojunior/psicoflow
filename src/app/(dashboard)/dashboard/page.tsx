@@ -6,14 +6,25 @@ import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointmen
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
+import { RecentPatients } from "@/components/dashboard/recent-patients"
+import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { OnboardingChecklist } from "@/components/onboarding-checklist"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity, CalendarDays, Sun, Moon } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
-import { cn } from "@/lib/utils"
+import { cn, formatTime } from "@/lib/utils"
 import { motion } from "framer-motion"
+
+interface ActivityItem {
+  id: string
+  type: "appointment" | "patient" | "payment" | "session" | "system"
+  description: string
+  timestamp: string
+  amount?: number
+}
 
 const quickActions = [
   { label: "Nova Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Agende um novo horário" },
@@ -27,7 +38,10 @@ export default function DashboardHome() {
     stats: { totalPatients: number; appointmentsToday: number; monthlyRevenue: number; pendingPayments: number; appointmentChange: number; revenueChange: number }
     monthlyData: { month: string; appointments: number; receita: number }[]
     appointments: { id: string; patientName: string; startTime: string; status: string; modality: string }[]
+    todaysAppointments: { id: string; patientName: string; startTime: string; status: string; modality: string }[]
+    tomorrowsAppointments: { id: string; patientName: string; startTime: string; status: string; modality: string }[]
     patients: { id: string; name: string; email: string | null; phone: string | null; createdAt: string }[]
+    recentActivity: ActivityItem[]
     financialSummary: { totalRevenue: number; totalExpenses: number; balance: number; pending: number; overdue: number; received: number; goal: number }
     indicators: { averageTicket: number; completionRate: number; cancellationRate: number; occupationRate: number }
     paymentsByMethod: { name: string; value: number }[]
@@ -88,10 +102,63 @@ export default function DashboardHome() {
 
   const stats = data?.stats ?? { totalPatients: 0, appointmentsToday: 0, monthlyRevenue: 0, pendingPayments: 0, appointmentChange: 0, revenueChange: 0 }
   const appointments = (data?.appointments ?? []).map((a) => ({ ...a, startTime: new Date(a.startTime) }))
+  const todaysAppointments = (data?.todaysAppointments ?? []).map((a) => ({ ...a, startTime: new Date(a.startTime) }))
+  const tomorrowsAppointments = (data?.tomorrowsAppointments ?? []).map((a) => ({ ...a, startTime: new Date(a.startTime) }))
+  const recentPatients = (data?.patients ?? []).map((p) => ({ ...p, createdAt: new Date(p.createdAt) }))
+  const recentActivity = data?.recentActivity ?? []
   const financialSummary = data?.financialSummary ?? { totalRevenue: 0, totalExpenses: 0, balance: 0, pending: 0, overdue: 0, received: 0, goal: 10000 }
   const indicators = data?.indicators ?? { averageTicket: 0, completionRate: 0, cancellationRate: 0, occupationRate: 0 }
 
   const filteredMonthlyData = (data?.monthlyData ?? []).slice(period === "6" ? -6 : period === "12" ? -12 : 0)
+
+  const statusVariant = (status: string) => {
+    switch (status) {
+      case "SCHEDULED": return "info"
+      case "CONFIRMED": return "success"
+      case "IN_PROGRESS": return "warning"
+      case "COMPLETED": return "success"
+      case "CANCELLED": return "destructive"
+      default: return "secondary"
+    }
+  }
+  const statusLabel = (status: string) => {
+    switch (status) {
+      case "SCHEDULED": return "Agendado"
+      case "CONFIRMED": return "Confirmado"
+      case "IN_PROGRESS": return "Em andamento"
+      case "COMPLETED": return "Concluído"
+      case "CANCELLED": return "Cancelado"
+      case "NO_SHOW": return "Faltou"
+      default: return status
+    }
+  }
+
+  const AppointmentList = ({ items, emptyIcon: EmptyIcon, emptyText }: { items: typeof todaysAppointments; emptyIcon: typeof Sun; emptyText: string }) => {
+    if (items.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <EmptyIcon className="h-6 w-6 text-muted-foreground/40 mb-2" />
+          <p className="text-xs text-muted-foreground">{emptyText}</p>
+        </div>
+      )
+    }
+    return (
+      <div className="space-y-2">
+        {items.slice(0, 6).map((apt) => (
+          <div key={apt.id} className="flex items-center gap-3 rounded-lg border p-2.5 transition-colors hover:bg-accent/50">
+            <div className="flex flex-col items-center justify-center w-12 shrink-0">
+              <span className="text-sm font-bold leading-none">{formatTime(apt.startTime)}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{apt.patientName}</p>
+              <p className="text-xs text-muted-foreground">{apt.modality === "online" ? "Online" : "Presencial"}</p>
+            </div>
+            <Badge variant={statusVariant(apt.status)} className="text-[10px]">{statusLabel(apt.status)}</Badge>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -135,6 +202,48 @@ export default function DashboardHome() {
             </div>
           </Link>
         ))}
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">Visão Rápida</h3>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Próximas Consultas: Hoje + Amanhã */}
+          <Card className="lg:col-span-1">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-blue-500" />
+                Próximas Consultas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Sun className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Hoje</span>
+                  <Badge variant="secondary" className="text-[10px] ml-auto">{todaysAppointments.length}</Badge>
+                </div>
+                <AppointmentList items={todaysAppointments} emptyIcon={Sun} emptyText="Nenhuma consulta hoje" />
+              </div>
+              <div className="border-t pt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Moon className="h-3.5 w-3.5 text-indigo-500" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Amanhã</span>
+                  <Badge variant="secondary" className="text-[10px] ml-auto">{tomorrowsAppointments.length}</Badge>
+                </div>
+                <AppointmentList items={tomorrowsAppointments} emptyIcon={Moon} emptyText="Nenhuma consulta amanhã" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pacientes Recentes */}
+          <RecentPatients patients={recentPatients} />
+
+          {/* Atividade Recente */}
+          <ActivityFeed activities={recentActivity} />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
