@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import { Button } from "@/components/ui/button"
-import { Loader2, Receipt, CheckCircle, Clock, AlertCircle, FileText, Copy, Check, CreditCard } from "lucide-react"
+import { Loader2, Receipt, CheckCircle, Clock, AlertCircle, FileText, Copy, Check, CreditCard, ArrowLeft } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface Invoice {
@@ -42,6 +43,7 @@ const methodLabels: Record<string, string> = {
 }
 
 export default function PatientInvoicesPage() {
+  const router = useRouter()
   const { token } = usePatientAuth()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
@@ -85,6 +87,10 @@ export default function PatientInvoicesPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Minhas Faturas</h1>
         <p className="text-muted-foreground text-sm mt-1">Histórico de cobranças</p>

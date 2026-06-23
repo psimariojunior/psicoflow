@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,11 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
 import { maskCpf, maskPhone, maskCep } from "@/lib/utils"
-import { Loader2, Save } from "lucide-react"
+import { Loader2, Save, ArrowLeft } from "lucide-react"
 
 const BRAZILIAN_STATES = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"]
 
 export default function MeusDadosPage() {
+  const router = useRouter()
   const { patient, token } = usePatientAuth()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -87,6 +89,10 @@ export default function MeusDadosPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Meus Dados</h1>
         <p className="text-muted-foreground text-sm mt-1">Mantenha suas informações atualizadas</p>

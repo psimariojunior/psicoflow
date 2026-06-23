@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
-import { Loader2, Calendar } from "lucide-react"
+import { Loader2, Calendar, ArrowLeft } from "lucide-react"
 import { WelcomeBanner } from "./components/welcome-banner"
 import { AppointmentList } from "./components/appointment-list"
 import { BookingFlow } from "./components/booking-flow"
@@ -25,6 +26,7 @@ interface AvailableDay {
 }
 
 export default function AgendaPacientePage() {
+  const router = useRouter()
   const { patient, token } = usePatientAuth()
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loadingAppts, setLoadingAppts] = useState(true)
@@ -70,6 +72,10 @@ export default function AgendaPacientePage() {
 
       {!showBooking && !isFirstTime && (
         <div className="max-w-2xl mx-auto px-4 py-8">
+          <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </button>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Minha Agenda</h1>

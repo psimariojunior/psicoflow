@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { usePatientAuth } from "@/components/patient-auth-provider"
-import { Brain, ArrowRight, CheckCircle2, Lock } from "lucide-react"
+import { Brain, ArrowRight, CheckCircle2, Lock, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Questionnaire {
@@ -24,6 +25,7 @@ interface Response {
 }
 
 export default function QuestionariosPage() {
+  const router = useRouter()
   const { token, loading: authLoading } = usePatientAuth()
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [responses, setResponses] = useState<Response[]>([])
@@ -63,6 +65,10 @@ export default function QuestionariosPage() {
 
   return (
     <div className="space-y-6">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Questionários Clínicos</h1>
         <p className="text-muted-foreground mt-1">Questionários disponíveis para preenchimento</p>

@@ -7,7 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { CommandPalette } from "@/components/command-palette"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt, Sun, Moon } from "lucide-react"
+import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt, Sun, Moon, Menu, X, ClipboardList, FileText, ShieldAlert, FileCheck, ListChecks } from "lucide-react"
 
 export interface PatientData {
   id: string
@@ -60,6 +60,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
@@ -128,14 +129,24 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
       <div className="min-h-screen bg-background">
         <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         {patient && (
-          <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <>
+          <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
-                  <Image src="/logo.png" alt="PsicoFlow" width={36} height={36} className="w-full h-full object-cover" priority />
-                </div>
-                <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
-              </Link>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:bg-accent transition-all"
+                  aria-label="Menu"
+                >
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+                <Link href="/paciente" className="flex items-center gap-2 group">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
+                    <Image src="/logo.png" alt="PsicoFlow" width={36} height={36} className="w-full h-full object-cover" priority />
+                  </div>
+                  <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
+                </Link>
+              </div>
               <div className="flex items-center gap-2 sm:gap-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -146,50 +157,84 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                   <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 </button>
                 <nav className="hidden sm:flex items-center gap-1">
-                <Link href="/paciente" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <LayoutDashboard className="h-3.5 w-3.5" />
-                  Início
-                </Link>
-                <Link href="/paciente/agenda" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/agenda" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  Agenda
-                </Link>
-                <Link href="/paciente/diario" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/diario" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <BookHeart className="h-3.5 w-3.5" />
-                  Diário
-                </Link>
-                <Link href="/paciente/historico" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/historico" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <History className="h-3.5 w-3.5" />
-                  Histórico
-                </Link>
-                <Link href="/paciente/meus-dados" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/meus-dados" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <User className="h-3.5 w-3.5" />
-                  Meus Dados
-                </Link>
-                <Link href="/paciente/faturas" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  pathname === "/paciente/faturas" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                }`}>
-                  <Receipt className="h-3.5 w-3.5" />
-                  Faturas
-                </Link>
-              </nav>
-              <span className="hidden sm:block text-muted-foreground text-sm">{patient.name}</span>
+                  <Link href="/paciente" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    Início
+                  </Link>
+                  <Link href="/paciente/agenda" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente/agenda" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    Agenda
+                  </Link>
+                  <Link href="/paciente/diario" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente/diario" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <BookHeart className="h-3.5 w-3.5" />
+                    Diário
+                  </Link>
+                  <Link href="/paciente/historico" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente/historico" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <History className="h-3.5 w-3.5" />
+                    Histórico
+                  </Link>
+                  <Link href="/paciente/meus-dados" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente/meus-dados" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <User className="h-3.5 w-3.5" />
+                    Meus Dados
+                  </Link>
+                  <Link href="/paciente/faturas" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    pathname === "/paciente/faturas" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  }`}>
+                    <Receipt className="h-3.5 w-3.5" />
+                    Faturas
+                  </Link>
+                </nav>
+                <span className="hidden sm:block text-muted-foreground text-sm">{patient.name}</span>
                 <button onClick={logout} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   Sair
                 </button>
               </div>
             </div>
           </header>
+
+          {mobileMenuOpen && (
+            <div className="sm:hidden fixed inset-0 z-30 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+              <nav className="absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg p-4 space-y-1" onClick={(e) => e.stopPropagation()}>
+                <p className="text-xs text-muted-foreground px-3 py-2">Olá, {patient.name.split(" ")[0]}</p>
+                {[
+                  { href: "/paciente", icon: LayoutDashboard, label: "Início" },
+                  { href: "/paciente/agenda", icon: CalendarDays, label: "Agenda" },
+                  { href: "/paciente/diario", icon: BookHeart, label: "Diário" },
+                  { href: "/paciente/historico", icon: History, label: "Histórico" },
+                  { href: "/paciente/meus-dados", icon: User, label: "Meus Dados" },
+                  { href: "/paciente/faturas", icon: Receipt, label: "Faturas" },
+                  { href: "/paciente/tarefas", icon: ClipboardList, label: "Tarefas" },
+                  { href: "/paciente/questionarios", icon: ListChecks, label: "Questionários" },
+                  { href: "/paciente/anamnese", icon: FileText, label: "Anamnese" },
+                  { href: "/paciente/protocolos-crise", icon: ShieldAlert, label: "Protocolos de Crise" },
+                  { href: "/paciente/consentimento", icon: FileCheck, label: "Consentimento" },
+                ].map(({ href, icon: Icon, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                      pathname === href ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          )}
+          </>
         )}
         <AnimatePresence mode="wait">
           <motion.div

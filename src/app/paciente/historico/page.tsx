@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import toast from "react-hot-toast"
-import { Loader2, Calendar, Clock, Video, MapPin, XCircle, CheckCircle2, FileText } from "lucide-react"
+import { Loader2, Calendar, Clock, Video, MapPin, XCircle, CheckCircle2, FileText, ArrowLeft } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -27,6 +28,7 @@ function formatTime(iso: string): string {
 }
 
 export default function HistoricoPage() {
+  const router = useRouter()
   const { token } = usePatientAuth()
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,6 +64,10 @@ export default function HistoricoPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Histórico de Sessões</h1>
         <p className="text-foreground text-sm mt-1">Todas as suas consultas realizadas</p>

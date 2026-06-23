@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import { Button } from "@/components/ui/button"
 import toast from "react-hot-toast"
-import { Loader2, Heart, Smile, Meh, Frown, Angry, Sun, Moon, CloudSun, Brain, Activity, BookHeart, Sparkles } from "lucide-react"
+import { Loader2, Heart, Smile, Meh, Frown, Angry, Sun, Moon, CloudSun, Brain, Activity, BookHeart, Sparkles, ArrowLeft } from "lucide-react"
 
 const MOODS = [
   { value: 1, icon: Angry, label: "Muito ruim", color: "text-red-400", bg: "bg-red-500/10", ring: "ring-red-500/30" },
@@ -37,6 +38,7 @@ interface DiaryEntry {
 }
 
 export default function DiarioPage() {
+  const router = useRouter()
   const { token } = usePatientAuth()
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -135,6 +137,10 @@ export default function DiarioPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 ring-1 ring-primary/20 mb-4">
           <BookHeart className="h-8 w-8 text-primary" />

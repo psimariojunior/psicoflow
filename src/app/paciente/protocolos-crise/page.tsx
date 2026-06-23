@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { usePatientAuth } from "@/components/patient-auth-provider"
-import { Shield, AlertTriangle, Phone, ExternalLink, ChevronDown, ChevronUp, BookOpen, Sparkles, Lock } from "lucide-react"
+import { Shield, AlertTriangle, Phone, ExternalLink, ChevronDown, ChevronUp, BookOpen, Sparkles, Lock, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Protocol {
@@ -21,6 +22,7 @@ interface Protocol {
 }
 
 export default function ProtocolosCrisePage() {
+  const router = useRouter()
   const [protocols, setProtocols] = useState<Protocol[]>([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -68,6 +70,10 @@ export default function ProtocolosCrisePage() {
 
   return (
     <div className="space-y-6 relative">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">

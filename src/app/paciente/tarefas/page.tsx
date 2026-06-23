@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -36,6 +37,7 @@ const typeLabels: Record<string, { label: string; icon: any; color: string }> = 
 }
 
 export default function TarefasPage() {
+  const router = useRouter()
   const { token, loading: authLoading } = usePatientAuth()
   const [tasks, setTasks] = useState<PatientTask[]>([])
   const [loading, setLoading] = useState(true)
@@ -90,6 +92,10 @@ export default function TarefasPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
           Minhas Tarefas

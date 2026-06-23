@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { usePatientAuth } from "@/components/patient-auth-provider"
 import { formatDate } from "@/lib/utils"
-import { Shield, CheckCircle, XCircle, Loader2, LogIn } from "lucide-react"
+import { Shield, CheckCircle, XCircle, Loader2, LogIn, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { motion } from "framer-motion"
@@ -21,6 +22,7 @@ interface ConsentRecord {
 }
 
 export default function ConsentimentoPage() {
+  const router = useRouter()
   const { patient, token, loading: authLoading } = usePatientAuth()
   const [consents, setConsents] = useState<ConsentRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -94,6 +96,10 @@ export default function ConsentimentoPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: "easeOut" }}>
         <Card>
           <CardHeader>

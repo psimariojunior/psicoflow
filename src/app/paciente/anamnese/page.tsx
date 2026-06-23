@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { usePatientAuth } from "@/components/patient-auth-provider"
-import { Loader2, Save, CheckCircle2, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle, Lock } from "lucide-react"
+import { Loader2, Save, CheckCircle2, Brain, Heart, Pill, Users, Leaf, Target, AlertCircle, Lock, ArrowLeft } from "lucide-react"
 import toast from "react-hot-toast"
 
 interface Anamnese {
@@ -36,6 +37,7 @@ const sections = [
 ]
 
 export default function AnamnesePage() {
+  const router = useRouter()
   const [anamnese, setAnamnese] = useState<Anamnese>({
     complaints: "", history: "", medications: "", allergies: "",
     familyHistory: "", lifestyle: "", expectations: "", previousTherapy: "",
@@ -121,6 +123,10 @@ export default function AnamnesePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
