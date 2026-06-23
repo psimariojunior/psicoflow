@@ -8,17 +8,18 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     url: 'https://psicoflow-iota.vercel.app',
     cleartext: false,
+    allowNavigation: ['*'],
   },
   plugins: {
     SplashScreen: {
       launchAutoHide: true,
-      launchShowDuration: 2000,
+      launchShowDuration: 1500,
       backgroundColor: '#2563EB',
       showSpinner: true,
       spinnerColor: '#FFFFFF',
       androidScaleType: 'CENTER_CROP',
       splashFullScreen: true,
-      splashImmersive: true,
+      splashImmersive: false,
     },
     StatusBar: {
       style: 'LIGHT',
@@ -30,7 +31,7 @@ const config: CapacitorConfig = {
     },
   },
   android: {
-    allowMixedContent: false,
+    allowMixedContent: true,
     backgroundColor: '#2563EB',
   },
 };
