@@ -30,6 +30,8 @@ model User {
   bio                    String?
   pixKey                 String?
   paymentInfo            String?
+  sessionDuration        Int      @default(50)
+  sessionInterval        Int      @default(10)
   emailVerified          DateTime?
   googleRefreshToken     String?
   googleCalendarId       String?

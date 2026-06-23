@@ -122,8 +122,10 @@ export const updateSettingsSchema = z.object({
   bio: z.string().max(2000).optional().or(z.literal("")),
   pixKey: z.string().max(100).optional().or(z.literal("")),
   paymentInfo: z.string().max(2000).optional().or(z.literal("")),
-    avatarUrl: z.string().max(100000).optional().or(z.literal("")),
-})
+      avatarUrl: z.string().max(100000).optional().or(z.literal("")),
+      sessionDuration: z.number().int().min(10).max(180).optional(),
+      sessionInterval: z.number().int().min(0).max(60).optional(),
+    })
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Senha atual é obrigatória"),

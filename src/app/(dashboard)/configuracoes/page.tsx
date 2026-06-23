@@ -156,6 +156,8 @@ export default function SettingsPage() {
     pixKey: "",
     paymentInfo: "",
     avatarUrl: "",
+    sessionDuration: 50,
+    sessionInterval: 10,
   })
   const [loading, setLoading] = useState(true)
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" })
@@ -189,16 +191,18 @@ export default function SettingsPage() {
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then((data) => {
         if (data.name) setProfile({
-          name: data.name || "",
-          email: data.email || "",
-          crp: data.crp || "",
-          phone: data.phone || "",
-          specialty: data.specialty || "",
-          bio: data.bio || "",
-          pixKey: data.pixKey || "",
-          paymentInfo: data.paymentInfo || "",
-          avatarUrl: data.avatarUrl || "",
-        })
+            name: data.name || "",
+            email: data.email || "",
+            crp: data.crp || "",
+            phone: data.phone || "",
+            specialty: data.specialty || "",
+            bio: data.bio || "",
+            pixKey: data.pixKey || "",
+            paymentInfo: data.paymentInfo || "",
+            avatarUrl: data.avatarUrl || "",
+            sessionDuration: data.sessionDuration || 50,
+            sessionInterval: data.sessionInterval || 10,
+          })
       })
       .catch(() => toast.error("Erro ao carregar configurações"))
       .finally(() => setLoading(false))
@@ -621,7 +625,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Duração padrão da sessão (minutos)</Label>
-                <Select defaultValue="40">
+                <Select value={String(profile.sessionDuration)} onValueChange={(v) => setProfile({...profile, sessionDuration: parseInt(v)})}>
                   <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="30">30 min</SelectItem>
@@ -634,7 +638,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Intervalo entre consultas (minutos)</Label>
-                <Select defaultValue="10">
+                <Select value={String(profile.sessionInterval)} onValueChange={(v) => setProfile({...profile, sessionInterval: parseInt(v)})}>
                   <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="0">Sem intervalo</SelectItem>

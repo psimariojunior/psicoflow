@@ -13,7 +13,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: psychologistId },
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true },
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true },
     })
 
     if (!user) {
@@ -74,7 +74,7 @@ export async function PUT(request: Request) {
     const user = await prisma.user.update({
       where: { id: psychologistId },
       data,
-      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true },
+      select: { name: true, email: true, phone: true, crp: true, specialty: true, bio: true, pixKey: true, paymentInfo: true, avatarUrl: true, sessionDuration: true, sessionInterval: true },
     })
 
     return apiSuccess(user)
