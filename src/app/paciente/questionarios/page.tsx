@@ -44,9 +44,20 @@ export default function QuestionariosPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="space-y-4">
-        <div className="h-8 w-48 bg-muted rounded animate-pulse" />
-        {[1, 2, 3].map(i => <Card key={i} className="animate-pulse"><CardContent className="pt-6"><div className="h-4 w-3/4 bg-muted rounded" /></CardContent></Card>)}
+      <div className="max-w-2xl mx-auto space-y-6 py-8">
+        <div className="h-6 w-20 bg-muted rounded animate-pulse" />
+        <div className="space-y-2">
+          <div className="h-8 w-64 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {[1, 2, 3, 4, 5, 6, 7].map(i => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader><div className="h-5 w-3/4 bg-muted rounded" /><div className="h-4 w-16 bg-muted rounded mt-2" /></CardHeader>
+              <CardContent><div className="h-4 w-1/3 bg-muted rounded mb-4" /><div className="h-9 w-full bg-muted rounded" /></CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     )
   }
@@ -69,11 +80,11 @@ export default function QuestionariosPage() {
         <ArrowLeft className="h-4 w-4" />
         Voltar
       </button>
-      <div>
+      <div className="animate-fade-in">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Questionários Clínicos</h1>
         <p className="text-muted-foreground mt-1">Questionários disponíveis para preenchimento</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 animate-stagger">
         {questionnaires.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <Brain className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
@@ -83,7 +94,7 @@ export default function QuestionariosPage() {
           questionnaires.map(q => {
             const lr = lastResp(q.id)
             return (
-              <Card key={q.id} className={cn("transition-all", lr && "ring-2 ring-blue-500/30")}>
+              <Card key={q.id} className={cn("transition-all card-hover", lr && "ring-2 ring-blue-500/30")}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>

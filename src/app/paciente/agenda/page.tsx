@@ -76,7 +76,7 @@ export default function AgendaPacientePage() {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </button>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 animate-fade-in">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Minha Agenda</h1>
               <p className="text-foreground text-sm mt-1">Olá, {patient?.name?.split(" ")[0]}</p>

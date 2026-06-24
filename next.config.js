@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs")
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
@@ -37,4 +39,10 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withSentryConfig(nextConfig, {
+  silent: true,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  tunnelRoute: "/api/sentry",
+})

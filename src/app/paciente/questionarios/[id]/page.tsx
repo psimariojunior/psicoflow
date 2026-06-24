@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { usePatientAuth } from "@/components/patient-auth-provider"
+import { cn } from "@/lib/utils"
 import { Loader2, ArrowLeft, Save, CheckCircle2, Brain, Lock } from "lucide-react"
 
 interface Question {
@@ -81,12 +82,12 @@ export default function QuestionnaireDetail() {
   if (result) {
     return (
       <div className="max-w-2xl mx-auto space-y-6 py-8">
-        <div className="text-center">
+        <div className="text-center animate-scale-in">
           <CheckCircle2 className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Questionário Concluído</h1>
           <p className="text-lg mb-4">Pontuação: {result.totalScore} — {result.severity}</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 animate-fade-in">
           <Button asChild variant="outline"><Link href="/paciente/questionarios"><ArrowLeft className="mr-2 h-4 w-4" />Voltar</Link></Button>
           <Button asChild><Link href="/paciente/diario"><Brain className="mr-2 h-4 w-4" />Diário</Link></Button>
         </div>
@@ -96,17 +97,35 @@ export default function QuestionnaireDetail() {
 
   if (!questionnaire) return null
 
+  const answered = Object.keys(answers).length
+  const total = questionnaire.questions.length
+  const progress = total > 0 ? (answered / total) * 100 : 0
+  const allAnswered = answered === total
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 py-8">
       <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="mr-2 h-5 w-5" />Voltar</Button>
-      <h1 className="text-2xl font-bold">{questionnaire.title}</h1>
-      <p className="text-muted-foreground">{questionnaire.description}</p>
+      <div className="animate-fade-in">
+        <h1 className="text-2xl font-bold">{questionnaire.title}</h1>
+        <p className="text-muted-foreground">{questionnaire.description}</p>
+      </div>
 
+      <div className="animate-fade-in">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+          <span>{answered} de {total} respondidas</span>
+          <span>{Math.round(progress)}%</span>
+        </div>
+        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+
+      <div className="animate-stagger">
       {questionnaire.questions.map(q => {
         let options: { value: number; label: string }[] = []
         try { options = JSON.parse(q.options || "[]") } catch {}
         return (
-          <Card key={q.id}>
+          <Card key={q.id} className={cn("transition-all duration-300", answers[q.id] !== undefined && "ring-2 ring-blue-500/20 bg-blue-50/30 dark:bg-blue-950/10")}>
             <CardHeader>
               {q.category && <span className="text-xs font-medium text-emerald-600 mb-1">{q.category}</span>}
               <CardTitle className="text-base">{q.questionText}</CardTitle>
@@ -126,9 +145,10 @@ export default function QuestionnaireDetail() {
             </CardContent>
           </Card>
         )
-      })}
+      }      )}
+      </div>
 
-      <Button onClick={handleSubmit} disabled={submitting} className="w-full">
+      <Button onClick={handleSubmit} disabled={submitting} className="w-full animate-fade-in">
         {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
         Finalizar Questionário
       </Button>
