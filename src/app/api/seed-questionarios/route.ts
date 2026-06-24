@@ -41,7 +41,7 @@ const optionsIsi = JSON.stringify([
   { value: 4, label: "Muito grave" },
 ])
 
-const optionsWhoqol = JSON.stringify([
+const optionsWhoqolAvaliacao = JSON.stringify([
   { value: 1, label: "Muito ruim" },
   { value: 2, label: "Ruim" },
   { value: 3, label: "Nem bom nem ruim" },
@@ -49,7 +49,15 @@ const optionsWhoqol = JSON.stringify([
   { value: 5, label: "Muito bom" },
 ])
 
-interface QuestionDef { order: number; text: string; category: string }
+const optionsWhoqolSatisfacao = JSON.stringify([
+  { value: 1, label: "Muito insatisfeito(a)" },
+  { value: 2, label: "Insatisfeito(a)" },
+  { value: 3, label: "Nem satisfeito nem insatisfeito" },
+  { value: 4, label: "Satisfeito(a)" },
+  { value: 5, label: "Muito satisfeito(a)" },
+])
+
+interface QuestionDef { order: number; text: string; category: string; options?: string }
 
 const questionnaireDefs: {
   type: QuestionnaireType; title: string; description: string; category: string
@@ -175,34 +183,34 @@ const questionnaireDefs: {
   {
     type: "WHOQOL", title: "WHOQOL-Bref — Qualidade de Vida",
     description: "Avalia a qualidade de vida em 4 domínios: físico, psicológico, relações e ambiente.",
-    category: "Qualidade de Vida", options: optionsWhoqol,
+    category: "Qualidade de Vida", options: optionsWhoqolAvaliacao,
     questions: [
-      { order: 1, text: "Como você avalia sua qualidade de vida?", category: "Físico" },
-      { order: 2, text: "Quão satisfeito(a) você está com sua saúde?", category: "Físico" },
-      { order: 3, text: "Quão satisfeito(a) você está com sua capacidade de realizar as atividades do dia a dia?", category: "Físico" },
-      { order: 4, text: "Quão satisfeito(a) você está com sua capacidade de trabalhar?", category: "Físico" },
-      { order: 5, text: "Quão satisfeito(a) você está consigo mesmo(a)?", category: "Psicológico" },
-      { order: 6, text: "Quão satisfeito(a) você está com seus relacionamentos pessoais?", category: "Relacionamentos" },
-      { order: 7, text: "Quão satisfeito(a) você está com o apoio que recebe das pessoas ao seu redor?", category: "Relacionamentos" },
-      { order: 8, text: "Quão satisfeito(a) você está com as condições do seu local de moradia?", category: "Ambiente" },
-      { order: 9, text: "Quão satisfeito(a) você está com seu acesso a serviços de saúde?", category: "Ambiente" },
-      { order: 10, text: "Quão satisfeito(a) você está com suas condições financeiras?", category: "Ambiente" },
-      { order: 11, text: "Quão satisfeito(a) você está com as informações disponíveis para suas necessidades cotidianas?", category: "Ambiente" },
-      { order: 12, text: "Quão satisfeito(a) você está com o transporte disponível?", category: "Ambiente" },
-      { order: 13, text: "Quão satisfeito(a) você está com a segurança do seu dia a dia?", category: "Ambiente" },
-      { order: 14, text: "Quão satisfeito(a) você está com o estado do seu ambiente natural (clima, natureza)?", category: "Ambiente" },
-      { order: 15, text: "Quão satisfeito(a) você está com sua aparência física?", category: "Psicológico" },
-      { order: 16, text: "Quão satisfeito(a) você está com sua energia para o dia a dia?", category: "Físico" },
-      { order: 17, text: "Quão satisfeito(a) você está com sua capacidade de pensar e tomar decisões?", category: "Psicológico" },
-      { order: 18, text: "Quão satisfeito(a) você está com sua felicidade?", category: "Psicológico" },
-      { order: 19, text: "Quão satisfeito(a) você está com sua satisfação sexual?", category: "Físico" },
-      { order: 20, text: "Quão satisfeito(a) você está com a satisfação que recebe de seus amigos?", category: "Relacionamentos" },
-      { order: 21, text: "Quão satisfeito(a) você está com as condições do seu dia a dia?", category: "Ambiente" },
-      { order: 22, text: "Quão satisfeito(a) você está com a possibilidade de fazer coisas do seu interesse?", category: "Físico" },
-      { order: 23, text: "Quão satisfeito(a) você está com sua capacidade de desempenhar suas tarefas diárias?", category: "Físico" },
-      { order: 24, text: "Quão satisfeito(a) você está com sua saúde para cumprir suas necessidades?", category: "Físico" },
-      { order: 25, text: "Quão satisfeito(a) você está com sua vida sexual?", category: "Físico" },
-      { order: 26, text: "Quão satisfeito(a) você está com o apoio que recebe de seus familiares?", category: "Relacionamentos" },
+      { order: 1, text: "Como você avalia sua qualidade de vida?", category: "Físico", options: optionsWhoqolAvaliacao },
+      { order: 2, text: "Quão satisfeito(a) você está com sua saúde?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 3, text: "Quão satisfeito(a) você está com sua capacidade de realizar as atividades do dia a dia?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 4, text: "Quão satisfeito(a) você está com sua capacidade de trabalhar?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 5, text: "Quão satisfeito(a) você está consigo mesmo(a)?", category: "Psicológico", options: optionsWhoqolSatisfacao },
+      { order: 6, text: "Quão satisfeito(a) você está com seus relacionamentos pessoais?", category: "Relacionamentos", options: optionsWhoqolSatisfacao },
+      { order: 7, text: "Quão satisfeito(a) você está com o apoio que recebe das pessoas ao seu redor?", category: "Relacionamentos", options: optionsWhoqolSatisfacao },
+      { order: 8, text: "Quão satisfeito(a) você está com as condições do seu local de moradia?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 9, text: "Quão satisfeito(a) você está com seu acesso a serviços de saúde?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 10, text: "Quão satisfeito(a) você está com suas condições financeiras?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 11, text: "Quão satisfeito(a) você está com as informações disponíveis para suas necessidades cotidianas?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 12, text: "Quão satisfeito(a) você está com o transporte disponível?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 13, text: "Quão satisfeito(a) você está com a segurança do seu dia a dia?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 14, text: "Quão satisfeito(a) você está com o estado do seu ambiente natural (clima, natureza)?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 15, text: "Quão satisfeito(a) você está com sua aparência física?", category: "Psicológico", options: optionsWhoqolSatisfacao },
+      { order: 16, text: "Quão satisfeito(a) você está com sua energia para o dia a dia?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 17, text: "Quão satisfeito(a) você está com sua capacidade de pensar e tomar decisões?", category: "Psicológico", options: optionsWhoqolSatisfacao },
+      { order: 18, text: "Quão satisfeito(a) você está com sua felicidade?", category: "Psicológico", options: optionsWhoqolSatisfacao },
+      { order: 19, text: "Quão satisfeito(a) você está com sua atividade sexual?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 20, text: "Quão satisfeito(a) você está com a satisfação que recebe de seus amigos?", category: "Relacionamentos", options: optionsWhoqolSatisfacao },
+      { order: 21, text: "Quão satisfeito(a) você está com as condições do seu dia a dia?", category: "Ambiente", options: optionsWhoqolSatisfacao },
+      { order: 22, text: "Quão satisfeito(a) você está com a possibilidade de fazer coisas do seu interesse?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 23, text: "Quão satisfeito(a) você está com sua capacidade de desempenhar suas tarefas diárias?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 24, text: "Quão satisfeito(a) você está com sua saúde para cumprir suas necessidades?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 25, text: "Quão satisfeito(a) você está com sua vida sexual?", category: "Físico", options: optionsWhoqolSatisfacao },
+      { order: 26, text: "Quão satisfeito(a) você está com o apoio que recebe de seus familiares?", category: "Relacionamentos", options: optionsWhoqolSatisfacao },
     ],
   },
 ]
@@ -236,7 +244,7 @@ export async function GET(request: Request) {
             description: def.description,
             isActive: true,
             psychologistId: psychId,
-            questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: def.options, category: q.category })) },
+            questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: q.options || def.options, category: q.category })) },
           },
         })
         results.push(`${def.type} recriado (force)`)
@@ -251,7 +259,7 @@ export async function GET(request: Request) {
           description: def.description,
           isActive: true,
           psychologistId: psychId,
-          questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: def.options, category: q.category })) },
+          questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: q.options || def.options, category: q.category })) },
         },
       })
       results.push(`${def.type} criado`)

@@ -51,6 +51,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       if (totalScore >= 15) severity = "Severa"
       else if (totalScore >= 10) severity = "Moderada"
       else if (totalScore >= 5) severity = "Leve"
+    } else if (questionnaire.type === "BAI") {
+      if (totalScore >= 37) severity = "Ansiedade grave"
+      else if (totalScore >= 26) severity = "Ansiedade moderada a severa"
+      else if (totalScore >= 16) severity = "Ansiedade leve a moderada"
+      else if (totalScore >= 8) severity = "Ansiedade mínima"
+    } else if (questionnaire.type === "BDI") {
+      if (totalScore >= 29) severity = "Depressão severa"
+      else if (totalScore >= 20) severity = "Depressão moderada"
+      else if (totalScore >= 14) severity = "Depressão leve"
+      else if (totalScore >= 4) severity = "Sem depressão"
+    } else if (questionnaire.type === "PSS") {
+      if (totalScore >= 27) severity = "Estresse alto"
+      else if (totalScore >= 14) severity = "Estresse moderado"
+      else severity = "Estresse baixo"
+    } else if (questionnaire.type === "ISI") {
+      if (totalScore >= 22) severity = "Insônia severa"
+      else if (totalScore >= 15) severity = "Insônia moderada"
+      else if (totalScore >= 8) severity = "Insônia subclínica"
+      else severity = "Sem insônia"
+    } else if (questionnaire.type === "WHOQOL") {
+      const avg = totalScore / answers.length
+      if (avg >= 4) severity = "Muito satisfeito"
+      else if (avg >= 3) severity = "Satisfeito"
+      else if (avg >= 2) severity = "Insatisfeito"
+      else severity = "Muito insatisfeito"
     }
 
     const response = await prisma.questionnaireResponse.create({
