@@ -237,32 +237,32 @@ export async function GET(request: Request) {
         await prisma.questionnaireResponse.deleteMany({ where: { questionnaireId: existing.id } })
         await prisma.questionnaireQuestion.deleteMany({ where: { questionnaireId: existing.id } })
         await prisma.questionnaire.delete({ where: { id: existing.id } })
-        await prisma.questionnaire.create({
-          data: {
-            type: def.type,
-            title: def.title,
-            description: def.description,
-            isActive: true,
-            psychologistId: psychId,
-            questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: q.options || def.options, category: q.category })) },
-          },
-        })
-        results.push(`${def.type} recriado (force)`)
-      } else {
-        results.push(`${def.type} já existe`)
       }
-    } else {
-      await prisma.questionnaire.create({
+    }
+
+    if (!existing || force) {
+      const created = await prisma.questionnaire.create({
         data: {
           type: def.type,
           title: def.title,
           description: def.description,
           isActive: true,
           psychologistId: psychId,
-          questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: q.options || def.options, category: q.category })) },
+          questions: { create: def.questions.map(q => ({ questionText: q.text, questionOrder: q.order, options: q.options || def.options, scaleMin: 0, scaleMax: q.options ? JSON.parse(q.options).length - 1 : 4, category: q.category })) },
         },
+        include: { questions: true },
       })
-      results.push(`${def.type} criado`)
+
+      for (const q of created.questions) {
+        const defQ = def.questions.find(d => d.order === q.questionOrder)
+        if (defQ?.options) {
+          await prisma.questionnaireQuestion.update({ where: { id: q.id }, data: { options: defQ.options } })
+        }
+      }
+
+      results.push(`${def.type} ${force ? 'recriado (force)' : 'criado'} com ${created.questions.length} perguntas`)
+    } else {
+      results.push(`${def.type} já existe`)
     }
   }
 
