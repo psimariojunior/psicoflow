@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 import { blogPosts } from "@/lib/blog-data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://psihumanis.vercel.app"
+  const baseUrl = "https://psihumanis.com.br"
 
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,

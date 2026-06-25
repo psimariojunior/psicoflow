@@ -4,7 +4,7 @@ interface BreadcrumbItem {
 }
 
 export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
-  const baseUrl = "https://psihumanis.vercel.app"
+  const baseUrl = "https://psihumanis.com.br"
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -30,7 +30,7 @@ export function OrganizationJsonLd() {
     "@type": "ProfessionalService",
     name: "PsiHumanis",
     description: "Sistema de gestão para psicólogos com agenda online, prontuários e sala virtual",
-    url: "https://psihumanis.vercel.app",
+    url: "https://psihumanis.com.br",
     areaServed: "BR",
     hasOfferCatalog: {
       "@type": "OfferCatalog",

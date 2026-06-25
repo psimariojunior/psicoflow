@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     })
     if (!post) return { title: "Post não encontrado" }
 
-    const baseUrl = "https://psihumanis.vercel.app"
+    const baseUrl = "https://psihumanis.com.br"
 
     return {
       title: post.title,

@@ -9,7 +9,7 @@ import { GoogleAnalytics } from "@/components/google-analytics"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
-const siteUrl = "https://psihumanis.vercel.app"
+const siteUrl = "https://psihumanis.com.br"
 const siteName = "PsiHumanis"
 const title = "PsiHumanis — Sistema de Gestão para Psicólogos | Agenda Online, Prontuários e Sala Virtual"
 const description = "Sistema completo de gestão para psicólogos. Agende consultas online, emita prontuários, gerencie finanças e realize atendimentos via sala virtual segura. Tudo em um só lugar."

@@ -226,7 +226,7 @@ const sections = [
       {
         title: "Compartilhar código da sala",
         content:
-          "Na página da sala virtual, copie o código gerado e envie ao paciente por WhatsApp ou e-mail. O link direto é: https://psihumanis.vercel.app/sala-virtual/entrar?room=CODIGO. O paciente abre o link, digita o nome e entra na videochamada.",
+          "Na página da sala virtual, copie o código gerado e envie ao paciente por WhatsApp ou e-mail. O link direto é: https://psihumanis.com.br/sala-virtual/entrar?room=CODIGO. O paciente abre o link, digita o nome e entra na videochamada.",
       },
       {
         title: "Dicas de uso",

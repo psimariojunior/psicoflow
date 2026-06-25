@@ -10,11 +10,11 @@ export function validateOrigin(request: Request): { allowed: boolean; error?: Ne
     return { allowed: true }
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://psihumanis-iota.vercel.app"
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://psihumanis.com.br"
 
   const allowedOrigins = [
     appUrl.replace(/\/$/, ""),
-    "https://psihumanis-iota.vercel.app",
+    "https://psihumanis.com.br",
   ]
 
   if (origin && !allowedOrigins.includes(origin)) {

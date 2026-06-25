@@ -8,7 +8,7 @@ export default defineConfig({
   workers: 1,
   reporter: "html",
   use: {
-    baseURL: "https://psihumanis-iota.vercel.app",
+    baseURL: "https://psihumanis.com.br",
     trace: "on-first-retry",
   },
   projects: [

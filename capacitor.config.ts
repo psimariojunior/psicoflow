@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    url: 'https://psihumanis.vercel.app',
+    url: 'https://psihumanis.com.br',
     cleartext: false,
     allowNavigation: ['*'],
   },

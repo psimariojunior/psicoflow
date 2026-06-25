@@ -59,7 +59,7 @@ export default withAuth(
     const origin = req.headers.get("origin") || ""
     const allowedOrigins = [
       process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""),
-      "https://psihumanis.vercel.app",
+      "https://psihumanis.com.br",
       "http://localhost:3000",
     ].filter(Boolean) as string[]
     if (origin && allowedOrigins.includes(origin)) {

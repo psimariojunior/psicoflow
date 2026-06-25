@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/", "/sala-virtual/", "/paciente/"],
     },
-    sitemap: "https://psihumanis.vercel.app/sitemap.xml",
+    sitemap: "https://psihumanis.com.br/sitemap.xml",
   }
 }
