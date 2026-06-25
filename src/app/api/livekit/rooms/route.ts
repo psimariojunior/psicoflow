@@ -1,6 +1,7 @@
 import { RoomServiceClient } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -22,7 +23,7 @@ export async function GET() {
     })
     return apiSuccess({ closed })
   } catch (error) {
-    console.error("GET closed rooms error:", error)
+    logger.error("GET closed rooms error", { error: String(error) })
     return apiError("Erro ao buscar salas")
   }
 }
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
       return apiError("Room name required", 400)
     }
 
-    console.log("POST room", { room, userId: psychologistId })
+    logger.info("Closing room", { room, userId: psychologistId })
 
     const { host, apiKey, apiSecret } = getLiveKitConfig()
 
@@ -59,11 +60,11 @@ export async function POST(request: Request) {
         psychologistId,
       },
     })
-    console.log("ClosedRoom created:", record)
+    logger.info("ClosedRoom created", { roomName: record.roomName })
 
     return apiSuccess({ success: true })
   } catch (error) {
-    console.error("Delete room error:", error)
+    logger.error("Delete room error", { error: String(error) })
     return apiError("Erro ao encerrar sala")
   }
 }
