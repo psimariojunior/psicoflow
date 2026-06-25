@@ -21,3 +21,7 @@ out/
 backups/
 deploy/.env.docker
 .env*
+
+# Test results
+test-results/
+playwright-report/
