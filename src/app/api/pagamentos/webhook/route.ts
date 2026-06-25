@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
               data: { subscriptionStatus: "past_due" },
             })
 
-            console.warn(`[Stripe Webhook] Payment failed for subscription ${failSubId}, user ${failSub.userId}`)
+            logger.warn("Payment failed for subscription", { subscriptionId: failSubId, userId: failSub.userId })
           }
         }
         break

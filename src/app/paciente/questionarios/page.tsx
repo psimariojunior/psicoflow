@@ -101,13 +101,13 @@ export default function QuestionariosPage() {
                       <CardTitle className="text-lg">{q.title}</CardTitle>
                       <span className={cn("inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1",
                         q.type === "PHQ9" ? "bg-blue-100 text-blue-700" :
-                        q.type === "GAD7" ? "bg-purple-100 text-purple-700" :
-                        q.type === "BAI" ? "bg-orange-100 text-orange-700" :
-                        q.type === "BDI" ? "bg-indigo-100 text-indigo-700" :
-                        q.type === "PSS" ? "bg-teal-100 text-teal-700" :
-                        q.type === "ISI" ? "bg-slate-200 text-slate-700" :
-                        q.type === "WHOQOL" ? "bg-emerald-100 text-emerald-700" :
-                        "bg-gray-100 text-gray-700"
+                        q.type === "GAD7" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" :
+                        q.type === "BAI" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" :
+                        q.type === "BDI" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400" :
+                        q.type === "PSS" ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400" :
+                        q.type === "ISI" ? "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300" :
+                        q.type === "WHOQOL" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
+                        "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                       )}>{q.type}</span>
                     </div>
                     {lr && <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />}
