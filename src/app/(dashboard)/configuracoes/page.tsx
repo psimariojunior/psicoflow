@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
+import { getLocale, setLocale } from "@/lib/i18n"
 import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet, Eye, Gift, Copy, MessageCircle, BookOpen } from "lucide-react"
 import { BlogEditor } from "@/components/admin/blog-editor"
 import toast from "react-hot-toast"
@@ -836,18 +837,30 @@ export default function SettingsPage() {
                   <p className="font-medium">Tema Escuro</p>
                   <p className="text-sm text-muted-foreground">Alternar entre tema claro e escuro</p>
                 </div>
-                <Switch />
+                <Switch
+                  checked={typeof document !== "undefined" && document.documentElement.classList.contains("dark")}
+                  onCheckedChange={(checked) => {
+                    const html = document.documentElement
+                    if (checked) {
+                      html.classList.add("dark")
+                      localStorage.setItem("theme", "dark")
+                    } else {
+                      html.classList.remove("dark")
+                      localStorage.setItem("theme", "light")
+                    }
+                  }}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Idioma</Label>
-                <Select defaultValue="pt-BR">
+                <Select value={getLocale()} onValueChange={(v) => setLocale(v as "pt" | "en")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
+                    <SelectItem value="pt">Português (Brasil)</SelectItem>
                     <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Idioma da interface e do conteúdo público</p>
               </div>
             </CardContent>
           </Card>
