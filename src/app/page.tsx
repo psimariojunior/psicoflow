@@ -240,59 +240,58 @@ export default function LandingPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
               <div className="relative w-full max-w-lg">
-                {/* Dashboard Preview Card */}
-                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-blue-950/30">
-                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 to-slate-900 p-6 overflow-hidden">
-                    {/* Mock Header */}
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                          <Brain className="h-4 w-4 text-blue-400" />
+                {/* Main Card - Video Call Experience */}
+                <div className="relative rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 p-1 shadow-2xl shadow-blue-950/30">
+                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden min-h-[340px]">
+                    {/* Video Call Mock */}
+                    <div className="relative rounded-2xl bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-white/10 p-6 mb-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="text-[11px] text-emerald-400 font-medium">Ao vivo</span>
                         </div>
-                        <span className="text-xs font-medium text-slate-400">Dashboard</span>
+                        <span className="text-[10px] text-slate-500">47:32</span>
                       </div>
-                      <div className="flex gap-1.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-                      </div>
-                    </div>
-                    {/* Mock Stats */}
-                    <div className="grid grid-cols-3 gap-3 mb-5">
-                      {[
-                        { label: "Consultas", value: "24", change: "+12%" },
-                        { label: "Receita", value: "R$4.8k", change: "+8%" },
-                        { label: "Pacientes", value: "38", change: "+3" },
-                      ].map((stat) => (
-                        <div key={stat.label} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
-                          <p className="text-[10px] text-slate-500 mb-1">{stat.label}</p>
-                          <p className="text-lg font-bold text-white">{stat.value}</p>
-                          <p className="text-[10px] text-emerald-400">{stat.change}</p>
+                      {/* Two participant circles */}
+                      <div className="flex items-center justify-center gap-8 py-4">
+                        <div className="text-center">
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/30">
+                            <span className="text-xl font-bold text-white">MJ</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-2">Psicólogo</p>
                         </div>
-                      ))}
-                    </div>
-                    {/* Mock Chart */}
-                    <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] text-slate-500">Receita mensal</span>
-                        <span className="text-[10px] text-emerald-400">↑ 23%</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                            <Heart className="h-4 w-4 text-pink-400" />
+                          </div>
+                          <span className="text-[9px] text-slate-500">Conexão</span>
+                        </div>
+                        <div className="text-center">
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 ring-2 ring-violet-400/30">
+                            <span className="text-xl font-bold text-white">AS</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-2">Paciente</p>
+                        </div>
                       </div>
-                      <div className="flex items-end gap-1.5 h-16">
-                        {[40, 55, 45, 70, 60, 85, 75, 90, 80, 95, 88, 100].map((h, i) => (
-                          <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-blue-600 to-blue-400 opacity-80" style={{ height: `${h}%` }} />
+                      {/* Controls */}
+                      <div className="flex items-center justify-center gap-3 mt-2">
+                        {["🎤", "📷", "💬", "📞"].map((emoji, i) => (
+                          <div key={i} className={`w-9 h-9 rounded-full flex items-center justify-center text-sm ${i === 3 ? "bg-red-500/80" : "bg-white/10 hover:bg-white/20"} transition-colors cursor-pointer`}>
+                            {emoji}
+                          </div>
                         ))}
                       </div>
                     </div>
-                    {/* Mock Appointments */}
-                    <div className="space-y-2">
+                    {/* Feature Pills */}
+                    <div className="flex flex-wrap gap-2">
                       {[
-                        { time: "09:00", name: "Ana S.", status: "Confirmado" },
-                        { time: "10:30", name: "Pedro M.", status: "Próximo" },
-                      ].map((apt, i) => (
-                        <div key={i} className="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2">
-                          <span className="text-[11px] font-mono text-blue-400">{apt.time}</span>
-                          <span className="text-[11px] text-slate-300 flex-1">{apt.name}</span>
-                          <span className={`text-[9px] px-2 py-0.5 rounded-full ${apt.status === "Confirmado" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>{apt.status}</span>
+                        { icon: Shield, label: "Criptografado", color: "text-emerald-400 bg-emerald-500/10" },
+                        { icon: Calendar, label: "Agendamento", color: "text-blue-400 bg-blue-500/10" },
+                        { icon: Brain, label: "Prontuário", color: "text-violet-400 bg-violet-500/10" },
+                      ].map((pill) => (
+                        <div key={pill.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-medium ${pill.color}`}>
+                          <pill.icon className="h-3 w-3" />
+                          {pill.label}
                         </div>
                       ))}
                     </div>
@@ -306,7 +305,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
-                      <p className="text-[9px] text-slate-500">Há 2 minutos</p>
+                      <p className="text-[9px] text-slate-500">Bem-estar garantido</p>
                     </div>
                   </div>
                 </div>
@@ -316,7 +315,7 @@ export default function LandingPage() {
                       <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Novo agendamento</p>
+                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Próxima sessão</p>
                       <p className="text-[9px] text-slate-500">Amanhã às 14:00</p>
                     </div>
                   </div>
