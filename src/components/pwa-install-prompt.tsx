@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { X, Download, Smartphone } from "lucide-react"
+import { X, Download, Smartphone, Zap, Bell, Shield } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 declare global {
@@ -46,35 +46,52 @@ export function PwaInstallPrompt() {
     <AnimatePresence>
       {deferredPrompt && !dismissed && (
         <motion.div
-          initial={{ y: 100, opacity: 0 }}
+          initial={{ y: 120, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-80"
+          exit={{ y: 120, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-96"
         >
-          <div className="bg-card border rounded-2xl shadow-2xl p-4 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-              <Smartphone className="h-6 w-6 text-white" />
+          <div className="bg-card border rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                  <Smartphone className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Instale o PsiHumanis</p>
+                  <p className="text-xs text-blue-100">Acesse em 1 toque, sem navegador</p>
+                </div>
+              </div>
+              <button
+                className="text-blue-200 hover:text-white transition-colors rounded-lg p-1"
+                onClick={handleDismiss}
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">Instalar PsicoFlow</p>
-              <p className="text-xs text-muted-foreground">Acesso rápido com um toque</p>
+            <div className="p-4 space-y-3">
+              <div className="flex items-start gap-2.5">
+                <Zap className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground">Acesso rápido à agenda e sala virtual</p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Bell className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground">Notificações de consultas e lembretes</p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Shield className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground">Funciona offline com dados em cache</p>
+              </div>
+              <Button
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/20 gap-1.5"
+                onClick={handleInstall}
+              >
+                <Download className="h-4 w-4" />
+                Instalar agora
+              </Button>
             </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={handleDismiss}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <Button
-              size="sm"
-              className="shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white gap-1.5 shadow-lg shadow-blue-500/20"
-              onClick={handleInstall}
-            >
-              <Download className="h-3.5 w-3.5" />
-              Instalar
-            </Button>
           </div>
         </motion.div>
       )}

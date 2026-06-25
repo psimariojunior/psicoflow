@@ -13,7 +13,7 @@ export function EndedView({ onNewRoom }: { onNewRoom: () => void }) {
               <VideoOff className="h-10 w-10 text-white/40" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Conexão encerrada</h1>
-            <p className="text-white/60">Obrigado por utilizar o PsicoFlow.</p>
+            <p className="text-white/60">Obrigado por utilizar o PsiHumanis.</p>
           </div>
           <Button className="w-full h-12 text-base" size="lg" onClick={onNewRoom}>
             <Camera className="mr-2 h-5 w-5" />

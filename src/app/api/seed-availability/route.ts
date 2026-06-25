@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const secret = body.secret || request.headers.get("x-seed-secret")
 
-    if (secret !== "psicoflow-seed-2026") {
+    if (secret !== "psihumanis-seed-2026") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

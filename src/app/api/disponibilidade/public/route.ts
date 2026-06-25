@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
+import { rateLimit } from "@/lib/rate-limit"
 
 export const dynamic = "force-dynamic"
 
+const limiter = rateLimit(30, 60000)
+
 export async function GET(request: NextRequest) {
   try {
+    const rawIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || "anon"
+    const limit = await limiter(rawIp)
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Muitas requisições. Tente novamente." }, { status: 429 })
+    }
     const searchParams = request.nextUrl.searchParams
     const psychologistId = searchParams.get("psychologistId")
     const startDateStr = searchParams.get("startDate")

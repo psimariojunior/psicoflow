@@ -35,8 +35,8 @@ model User {
   sessionPrice           Int?
   welcomeMessage         String?
   clinicAddress          String?
-  sessionDuration        Int      @default(50)
-  sessionInterval        Int      @default(10)
+  sessionDuration        Int       @default(50)
+  sessionInterval        Int       @default(10)
   emailVerified          DateTime?
   googleRefreshToken     String?
   googleCalendarId       String?
@@ -46,6 +46,8 @@ model User {
   stripeSubscriptionId   String?
   stripeCustomerId       String?
   subscriptionStatus     String    @default("active")
+  referralCode           String?   @unique
+  referredById           String?
   twoFactorEnabled       Boolean   @default(false)
   twoFactorSecret        String?
   active                 Boolean   @default(true)
@@ -83,17 +85,19 @@ model User {
   documentTemplates      DocumentTemplate[]
   reviews                Review[]
   quickNotes             QuickNote[]
+  referralsMade          Referral[]              @relation("ReferrerRelations")
+  referralsReceived      Referral[]              @relation("ReferredRelations")
 }
 
 model QuickNote {
-  id             String   @id @default(cuid())
-  content        String
-  patientId      String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(cuid())
+  content   String
+  patientId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   psychologistId String
-  psychologist   User     @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+  psychologist   User   @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
 
   @@index([psychologistId])
 }
@@ -815,4 +819,35 @@ model CrisisProtocolAccess {
   @@index([patientId])
   @@index([protocolId])
   @@index([psychologistId])
+}
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerId    String
+  referredId    String   @unique
+  code          String
+  rewardGranted Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  referrer User @relation("ReferrerRelations", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred User @relation("ReferredRelations", fields: [referredId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([code])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String
+  category    String
+  readTime    String
+  publishedAt DateTime @default(now())
+  image       String?
+  published   Boolean  @default(true)
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

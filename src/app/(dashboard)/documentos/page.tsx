@@ -234,7 +234,7 @@ function printDocument(title: string, content: string) {
   </style></head><body>
   <div class="doc-header"><p class="doc-title">${title}</p></div>
   <pre>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
-  <div class="doc-footer">Documento gerado por PsicoFlow • ${formatDate(new Date())}</div>
+  <div class="doc-footer">Documento gerado por PsiHumanis • ${formatDate(new Date())}</div>
   <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 300); }<\/script>
   </body></html>`)
   win.document.close()
@@ -794,7 +794,7 @@ export default function DocumentosPage() {
                 </pre>
                 <div className="mt-10 pt-3 border-t border-slate-200 text-center">
                   <p className="font-serif text-[10px] text-slate-400">
-                    Gerado por PsicoFlow • {formatDate(new Date())}
+                    Gerado por PsiHumanis • {formatDate(new Date())}
                   </p>
                 </div>
               </div>

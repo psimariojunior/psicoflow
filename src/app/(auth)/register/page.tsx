@@ -1,27 +1,44 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { Loader2, CheckCircle2, AlertCircle, Gift } from "lucide-react"
 import toast from "react-hot-toast"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
+  const [referralValid, setReferralValid] = useState<{ valid: boolean; referrerName?: string } | null>(null)
+  const [referralLoading, setReferralLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     crp: "",
+    referralCode: searchParams.get("ref") || "",
   })
+
+  useEffect(() => {
+    const code = searchParams.get("ref")
+    if (code) {
+      setFormData((prev) => ({ ...prev, referralCode: code }))
+      setReferralLoading(true)
+      fetch(`/api/referrals/validate?code=${encodeURIComponent(code)}`)
+        .then((r) => r.json())
+        .then((data) => setReferralValid(data))
+        .catch(() => setReferralValid({ valid: false }))
+        .finally(() => setReferralLoading(false))
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -41,6 +58,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           crp: formData.crp,
+          referralCode: formData.referralCode || undefined,
         }),
       })
 
@@ -51,8 +69,8 @@ export default function RegisterPage() {
         return
       }
 
-      toast.success("Conta criada com sucesso! Escolha seu plano.")
-      router.push("/pricing")
+      toast.success("Conta criada com sucesso! Vamos configurar seu perfil.")
+      router.push("/onboarding")
     } catch {
       toast.error("Erro ao cadastrar")
     } finally {
@@ -65,7 +83,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl shadow-blue-500/30 ring-4 ring-blue-500/20 mb-1">
-            <Image src="/logo.png" alt="PsicoFlow" width={80} height={80} className="w-full h-full object-cover" priority />
+            <Image src="/logo.png" alt="PsiHumanis" width={80} height={80} className="w-full h-full object-cover" priority />
           </div>
           <h1 className="text-3xl font-bold">Criar Conta</h1>
           <p className="text-sm text-muted-foreground">
@@ -80,6 +98,17 @@ export default function RegisterPage() {
               <CardDescription>Informe seus dados para criar sua conta</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 p-4 space-y-2">
+                <p className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+                  <Gift className="h-4 w-4" /> 14 dias de trial gratuito
+                </p>
+                <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1">
+                  <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Agenda online e prontuários digitais</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Sala virtual com videochamada segura</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Lembretes automáticos por WhatsApp e email</li>
+                  <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Sem cartão de crédito necessário</li>
+                </ul>
+              </div>
               <div className="grid gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome completo</Label>
@@ -110,6 +139,37 @@ export default function RegisterPage() {
                     value={formData.crp}
                     onChange={(e) => setFormData({ ...formData, crp: e.target.value })}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="referralCode" className="flex items-center gap-1.5">
+                    <Gift className="h-3.5 w-3.5 text-emerald-600" />
+                    Código de indicação (opcional)
+                  </Label>
+                  <Input
+                    id="referralCode"
+                    placeholder="Ex: AB-123456"
+                    value={formData.referralCode}
+                    onChange={(e) => setFormData({ ...formData, referralCode: e.target.value.toUpperCase() })}
+                    disabled={!!referralValid?.valid}
+                    className={referralValid?.valid ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20" : ""}
+                  />
+                  {referralLoading && (
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Verificando código...
+                    </p>
+                  )}
+                  {referralValid?.valid && referralValid.referrerName && (
+                    <p className="flex items-center gap-1 text-xs text-emerald-600">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Indicado por <strong>{referralValid.referrerName}</strong> — vocês ganham 1 mês grátis!
+                    </p>
+                  )}
+                  {referralValid && !referralValid.valid && (
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                      Código inválido ou expirado
+                    </p>
+                  )}
                 </div>
                 <Button onClick={() => setStep(2)} className="w-full">
                   Continuar

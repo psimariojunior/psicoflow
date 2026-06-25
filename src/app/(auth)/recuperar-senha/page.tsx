@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl shadow-emerald-500/30 ring-4 ring-emerald-500/20 mb-1">
-            <Image src="/logo.png" alt="PsicoFlow" width={80} height={80} className="w-full h-full object-cover" priority />
+            <Image src="/logo.png" alt="PsiHumanis" width={80} height={80} className="w-full h-full object-cover" priority />
           </div>
           <h1 className="text-3xl font-bold">Recuperar Senha</h1>
           <p className="text-sm text-muted-foreground">

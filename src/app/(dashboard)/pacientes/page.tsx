@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/shared/status-badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getInitials, formatDate, calculateAge } from "@/lib/utils"
-import { Plus, Mail, Phone, MoreHorizontal, Trash2 } from "lucide-react"
+import { Plus, Mail, Phone, MoreHorizontal, Trash2, Download } from "lucide-react"
 import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import {
@@ -165,13 +165,16 @@ export default function PatientsPage() {
             Gerencie seus pacientes e informações
           </p>
         </div>
-        <Button asChild>
-          <Link href="/pacientes/novo">
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Paciente
-          </Link>
-        </Button>
-      </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => window.print()}><Download className="mr-2 h-4 w-4" /> PDF</Button>
+          <Button asChild>
+            <Link href="/pacientes/novo">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Paciente
+            </Link>
+          </Button>
+          </div>
+        </div>
 
       <DataTable
         columns={columns}

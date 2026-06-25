@@ -53,6 +53,7 @@ export default function AgendaPage() {
   const [recurring, setRecurring] = useState(false)
   const [recurringFreq, setRecurringFreq] = useState<"weekly" | "biweekly">("weekly")
   const [recurringOccurrences, setRecurringOccurrences] = useState(4)
+  const [hasAvailability, setHasAvailability] = useState(true)
 
   const fetchAppointments = useCallback(async (signal?: AbortSignal) => {
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
@@ -95,6 +96,16 @@ export default function AgendaPage() {
 
     return () => controller.abort()
   }, [fetchAppointments])
+
+  useEffect(() => {
+    fetch("/api/disponibilidade")
+      .then((r) => r.json())
+      .then((data) => {
+        const slots = data.slots || data || []
+        setHasAvailability(Array.isArray(slots) && slots.length > 0)
+      })
+      .catch(() => {})
+  }, [])
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
@@ -227,14 +238,48 @@ export default function AgendaPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-40 animate-shimmer rounded-lg" />
+            <div className="h-4 w-56 animate-shimmer rounded-lg" />
+          </div>
+          <div className="h-9 w-36 animate-shimmer rounded-lg" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-32 animate-shimmer rounded-2xl" />
+          ))}
+        </div>
+        <div className="h-[400px] animate-shimmer rounded-2xl" />
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
+      {/* Availability Guidance Banner */}
+      {!hasAvailability && (
+        <div className="rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-amber-800 dark:text-amber-200">Horários não configurados</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Configure seus horários para que pacientes possam agendar consultas.
+                </p>
+              </div>
+            </div>
+            <Button asChild size="sm" className="bg-amber-600 hover:bg-amber-700 text-white shrink-0">
+              <Link href="/disponibilidade">Configurar Agora</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Agenda</h2>

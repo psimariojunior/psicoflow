@@ -132,10 +132,10 @@ export async function POST(request: NextRequest) {
       const timeStr = startDate.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
       sendEmail(
         email.trim(),
-        "Confirmação de Consulta - PsicoFlow",
+        "Confirmação de Consulta - PsiHumanis",
         `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+            <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
             <p style="color: #666; margin: 0;">Confirmação de agendamento</p>
           </div>
           <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
             </table>
             <p style="margin-top: 16px; font-size: 0.875rem; color: #666;">Você receberá um lembrete 24h antes da consulta.</p>
           </div>
-          <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
+          <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsiHumanis — Gestão de Psicologia</p>
         </div>`
       ).catch((e: unknown) => logger.error("confirmation email failed", { error: String(e) }))
     }
@@ -159,10 +159,10 @@ export async function POST(request: NextRequest) {
     const timeStr = startDate.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
     sendEmail(
       psychEmail,
-      "Novo Agendamento - PsicoFlow",
+      "Novo Agendamento - PsiHumanis",
       `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+          <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
           <p style="color: #666; margin: 0;">Novo agendamento recebido</p>
         </div>
         <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
             <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "presential" ? "Presencial" : "Online"}</strong></td></tr>
           </table>
         </div>
-        <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
+        <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsiHumanis — Gestão de Psicologia</p>
       </div>`
     ).catch((e: unknown) => logger.error("psychologist notification email failed", { error: String(e) }))
 

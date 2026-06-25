@@ -185,9 +185,7 @@ export default function FinancialPage() {
                   toast.success("CSV exportado")
                 } catch { toast.error("Erro ao exportar CSV") }
               }}>
-                <Download className="mr-2 h-4 w-4" /> Exportar
-              </Button>
-              <Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
+                <Download className="mr-2 h-4 w-4" /> Exportar</Button><Button onClick={() => window.print()} variant="outline" size="sm"><Receipt className="mr-2 h-4 w-4" /> PDF</Button><Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
                 <DialogTrigger asChild>
                   <Button><Plus className="mr-2 h-4 w-4" /> Nova Transação</Button>
                 </DialogTrigger>
@@ -418,3 +416,4 @@ export default function FinancialPage() {
     </div>
   )
 }
+

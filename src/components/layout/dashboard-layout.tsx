@@ -9,6 +9,7 @@ import { Header } from "./header"
 import { CommandPalette } from "@/components/command-palette"
 import { KeyboardShortcutsHint } from "@/components/keyboard-shortcuts"
 import { OnboardingTour } from "@/components/onboarding-tour"
+import { PushNotificationPrompt } from "@/components/push-notification-prompt"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertTriangle, X, ArrowRight } from "lucide-react"
@@ -76,7 +77,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <h1 className="text-2xl font-bold text-foreground mb-2">Trial Expirado</h1>
           <p className="text-muted-foreground mb-1">{trialExpiredReason}</p>
           <p className="text-sm text-muted-foreground mb-6">
-            Para continuar usando o PsicoFlow, escolha um plano que melhor se adapta às suas necessidades.
+            Para continuar usando o PsiHumanis, escolha um plano que melhor se adapta às suas necessidades.
           </p>
           <Button
             size="lg"
@@ -146,6 +147,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         <KeyboardShortcutsHint />
         <OnboardingTour />
+        <PushNotificationPrompt />
       </div>
     </div>
   )

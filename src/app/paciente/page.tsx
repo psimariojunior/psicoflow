@@ -77,14 +77,30 @@ export default function PacienteDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Olá, {patient?.name?.split(" ")[0]}</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Bem-vindo ao PsicoFlow</p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <TrendingUp className="h-4 w-4 text-blue-500" />
-          <span>{sessionCount} sessão{ sessionCount !== 1 ? "s" : "" } realizada{ sessionCount !== 1 ? "s" : "" }</span>
+      <div className="relative overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950 p-6 text-white shadow-2xl shadow-blue-950/20">
+        <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="absolute -bottom-20 left-10 h-44 w-44 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-blue-100">
+              <Sparkles className="h-3.5 w-3.5" />
+              Sua jornada terapêutica
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">Olá, {patient?.name?.split(" ")[0]}</h1>
+            <p className="mt-2 max-w-lg text-sm leading-6 text-blue-100">
+              Acompanhe consultas, tarefas, diário emocional e documentos em um espaço seguro e acolhedor.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm sm:w-64">
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-blue-200">Sessões</p>
+              <p className="text-2xl font-bold">{sessionCount}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-blue-200">Diário</p>
+              <p className="text-2xl font-bold">{diaryEntries.length}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -128,6 +144,22 @@ export default function PacienteDashboard() {
       )}
 
       <MoodChart entries={diaryEntries} />
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[
+          { label: "Cuidado contínuo", desc: "Registre emoções entre sessões", icon: BookHeart, href: "/paciente/diario" },
+          { label: "Questionários", desc: "Acompanhe sua evolução clínica", icon: Brain, href: "/paciente/questionarios" },
+          { label: "Tarefas terapêuticas", desc: "Veja exercícios enviados", icon: ListTodo, href: "/paciente/tarefas" },
+        ].map((item) => (
+          <Link key={item.label} href={item.href}>
+            <Card className="group h-full p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5">
+              <item.icon className="h-5 w-5 text-blue-600 transition-transform group-hover:scale-110" />
+              <h3 className="mt-3 text-sm font-semibold">{item.label}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{item.desc}</p>
+            </Card>
+          </Link>
+        ))}
+      </div>
 
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Acesso rápido</h3>

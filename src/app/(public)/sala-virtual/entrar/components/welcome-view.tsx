@@ -84,7 +84,7 @@ export function WelcomeView({
           </div>
 
           <p className="mt-6 text-xs text-white/30">
-            PsicoFlow &mdash; Tecnologia a serviço da saúde mental
+            PsiHumanis &mdash; Tecnologia a serviço da saúde mental
           </p>
         </div>
       </div>

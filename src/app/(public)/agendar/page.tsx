@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Loader2, Calendar, User } from "lucide-react"
+import { Loader2, Calendar, User, MapPin, MessageSquare, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import toast from "react-hot-toast"
@@ -35,7 +35,7 @@ function AgendarPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center">
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-10 w-10 animate-spin text-blue-400 mx-auto mb-4" />
           <p className="text-white/60">Carregando profissionais...</p>
@@ -45,14 +45,14 @@ function AgendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
+      <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 mb-4">
-            <Calendar className="h-8 w-8 text-blue-400" />
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl shadow-blue-500/20 mb-4">
+            <Calendar className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Escolha seu psicólogo</h1>
-          <p className="text-white/50">Selecione o profissional para agendar sua consulta</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Escolha seu psicólogo</h1>
+          <p className="text-white/50 max-w-md mx-auto">Selecione o profissional para agendar sua consulta online de forma segura e rápida.</p>
         </div>
 
         {psychologists.length === 0 ? (
@@ -60,51 +60,69 @@ function AgendarPage() {
             Nenhum profissional disponível no momento.
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {psychologists.map((psy) => (
               <Link
                 key={psy.id}
                 href={`/agendar/${psy.id}`}
-                className="group bg-white/5 backdrop-blur rounded-2xl p-6 ring-1 ring-white/10 hover:ring-blue-500/40 hover:bg-white/10 transition-all flex items-start gap-4"
+                className="group relative overflow-hidden bg-white/[0.06] backdrop-blur-xl rounded-3xl p-6 ring-1 ring-white/10 hover:ring-blue-500/40 hover:bg-white/[0.1] transition-all duration-300 hover:-translate-y-0.5"
               >
-                {psy.avatarUrl ? (
-                  <Image
-                    src={psy.avatarUrl}
-                    alt={psy.name}
-                    width={64}
-                    height={64}
-                    className="h-16 w-16 rounded-full object-cover ring-2 ring-white/10"
-                  />
-                ) : (
-                  <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center ring-2 ring-white/10 shrink-0">
-                    <User className="h-8 w-8 text-blue-400" />
+                <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue-500/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex items-start gap-4">
+                  {psy.avatarUrl ? (
+                    <Image
+                      src={psy.avatarUrl}
+                      alt={psy.publicName || psy.name}
+                      width={72}
+                      height={72}
+                      className="h-18 w-18 rounded-2xl object-cover ring-2 ring-white/10 shrink-0"
+                    />
+                  ) : (
+                    <div className="h-18 w-18 rounded-2xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center ring-2 ring-white/10 shrink-0" style={{ width: 72, height: 72 }}>
+                      <User className="h-8 w-8 text-blue-400" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
+                      {psy.publicName || psy.name}
+                    </h2>
+                    {psy.specialty && (
+                      <p className="text-blue-400/80 text-sm mt-0.5">{psy.specialty}</p>
+                    )}
+                    {(psy.publicBio || psy.bio) && (
+                      <p className="text-white/40 text-sm mt-2 line-clamp-2 leading-relaxed">{psy.publicBio || psy.bio}</p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-3 mt-3">
+                      {psy.sessionPrice && (
+                        <span className="inline-flex items-center gap-1 text-emerald-400 text-sm font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-lg">
+                          R$ {psy.sessionPrice.toFixed(2)}
+                        </span>
+                      )}
+                      {psy.clinicAddress && (
+                        <span className="inline-flex items-center gap-1 text-white/30 text-xs">
+                          <MapPin className="h-3 w-3" /> {psy.clinicAddress}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                )}
-                <div className="min-w-0">
-                  <h2 className="text-lg font-semibold text-white group-hover:text-blue-300 transition-colors truncate">
-                    {psy.publicName || psy.name}
-                  </h2>
-                  {psy.specialty && (
-                    <p className="text-blue-400/80 text-sm mt-0.5">{psy.specialty}</p>
-                  )}
-                  {psy.sessionPrice && (
-                    <p className="text-green-400 text-sm font-medium mt-1">R$ {psy.sessionPrice.toFixed(2)}</p>
-                  )}
-                  {(psy.publicBio || psy.bio) && (
-                    <p className="text-white/40 text-sm mt-2 line-clamp-2">{psy.publicBio || psy.bio}</p>
-                  )}
+                  <ArrowRight className="h-5 w-5 text-white/20 group-hover:text-blue-400 group-hover:translate-x-1 transition-all shrink-0 mt-1" />
                 </div>
+                {psy.welcomeMessage && (
+                  <p className="relative mt-4 pt-4 border-t border-white/5 text-blue-200/40 text-xs italic line-clamp-2">
+                    &ldquo;{psy.welcomeMessage}&rdquo;
+                  </p>
+                )}
               </Link>
             ))}
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-3 mt-10">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-1 ring-blue-500/30">
-            <Image src="/logo.png" alt="PsicoFlow" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
+        <div className="flex items-center justify-center gap-3 mt-12">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-1 ring-blue-500/30">
+            <Image src="/logo.png" alt="PsiHumanis" width={32} height={32} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <p className="text-center text-xs text-white/20">
-            PsicoFlow &mdash; Tecnologia a serviço da saúde mental
+            PsiHumanis &mdash; Tecnologia a serviço da saúde mental
           </p>
         </div>
       </div>

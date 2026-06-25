@@ -55,7 +55,7 @@ export async function GET(
 <body>
   <div class="container">
     <div class="header">
-      <h1>PsicoFlow</h1>
+      <h1>PsiHumanis</h1>
       <p class="subtitle">Gest\u00e3o em Psicologia</p>
     </div>
     <div class="number">
@@ -97,7 +97,7 @@ export async function GET(
       <p style="font-size: 11px; color: #94a3b8; margin-top: 8px;">QR Code para pagamento</p>
     </div>
     <div class="footer">
-      <p>Documento emitido pelo PsicoFlow \u2014 Gest\u00e3o em Psicologia</p>
+      <p>Documento emitido pelo PsiHumanis \u2014 Gest\u00e3o em Psicologia</p>
       <p style="margin-top: 4px;">Este \u00e9 um documento v\u00e1lido como comprovante de pagamento.</p>
     </div>
   </div>

@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: "psicoflow",
+    name: "psihumanis",
     script: "node_modules/next/dist/bin/next",
     args: "start",
     cwd: __dirname,

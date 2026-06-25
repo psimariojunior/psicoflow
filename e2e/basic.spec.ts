@@ -3,12 +3,12 @@ import { test, expect } from "@playwright/test"
 test.describe("Public Pages", () => {
   test("landing page loads", async ({ page }) => {
     await page.goto("/")
-    await expect(page.locator("body")).toContainText("PsicoFlow")
+    await expect(page.locator("body")).toContainText("PsiHumanis")
   })
 
   test("booking page loads", async ({ page }) => {
     await page.goto("/agendar")
-    await expect(page.locator("h1")).toContainText("Agende")
+    await expect(page.locator("h1")).toContainText("Escolha seu psicólogo")
   })
 
   test("terms page loads", async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Public Pages", () => {
 test.describe("Auth Pages", () => {
   test("login page has form", async ({ page }) => {
     await page.goto("/login")
-    await expect(page.locator("h1")).toContainText("PsicoFlow")
+    await expect(page.locator("h1")).toContainText("PsiHumanis")
     await expect(page.locator('input[type="email"]')).toBeVisible()
     await expect(page.locator('input[type="password"]')).toBeVisible()
     await expect(page.getByRole("button", { name: /entrar/i })).toBeVisible()
@@ -167,12 +167,12 @@ test.describe("Patient Portal Pages", () => {
 
 test.describe("API Health", () => {
   test("health endpoint returns ok", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/api/health")
+    const response = await request.get("/api/health")
     expect(response.ok()).toBeTruthy()
   })
 
   test("disponibilidade public endpoint works", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/api/disponibilidade/public")
+    const response = await request.get("/api/disponibilidade/public")
     expect(response.ok()).toBeTruthy()
   })
 })
@@ -181,7 +181,7 @@ test.describe("Static Pages SEO", () => {
   test("landing page has meta title", async ({ page }) => {
     await page.goto("/")
     const title = await page.title()
-    expect(title).toContain("PsicoFlow")
+    expect(title).toContain("PsiHumanis")
   })
 
   test("landing page has og meta tags", async ({ page }) => {
@@ -191,26 +191,26 @@ test.describe("Static Pages SEO", () => {
   })
 
   test("sitemap loads", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/sitemap.xml")
+    const response = await request.get("/sitemap.xml")
     expect(response.ok()).toBeTruthy()
   })
 
   test("robots loads", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/robots.txt")
+    const response = await request.get("/robots.txt")
     expect(response.ok()).toBeTruthy()
   })
 })
 
 test.describe("PWA Manifest", () => {
   test("manifest is accessible", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/manifest.webmanifest")
+    const response = await request.get("/manifest.webmanifest")
     expect(response.ok()).toBeTruthy()
     const json = await response.json()
-    expect(json.name).toContain("PsicoFlow")
+    expect(json.name).toContain("PsiHumanis")
   })
 
   test("service worker loads", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/sw.js")
+    const response = await request.get("/sw.js")
     expect(response.ok()).toBeTruthy()
   })
 })

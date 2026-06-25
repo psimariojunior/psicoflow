@@ -3,7 +3,7 @@ export function generateReportHTML(title: string, content: string, logo?: string
 <html>
 <head>
   <meta charset="utf-8">
-  <title>${title} - PsicoFlow</title>
+  <title>${title} - PsiHumanis</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
     .header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }
@@ -19,12 +19,12 @@ export function generateReportHTML(title: string, content: string, logo?: string
 </head>
 <body>
   <div class="header">
-    <div class="logo">PsicoFlow</div>
+    <div class="logo">PsiHumanis</div>
     <h1>${title}</h1>
     <p class="subtitle">Gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}</p>
   </div>
   ${content}
-  <div class="footer">PsicoFlow — Gestão para Psicólogos | Documento gerado automaticamente</div>
+  <div class="footer">PsiHumanis — Gestão para Psicólogos | Documento gerado automaticamente</div>
 </body>
 </html>`
 }

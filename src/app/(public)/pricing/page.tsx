@@ -4,8 +4,10 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, Zap, Building2, ArrowLeft, Loader2 } from "lucide-react"
+import { Check, Zap, Building2, ArrowLeft, Loader2, Shield, Sparkles, Gift, CreditCard, ChevronDown } from "lucide-react"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { BreadcrumbJsonLd } from "@/lib/seo"
 
 const plans = [
   {
@@ -49,6 +51,16 @@ const plans = [
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null)
+  const [faqOpen, setFaqOpen] = useState<number | null>(null)
+
+  const faqs = [
+    { q: "Posso começar sem cartão de crédito?", a: "Sim! O trial de 14 dias é gratuito e não exige cartão. Você só insere os dados de pagamento quando decidir assinar." },
+    { q: "O que acontece quando o trial expirar?", a: "Seu plano é rebaixado para o plano gratuito, que oferece funcionalidades limitadas. Seus dados não são perdidos." },
+    { q: "Posso cancelar quando quiser?", a: "Sim, sem multa ou burocracia. O cancelamento é imediato e você mantém acesso até o final do período pago." },
+    { q: "Tem desconto para pagamento anual?", a: "Entre em contato pelo email psi_mariojunior@hotmail.com para condições especiais de pagamento anual." },
+    { q: "Posso mudar de plano depois?", a: "Sim, você pode fazer upgrade ou downgrade a qualquer momento. A diferença é proporcional." },
+    { q: "Meus dados ficam seguros?", a: "Sim. Criptografia ponta a ponta, servidores no Brasil, conformidade com LGPD e dados isolados por profissional." },
+  ]
 
   const handleCheckout = async (plan: "pro" | "clinica") => {
     setLoading(plan)
@@ -76,25 +88,35 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-emerald-50/30 dark:to-emerald-950/10">
-      <div className="container mx-auto px-4 py-12 max-w-5xl">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_35%),linear-gradient(to_bottom,var(--background),rgba(16,185,129,0.06))]">
+      <BreadcrumbJsonLd items={[
+        { name: "Início", item: "/" },
+        { name: "Planos", item: "/pricing" },
+      ]} />
+      <div className="container mx-auto px-4 py-12 max-w-6xl">
         <div className="mb-8">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar
           </Link>
 
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-5">
             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
-              14 dias grátis
+              <Sparkles className="mr-1 h-3.5 w-3.5" /> 14 dias grátis
             </Badge>
-            <h1 className="text-4xl font-bold tracking-tight">
-              Escolha o plano ideal para você
+            <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">
+              Gestão clínica premium sem complicar sua rotina
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comece gratuitamente e evolua conforme sua prática cresce.
-              Sem compromisso, cancele quando quiser.
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-7">
+              Agenda, pacientes, prontuários, videochamada, cobranças, relatórios e automações em uma única plataforma.
             </p>
+            <div className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-3">
+              {["Sem cartão no trial", "Cancele quando quiser", "Dados protegidos"].map((item) => (
+                <div key={item} className="rounded-2xl border bg-background/80 p-3 text-sm shadow-sm backdrop-blur">
+                  <Check className="mx-auto mb-1 h-4 w-4 text-emerald-600" />{item}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -104,12 +126,13 @@ export default function PricingPage() {
             return (
               <Card
                 key={plan.id}
-                className={`relative flex flex-col ${
+                className={`relative flex flex-col overflow-hidden rounded-3xl ${
                   plan.popular
-                    ? "border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10"
-                    : ""
+                    ? "border-emerald-500 dark:border-emerald-400 shadow-2xl shadow-emerald-500/15 scale-[1.01]"
+                    : "shadow-lg shadow-slate-900/5"
                 }`}
               >
+                {plan.popular && <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-blue-500 to-indigo-500" />}
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -142,7 +165,7 @@ export default function PricingPage() {
                   </ul>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="flex-col gap-3">
                   <Button
                     className={`w-full ${plan.popular ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
                     variant={plan.popular ? "default" : "outline"}
@@ -154,10 +177,47 @@ export default function PricingPage() {
                     ) : null}
                     {loading === plan.id ? "Redirecionando..." : "Começar agora"}
                   </Button>
+                  <p className="text-center text-xs text-muted-foreground">Trial gratuito. Ative o plano só se fizer sentido.</p>
                 </CardFooter>
               </Card>
             )
           })}
+        </div>
+
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Dúvidas frequentes</h2>
+          <div className="space-y-3">
+            {faqs.map((item, i) => (
+              <div key={i} className="rounded-xl border bg-card overflow-hidden">
+                <button
+                  onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-accent/50 transition-colors"
+                >
+                  <span className="font-medium text-sm">{item.q}</span>
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0 ml-4", faqOpen === i && "rotate-180")} />
+                </button>
+                {faqOpen === i && (
+                  <div className="px-4 pb-4 text-sm text-muted-foreground leading-relaxed">
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {[
+            { icon: Gift, title: "Indique e ganhe", desc: "Ganhe 1 mês grátis por amigo que assinar." },
+            { icon: CreditCard, title: "Cobrança integrada", desc: "Cartão, PIX, boleto e histórico financeiro." },
+            { icon: Shield, title: "Segurança clínica", desc: "Rotas protegidas, LGPD e dados isolados por profissional." },
+          ].map((item) => (
+            <Card key={item.title} className="p-5">
+              <item.icon className="h-5 w-5 text-emerald-600" />
+              <h3 className="mt-3 font-semibold">{item.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
+            </Card>
+          ))}
         </div>
 
         <div className="mt-12 text-center space-y-4">

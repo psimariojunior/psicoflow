@@ -6,7 +6,7 @@ const LIVEKIT_WS = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psico
 const publicPages = [
   "/", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest",
   "/termos", "/privacidade", "/login", "/register", "/recuperar-senha",
-  "/pricing", "/blog", "/sobre", "/avaliacoes",
+  "/pricing", "/blog", "/sobre", "/avaliacoes", "/status",
 ]
 
 const publicPrefixes = [
@@ -20,12 +20,14 @@ const publicApiPrefixes = [
   "/api/pacientes/me",   "/api/pacientes/invoices", "/api/pacientes/auth/refresh",
   "/api/pacientes/questionarios", "/api/pacientes/anamnese", "/api/pacientes/tarefas",
   "/api/pacientes/protocolos-crise",
-  "/api/cron", "/api/health", "/api/seed-questionarios", "/api/seed-avaliacoes", "/api/hermes", "/api/cron/backup",
+  "/api/cron", "/api/health", "/api/seed-questionarios", "/api/seed-avaliacoes", "/api/seed-blog", "/api/hermes", "/api/cron/backup",
   "/api/recibos", "/api/lista-espera",
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
   "/api/pagamentos/public-checkout", "/api/setup/promote-me",
-  "/api/avaliacoes",
+  "/api/avaliacoes", "/api/referrals/validate",
+  "/api/push/vapid", "/api/push/subscribe",
+  "/api/avatar", "/api/blog",
 ]
 
 const staticPrefixes = ["/_next", "/static"]
@@ -57,7 +59,7 @@ export default withAuth(
     const origin = req.headers.get("origin") || ""
     const allowedOrigins = [
       process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""),
-      "https://psicoflow-iota.vercel.app",
+      "https://psihumanis.vercel.app",
       "http://localhost:3000",
     ].filter(Boolean) as string[]
     if (origin && allowedOrigins.includes(origin)) {
@@ -83,7 +85,7 @@ export default withAuth(
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https:",
         "font-src 'self' data:",
-        `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud https://api.stripe.com`,
+        `connect-src 'self' ${LIVEKIT_WS} https://api.sendgrid.com https://api.resend.com https://graph.facebook.com https://api.livekit.cloud https://gestao-de-psicologia-sx5sdgua.livekit.cloud wss://gestao-de-psicologia-sx5sdgua.livekit.cloud https://api.stripe.com https://www.googletagmanager.com https://www.google-analytics.com`,
         "media-src 'self' blob: mediastream:",
         "worker-src 'self' blob:",
         "child-src 'self' blob:",

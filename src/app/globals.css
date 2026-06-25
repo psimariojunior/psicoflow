@@ -39,29 +39,30 @@
     --foreground: 210 40% 98%;
     --card: 222.2 84% 5.5%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4%;
+    --popover: 222.2 84% 3.5%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 80% 55%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217 30% 10%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 20% 10%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217 30% 10%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --primary: 217 75% 52%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 25% 12%;
+    --secondary-foreground: 210 40% 90%;
+    --muted: 217 18% 10%;
+    --muted-foreground: 215 20.2% 72%;
+    --accent: 217 25% 12%;
+    --accent-foreground: 210 40% 90%;
+    --destructive: 0 65% 32%;
     --destructive-foreground: 210 40% 98%;
-    --success: 160 60% 40%;
+    --success: 160 60% 42%;
     --success-foreground: 210 40% 98%;
-    --warning: 38 80% 45%;
+    --warning: 38 80% 48%;
     --warning-foreground: 210 40% 98%;
-    --border: 217 20% 14%;
-    --input: 217 20% 14%;
-    --ring: 217 70% 55%;
-    --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.4);
-    --shadow-card-hover: 0 10px 30px rgba(59,130,246,0.1), 0 4px 10px rgba(0,0,0,0.3);
-    --shadow-dropdown: 0 10px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
-    --shadow-glow: 0 0 20px rgba(59,130,246,0.08);
+    --border: 217 20% 16%;
+    --input: 217 20% 16%;
+    --ring: 217 75% 50%;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-card-hover: 0 10px 30px rgba(59,130,246,0.12), 0 4px 10px rgba(0,0,0,0.4);
+    --shadow-dropdown: 0 10px 40px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+    --shadow-glow: 0 0 20px rgba(59,130,246,0.1);
+    color-scheme: dark;
   }
 
   html {
@@ -114,6 +115,14 @@
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
+  }
+
+  html {
+    transition: color-scheme 0.3s ease;
+  }
+
+  body, .transition-theme, .bg-background, .bg-card, .bg-muted, .border-border, .text-foreground, .text-muted-foreground {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   }
 }
 

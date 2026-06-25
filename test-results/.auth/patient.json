@@ -1,0 +1,59 @@
+{
+  "cookies": [
+    {
+      "name": "__Host-next-auth.csrf-token",
+      "value": "779b8f2e99ff39c87be821620decdd06edce6e82d8d5b70147df0d94f2f3a6b4%7C62e48fc27d395b91d4e13336f9c1fe0994632a9b89e296c26cf901c2273f7691",
+      "domain": "psicoflow-iota.vercel.app",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.750830330.1782334580",
+      "domain": ".psicoflow-iota.vercel.app",
+      "path": "/",
+      "expires": 1816894580.318594,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-next-auth.callback-url",
+      "value": "https%3A%2F%2Fpsicoflow-iota.vercel.app%2Fapi%2Fsentry%3Fo%3D4511622269370368%26p%3D4511622272122880%26r%3Dus",
+      "domain": "psicoflow-iota.vercel.app",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_02JZYR1T20",
+      "value": "GS2.1.s1782334580$o1$g1$t1782334582$j58$l0$h0",
+      "domain": ".psicoflow-iota.vercel.app",
+      "path": "/",
+      "expires": 1816894582.675427,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://psicoflow-iota.vercel.app",
+      "localStorage": [
+        {
+          "name": "nextauth.message",
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1782334580}"
+        },
+        {
+          "name": "patient_token",
+          "value": "eyJhbGciOiJIUzI1NiJ9.eyJwYXRpZW50SWQiOiJjbXFyN2JpemUwMDAxNmNhMWllNW1nMWt5IiwiZW1haWwiOiJwYWNpZW50ZS50ZXN0ZUBlbWFpbC5jb20iLCJqdGkiOiIyYzRmYmYyZS0yODczLTQwYzAtOGQ2MS02YWU5MTI5MmY4NDUiLCJleHAiOjE3ODI0MjA5ODB9.Gx0MAplgo-tXRbwxgErheM4p45K-U59S5HWEKLvxU3k"
+        }
+      ]
+    }
+  ]
+}

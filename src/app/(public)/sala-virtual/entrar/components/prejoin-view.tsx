@@ -151,7 +151,7 @@ export function PrejoinView({
               </Button>
 
               <p className="text-[11px] text-white/25 text-center leading-relaxed">
-                Ao entrar, você aceita os termos de uso e política de privacidade do PsicoFlow.
+                Ao entrar, você aceita os termos de uso e política de privacidade do PsiHumanis.
               </p>
             </div>
           </div>

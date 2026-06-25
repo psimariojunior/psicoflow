@@ -275,6 +275,23 @@ export async function GET() {
     activity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     const recentActivity = activity.slice(0, 10)
 
+    // Streak: consecutive working days with at least one non-cancelled appointment
+    const appointmentDates = allAppointments
+      .filter((a) => a.status !== "CANCELLED")
+      .map((a) => {
+        const d = new Date(a.startTime.getTime() - 3 * 3600000)
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`
+      })
+    const uniqueDates = Array.from(new Set(appointmentDates)).sort().reverse()
+    let streak = 0
+    const today = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(brtNow.getUTCDate()).padStart(2, "0")}`
+    for (let i = 0; i < uniqueDates.length; i++) {
+      const expected = new Date(brtNow.getTime() - i * 86400000)
+      const expectedStr = `${expected.getUTCFullYear()}-${String(expected.getUTCMonth() + 1).padStart(2, "0")}-${String(expected.getUTCDate()).padStart(2, "0")}`
+      if (uniqueDates[i] === expectedStr) streak++
+      else break
+    }
+
     return apiSuccess({
       stats: {
         totalPatients,
@@ -330,6 +347,7 @@ export async function GET() {
         month: ap.mes.slice(5),
         count: Number(ap.total),
       })),
+      streak,
     })
   } catch (error) {
     logger.error("Error fetching dashboard data", { error: String(error) })

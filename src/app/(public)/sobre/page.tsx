@@ -16,7 +16,7 @@ export default function SobrePage() {
               <img src="/profile.jpg" alt="Mário Júnior" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight">Mário Júnior</h1>
-            <p className="text-lg text-muted-foreground">Fundador do PsicoFlow</p>
+            <p className="text-lg text-muted-foreground">Fundador do PsiHumanis</p>
             <p className="text-sm text-muted-foreground">CRP 04/52274 · Gestalt-Terapia</p>
           </div>
 
@@ -27,11 +27,11 @@ export default function SobrePage() {
               cara ou não atendia às necessidades reais do profissional.
             </p>
 
-            <h2>Por que criou o PsicoFlow?</h2>
+            <h2>Por que criou o PsiHumanis?</h2>
             <p>
               &quot;Eu precisava de um sistema que me permitisse focar no que importa: meus pacientes.
               Sem complicação, sem custos escondidos, sem funções que eu nunca vou usar.
-              Assim nasceu o PsicoFlow.&quot;
+              Assim nasceu o PsiHumanis.&quot;
             </p>
 
             <h2>Valores</h2>

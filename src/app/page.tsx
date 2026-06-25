@@ -10,10 +10,14 @@ import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { WhatsAppWidget } from "@/components/whatsapp-widget"
+import { setLocale, t, getLocale } from "@/lib/i18n"
+import toast from "react-hot-toast"
+import { BreadcrumbJsonLd } from "@/lib/seo"
 import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
   Users, Globe, Calendar, MessageCircle, ChevronDown, Menu, X, Star,
-  Phone, Mail, MapPin, Clock, Award, Quote,
+  Phone, Mail, MapPin, Clock, Award, Quote, BarChart3 as BarChartIcon,
+  Sun, Moon, Languages,
 } from "lucide-react"
 
 const services = [
@@ -27,7 +31,7 @@ const services = [
 
 const faqItems = [
   { q: "Como funciona a terapia online?", a: "Você agenda um horário, recebe um link seguro por email, e no horário marcado basta clicar para entrar na sala virtual. Tudo criptografado." },
-  { q: "Qual a duração de cada sessão?", a: "As sessões têm duração de 30 minutos. A frequência é combinada entre psicólogo e paciente." },
+  { q: "Qual a duração de cada sessão?", a: "O tempo da sessão é acordado com o profissional, com duração média de 30 minutos. A frequência também é definida em conjunto." },
   { q: "O sigilo é garantido?", a: "Sim. Todas as sessões seguem o código de ética do CRP. Videochamadas criptografadas e registros seguros." },
   { q: "Preciso de encaminhamento médico?", a: "Não. Agende diretamente sem necessidade de encaminhamento." },
   { q: "Quais formas de pagamento?", a: "Aceitamos PIX, cartão de crédito, boleto e transferência bancária." },
@@ -35,19 +39,20 @@ const faqItems = [
 ]
 
 const steps = [
-  { icon: Calendar, title: "Agende", desc: "Escolha o dia e horário ideal na agenda online. Sem burocracia." },
-  { icon: Globe, title: "Conecte-se", desc: "No horário marcado, entre na sala virtual segura com um clique." },
-  { icon: Heart, title: "Transforme-se", desc: "Participe da sessão com privacidade e dê o próximo passo no seu bem-estar." },
+  { icon: Calendar, title: "Agende", en: "Book", desc: "Escolha o dia e horário ideal na agenda online. Sem burocracia.", enDesc: "Choose the ideal day and time in the online calendar. No bureaucracy." },
+  { icon: Globe, title: "Conecte-se", en: "Connect", desc: "No horário marcado, entre na sala virtual segura com um clique.", enDesc: "At the scheduled time, enter the secure virtual room with one click." },
+  { icon: Heart, title: "Transforme-se", en: "Transform", desc: "Participe da sessão com privacidade e dê o próximo passo no seu bem-estar.", enDesc: "Join the session with privacy and take the next step in your well-being." },
 ]
 
 const navLinks = [
-  { label: "Início", href: "/" },
-  { label: "Serviços", href: "/#servicos" },
-  { label: "Sobre", href: "/sobre" },
-  { label: "Avaliações", href: "/avaliacoes" },
-  { label: "Blog", href: "/blog" },
-  { label: "Agendamento", href: "/agendar" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "Início", href: "/", en: "Home" },
+  { label: "Serviços", href: "/#servicos", en: "Services" },
+  { label: "Sobre", href: "/sobre", en: "About" },
+  { label: "Avaliações", href: "/avaliacoes", en: "Reviews" },
+  { label: "Blog", href: "/blog", en: "Blog" },
+  { label: "Planos", href: "/pricing", en: "Plans" },
+  { label: "Agendamento", href: "/agendar", en: "Booking" },
+  { label: "FAQ", href: "/#faq", en: "FAQ" },
 ]
 
 export default function LandingPage() {
@@ -58,6 +63,24 @@ export default function LandingPage() {
   const [reviewsAvg, setReviewsAvg] = useState(0)
   const [reviewsTotal, setReviewsTotal] = useState(0)
   const pathname = usePathname()
+  const [darkMode, setDarkMode] = useState(() =>
+    typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false
+  )
+  const locale = getLocale()
+
+  const toggleTheme = () => {
+    const html = document.documentElement
+    const isDark = html.classList.contains("dark")
+    html.classList.toggle("dark")
+    localStorage.setItem("theme", isDark ? "light" : "dark")
+    setDarkMode(!isDark)
+  }
+
+  const toggleLanguage = () => {
+    const newLocale = locale === "pt" ? "en" : "pt"
+    toast.success(newLocale === "en" ? "Language switched to English" : "Idioma alterado para Português", { duration: 2000 })
+    setLocale(newLocale)
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -89,6 +112,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
+      <BreadcrumbJsonLd items={[
+        { name: "Início", item: "/" },
+        { name: "Serviços", item: "/#servicos" },
+        { name: "FAQ", item: "/#faq" },
+      ]} />
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         scrolled
@@ -103,10 +131,10 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="flex items-center justify-center w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
-                <Image src="/logo.png" alt="PsicoFlow" width={44} height={44} className="w-full h-full object-cover" priority />
+                <Image src="/logo.png" alt="PsiHumanis" width={44} height={44} className="w-full h-full object-cover" priority />
               </div>
               <div className={cn("flex-col transition-all duration-500", scrolled ? "opacity-100 translate-x-0 flex" : "opacity-0 -translate-x-2 hidden md:flex")}>
-                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">PsicoFlow</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">PsiHumanis</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-500 leading-none">CRP 04/52274</span>
               </div>
             </Link>
@@ -114,11 +142,25 @@ export default function LandingPage() {
               {navLinks.map(link => (
                 <Link key={link.href} href={link.href} onClick={e => {
                   if (link.href.startsWith("/#")) { e.preventDefault(); const id = link.href.slice(2); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth" }) }
-                }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{link.label}</Link>
+                }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{locale === "en" ? link.en : link.label}</Link>
               ))}
               <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
-              <Link href="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
-              <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">Agende sua Consulta</Button></Link>
+              <button
+                onClick={toggleLanguage}
+                className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                aria-label="Toggle language"
+              >
+                <Languages className="h-4 w-4" />
+              </button>
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                aria-label="Toggle theme"
+              >
+                {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+              <Link href="/login"><Button variant="ghost" size="sm">{t("nav.login", locale)}</Button></Link>
+              <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">{t("nav.book", locale)}</Button></Link>
             </nav>
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Abrir menu">
               {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -129,9 +171,24 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl">
             <div className="px-4 py-4 space-y-1">
               {navLinks.map(link => (
-                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">{link.label}</Link>
+                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">{locale === "en" ? link.en : link.label}</Link>
               ))}
               <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
+              <div className="flex items-center gap-2 px-4 py-2">
+                <button
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                >
+                  <Languages className="h-3.5 w-3.5" /> {locale === "pt" ? "EN" : "PT"}
+                </button>
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                >
+                  {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                  {darkMode ? "Claro" : "Escuro"}
+                </button>
+              </div>
               <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Psicólogo</Link>
               <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400">Área do Paciente</Link>
               <Link href="/agendar" className="block mt-2"><Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white">Agende sua Consulta</Button></Link>
@@ -150,25 +207,25 @@ export default function LandingPage() {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="space-y-8">
               <motion.div animate={{ opacity: [1, 0.7, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium">
                 <Sparkles className="h-4 w-4" />
-                Atendimento psicológico online e presencial
+                {t("hero.badge", locale)}
               </motion.div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-                <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">Cuide da sua mente,</span>
+                <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{t("hero.title1", locale)}</span>
                 <br />
-                <span className="bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">transforme sua vida</span>
+                <span className="bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">{t("hero.title2", locale)}</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg">
-                Psicoterapia com abordagem humanizada. Atendimento individual, de casal e online com profissional qualificado.
+                {t("hero.subtitle", locale)}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link href="/agendar">
                   <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25 text-base h-12 px-8">
-                    Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" />
+                    {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/paciente/login">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto text-base h-12 px-8 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
-                    Área do Paciente
+                    {t("hero.patient", locale)}
                   </Button>
                 </Link>
               </div>
@@ -177,6 +234,9 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-blue-500" /><span>Online ou Presencial</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-500" /><span>CRP Ativo</span></div>
               </div>
+              <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium pt-2">
+                <Sparkles className="h-3.5 w-3.5" /> Psicólogo? Comece grátis por 14 dias
+              </Link>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
               <div className="relative w-full max-w-md aspect-square">
@@ -209,9 +269,9 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Como Funciona</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Sua jornada em <span className="text-blue-500">3 passos</span></h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">Simples, rápido e seguro. Comece hoje.</p>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("steps.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("steps.title", locale)}</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">{t("steps.subtitle", locale)}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 relative">
             <div className="hidden md:block absolute top-1/2 left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-blue-500/30 via-blue-500/50 to-blue-500/30 -translate-y-1/2" />
@@ -225,8 +285,8 @@ export default function LandingPage() {
                     </div>
                     <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center shadow-md">{i + 1}</div>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">{step.title}</h3>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{step.desc}</p>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">{locale === "en" ? step.en : step.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{locale === "en" ? step.enDesc : step.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -234,12 +294,42 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
+      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-950 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div>
+              <Badge className="mb-4 bg-blue-500/15 text-blue-200 border border-blue-400/20">{t("saas.badge", locale)}</Badge>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">{t("saas.title", locale)}</h2>
+              <p className="mt-5 text-slate-300 leading-7">{t("saas.subtitle", locale)}</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-blue-50">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+                <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">{t("saas.login", locale)}</Button></Link>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale) },
+                { icon: Brain, title: t("saas.feature2", locale), desc: t("saas.feature2desc", locale) },
+                { icon: Shield, title: t("saas.feature3", locale), desc: t("saas.feature3desc", locale) },
+                { icon: BarChartIcon, title: t("saas.feature4", locale), desc: t("saas.feature4desc", locale) },
+              ].map((item) => (
+                <Card key={item.title} className="border-white/10 bg-white/[0.06] p-5 text-white backdrop-blur-xl group hover:bg-white/[0.1] transition-all">
+                  <item.icon className="h-6 w-6 text-blue-300 group-hover:scale-110 transition-transform" />
+                  <h3 className="mt-4 font-semibold">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{item.desc}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="servicos" className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Serviços</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Cuidado <span className="text-blue-500">especializado</span></h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">Diversas modalidades para cuidar de você.</p>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("services.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("services.title", locale)}</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">{t("services.subtitle", locale)}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, i) => (
@@ -260,12 +350,14 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28 bg-gradient-to-br from-blue-50/50 to-slate-50/50 dark:from-slate-900/50 dark:to-slate-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-xl mx-auto text-center">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Sobre</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">Conheça o <span className="text-blue-500">fundador</span></h2>
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mx-auto flex items-center justify-center text-white text-2xl font-bold shadow-xl mb-6">MJ</div>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("about.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{t("about.title", locale)}</h2>
+            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-blue-500/20 mb-6">
+              <Image src="/profile.jpg" alt="Mário Júnior" width={96} height={96} className="w-full h-full object-cover" loading="lazy" />
+            </div>
             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
               <strong className="text-slate-900 dark:text-white">Mário Júnior</strong> — Psicólogo clínico (CRP 04/52274), Gestalt-Terapia. 
-              Criou o PsicoFlow para simplificar a gestão de consultórios e permitir que profissionais foquem no que importa: seus pacientes.
+              Criou o PsiHumanis para simplificar a gestão de consultórios e permitir que profissionais foquem no que importa: seus pacientes.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               {["Terapia Individual", "Terapia de Casal", "Online"].map((item) => (
@@ -274,7 +366,7 @@ export default function LandingPage() {
             </div>
             <Link href="/sobre">
               <Button variant="outline" size="lg" className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">
-                Saiba Mais <ArrowRight className="ml-2 h-5 w-5" />
+                {t("about.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -285,8 +377,8 @@ export default function LandingPage() {
         <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="avaliacoes" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Avaliações</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">O que dizem <span className="text-blue-500">nossos pacientes</span></h2>
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("reviews.badge", locale)}</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("reviews.title", locale)}</h2>
               <div className="flex items-center justify-center gap-3 mt-6">
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -331,9 +423,9 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="faq" className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">FAQ</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Perguntas <span className="text-blue-500">frequentes</span></h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">Tire suas dúvidas sobre o processo terapêutico.</p>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("faq.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("faq.title", locale)}</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">{t("faq.subtitle", locale)}</p>
           </div>
           <div className="space-y-3">
             {faqItems.map((item, i) => (
@@ -359,13 +451,16 @@ export default function LandingPage() {
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-white/5 blur-3xl" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-8">
-            <Badge className="px-4 py-2 text-sm bg-white/10 text-white border-white/20">Comece Agora</Badge>
-            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">Pronto para começar sua <br /><span className="text-blue-200">jornada de transformação?</span></h2>
-            <p className="text-lg text-blue-100/80 max-w-lg mx-auto">Dê o primeiro passo em direção ao seu bem-estar emocional.</p>
+            <Badge className="px-4 py-2 text-sm bg-white/10 text-white border-white/20">{t("cta.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">{t("cta.title", locale)}</h2>
+            <p className="text-lg text-blue-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-              <Link href="/paciente/cadastro"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-base h-12 px-8">Criar Conta</Button></Link>
+              <Link href="/paciente/cadastro"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-base h-12 px-8">{t("cta.patient", locale)}</Button></Link>
             </div>
+            <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-200 hover:text-white transition-colors pt-2">
+              <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
+            </Link>
           </motion.div>
         </div>
       </motion.section>
@@ -376,10 +471,10 @@ export default function LandingPage() {
             <div className="space-y-4">
               <Link href="/" className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20">
-                  <Image src="/logo.png" alt="PsicoFlow" width={40} height={40} className="w-full h-full object-cover" />
+                  <Image src="/logo.png" alt="PsiHumanis" width={40} height={40} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <span className="text-lg font-bold text-white">PsicoFlow</span>
+                  <span className="text-lg font-bold text-white">PsiHumanis</span>
                   <p className="text-[10px] text-slate-300 leading-none">CRP 04/52274</p>
                 </div>
               </Link>
@@ -417,7 +512,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-slate-800">
-            <p className="text-sm text-slate-400 text-center">© {new Date().getFullYear()} PsicoFlow. Todos os direitos reservados. CRP 04/52274 • Psicólogo Responsável</p>
+            <p className="text-sm text-slate-400 text-center">© {new Date().getFullYear()} PsiHumanis. Todos os direitos reservados. CRP 04/52274 • Psicólogo Responsável</p>
           </div>
         </div>
       </footer>

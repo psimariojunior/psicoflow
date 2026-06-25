@@ -16,7 +16,7 @@ export default function TermosPage() {
               <Shield className="h-5 w-5 text-emerald-500" /> 1. Aceitação dos Termos
             </h2>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              Ao utilizar a plataforma PsicoFlow, você declara ter lido, compreendido e concordado
+              Ao utilizar a plataforma PsiHumanis, você declara ter lido, compreendido e concordado
               com todos os termos e condições descritos neste documento. Caso não concorde com
               qualquer disposição, você não deve utilizar nossos serviços.
             </p>
@@ -44,7 +44,7 @@ export default function TermosPage() {
               <AlertTriangle className="h-5 w-5 text-emerald-500" /> 3. Responsabilidades
             </h2>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-              O PsicoFlow atua como plataforma de gestão e agendamento. A responsabilidade
+              O PsiHumanis atua como plataforma de gestão e agendamento. A responsabilidade
               pelo conteúdo das consultas, prontuários e registros é integralmente do
               profissional psicólogo responsável, registrado no CRP sob o número 04/52274.
             </p>

@@ -34,7 +34,7 @@ const sections = [
     highlight: true,
     items: [
       {
-        title: "Como começar a usar o PsicoFlow",
+        title: "Como começar a usar o PsiHumanis",
         content:
           "Após criar sua conta, comece cadastrando seus pacientes em 'Pacientes > Novo Paciente'. Em seguida, configure seus horários de atendimento em 'Configurações > Disponibilidade' para que os pacientes possam agendar consultas pelo link público.",
       },
@@ -226,7 +226,7 @@ const sections = [
       {
         title: "Compartilhar código da sala",
         content:
-          "Na página da sala virtual, copie o código gerado e envie ao paciente por WhatsApp ou e-mail. O link direto é: https://psicoflow.vercel.app/sala-virtual/entrar?room=CODIGO. O paciente abre o link, digita o nome e entra na videochamada.",
+          "Na página da sala virtual, copie o código gerado e envie ao paciente por WhatsApp ou e-mail. O link direto é: https://psihumanis.vercel.app/sala-virtual/entrar?room=CODIGO. O paciente abre o link, digita o nome e entra na videochamada.",
       },
       {
         title: "Dicas de uso",
@@ -318,7 +318,7 @@ const sections = [
       {
         title: "Integração com Google Calendar",
         content:
-          "Conecte sua conta Google Calendar para sincronizar automaticamente suas consultas. As consultas agendadas no PsicoFlow aparecem no seu Google Calendar e vice-versa. Acesse em 'Configurações > Google Calendar'.",
+          "Conecte sua conta Google Calendar para sincronizar automaticamente suas consultas. As consultas agendadas no PsiHumanis aparecem no seu Google Calendar e vice-versa. Acesse em 'Configurações > Google Calendar'.",
       },
       {
         title: "Disponibilidade e horários",
@@ -336,7 +336,7 @@ const sections = [
       {
         title: "Como funciona a assinatura",
         content:
-          "O PsicoFlow oferece planos gratuitos e pagos. No plano gratuito, você tem acesso a funcionalidades básicas. Para desbloquear todos os recursos (sala virtual, IA, relatórios avançados), assine um plano pago diretamente em 'Configurações > Planos'.",
+          "O PsiHumanis oferece planos gratuitos e pagos. No plano gratuito, você tem acesso a funcionalidades básicas. Para desbloquear todos os recursos (sala virtual, IA, relatórios avançados), assine um plano pago diretamente em 'Configurações > Planos'.",
       },
       {
         title: "Formas de pagamento",
@@ -373,7 +373,7 @@ export default function AjudaPage() {
             </Badge>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
-            Guia do PsicoFlow
+            Guia do PsiHumanis
           </h1>
           <p className="text-blue-100 text-lg sm:text-xl max-w-2xl">
             Tudo que você precisa saber para usar o sistema
@@ -497,7 +497,7 @@ export default function AjudaPage() {
         </div>
         <CardContent className="p-6 space-y-4">
           <p className="text-sm text-muted-foreground">
-            Nossa equipe está pronta para ajudar com qualquer dúvida sobre o PsicoFlow.
+            Nossa equipe está pronta para ajudar com qualquer dúvida sobre o PsiHumanis.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex items-center gap-3 rounded-xl border p-4 flex-1 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
@@ -507,10 +507,10 @@ export default function AjudaPage() {
               <div>
                 <p className="text-xs text-muted-foreground">E-mail</p>
                 <a
-                  href="mailto:suporte@psicoflow.com"
+                  href="mailto:suporte@psihumanis.com"
                   className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  suporte@psicoflow.com
+                  suporte@psihumanis.com
                 </a>
               </div>
             </div>

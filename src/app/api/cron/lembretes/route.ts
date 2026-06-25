@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     if (url.searchParams.has("testemail")) {
       const to = url.searchParams.get("to") || ""
       if (!to) return NextResponse.json({ ok: false, error: "?to=email" })
-      const err = await sendEmail(to, "Teste PsicoFlow", "<p>Teste de email</p>")
+      const err = await sendEmail(to, "Teste PsiHumanis", "<p>Teste de email</p>")
       return NextResponse.json({ ok: err === null, error: err })
     }
 

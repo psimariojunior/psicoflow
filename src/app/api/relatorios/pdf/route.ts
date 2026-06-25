@@ -348,7 +348,7 @@ export async function GET(request: NextRequest) {
   </div>
 
   <div style="margin-top:30px;padding-top:16px;border-top:2px solid #e2e8f0;text-align:center;color:#94a3b8;font-size:11px">
-    <p>PsicoFlow — Relatório gerado em ${new Date().toLocaleString("pt-BR")}</p>
+    <p>PsiHumanis — Relatório gerado em ${new Date().toLocaleString("pt-BR")}</p>
   </div>
 
   <script>

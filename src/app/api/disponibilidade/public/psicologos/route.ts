@@ -20,7 +20,13 @@ export async function GET() {
         clinicAddress: true,
       },
     })
-    return NextResponse.json(psychologists)
+    const result = psychologists.map((p) => ({
+      ...p,
+      avatarUrl: p.avatarUrl?.startsWith("data:image")
+        ? `/api/avatar?psychologistId=${p.id}`
+        : p.avatarUrl,
+    }))
+    return NextResponse.json(result)
   } catch {
     return NextResponse.json({ error: "Failed to fetch psychologists" }, { status: 500 })
   }

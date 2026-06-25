@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, stripeCustomerId: true, stripeSubscriptionId: true },
+      select: { email: true, name: true, stripeCustomerId: true, stripeSubscriptionId: true, referredById: true },
     })
 
     if (!user) {
@@ -55,6 +55,23 @@ export async function POST(request: NextRequest) {
 
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
+    let referralDiscount: string | undefined
+    if (user.referredById) {
+      try {
+        const coupons = await stripe.coupons.list({ limit: 100 })
+        let coupon = coupons.data.find((c) => c.id === "REFERRAL_10")
+        if (!coupon) {
+          coupon = await stripe.coupons.create({
+            id: "REFERRAL_10",
+            percent_off: 10,
+            duration: "once",
+            name: "10% off - Indicação",
+          })
+        }
+        referralDiscount = coupon.id
+      } catch {}
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -65,6 +82,7 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
+      discounts: referralDiscount ? [{ coupon: referralDiscount }] : undefined,
       subscription_data: {
         trial_period_days: user.stripeSubscriptionId ? undefined : 14,
         metadata: { userId, plan },

@@ -6,6 +6,7 @@ import { useTheme } from "next-themes"
 import Link from "next/link"
 import Image from "next/image"
 import { CommandPalette } from "@/components/command-palette"
+import { PushNotificationPrompt } from "@/components/push-notification-prompt"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Receipt, Sun, Moon, Menu, X, ClipboardList, FileText, ShieldAlert, FileCheck, ListChecks } from "lucide-react"
 
@@ -142,9 +143,9 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                 </button>
                 <Link href="/paciente" className="flex items-center gap-2 group">
                   <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
-                    <Image src="/logo.png" alt="PsicoFlow" width={36} height={36} className="w-full h-full object-cover" priority />
+                    <Image src="/logo.png" alt="PsiHumanis" width={36} height={36} className="w-full h-full object-cover" priority />
                   </div>
-                  <span className="text-foreground font-semibold text-sm">PsicoFlow</span>
+                  <span className="text-foreground font-semibold text-sm">PsiHumanis</span>
                 </Link>
               </div>
               <div className="flex items-center gap-2 sm:gap-4">
@@ -248,6 +249,6 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
           </motion.div>
         </AnimatePresence>
       </div>
-    </PatientAuthContext.Provider>
+    <PushNotificationPrompt /></PatientAuthContext.Provider>
   )
 }

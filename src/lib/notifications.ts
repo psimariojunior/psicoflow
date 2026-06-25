@@ -3,6 +3,7 @@ import { prisma } from "./prisma"
 import { logger } from "./logger"
 import { sendAppointmentReminderEmail } from "./email"
 import { sendAppointmentReminderWhatsApp } from "./whatsapp"
+import { sendPushToSubscriptions } from "./push"
 
 export async function sendReminderNow(
   patientId: string,
@@ -151,6 +152,28 @@ export async function dispatchNotification(
       errorMessage: sendErr,
     },
   })
+
+  if (!sendErr) {
+    try {
+      const { Redis } = await import("@upstash/redis") as typeof import("@upstash/redis")
+      const redisUrl = process.env.UPSTASH_REDIS_REST_URL
+      const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+      if (redisUrl && redisToken) {
+        const redis = new Redis({ url: redisUrl, token: redisToken })
+        const key = `push:subscriptions:${notification.psychologistId}`
+        const subs: string[] = await redis.get(key) || []
+        if (subs.length > 0) {
+          const parsed = subs.map(s => { try { return JSON.parse(s) } catch { return null } }).filter(Boolean)
+          await sendPushToSubscriptions(parsed, {
+            title: notification.title || "PsiHumanis",
+            body: `Lembrete ${notification.channel} enviado para ${patientName}${appointmentDate ? ` (${appointmentDate})` : ""}`,
+            url: "/notificacoes",
+            tag: `reminder-${notificationId}`,
+          })
+        }
+      }
+    } catch {}
+  }
 }
 
 export async function scheduleReminders(

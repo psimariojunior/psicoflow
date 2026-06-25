@@ -1,32 +1,58 @@
+"use client"
+
 import Link from "next/link"
+import { ArrowLeft, Calendar, Home, Search, FileText, HelpCircle } from "lucide-react"
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl shadow-blue-500/30 mb-8">
-          <span className="text-5xl font-bold text-white">404</span>
+    <div className="min-h-screen bg-gradient-to-b from-background via-blue-50/20 to-background dark:via-blue-950/10 flex items-center justify-center p-4">
+      <div className="text-center max-w-lg">
+        <div className="inline-flex items-center justify-center w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-500 to-indigo-600 shadow-2xl shadow-blue-500/30 mb-8 ring-4 ring-blue-500/10">
+          <span className="text-6xl font-bold text-white">404</span>
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
           Página não encontrada
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-          A página que você procura não existe ou foi movida.
-          Verifique o endereço ou volte para o início.
+        <p className="text-muted-foreground mb-8 leading-relaxed max-w-sm mx-auto">
+          A página que você procura não existe ou foi movida. 
+          Que tal tentar um dos links abaixo?
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 hover:from-blue-600 hover:to-blue-700 transition-all"
-          >
-            Voltar ao Início
-          </Link>
-          <Link
-            href="/agendar"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-          >
-            Agendar Consulta
-          </Link>
+
+        <div className="grid gap-3 sm:grid-cols-2 mb-8">
+          {[
+            { href: "/", icon: Home, label: "Voltar ao Início", desc: "Página principal" },
+            { href: "/agendar", icon: Calendar, label: "Agendar Consulta", desc: "Marque um horário" },
+            { href: "/blog", icon: FileText, label: "Blog", desc: "Artigos e dicas" },
+            { href: "/ajuda", icon: HelpCircle, label: "Ajuda", desc: "Perguntas frequentes" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex items-center gap-3 p-4 rounded-2xl border bg-card hover:bg-accent hover:border-blue-200 dark:hover:border-blue-800 transition-all"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-sm">{item.label}</p>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Buscar no PsiHumanis..."
+            className="w-full rounded-xl border bg-card py-3 pl-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring/30 transition-all"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
+                window.location.href = `/blog?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`
+              }
+            }}
+          />
         </div>
       </div>
     </div>

@@ -5,19 +5,37 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "https://psihumanis.vercel.app",
     trace: "on-first-retry",
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "setup-patient",
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
+      name: "chromium-noauth",
+      testMatch: /basic\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "chromium-patient",
+      testMatch: /questionarios\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], storageState: "test-results/.auth/patient.json" },
+      dependencies: ["setup-patient"],
+    },
+    {
+      name: "setup-psychologist",
+      testMatch: /psychologist-auth\.setup\.ts/,
+    },
+    {
+      name: "chromium-psychologist",
+      testMatch: /psychologist\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], storageState: "test-results/.auth/psychologist.json" },
+      dependencies: ["setup-psychologist"],
+    },
   ],
-  webServer: {
-    command: "npx next dev -p 3000",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
 })

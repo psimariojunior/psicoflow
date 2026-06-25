@@ -80,12 +80,12 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
       <div className="flex h-16 items-center justify-between px-4 border-b relative">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
-            <Image src="/logo.png" alt="PsicoFlow" width={40} height={40} className="w-full h-full object-cover" priority />
+            <Image src="/logo.png" alt="PsiHumanis" width={40} height={40} className="w-full h-full object-cover" priority />
           </div>
           {!collapsed && (
             <div>
               <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-400 dark:to-sky-400 bg-clip-text text-transparent">
-                PsicoFlow
+                PsiHumanis
               </span>
               <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Gestão em Psicologia</p>
             </div>

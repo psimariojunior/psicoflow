@@ -16,6 +16,36 @@ function getSubPeriodEnd(sub: Stripe.Subscription): number | null {
   return item?.current_period_end ?? null
 }
 
+async function grantReferralReward(referredUserId: string) {
+  const referral = await prisma.referral.findUnique({
+    where: { referredId: referredUserId },
+    select: { id: true, referrerId: true, rewardGranted: true },
+  })
+
+  if (!referral || referral.rewardGranted) return
+
+  const referrer = await prisma.user.findUnique({
+    where: { id: referral.referrerId },
+    select: { planExpiresAt: true },
+  })
+
+  const base = referrer?.planExpiresAt && referrer.planExpiresAt > new Date()
+    ? referrer.planExpiresAt
+    : new Date()
+  const newExpiry = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000)
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: referral.referrerId },
+      data: { planExpiresAt: newExpiry },
+    }),
+    prisma.referral.update({
+      where: { id: referral.id },
+      data: { rewardGranted: true },
+    }),
+  ])
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
@@ -132,6 +162,8 @@ export async function POST(request: NextRequest) {
               planExpiresAt: periodEnd ? new Date(periodEnd * 1000) : null,
             },
           })
+
+          if (sub.status === "active") await grantReferralReward(subUserId)
         }
         break
       }
@@ -174,6 +206,8 @@ export async function POST(request: NextRequest) {
               planExpiresAt: periodEnd ? new Date(periodEnd * 1000) : null,
             },
           })
+
+          if (updatedSub.status === "active") await grantReferralReward(targetUserId)
         }
         break
       }
@@ -233,6 +267,8 @@ export async function POST(request: NextRequest) {
                 planExpiresAt: new Date(paidInvoice.period_end * 1000),
               },
             })
+
+            await grantReferralReward(invSub.userId)
           }
         }
         break

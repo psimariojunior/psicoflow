@@ -215,31 +215,44 @@ function BookingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 mb-4">
-            <Calendar className="h-8 w-8 text-blue-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Agende sua consulta</h1>
-          {psychologist ? (
-            <>
-              <p className="text-white/50">
-                com <span className="text-blue-400/80">{psychologist.publicName || psychologist.name}</span>
-                {psychologist.specialty && <span className="text-white/40"> &mdash; {psychologist.specialty}</span>}
+      <div className="mx-auto max-w-5xl px-4 py-10">
+        <div className="mb-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 text-white shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl" />
+            <div className="relative">
+              <div className="mb-5 flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold shadow-lg shadow-blue-500/20">
+                  {psychologist?.avatarUrl ? <Image src={psychologist.avatarUrl} alt={psychologist.publicName || psychologist.name} width={64} height={64} className="h-full w-full object-cover" /> : (psychologist?.publicName || psychologist?.name || "P").slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-blue-200">Perfil profissional</p>
+                  <h1 className="text-2xl font-bold">{psychologist?.publicName || psychologist?.name || "Agendamento"}</h1>
+                  {psychologist?.specialty && <p className="text-sm text-blue-100/80">{psychologist.specialty}</p>}
+                </div>
+              </div>
+              <p className="text-sm leading-6 text-white/70">
+                {psychologist?.publicBio || psychologist?.welcomeMessage || "Escolha o melhor dia e horário para iniciar seu cuidado com segurança e acolhimento."}
               </p>
-              {psychologist.sessionPrice && (
-                <p className="text-green-400 text-sm font-medium mt-1">R$ {psychologist.sessionPrice.toFixed(2)}</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-white/10 p-3"><CheckCircle className="mb-2 h-4 w-4 text-emerald-300" /><p className="text-xs text-white/70">Ambiente seguro</p></div>
+                <div className="rounded-2xl bg-white/10 p-3"><Clock className="mb-2 h-4 w-4 text-blue-300" /><p className="text-xs text-white/70">Horários online</p></div>
+                <div className="rounded-2xl bg-white/10 p-3"><Calendar className="mb-2 h-4 w-4 text-indigo-300" /><p className="text-xs text-white/70">Confirmação rápida</p></div>
+              </div>
+              {(psychologist?.sessionPrice || psychologist?.clinicAddress) && (
+                <div className="mt-5 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/70">
+                  {psychologist.sessionPrice && <p className="font-semibold text-emerald-300">Sessão: R$ {psychologist.sessionPrice.toFixed(2)}</p>}
+                  {psychologist.clinicAddress && <p className="mt-1 text-xs text-white/50">{psychologist.clinicAddress}</p>}
+                </div>
               )}
-              {psychologist.welcomeMessage && (
-                <p className="text-blue-300/60 text-sm mt-2 italic max-w-md mx-auto">&ldquo;{psychologist.welcomeMessage}&rdquo;</p>
-              )}
-              {psychologist.clinicAddress && (
-                <p className="text-white/30 text-xs mt-2">{psychologist.clinicAddress}</p>
-              )}
-            </>
-          ) : (
-            <p className="text-white/50">Escolha o melhor dia e horário para você</p>
-          )}
+            </div>
+          </div>
+          <div className="flex flex-col justify-center rounded-[2rem] border border-white/10 bg-gradient-to-br from-blue-500/15 to-indigo-500/10 p-6 text-center text-white backdrop-blur-xl">
+            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10">
+              <Calendar className="h-8 w-8 text-blue-200" />
+            </div>
+            <h2 className="text-3xl font-bold">Agende sua consulta</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/60">Selecione data, horário e informe seus dados. O processo leva menos de 1 minuto.</p>
+          </div>
         </div>
 
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -409,10 +422,10 @@ function BookingPage() {
 
         <div className="flex items-center justify-center gap-3 mt-8">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-1 ring-blue-500/30">
-            <Image src="/logo.png" alt="PsicoFlow" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
+            <Image src="/logo.png" alt="PsiHumanis" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <p className="text-center text-xs text-white/20">
-            PsicoFlow &mdash; Tecnologia a serviço da saúde mental
+            PsiHumanis &mdash; Tecnologia a serviço da saúde mental
           </p>
         </div>
       </div>

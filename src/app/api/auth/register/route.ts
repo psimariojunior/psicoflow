@@ -13,6 +13,7 @@ const registerSchema = z.object({
   email: z.string().email("Email inválido").max(255),
   password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").max(128, "Senha muito longa"),
   crp: z.string().max(20).optional().or(z.literal("")),
+  referralCode: z.string().max(20).optional().or(z.literal("")),
 })
 
 const rateLimit = rateLimitMiddleware(3, 60000)
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    const { name, email, password, crp } = parse.data
+    const { name, email, password, crp, referralCode } = parse.data
     const sanitizedName = sanitizeHtml(name.trim())
 
     const existingUser = await prisma.user.findUnique({
@@ -44,6 +45,14 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    const normalizedReferralCode = referralCode?.trim().toUpperCase() || null
+    const referrer = normalizedReferralCode
+      ? await prisma.user.findUnique({
+          where: { referralCode: normalizedReferralCode },
+          select: { id: true },
+        })
+      : null
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
@@ -58,6 +67,7 @@ export async function POST(request: Request) {
         password: hashedPassword,
         crp: crp || null,
         role: userRole,
+        referredById: referrer?.id || null,
         permissions: {
           create: {},
         },
@@ -72,27 +82,56 @@ export async function POST(request: Request) {
 
     await logAudit(user.id, "REGISTER", "User", user.id, "Novo usuário cadastrado")
 
+    if (normalizedReferralCode && referrer) {
+      if (referrer && referrer.id !== user.id) {
+        await prisma.referral.create({
+          data: {
+            referrerId: referrer.id,
+            referredId: user.id,
+            code: normalizedReferralCode,
+          },
+        }).catch(() => {})
+      }
+    }
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
     sendEmail(
       email,
-      "Bem-vindo ao PsicoFlow!",
-      `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">Bem-vindo ao PsicoFlow!</h2>
-        <p>Olá <strong>${sanitizedName}</strong>!</p>
-        <p>Sua conta foi criada com sucesso.</p>
-        <p>Você tem <strong>14 dias de trial gratuito</strong> para testar todas as funcionalidades.</p>
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="${appUrl}/login"
-             style="display: inline-block; padding: 12px 24px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">
-            Acessar PsicoFlow
-          </a>
+      "Bem-vindo ao PsiHumanis!",
+      `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  <div style="max-width:560px;margin:0 auto;padding:24px 16px">
+    <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+      <div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:32px 24px;text-align:center">
+        <div style="width:56px;height:56px;background:#fff;border-radius:14px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px">🧠</div>
+        <h1 style="color:#fff;font-size:24px;font-weight:700;margin:0 0 4px">Bem-vindo ao PsiHumanis!</h1>
+        <p style="color:#bfdbfe;font-size:14px;margin:0">Sua conta está pronta para usar</p>
+      </div>
+      <div style="padding:32px 24px">
+        <p style="color:#1e293b;font-size:16px;line-height:1.6;margin:0 0 16px">Olá <strong>${sanitizedName}</strong>!</p>
+        <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 24px">Sua conta foi criada com sucesso. Você tem <strong style="color:#2563eb">14 dias de trial gratuito</strong> para testar todas as funcionalidades sem compromisso.</p>
+        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:16px 20px;margin:0 0 24px">
+          <p style="color:#0369a1;font-size:13px;font-weight:600;margin:0 0 12px">✨ O que você pode fazer agora:</p>
+          <ul style="color:#0c4a6e;font-size:13px;line-height:1.8;margin:0;padding-left:20px">
+            <li>Cadastrar seus pacientes e criar prontuários digitais</li>
+            <li>Agendar consultas e configurar sua disponibilidade</li>
+            <li>Iniciar atendimentos na sala virtual segura</li>
+            <li>Enviar lembretes automáticos por WhatsApp e email</li>
+            <li>Acompanhar seu faturamento e indicadores</li>
+          </ul>
         </div>
-        <p style="font-size: 0.875rem; color: #666;">
-          Se tiver alguma dúvida, responda este email.
-        </p>
-        <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-        <p style="font-size: 0.75rem; color: #999; text-align: center;">PsicoFlow - Gestão para Psicólogos</p>
-      </div>`
+        <div style="text-align:center;margin:0 0 24px">
+          <a href="${appUrl}/login" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;text-decoration:none;border-radius:12px;font-weight:600;font-size:15px;box-shadow:0 4px 12px rgba(37,99,235,0.3)">Acessar PsiHumanis →</a>
+        </div>
+        <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0 0 8px;border-top:1px solid #e2e8f0;padding-top:20px">Precisa de ajuda? Responda este email ou acesse o suporte dentro da plataforma.</p>
+        <p style="color:#cbd5e1;font-size:12px;text-align:center;margin:0">PsiHumanis — Gestão para Psicólogos · CRP 04/52274</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
     ).catch((err) => console.error("[register] Failed to send welcome email:", err))
 
     return NextResponse.json(

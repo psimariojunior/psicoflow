@@ -9,9 +9,9 @@ import { GoogleAnalytics } from "@/components/google-analytics"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
-const siteUrl = "https://psicoflow-iota.vercel.app"
-const siteName = "PsicoFlow"
-const title = "PsicoFlow — Sistema de Gestão para Psicólogos | Agenda Online, Prontuários e Sala Virtual"
+const siteUrl = "https://psihumanis.vercel.app"
+const siteName = "PsiHumanis"
+const title = "PsiHumanis — Sistema de Gestão para Psicólogos | Agenda Online, Prontuários e Sala Virtual"
 const description = "Sistema completo de gestão para psicólogos. Agende consultas online, emita prontuários, gerencie finanças e realize atendimentos via sala virtual segura. Tudo em um só lugar."
 
 export const metadata: Metadata = {
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     "atendimento psicológico", "software psicologia", "psicólogo",
     "consulta online", "CRP", "clínica de psicologia",
   ],
-  authors: [{ name: "PsicoFlow" }],
-  creator: "PsicoFlow",
-  publisher: "PsicoFlow",
+  authors: [{ name: "PsiHumanis" }],
+  creator: "PsiHumanis",
+  publisher: "PsiHumanis",
   metadataBase: new URL(siteUrl),
   openGraph: {
     type: "website",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PsicoFlow - Gestão para Psicólogos",
+        alt: "PsiHumanis - Gestão para Psicólogos",
       },
     ],
   },
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title,
     description,
     images: ["/og-image.png"],
-    creator: "@psicoflow",
+    creator: "@psihumanis",
   },
   robots: {
     index: true,
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "PsicoFlow",
+    title: "PsiHumanis",
     statusBarStyle: "black-translucent",
     startupImage: ["/pwa-512-v5.png"],
   },
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     "application/ld+json": JSON.stringify({
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
-      name: "PsicoFlow",
+      name: "PsiHumanis",
       description: "Sistema de gestão para psicólogos com agenda online, prontuários e sala virtual",
       url: siteUrl,
       areaServed: "BR",

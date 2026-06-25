@@ -158,14 +158,14 @@ export default function LandingPageEN() {
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/en" className="flex items-center gap-3 group">
               <div className="flex items-center justify-center w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-xl shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105">
-                <Image src="/logo.png" alt="PsicoFlow" width={64} height={64} className="w-full h-full object-cover" priority />
+                <Image src="/logo.png" alt="PsiHumanis" width={64} height={64} className="w-full h-full object-cover" priority />
               </div>
               <div className={cn(
                 "flex flex-col transition-all duration-500",
                 scrolled ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 hidden md:flex"
               )}>
                 <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-400 dark:to-sky-400 bg-clip-text text-transparent">
-                  PsicoFlow
+                  PsiHumanis
                 </span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-500 leading-none">CRP 04/52274</span>
               </div>
@@ -482,10 +482,10 @@ export default function LandingPageEN() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-xl shadow-blue-500/20 ring-2 ring-blue-500/30">
-                  <Image src="/logo.png" alt="PsicoFlow" width={56} height={56} className="w-full h-full object-cover" loading="lazy" />
+                  <Image src="/logo.png" alt="PsiHumanis" width={56} height={56} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div>
-                  <span className="text-xl font-bold text-white block">PsicoFlow</span>
+                  <span className="text-xl font-bold text-white block">PsiHumanis</span>
                   <span className="text-xs text-blue-400/70">CRP 04/52274</span>
                 </div>
               </div>
@@ -521,7 +521,7 @@ export default function LandingPageEN() {
             </div>
           </div>
           <div className="mt-10 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">© {new Date().getFullYear()} PsicoFlow. {t.footer.copyright}</p>
+            <p className="text-sm text-slate-500">© {new Date().getFullYear()} PsiHumanis. {t.footer.copyright}</p>
             <p className="text-sm text-slate-500">{t.footer.crp}</p>
           </div>
         </div>

@@ -112,7 +112,7 @@ const steps: Step[] = [
   {
     page: "Conclusão",
     title: "Tudo pronto!",
-    intro: "Você conhece as principais funcionalidades do PsicoFlow.",
+    intro: "Você conhece as principais funcionalidades do PsiHumanis.",
     points: [
       { label: "Primeiros passos", text: "Cadastre um paciente, agende uma consulta e teste a videochamada" },
       { label: "Questionários", text: "Aplique PHQ-9, GAD-7 e outros testes com seus pacientes" },
@@ -122,9 +122,9 @@ const steps: Step[] = [
   },
 ]
 
-const KEY = "psicoflow-tour-v13"
-const STEP_KEY = "psicoflow-tour-step-v13"
-const ACTIVE_KEY = "psicoflow-tour-active-v13"
+const KEY = "psihumanis-tour-v13"
+const STEP_KEY = "psihumanis-tour-step-v13"
+const ACTIVE_KEY = "psihumanis-tour-active-v13"
 
 export function OnboardingTour() {
   const [open, setOpen] = useState(false)
@@ -192,17 +192,23 @@ export function OnboardingTour() {
           transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        {/* Pulsing glow */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-cyan-500/20 rounded-3xl blur-xl animate-pulse" />
+        <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {/* Header with gradient */}
           <div className="relative h-2 bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500" />
 
           {/* Close + progress */}
           <div className="flex items-center justify-between px-5 pt-4">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950/50 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950/50 flex items-center justify-center animate-pulse">
                 <Lightbulb className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               </div>
-              <span className="text-xs font-semibold text-slate-400">{step + 1} / {steps.length}</span>
+              <div className="flex items-center gap-1">
+                {steps.map((_, i) => (
+                  <div key={i} className={cn("h-1.5 rounded-full transition-all duration-300", i === step ? "w-6 bg-blue-500" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200 dark:bg-slate-700")} />
+                ))}
+              </div>
             </div>
             <button onClick={finish} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors">
               <X className="h-3.5 w-3.5" />

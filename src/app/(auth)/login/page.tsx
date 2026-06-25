@@ -43,9 +43,9 @@ export default function LoginPage() {
         <div className="relative w-full max-w-md space-y-8">
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-2xl shadow-blue-500/30 ring-4 ring-blue-500/20 mb-2">
-              <Image src="/logo.png" alt="PsicoFlow" width={80} height={80} className="w-full h-full object-cover" priority />
+              <Image src="/logo.png" alt="PsiHumanis" width={80} height={80} className="w-full h-full object-cover" priority />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">PsicoFlow</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">PsiHumanis</h1>
             <p className="text-sm text-muted-foreground">Faça login para acessar o sistema</p>
           </div>
 

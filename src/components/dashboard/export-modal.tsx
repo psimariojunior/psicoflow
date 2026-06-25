@@ -68,7 +68,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `relatorio-psicoflow-${new Date().toISOString().slice(0, 10)}.csv`
+      a.download = `relatorio-psihumanis-${new Date().toISOString().slice(0, 10)}.csv`
       a.click()
       URL.revokeObjectURL(url)
       toast.success("CSV exportado com sucesso!")
@@ -90,7 +90,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `dados-psicoflow-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = `dados-psihumanis-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
       toast.success("JSON exportado com sucesso!")
@@ -117,7 +117,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
 
       let txt = ""
       txt += "=".repeat(48) + "\n"
-      txt += "  PSICOFLOW — RELATÓRIO COMPLETO\n"
+      txt += "  PSIHUMANIS — RELATÓRIO COMPLETO\n"
       txt += `  Gerado em ${new Date().toLocaleString("pt-BR")}\n`
       txt += "=".repeat(48) + "\n\n"
 
@@ -163,7 +163,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
       }
 
       txt += "=".repeat(48) + "\n"
-      txt += "  Relatório gerado por PsicoFlow\n"
+      txt += "  Relatório gerado por PsiHumanis\n"
       txt += "=".repeat(48) + "\n"
 
       const blob = new Blob([txt], { type: "text/plain;charset=utf-8" })

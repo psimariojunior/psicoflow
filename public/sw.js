@@ -1,6 +1,6 @@
-const CACHE = "psicoflow-v6"
-const STATIC_CACHE = "psicoflow-static-v6"
-const IMAGE_CACHE = "psicoflow-images-v6"
+const CACHE = "psihumanis-v7"
+const STATIC_CACHE = "psihumanis-static-v7"
+const IMAGE_CACHE = "psihumanis-images-v7"
 
 const PRECACHE_URLS = [
   "/",
@@ -44,6 +44,42 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => !keepCaches.includes(k)).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
+  )
+})
+
+self.addEventListener("push", (event) => {
+  const data = event.data?.json() || {}
+  const title = data.title || "PsiHumanis"
+  const body = data.body || "Você tem uma nova notificação."
+  const icon = data.icon || "/pwa-192-v5.png"
+  const badge = "/pwa-72-v5.png"
+  const tag = data.tag || "default"
+  const url = data.url || "/"
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon,
+      badge,
+      tag,
+      data: { url },
+      vibrate: [200, 100, 200],
+      actions: data.actions || [],
+      requireInteraction: true,
+    })
+  )
+})
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close()
+  const url = event.notification.data?.url || "/"
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === url && "focus" in client) return client.focus()
+      }
+      return clients.openWindow(url)
+    })
   )
 })
 

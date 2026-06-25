@@ -1,10 +1,13 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+
+const AdminMRRChart = dynamic(() => import("@/components/admin/mrr-chart"), { ssr: false })
 import {
   Users,
   Calendar,
@@ -97,13 +100,38 @@ export default function AdminPage() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5)
 
+    const thisMonth = users.filter(u => {
+      const c = new Date(u.createdAt)
+      const now = new Date()
+      return c.getMonth() === now.getMonth() && c.getFullYear() === now.getFullYear()
+    }).length
+    const lastMonth = users.filter(u => {
+      const c = new Date(u.createdAt)
+      const now = new Date()
+      const last = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      return c.getMonth() === last.getMonth() && c.getFullYear() === last.getFullYear()
+    }).length
+    const growthRate = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : thisMonth > 0 ? 100 : 0
+
+    const cancelledCount = users.filter(u => u.subscriptionStatus === "canceled" || u.plan === "free").length
+    const churnRate = users.length > 0 ? Math.round((cancelledCount / users.length) * 100) : 0
+
+    const totalPatientsAll = users.reduce((acc, u) => acc + u._count.patients, 0)
+    const totalApptsAll = users.reduce((acc, u) => acc + u._count.appointments, 0)
+
     return {
       totalPsychologists,
-      totalPatients,
+      totalPatients: totalPatientsAll,
       currentMRR,
       projectedMRR,
       trialCount: trialUsers.length,
       activeCount: users.filter(u => u.subscriptionStatus === "active").length,
+      freeCount: users.filter(u => u.plan === "free").length,
+      cancelledCount,
+      churnRate,
+      growthRate,
+      totalAppointments: totalApptsAll,
+      thisMonthRegistrations: thisMonth,
       recentRegistrations,
     }
   }, [users])
@@ -221,14 +249,69 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-amber-700">
-              {users.reduce((acc, u) => acc + u._count.appointments, 0)}
+              {metrics.totalAppointments}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Total em todos os psicólogos
             </p>
           </CardContent>
         </Card>
+
+        <Card className="border-rose-100 bg-gradient-to-br from-rose-50/50 to-background">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-rose-700">Churn</CardTitle>
+            <Activity className="h-5 w-5 text-rose-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-rose-700">{metrics.churnRate}%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {metrics.cancelledCount} {metrics.cancelledCount === 1 ? "cancelou" : "cancelaram"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-teal-100 bg-gradient-to-br from-teal-50/50 to-background">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-teal-700">Crescimento</CardTitle>
+            <TrendingUp className="h-5 w-5 text-teal-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-teal-700">{metrics.growthRate > 0 ? "+" : ""}{metrics.growthRate}%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {metrics.thisMonthRegistrations} novos este mês
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-background">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-indigo-700">Receita Projetada</CardTitle>
+            <BarChart3 className="h-5 w-5 text-indigo-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-indigo-700">
+              R$ {metrics.projectedMRR.toLocaleString("pt-BR")}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {metrics.trialCount} em trial · {metrics.freeCount} free
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* MRR Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-blue-600" />
+            MRR por plano
+          </CardTitle>
+          <CardDescription>Valor mensal por plano de assinatura</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AdminMRRChart />
+        </CardContent>
+      </Card>
 
       {/* Revenue + Quick Actions row */}
       <div className="grid gap-4 lg:grid-cols-3">

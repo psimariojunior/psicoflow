@@ -13,7 +13,7 @@ async function sendViaResend(to: string, subject: string, html: string): Promise
 
   try {
     const { error } = await client.emails.send({
-      from: process.env.EMAIL_FROM || "PsicoFlow <onboarding@resend.dev>",
+      from: process.env.EMAIL_FROM || "PsiHumanis <onboarding@resend.dev>",
       to: [to],
       subject,
       html,
@@ -45,7 +45,7 @@ async function sendViaSendGrid(to: string, subject: string, html: string): Promi
       },
       body: JSON.stringify({
         personalizations: [{ to: [{ email: to }] }],
-        from: { email: fromEmail, name: "PsicoFlow" },
+        from: { email: fromEmail, name: "PsiHumanis" },
         subject,
         content: [{ type: "text/html", value: html }],
       }),
@@ -84,7 +84,7 @@ export async function sendCancellationNotification(
 ): Promise<string | null> {
   return sendEmail(
     psyEmail,
-    "Cancelamento de Consulta - PsicoFlow",
+    "Cancelamento de Consulta - PsiHumanis",
     `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
       <h2 style="color: #dc2626;">Cancelamento de Consulta</h2>
       <p>O paciente <strong>${patientName}</strong> cancelou a consulta:</p>
@@ -103,10 +103,10 @@ export async function sendPasswordResetEmail(email: string, token: string, path 
   const resetUrl = `${appUrl}${path}?token=${token}`
   return sendEmail(
     email,
-    "Recuperação de Senha - PsicoFlow",
+    "Recuperação de Senha - PsiHumanis",
     `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
       <h2>Recuperação de Senha</h2>
-      <p>Você solicitou a redefinição da sua senha no PsicoFlow.</p>
+      <p>Você solicitou a redefinição da sua senha no PsiHumanis.</p>
       <p>Clique no link abaixo para criar uma nova senha:</p>
       <a href="${resetUrl}"
          style="display: inline-block; padding: 12px 24px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 6px;">
@@ -133,10 +133,10 @@ export async function sendAppointmentReminderEmail(
   const safePsychologistName = sanitizeHtml(psychologistName)
   return sendEmail(
     to,
-    "Lembrete de Consulta - PsicoFlow",
+    "Lembrete de Consulta - PsiHumanis",
     `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+        <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
         <p style="color: #666; margin: 0;">Seu lembrete de consulta</p>
       </div>
       <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -153,7 +153,7 @@ export async function sendAppointmentReminderEmail(
           ? '<p style="margin-top: 16px; padding: 12px; background: #e0f2fe; border-radius: 6px; font-size: 0.875rem;">A consulta ser\u00e1 online. Acesse o link da sala virtual no momento da consulta.</p>'
           : '<p style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-radius: 6px; font-size: 0.875rem;">A consulta ser\u00e1 presencial. Compare\u00e7a ao endere\u00e7o do consult\u00f3rio.</p>'}
       </div>
-      <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gestão de Psicologia</p>
+      <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsiHumanis — Gestão de Psicologia</p>
     </div>`
   )
 }

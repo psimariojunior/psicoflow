@@ -1,4 +1,4 @@
-package com.psicoflow.app;
+package com.psihumanis.app;
 
 import android.os.Bundle;
 import android.webkit.WebView;

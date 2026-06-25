@@ -1,5 +1,5 @@
 $port = 3000
-$log = Join-Path $env:TEMP "psicoflow-dev.log"
+$log = Join-Path $env:TEMP "psihumanis-dev.log"
 
 # Kill any existing process on port 3000
 $existing = netstat -ano | Select-String ":${port} " | Select-String LISTENING

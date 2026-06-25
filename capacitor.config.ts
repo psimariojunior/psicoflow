@@ -1,12 +1,12 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.psicoflow.app',
-  appName: 'PsicoFlow',
+  appId: 'com.psihumanis.app',
+  appName: 'PsiHumanis',
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    url: 'https://psicoflow-iota.vercel.app',
+    url: 'https://psihumanis.vercel.app',
     cleartext: false,
     allowNavigation: ['*'],
   },

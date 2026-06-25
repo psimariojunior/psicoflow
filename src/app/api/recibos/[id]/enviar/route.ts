@@ -25,7 +25,7 @@ export async function POST(
     const html = `
 <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
   <div style="text-align: center; margin-bottom: 24px;">
-    <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsicoFlow</h1>
+    <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
     <p style="color: #666; margin: 0;">Recibo de pagamento</p>
   </div>
   <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -43,14 +43,14 @@ export async function POST(
       </a>
     </p>
   </div>
-  <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsicoFlow — Gest\u00e3o de Psicologia</p>
+  <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsiHumanis — Gest\u00e3o de Psicologia</p>
 </div>`
 
     const error = await sendEmail(
       receipt.patientId
         ? (await prisma.patient.findUnique({ where: { id: receipt.patientId }, select: { email: true } }))?.email || ""
         : "",
-      `Recibo ${receipt.number} - PsicoFlow`,
+      `Recibo ${receipt.number} - PsiHumanis`,
       html
     )
 

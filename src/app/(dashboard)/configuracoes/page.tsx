@@ -12,7 +12,8 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getInitials } from "@/lib/utils"
-import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet, Eye } from "lucide-react"
+import { Save, User, Bell, Lock, Globe, Palette, Shield, CreditCard, Users, Loader2, Calendar, CheckCircle, XCircle, ExternalLink, AlertTriangle, Camera, Download, FileJson, FileSpreadsheet, Eye, Gift, Copy, MessageCircle, BookOpen } from "lucide-react"
+import { BlogEditor } from "@/components/admin/blog-editor"
 import toast from "react-hot-toast"
 
 function GoogleCalendarStatus() {
@@ -145,6 +146,147 @@ function GoogleCalendarStatus() {
   )
 }
 
+interface ReferralInfo {
+  code: string
+  inviteLink: string
+  referrals: Array<{
+    id: string
+    name: string
+    email: string
+    plan: string
+    rewardGranted: boolean
+    createdAt: string
+  }>
+  totalReferrals: number
+  totalRewards: number
+}
+
+function ReferralProgram() {
+  const [info, setInfo] = useState<ReferralInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/referrals")
+      .then((r) => r.json())
+      .then((data) => setInfo(data))
+      .catch(() => toast.error("Erro ao carregar indicações"))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const copy = async (text: string, message: string) => {
+    await navigator.clipboard.writeText(text)
+    toast.success(message)
+  }
+  const whatsappText = encodeURIComponent(`Ganhe 14 dias grátis no PsiHumanis usando meu convite: ${info?.inviteLink || ""}`)
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!info) return null
+
+  return (
+    <div className="space-y-6">
+      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-background dark:from-emerald-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gift className="h-5 w-5 text-emerald-600" />
+            Programa de Indicação
+          </CardTitle>
+          <CardDescription>
+            Indique outros psicólogos. Quando um indicado assinar um plano pago, você ganha 1 mês grátis.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border bg-background p-4">
+              <Label>Seu código</Label>
+              <div className="mt-2 flex gap-2">
+                <Input value={info.code} readOnly className="font-mono font-semibold" />
+                <Button type="button" variant="outline" onClick={() => copy(info.code, "Código copiado")}> 
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="rounded-xl border bg-background p-4">
+              <Label>Link de convite</Label>
+              <div className="mt-2 flex gap-2">
+                <Input value={info.inviteLink} readOnly className="text-xs" />
+                <Button type="button" variant="outline" onClick={() => copy(info.inviteLink, "Link copiado")}> 
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 rounded-2xl border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold">Convide pelo WhatsApp</p>
+              <p className="text-sm text-muted-foreground">Compartilhe seu link com colegas e ganhe 1 mês grátis por assinatura ativada.</p>
+            </div>
+            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <a href={`https://wa.me/?text=${whatsappText}`} target="_blank" rel="noreferrer">
+                <MessageCircle className="mr-2 h-4 w-4" /> Compartilhar
+              </a>
+            </Button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border bg-background p-4">
+              <p className="text-sm text-muted-foreground">Indicações</p>
+              <p className="text-3xl font-bold">{info.totalReferrals}</p>
+            </div>
+            <div className="rounded-xl border bg-background p-4">
+              <p className="text-sm text-muted-foreground">Meses grátis liberados</p>
+              <p className="text-3xl font-bold text-emerald-600">{info.totalRewards}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Histórico de indicações</CardTitle>
+          <CardDescription>A recompensa é liberada quando o indicado ativa um plano pago.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {info.referrals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nenhuma indicação registrada ainda.</p>
+          ) : (
+            <div className="space-y-3">
+              {info.referrals.map((referral) => (
+                <div key={referral.id} className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-medium">{referral.name}</p>
+                    <p className="text-xs text-muted-foreground">{referral.email}</p>
+                  </div>
+                  <div className="text-sm">
+                    {referral.rewardGranted ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
+                        <CheckCircle className="h-3.5 w-3.5" /> Recompensa liberada
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                        Aguardando assinatura
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const [profile, setProfile] = useState({
     name: "",
@@ -185,7 +327,7 @@ export default function SettingsPage() {
   const [lastExport, setLastExport] = useState<{ at: string; format: string } | null>(null)
 
   useEffect(() => {
-    const raw = localStorage.getItem("psicoflow_last_export")
+    const raw = localStorage.getItem("psihumanis_last_export")
     if (raw) {
       try { setLastExport(JSON.parse(raw)) } catch {}
     }
@@ -373,13 +515,13 @@ export default function SettingsPage() {
       a.href = url
       const disp = res.headers.get("Content-Disposition") || ""
       const match = disp.match(/filename="([^"]+)"/)
-      a.download = match ? match[1] : `psicoflow-backup.${format}`
+      a.download = match ? match[1] : `psihumanis-backup.${format}`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       const entry = { at: new Date().toISOString(), format }
-      localStorage.setItem("psicoflow_last_export", JSON.stringify(entry))
+      localStorage.setItem("psihumanis_last_export", JSON.stringify(entry))
       setLastExport(entry)
       toast.success(`Exportação ${format.toUpperCase()} concluída!`)
     } catch {
@@ -434,7 +576,9 @@ export default function SettingsPage() {
           <TabsTrigger value="appearance"><Palette className="mr-2 h-4 w-4" />Aparência</TabsTrigger>
           <TabsTrigger value="schedule"><Globe className="mr-2 h-4 w-4" />Agenda</TabsTrigger>
           <TabsTrigger value="financial"><CreditCard className="mr-2 h-4 w-4" />Pagamentos</TabsTrigger>
+          <TabsTrigger value="referrals"><Gift className="mr-2 h-4 w-4" />Indicações</TabsTrigger>
           <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Equipe</TabsTrigger>
+          <TabsTrigger value="blog"><BookOpen className="mr-2 h-4 w-4" />Blog</TabsTrigger>
           <TabsTrigger value="export"><Download className="mr-2 h-4 w-4" />Exportação</TabsTrigger>
         </TabsList>
 
@@ -803,6 +947,10 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="referrals" className="mt-4">
+          <ReferralProgram />
+        </TabsContent>
+
         <TabsContent value="team" className="mt-4">
           <Card>
             <CardHeader>
@@ -862,6 +1010,10 @@ export default function SettingsPage() {
               <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" /> Salvar</Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="blog" className="mt-4">
+          <BlogEditor />
         </TabsContent>
 
         <TabsContent value="export" className="mt-4">
