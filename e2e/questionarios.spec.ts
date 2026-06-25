@@ -103,22 +103,29 @@ test.describe("PHQ-9 Questionnaire Flow", () => {
   })
 })
 
+async function goToWhoqol(page: Page) {
+  await goToQuestionarios(page)
+  const allLinks = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll("a[href*='/paciente/questionarios/']")).map(a => a.getAttribute("href") || "")
+  })
+  // WHOQOL is the last card with 26 questions
+  const whoqolLink = allLinks.find(h => h.length > 30)
+  if (whoqolLink) {
+    await page.goto(whoqolLink)
+    await page.waitForTimeout(3000)
+  }
+}
+
 test.describe("WHOQOL Per-Question Options", () => {
   test("WHOQOL Q1 has avaliacao options", async ({ page }) => {
-    await goToQuestionarios(page)
-    await page.locator("a[href*='/paciente/questionarios/']").filter({ hasText: /Iniciar/ }).first().click()
-    await page.waitForTimeout(2000)
-
+    await goToWhoqol(page)
     await expect(page.locator("body")).toContainText("Como você avalia sua qualidade de vida")
     await expect(page.locator("body")).toContainText("Muito ruim")
     await expect(page.locator("body")).toContainText("Muito bom")
   })
 
   test("WHOQOL satisfaction questions have satisfeito options", async ({ page }) => {
-    await goToQuestionarios(page)
-    await page.locator("a[href*='/paciente/questionarios/']").filter({ hasText: /Iniciar/ }).first().click()
-    await page.waitForTimeout(2000)
-
+    await goToWhoqol(page)
     await expect(page.locator("body")).toContainText("Quão satisfeito")
     await expect(page.locator("body")).toContainText("Muito insatisfeito(a)")
     await expect(page.locator("body")).toContainText("Muito satisfeito(a)")

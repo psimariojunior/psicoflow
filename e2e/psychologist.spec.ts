@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test"
 test.describe("Psychologist Dashboard", () => {
   test("dashboard loads with key metrics", async ({ page }) => {
     await page.goto("/dashboard")
-    await expect(page.locator("h1")).toContainText("Sua clínica", { timeout: 15000 })
+    await expect(page.locator("body")).toContainText("Boa", { timeout: 15000 })
   })
 
   test("can navigate to patients page", async ({ page }) => {

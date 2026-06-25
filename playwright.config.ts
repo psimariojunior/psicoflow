@@ -8,32 +8,32 @@ export default defineConfig({
   workers: 1,
   reporter: "html",
   use: {
-    baseURL: "https://psihumanis.vercel.app",
+    baseURL: "https://psihumanis-iota.vercel.app",
     trace: "on-first-retry",
   },
   projects: [
     {
       name: "setup-patient",
-      testMatch: /auth\.setup\.ts/,
+      testMatch: "auth.setup.ts",
     },
     {
       name: "chromium-noauth",
-      testMatch: /basic\.spec\.ts/,
+      testMatch: /basic\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"] },
     },
     {
       name: "chromium-patient",
-      testMatch: /questionarios\.spec\.ts/,
+      testMatch: /questionarios\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"], storageState: "test-results/.auth/patient.json" },
       dependencies: ["setup-patient"],
     },
     {
       name: "setup-psychologist",
-      testMatch: /psychologist-auth\.setup\.ts/,
+      testMatch: /psychologist-auth\.setup\.ts$/,
     },
     {
       name: "chromium-psychologist",
-      testMatch: /psychologist\.spec\.ts/,
+      testMatch: /psychologist\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"], storageState: "test-results/.auth/psychologist.json" },
       dependencies: ["setup-psychologist"],
     },
