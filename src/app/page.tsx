@@ -239,24 +239,85 @@ export default function LandingPage() {
               </Link>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
-              <div className="relative w-full max-w-md aspect-square">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-3xl blur-2xl" />
-                <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-1">
-                  <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-900 p-8 flex flex-col items-center justify-center">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20 mb-6">
-                      <Heart className="h-10 w-10 text-white" />
+              <div className="relative w-full max-w-lg">
+                {/* Dashboard Preview Card */}
+                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-blue-950/30">
+                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 to-slate-900 p-6 overflow-hidden">
+                    {/* Mock Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                          <Brain className="h-4 w-4 text-blue-400" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-400">Dashboard</span>
+                      </div>
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Bem-estar emocional</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-center text-sm">Sua jornada de autoconhecimento começa aqui</p>
-                    <div className="grid grid-cols-3 gap-4 mt-8 w-full">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                          </div>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 text-center font-medium">Passo {i}</span>
+                    {/* Mock Stats */}
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      {[
+                        { label: "Consultas", value: "24", change: "+12%" },
+                        { label: "Receita", value: "R$4.8k", change: "+8%" },
+                        { label: "Pacientes", value: "38", change: "+3" },
+                      ].map((stat) => (
+                        <div key={stat.label} className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+                          <p className="text-[10px] text-slate-500 mb-1">{stat.label}</p>
+                          <p className="text-lg font-bold text-white">{stat.value}</p>
+                          <p className="text-[10px] text-emerald-400">{stat.change}</p>
                         </div>
                       ))}
+                    </div>
+                    {/* Mock Chart */}
+                    <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] text-slate-500">Receita mensal</span>
+                        <span className="text-[10px] text-emerald-400">↑ 23%</span>
+                      </div>
+                      <div className="flex items-end gap-1.5 h-16">
+                        {[40, 55, 45, 70, 60, 85, 75, 90, 80, 95, 88, 100].map((h, i) => (
+                          <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-blue-600 to-blue-400 opacity-80" style={{ height: `${h}%` }} />
+                        ))}
+                      </div>
+                    </div>
+                    {/* Mock Appointments */}
+                    <div className="space-y-2">
+                      {[
+                        { time: "09:00", name: "Ana S.", status: "Confirmado" },
+                        { time: "10:30", name: "Pedro M.", status: "Próximo" },
+                      ].map((apt, i) => (
+                        <div key={i} className="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2">
+                          <span className="text-[11px] font-mono text-blue-400">{apt.time}</span>
+                          <span className="text-[11px] text-slate-300 flex-1">{apt.name}</span>
+                          <span className={`text-[9px] px-2 py-0.5 rounded-full ${apt.status === "Confirmado" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>{apt.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Floating Elements */}
+                <div className="absolute -top-4 -right-4 rounded-2xl bg-white dark:bg-slate-800 p-3 shadow-xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700 animate-float">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
+                      <p className="text-[9px] text-slate-500">Há 2 minutos</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-3 -left-3 rounded-2xl bg-white dark:bg-slate-800 p-3 shadow-xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700" style={{ animation: "float 6s ease-in-out infinite 1s" }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Novo agendamento</p>
+                      <p className="text-[9px] text-slate-500">Amanhã às 14:00</p>
                     </div>
                   </div>
                 </div>
@@ -265,6 +326,26 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Social Proof Stats */}
+      <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="py-12 border-y border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { value: "500+", label: "Profissionais", sublabel: "confiam no PsiHumanis" },
+              { value: "15k+", label: "Consultas", sublabel: "realizadas na plataforma" },
+              { value: "98%", label: "Satisfação", sublabel: "dos profissionais" },
+              { value: "24/7", label: "Disponível", sublabel: "acesso de qualquer lugar" },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">{stat.value}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white mt-1">{stat.label}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{stat.sublabel}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
 
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -294,7 +375,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-950 text-white">
+      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-950 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
@@ -305,20 +386,33 @@ export default function LandingPage() {
                 <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-blue-50">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
                 <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">{t("saas.login", locale)}</Button></Link>
               </div>
+              {/* Trust indicators */}
+              <div className="mt-8 flex items-center gap-6 text-sm text-slate-400">
+                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>14 dias grátis</span></div>
+                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Sem cartão</span></div>
+                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Cancele quando quiser</span></div>
+              </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale) },
-                { icon: Brain, title: t("saas.feature2", locale), desc: t("saas.feature2desc", locale) },
-                { icon: Shield, title: t("saas.feature3", locale), desc: t("saas.feature3desc", locale) },
-                { icon: BarChartIcon, title: t("saas.feature4", locale), desc: t("saas.feature4desc", locale) },
-              ].map((item) => (
-                <Card key={item.title} className="border-white/10 bg-white/[0.06] p-5 text-white backdrop-blur-xl group hover:bg-white/[0.1] transition-all">
-                  <item.icon className="h-6 w-6 text-blue-300 group-hover:scale-110 transition-transform" />
-                  <h3 className="mt-4 font-semibold">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">{item.desc}</p>
-                </Card>
-              ))}
+            <div className="relative">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
+              {/* Feature Grid */}
+              <div className="relative grid gap-4 sm:grid-cols-2">
+                {[
+                  { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale), color: "from-blue-500 to-blue-600" },
+                  { icon: Brain, title: t("saas.feature2", locale), desc: t("saas.feature2desc", locale), color: "from-violet-500 to-purple-600" },
+                  { icon: Shield, title: t("saas.feature3", locale), desc: t("saas.feature3desc", locale), color: "from-emerald-500 to-teal-600" },
+                  { icon: BarChartIcon, title: t("saas.feature4", locale), desc: t("saas.feature4desc", locale), color: "from-amber-500 to-orange-600" },
+                ].map((item) => (
+                  <Card key={item.title} className="border-white/10 bg-white/[0.06] p-5 text-white backdrop-blur-xl group hover:bg-white/[0.1] transition-all duration-300 hover:scale-[1.02]">
+                    <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4 group-hover:scale-110 transition-transform", item.color)}>
+                      <item.icon className="h-5 w-5 text-white" />
+                    </div>
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{item.desc}</p>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -445,22 +539,30 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      <motion.section initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="relative py-20 md:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900" />
+      <motion.section initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="relative py-24 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800" />
         <div className="absolute top-[-30%] right-[-20%] w-[70%] h-[70%] rounded-full bg-white/5 blur-3xl" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-white/5 blur-3xl" />
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-grid opacity-10" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-8">
             <Badge className="px-4 py-2 text-sm bg-white/10 text-white border-white/20">{t("cta.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">{t("cta.title", locale)}</h2>
             <p className="text-lg text-blue-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+              <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
               <Link href="/paciente/cadastro"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-base h-12 px-8">{t("cta.patient", locale)}</Button></Link>
             </div>
             <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
             </Link>
+            {/* Trust badges */}
+            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-blue-200/70">
+              <div className="flex items-center gap-2"><Shield className="h-4 w-4" /><span>100% Sigilo</span></div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4" /><span>CRP Ativo</span></div>
+              <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>Atendimento Humanizado</span></div>
+            </div>
           </motion.div>
         </div>
       </motion.section>
@@ -479,40 +581,59 @@ export default function LandingPage() {
                 </div>
               </Link>
               <p className="text-sm text-slate-300 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
+              <div className="flex items-center gap-3 pt-2">
+                <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                  <MessageCircle className="h-4 w-4" />
+                </a>
+                <a href="mailto:psi_mariojunior@hotmail.com" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                  <Mail className="h-4 w-4" />
+                </a>
+                <a href="tel:+5531992863861" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                  <Phone className="h-4 w-4" />
+                </a>
+              </div>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Links</h4>
-              <ul className="space-y-2">
+              <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Plataforma</h4>
+              <ul className="space-y-2.5">
                 <li><Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">Início</Link></li>
                 <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
-                <li><Link href="/sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
-                <li><Link href="/avaliacoes" className="text-sm text-slate-300 hover:text-white transition-colors">Avaliações</Link></li>
+                <li><Link href="/pricing" className="text-sm text-slate-300 hover:text-white transition-colors">Planos</Link></li>
                 <li><Link href="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
+                <li><Link href="/sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
                 <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link href="/termos" className="text-sm text-slate-300 hover:text-white transition-colors">Termos de Uso</Link></li>
-                <li><Link href="/privacidade" className="text-sm text-slate-300 hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Acesso</h4>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 <li><Link href="/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Psicólogo</Link></li>
                 <li><Link href="/paciente/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Paciente</Link></li>
                 <li><Link href="/paciente/cadastro" className="text-sm text-slate-300 hover:text-white transition-colors">Cadastre-se</Link></li>
                 <li><Link href="/agendar" className="text-sm text-slate-300 hover:text-white transition-colors">Agende Consulta</Link></li>
+                <li><Link href="/avaliacoes" className="text-sm text-slate-300 hover:text-white transition-colors">Avaliações</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />psi_mariojunior@hotmail.com</li>
-                <li className="flex items-center gap-2 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99286-3861</li>
-                <li className="flex items-center gap-2 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />psi_mariojunior@hotmail.com</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99286-3861</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
+              <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-xs text-slate-400 mb-2">Horário de atendimento</p>
+                <p className="text-sm text-white font-medium">Seg - Sex: 8h às 18h</p>
+              </div>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-slate-800">
-            <p className="text-sm text-slate-400 text-center">© {new Date().getFullYear()} PsiHumanis. Todos os direitos reservados. CRP 04/52274 • Psicólogo Responsável</p>
+          <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-slate-400">© {new Date().getFullYear()} PsiHumanis. Todos os direitos reservados.</p>
+            <div className="flex items-center gap-4">
+              <Link href="/termos" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Termos de Uso</Link>
+              <Link href="/privacidade" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Privacidade</Link>
+              <span className="text-xs text-slate-600">CRP 04/52274</span>
+            </div>
           </div>
         </div>
       </footer>
