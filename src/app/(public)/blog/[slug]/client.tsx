@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import DOMPurify from "dompurify"
 
 interface BlogPost {
   id: string
@@ -88,7 +89,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{post.title}</h1>
           </div>
 
-          <div className="prose prose-blue dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="prose prose-blue dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ALLOWED_TAGS: ["p", "br", "strong", "em", "h1", "h2", "h3", "h4", "ul", "ol", "li", "a", "blockquote", "code", "pre", "img", "figure", "figcaption", "table", "thead", "tbody", "tr", "th", "td", "hr", "span", "div"], ALLOWED_ATTR: ["href", "src", "alt", "title", "className", "target", "rel"] }) }} />
 
           <div className="border-t pt-6 mt-8">
             <div className="flex items-center justify-between">

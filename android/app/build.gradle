@@ -20,6 +20,8 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+            // TODO: Configure release signing key before Play Store submission
+            // signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false

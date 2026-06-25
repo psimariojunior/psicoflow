@@ -17,7 +17,7 @@ import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
   Users, Globe, Calendar, MessageCircle, ChevronDown, Menu, X, Star,
   Phone, Mail, MapPin, Clock, Award, Quote, BarChart3 as BarChartIcon,
-  Sun, Moon, Languages,
+  Sun, Moon, Languages, Video, Mic, Maximize2,
 } from "lucide-react"
 
 const services = [
@@ -240,60 +240,64 @@ export default function LandingPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
               <div className="relative w-full max-w-lg">
-                {/* Main Card - Video Call Experience */}
-                <div className="relative rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 p-1 shadow-2xl shadow-blue-950/30">
-                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden min-h-[340px]">
-                    {/* Video Call Mock */}
-                    <div className="relative rounded-2xl bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-white/10 p-6 mb-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span className="text-[11px] text-emerald-400 font-medium">Ao vivo</span>
+                {/* Main Card - Realistic Video Call */}
+                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-blue-950/30">
+                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden min-h-[380px] relative">
+                    {/* Remote video background - gradient representing psychologist video */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-slate-900 to-indigo-950/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+
+                    {/* Remote participant name badge - top left */}
+                    <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
+                      <span className="text-[11px] font-medium">Dr. Mario Jr.</span>
+                    </div>
+
+                    {/* Timer - top left next to name */}
+                    <div className="absolute top-3 left-[140px] z-20 bg-black/40 backdrop-blur-xl text-white/70 px-2.5 py-1.5 rounded-xl border border-white/10">
+                      <span className="text-[10px] font-mono">47:32</span>
+                    </div>
+
+                    {/* Room name - top right */}
+                    <div className="absolute top-3 right-3 z-20 flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
+                      <Video className="h-3 w-3 text-blue-400" />
+                      <span className="text-[10px] font-medium">sala-abc123</span>
+                    </div>
+
+                    {/* Local video PiP - bottom right */}
+                    <div className="absolute bottom-20 right-3 z-20">
+                      <div className="relative w-24 h-18 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                        <div className="w-full h-full bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                          <span className="text-lg font-bold text-white">Você</span>
                         </div>
-                        <span className="text-[10px] text-slate-500">47:32</span>
-                      </div>
-                      {/* Two participant circles */}
-                      <div className="flex items-center justify-center gap-8 py-4">
-                        <div className="text-center">
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/30">
-                            <span className="text-xl font-bold text-white">MJ</span>
-                          </div>
-                          <p className="text-[10px] text-slate-400 mt-2">Psicólogo</p>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-5 pointer-events-none" />
+                        <div className="absolute bottom-0.5 left-1.5">
+                          <span className="text-[8px] text-white/80 font-medium bg-black/40 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Você</span>
                         </div>
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                            <Heart className="h-4 w-4 text-pink-400" />
-                          </div>
-                          <span className="text-[9px] text-slate-500">Conexão</span>
-                        </div>
-                        <div className="text-center">
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 ring-2 ring-violet-400/30">
-                            <span className="text-xl font-bold text-white">AS</span>
-                          </div>
-                          <p className="text-[10px] text-slate-400 mt-2">Paciente</p>
-                        </div>
-                      </div>
-                      {/* Controls */}
-                      <div className="flex items-center justify-center gap-3 mt-2">
-                        {["🎤", "📷", "💬", "📞"].map((emoji, i) => (
-                          <div key={i} className={`w-9 h-9 rounded-full flex items-center justify-center text-sm ${i === 3 ? "bg-red-500/80" : "bg-white/10 hover:bg-white/20"} transition-colors cursor-pointer`}>
-                            {emoji}
-                          </div>
-                        ))}
                       </div>
                     </div>
-                    {/* Feature Pills */}
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { icon: Shield, label: "Criptografado", color: "text-emerald-400 bg-emerald-500/10" },
-                        { icon: Calendar, label: "Agendamento", color: "text-blue-400 bg-blue-500/10" },
-                        { icon: Brain, label: "Prontuário", color: "text-violet-400 bg-violet-500/10" },
-                      ].map((pill) => (
-                        <div key={pill.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-medium ${pill.color}`}>
-                          <pill.icon className="h-3 w-3" />
-                          {pill.label}
+
+                    {/* Bottom controls */}
+                    <div className="absolute bottom-0 left-0 right-0 z-30 pb-5">
+                      <div className="flex items-center justify-center">
+                        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-2.5 border border-white/10 shadow-2xl">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
+                            <Mic className="h-4 w-4" />
+                          </div>
+                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
+                            <Video className="h-4 w-4" />
+                          </div>
+                          <div className="w-px h-6 bg-white/10 mx-0.5" />
+                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
+                            <Maximize2 className="h-4 w-4" />
+                          </div>
+                          <div className="w-px h-6 bg-white/10 mx-0.5" />
+                          <div className="flex items-center gap-1.5 bg-red-600 text-white px-4 py-2 rounded-xl text-[11px] font-medium">
+                            <Phone className="h-3.5 w-3.5 rotate-[135deg]" />
+                            Sair
+                          </div>
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>

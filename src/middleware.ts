@@ -24,7 +24,7 @@ const publicApiPrefixes = [
   "/api/recibos", "/api/lista-espera",
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",
-  "/api/pagamentos/public-checkout", "/api/setup/promote-me",
+  "/api/pagamentos/public-checkout",
   "/api/avaliacoes", "/api/referrals/validate",
   "/api/push/vapid", "/api/push/subscribe",
   "/api/avatar", "/api/blog",

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">PsicoFlow</string>
-    <string name="title_activity_main">PsicoFlow</string>
+    <string name="app_name">PsiHumanis</string>
+    <string name="title_activity_main">PsiHumanis</string>
     <string name="package_name">com.psihumanis.app</string>
     <string name="custom_url_scheme">com.psihumanis.app</string>
 </resources>
