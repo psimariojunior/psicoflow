@@ -12,6 +12,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey?: string
   searchPlaceholder?: string
+  renderMobileCard?: (row: TData) => React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -19,6 +20,7 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder = "Pesquisar...",
+  renderMobileCard,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -50,7 +52,25 @@ export function DataTable<TData, TValue>({
           />
         </div>
       )}
-      <div className="rounded-xl border overflow-x-auto">
+      {/* Mobile: card layout */}
+      {renderMobileCard && (
+        <div className="sm:hidden space-y-3">
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <div key={row.id} className="rounded-xl border bg-card p-4 shadow-sm">
+                {renderMobileCard(row.original)}
+              </div>
+            ))
+          ) : (
+            <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+              Nenhum resultado encontrado.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Desktop: table layout */}
+      <div className={renderMobileCard ? "hidden sm:block rounded-xl border overflow-x-auto" : "rounded-xl border overflow-x-auto"}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

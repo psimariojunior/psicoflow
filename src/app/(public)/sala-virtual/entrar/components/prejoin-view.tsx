@@ -54,8 +54,8 @@ export function PrejoinView({
             </div>
           </div>
 
-          <div className="grid md:grid-cols-5 gap-6">
-            <div className="md:col-span-3">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2">
               <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] ring-1 ring-white/10 shadow-2xl backdrop-blur-xl">
                 <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-800 to-black">
                   <video ref={videoRef as React.LegacyRef<HTMLVideoElement>} autoPlay muted playsInline className={`w-full h-full object-cover scale-x-[-1] ${cameraReady ? "block" : "hidden"}`} />
@@ -109,7 +109,7 @@ export function PrejoinView({
               </div>
             </div>
 
-            <div className="md:col-span-2 flex flex-col justify-center space-y-6">
+            <div className="md:col-span-1 flex flex-col justify-center space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50" />

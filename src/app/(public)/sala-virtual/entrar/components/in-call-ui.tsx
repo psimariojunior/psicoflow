@@ -194,7 +194,7 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
       )}
 
       {/* Room name */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20">
         <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
           <Camera className="h-3 w-3 text-blue-400" />
           <span className="text-[11px] font-medium">{roomName}</span>
@@ -202,8 +202,8 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
       </div>
 
       {/* Local video - picture in picture */}
-      <div className="absolute bottom-24 right-3 z-20 md:bottom-24 md:right-4">
-        <div className="relative w-20 h-15 md:w-36 md:h-28 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+      <div className="absolute bottom-20 sm:bottom-24 right-2 sm:right-3 md:right-4 z-20">
+        <div className="relative w-16 h-12 sm:w-20 sm:h-15 md:w-36 md:h-28 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
           {localVideoRef && (
             <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-contain scale-x-[-1]" />
           )}
@@ -216,11 +216,11 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
 
       {/* Bottom controls */}
       <div className="absolute bottom-0 left-0 right-0 z-30">
-        <div className="flex items-center justify-center gap-3 pb-6 md:pb-8">
-          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/10 shadow-2xl">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 pb-4 sm:pb-6 md:pb-8 px-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-black/60 backdrop-blur-xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 border border-white/10 shadow-2xl flex-wrap justify-center max-w-full">
             <button
               onClick={toggleCam}
-              className={`relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+              className={`relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl transition-all duration-200 ${
                 camOn 
                   ? 'bg-white/10 hover:bg-white/20 text-white' 
                   : 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
@@ -233,7 +233,7 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
 
             <button
               onClick={toggleMic}
-              className={`relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+              className={`relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl transition-all duration-200 ${
                 micOn 
                   ? 'bg-white/10 hover:bg-white/20 text-white' 
                   : 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
@@ -244,21 +244,21 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
               {!micOn && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black" />}
             </button>
 
-            <div className="w-px h-8 bg-white/10 mx-1" />
+            <div className="w-px h-8 bg-white/10 mx-0.5 sm:mx-1 hidden sm:block" />
 
             <button
               onClick={toggleFullscreen}
-              className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+              className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
               aria-label="Alternar tela cheia"
             >
               {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
             </button>
 
-            <div className="w-px h-8 bg-white/10 mx-1" />
+            <div className="w-px h-8 bg-white/10 mx-0.5 sm:mx-1 hidden sm:block" />
 
             <button
               onClick={onLeave}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 shadow-lg shadow-red-600/25"
+              className="flex items-center gap-1.5 sm:gap-2 bg-red-600 hover:bg-red-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-red-600/25"
             >
               <Phone className="h-4 w-4 rotate-[135deg]" />
               Sair

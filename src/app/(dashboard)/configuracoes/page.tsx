@@ -569,18 +569,18 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile">
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="profile"><User className="mr-2 h-4 w-4" />Perfil</TabsTrigger>
-          <TabsTrigger value="public"><Eye className="mr-2 h-4 w-4" />Perfil Público</TabsTrigger>
-          <TabsTrigger value="notifications"><Bell className="mr-2 h-4 w-4" />Notificações</TabsTrigger>
-          <TabsTrigger value="security"><Lock className="mr-2 h-4 w-4" />Segurança</TabsTrigger>
-          <TabsTrigger value="appearance"><Palette className="mr-2 h-4 w-4" />Aparência</TabsTrigger>
-          <TabsTrigger value="schedule"><Globe className="mr-2 h-4 w-4" />Agenda</TabsTrigger>
-          <TabsTrigger value="financial"><CreditCard className="mr-2 h-4 w-4" />Pagamentos</TabsTrigger>
-          <TabsTrigger value="referrals"><Gift className="mr-2 h-4 w-4" />Indicações</TabsTrigger>
-          <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Equipe</TabsTrigger>
-          <TabsTrigger value="blog"><BookOpen className="mr-2 h-4 w-4" />Blog</TabsTrigger>
-          <TabsTrigger value="export"><Download className="mr-2 h-4 w-4" />Exportação</TabsTrigger>
+        <TabsList className="flex-nowrap overflow-x-auto w-full justify-start -mb-px">
+          <TabsTrigger value="profile" className="shrink-0"><User className="mr-2 h-4 w-4" />Perfil</TabsTrigger>
+          <TabsTrigger value="public" className="shrink-0"><Eye className="mr-2 h-4 w-4" />Perfil Público</TabsTrigger>
+          <TabsTrigger value="notifications" className="shrink-0"><Bell className="mr-2 h-4 w-4" />Notificações</TabsTrigger>
+          <TabsTrigger value="security" className="shrink-0"><Lock className="mr-2 h-4 w-4" />Segurança</TabsTrigger>
+          <TabsTrigger value="appearance" className="shrink-0"><Palette className="mr-2 h-4 w-4" />Aparência</TabsTrigger>
+          <TabsTrigger value="schedule" className="shrink-0"><Globe className="mr-2 h-4 w-4" />Agenda</TabsTrigger>
+          <TabsTrigger value="financial" className="shrink-0"><CreditCard className="mr-2 h-4 w-4" />Pagamentos</TabsTrigger>
+          <TabsTrigger value="referrals" className="shrink-0"><Gift className="mr-2 h-4 w-4" />Indicações</TabsTrigger>
+          <TabsTrigger value="team" className="shrink-0"><Users className="mr-2 h-4 w-4" />Equipe</TabsTrigger>
+          <TabsTrigger value="blog" className="shrink-0"><BookOpen className="mr-2 h-4 w-4" />Blog</TabsTrigger>
+          <TabsTrigger value="export" className="shrink-0"><Download className="mr-2 h-4 w-4" />Exportação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4 space-y-6">

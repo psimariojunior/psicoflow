@@ -5,6 +5,7 @@ import { DataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { getInitials, formatDate, calculateAge } from "@/lib/utils"
 import { Plus, Mail, Phone, MoreHorizontal, Trash2, Download } from "lucide-react"
 import Link from "next/link"
@@ -181,6 +182,52 @@ export default function PatientsPage() {
         data={patients}
         searchKey="name"
         searchPlaceholder="Buscar paciente..."
+        renderMobileCard={(patient) => (
+          <Link href={`/pacientes/${patient.id}`} className="block">
+            <div className="flex items-start gap-3">
+              <Avatar className="h-10 w-10 shrink-0">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                  {getInitials(patient.name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium truncate">{patient.name}</p>
+                  <Badge variant={patient.active ? "success" : "secondary"} className="text-[10px] shrink-0">
+                    {patient.active ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+                <div className="mt-1 space-y-0.5">
+                  {patient.email && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Mail className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{patient.email}</span>
+                    </div>
+                  )}
+                  {patient.phone && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Phone className="h-3 w-3 shrink-0" />
+                      <span>{patient.phone}</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {patient.dateOfBirth ? `${calculateAge(patient.dateOfBirth)} anos` : ""}
+                  {patient.gender ? ` · ${patient.gender}` : ""}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 h-8 w-8"
+                onClick={(e) => { e.preventDefault(); setDeleteTarget(patient) }}
+                aria-label={`Excluir ${patient.name}`}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+              </Button>
+            </div>
+          </Link>
+        )}
       />
 
       {deleteTarget && (
