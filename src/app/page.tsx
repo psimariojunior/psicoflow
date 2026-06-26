@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 import { WhatsAppWidget } from "@/components/whatsapp-widget"
 import { setLocale, t, getLocale } from "@/lib/i18n"
 import toast from "react-hot-toast"
-import { BreadcrumbJsonLd } from "@/lib/seo"
+import { BreadcrumbJsonLd, FaqJsonLd } from "@/lib/seo"
 import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
   Users, Globe, Calendar, MessageCircle, ChevronDown, Menu, X, Star,
@@ -116,6 +116,7 @@ export default function LandingPage() {
         { name: "Serviços", item: "/#servicos" },
         { name: "FAQ", item: "/#faq" },
       ]} />
+      <FaqJsonLd items={faqItems.map((item) => ({ q: item.q, a: item.a }))} />
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         scrolled
