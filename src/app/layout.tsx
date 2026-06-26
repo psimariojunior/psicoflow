@@ -76,6 +76,9 @@ export const metadata: Metadata = {
     startupImage: ["/pwa-512-v5.png"],
   },
   manifest: "/manifest",
+  verification: {
+    google: "INSERIR_CODIGO_AQUI",
+  },
   other: {
     "application/ld+json": JSON.stringify({
       "@context": "https://schema.org",
