@@ -26,10 +26,10 @@ interface ActivityItem {
 }
 
 const quickActions = [
-  { label: "Agendar Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Abra a agenda" },
   { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600", desc: "Cadastre um paciente" },
   { label: "Prontuário", href: "/prontuarios/novo", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre uma evolução" },
   { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-blue-700", desc: "Videochamada segura" },
+  { label: "Relatórios", href: "/relatorios", icon: BarChart3, gradient: "from-emerald-500 to-teal-600", desc: "Análises e indicadores" },
 ]
 
 export default function DashboardHome() {
