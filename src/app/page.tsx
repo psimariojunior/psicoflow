@@ -158,7 +158,8 @@ export default function LandingPage() {
               >
                 {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
-              <Link href="/login"><Button variant="ghost" size="sm">{t("nav.login", locale)}</Button></Link>
+              <Link href="/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">{t("nav.login", locale)}</Link>
+              <Link href="/paciente/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Paciente</Link>
               <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">{t("nav.book", locale)}</Button></Link>
             </nav>
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Abrir menu">
@@ -188,7 +189,7 @@ export default function LandingPage() {
                   {darkMode ? "Claro" : "Escuro"}
                 </button>
               </div>
-              <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Psicólogo</Link>
+              <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Área do Psicólogo</Link>
               <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400">Área do Paciente</Link>
               <Link href="/agendar" className="block mt-2"><Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white">Agende sua Consulta</Button></Link>
             </div>
