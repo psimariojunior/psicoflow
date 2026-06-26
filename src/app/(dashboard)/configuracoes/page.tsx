@@ -809,16 +809,58 @@ export default function SettingsPage() {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Sessões Ativas</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between rounded-lg border p-3">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  Notificação de Incidente de Dados (ANPD)
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Em caso de vazamento ou acesso não autorizado a dados de pacientes, você deve
+                  notificar a ANPD em até 2 dias úteis (Art. 48 da LGPD). Siga o passo a passo:
+                </p>
+                <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">1</span>
                     <div>
-                      <p className="text-sm font-medium">Windows • Chrome</p>
-                      <p className="text-xs text-muted-foreground">Ativo agora • São Paulo</p>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Identifique e contenha o incidente</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400">Altere senhas, revogue acessos, documente o que aconteceu.</p>
                     </div>
-                    <span className="text-xs text-emerald-500">Atual</span>
                   </div>
-                  <Button variant="destructive" size="sm">Encerrar Todas as Sessões</Button>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">2</span>
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Registre o relatório interno</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400">Data, natureza dos dados afetados, número de titulares, consequências.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">3</span>
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Notifique a ANPD</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        Pelo canal:{" "}
+                        <a href="https://www.gov.br/anpd" target="_blank" rel="noopener noreferrer" className="underline font-medium">
+                          www.gov.br/anpd
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold shrink-0">4</span>
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Notifique os titulares afetados</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400">Se houver risco aos direitos dos pacientes, informe-os individualmente.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <a
+                    href="https://www.gov.br/anpd/pt-br/documentos-e-publicacoes/modelo-de-comunicacao-a-anpd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline font-medium flex items-center gap-1"
+                  >
+                    Modelo de comunicação à ANPD ↗
+                  </a>
                 </div>
               </div>
             </CardContent>

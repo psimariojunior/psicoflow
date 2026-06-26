@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { ArrowLeft, Save, Loader2, FileText } from "lucide-react"
+import { ArrowLeft, Save, Loader2, FileText, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
@@ -137,6 +137,21 @@ export default function NewRecordPage({ searchParams }: { searchParams?: { pacie
                 <p className="text-xs text-muted-foreground">
                   Apenas você terá acesso a este prontuário
                 </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                  <p className="font-semibold">Responsabilidade Profissional (CFP)</p>
+                  <p>
+                    Este prontuário é de sua inteira responsabilidade, conforme o Código de Ética
+                    Profissional do Psicólogo (Resolução CFP nº 010/2005). Mantenha registros
+                    objetivos, baseados em observação clínica, sem juízos de valor. Prontuários
+                    devem ser armazenados por no mínimo 5 anos (Resolução CFP nº 06/2019).
+                  </p>
+                </div>
               </div>
             </div>
 

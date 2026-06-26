@@ -96,6 +96,19 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return apiError("Prontuário não encontrado", 404)
     }
 
+    const created = new Date(existing.createdAt)
+    const fiveYearsAgo = new Date()
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5)
+
+    if (created > fiveYearsAgo) {
+      return apiError(
+        "Prontuário não pode ser excluído: prontuários clínicos devem ser mantidos por no mínimo 5 anos " +
+        "conforme Resolução CFP nº 06/2019. Prontuário criado em " +
+        created.toLocaleDateString("pt-BR") + ".",
+        403
+      )
+    }
+
     await prisma.medicalRecord.delete({ where: { id: params.id } })
     return apiSuccess({ message: "Prontuário excluído com sucesso" })
   } catch (error) {
