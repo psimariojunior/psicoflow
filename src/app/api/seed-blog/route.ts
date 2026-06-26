@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, created, updated, total: blogPosts.length })
+    return NextResponse.json({ ok: true, created, updated, total: blogPosts.length, ts: Date.now() })
   } catch (error) {
     console.error("[seed-blog] Error:", error)
     return NextResponse.json({ error: "Erro interno" }, { status: 500 })
