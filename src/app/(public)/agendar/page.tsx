@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Loader2, Calendar, User, MapPin, ArrowRight, Shield, Sparkles } from "lucide-react"
+import { Loader2, Calendar, User, MapPin, ArrowRight, Shield, Sparkles, Moon, Sun } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import toast from "react-hot-toast"
+import { useTheme } from "next-themes"
 
 interface Psychologist {
   id: string
@@ -20,6 +21,7 @@ interface Psychologist {
 }
 
 function AgendarPage() {
+  const { theme, setTheme } = useTheme()
   const [psychologists, setPsychologists] = useState<Psychologist[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -48,6 +50,17 @@ function AgendarPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-blue-950 dark:to-slate-900 transition-colors">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/" className="flex items-center gap-2 text-slate-500 dark:text-white/40 hover:text-slate-700 dark:hover:text-white/70 text-sm transition-colors">
+              <ArrowRight className="h-4 w-4 rotate-180" /> Voltar
+            </Link>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-xl bg-white dark:bg-white/10 ring-1 ring-slate-200 dark:ring-white/10 text-slate-500 dark:text-white/60 hover:text-slate-700 dark:hover:text-white transition-all"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+          </div>
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl shadow-blue-500/20 mb-4">
             <Calendar className="h-8 w-8 text-white" />
           </div>

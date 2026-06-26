@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import Image from "next/image"
-import { Loader2, Calendar, Clock, User, Phone, Mail, CheckCircle, ArrowLeft, ChevronLeft, ChevronRight, Shield, Zap } from "lucide-react"
+import { Loader2, Calendar, Clock, User, Phone, Mail, CheckCircle, ArrowLeft, ChevronLeft, ChevronRight, Shield, Zap, Moon, Sun } from "lucide-react"
 import toast from "react-hot-toast"
+import { useTheme } from "next-themes"
 
 interface TimeSlot {
   time: string
@@ -52,6 +53,7 @@ function getDayName(dayOfWeek: number): string {
 function BookingPage() {
   const params = useParams()
   const psychologistId = params.psychologistId as string
+  const { theme, setTheme } = useTheme()
 
   const [step, setStep] = useState<Step>("date")
   const [availableDays, setAvailableDays] = useState<AvailableDay[]>([])
@@ -216,6 +218,17 @@ function BookingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
       <div className="mx-auto max-w-5xl px-4 py-10">
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/agendar" className="flex items-center gap-2 text-slate-500 dark:text-white/40 hover:text-slate-700 dark:hover:text-white/70 text-sm transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Voltar à seleção
+          </Link>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-xl bg-white dark:bg-white/10 ring-1 ring-slate-200 dark:ring-white/10 text-slate-500 dark:text-white/60 hover:text-slate-700 dark:hover:text-white transition-all"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+        </div>
         <div className="mb-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
           <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.06] p-6 text-slate-900 dark:text-white shadow-xl shadow-slate-200/50 dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
             <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
