@@ -21,12 +21,12 @@ import {
 } from "lucide-react"
 
 const services = [
-  { icon: Heart, title: "Terapia Individual", desc: "Atendimento psicológico individual para adultos e adolescentes, com abordagem personalizada.", color: "from-rose-500 to-pink-600", bgLight: "bg-rose-50 dark:bg-rose-950/30", textLight: "text-rose-600 dark:text-rose-400" },
-  { icon: Users, title: "Terapia de Casal", desc: "Mediação para casais que buscam melhorar a comunicação e fortalecer o vínculo.", color: "from-violet-500 to-purple-600", bgLight: "bg-violet-50 dark:bg-violet-950/30", textLight: "text-violet-600 dark:text-violet-400" },
-  { icon: Brain, title: "Terapia Online", desc: "Consultas por videochamada com segurança e privacidade. Atenda de onde estiver.", color: "from-blue-500 to-cyan-600", bgLight: "bg-blue-50 dark:bg-blue-950/30", textLight: "text-blue-600 dark:text-blue-400" },
-  { icon: Shield, title: "Gestão de Ansiedade", desc: "Técnicas baseadas em evidências para lidar com ansiedade, estresse e burnout.", color: "from-blue-500 to-blue-700", bgLight: "bg-blue-50 dark:bg-blue-950/30", textLight: "text-blue-600 dark:text-blue-400" },
-  { icon: Heart, title: "Acompanhamento Psicológico", desc: "Suporte para momentos de transição, luto e desenvolvimento pessoal.", color: "from-orange-500 to-amber-600", bgLight: "bg-orange-50 dark:bg-orange-950/30", textLight: "text-orange-600 dark:text-orange-400" },
-  { icon: Globe, title: "Supervisão Clínica", desc: "Supervisão para profissionais com discussão de casos e orientação técnica.", color: "from-indigo-500 to-blue-600", bgLight: "bg-indigo-50 dark:bg-indigo-950/30", textLight: "text-indigo-600 dark:text-indigo-400" },
+  { icon: Heart, title: "Terapia Individual", desc: "Atendimento psicológico individual para adultos e adolescentes, com abordagem personalizada.", color: "from-rose-500 to-pink-600" },
+  { icon: Users, title: "Terapia de Casal", desc: "Mediação para casais que buscam melhorar a comunicação e fortalecer o vínculo.", color: "from-violet-500 to-purple-600" },
+  { icon: Video, title: "Terapia Online", desc: "Consultas por videochamada com segurança e privacidade. Atenda de onde estiver.", color: "from-blue-500 to-cyan-600" },
+  { icon: Brain, title: "Gestão de Ansiedade", desc: "Técnicas baseadas em evidências para lidar com ansiedade, estresse e burnout.", color: "from-amber-500 to-orange-600" },
+  { icon: Clock, title: "Acompanhamento Psicológico", desc: "Suporte para momentos de transição, luto e desenvolvimento pessoal.", color: "from-emerald-500 to-teal-600" },
+  { icon: Shield, title: "Supervisão Clínica", desc: "Supervisão para profissionais com discussão de casos e orientação técnica.", color: "from-indigo-500 to-blue-600" },
 ]
 
 const faqItems = [
@@ -332,20 +332,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof Stats */}
-      <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="py-12 border-y border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50">
+      {/* Trust Badges */}
+      <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="py-10 border-y border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             {[
-              { value: "500+", label: "Profissionais", sublabel: "confiam no PsiHumanis" },
-              { value: "15k+", label: "Consultas", sublabel: "realizadas na plataforma" },
-              { value: "98%", label: "Satisfação", sublabel: "dos profissionais" },
-              { value: "24/7", label: "Disponível", sublabel: "acesso de qualquer lugar" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">{stat.value}</p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white mt-1">{stat.label}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{stat.sublabel}</p>
+              { icon: Shield, text: "Dados criptografados e seguros" },
+              { icon: CheckCircle, text: "CRP ativo e regular" },
+              { icon: Globe, text: "Atendimento online ou presencial" },
+              { icon: Clock, text: "Suporte em horário comercial" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <item.icon className="h-5 w-5 text-blue-500" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.text}</span>
               </div>
             ))}
           </div>
@@ -557,6 +556,7 @@ export default function LandingPage() {
             <p className="text-lg text-blue-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+              <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white text-base h-12 px-8 font-semibold">Área do Paciente</Button></Link>
             </div>
             <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
@@ -626,7 +626,7 @@ export default function LandingPage() {
                 <li className="flex items-center gap-2.5 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
               <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                <p className="text-xs text-slate-400 mb-2">Horário de atendimento</p>
+                <p className="text-xs text-slate-400 mb-2">Horário de suporte</p>
                 <p className="text-sm text-white font-medium">Seg - Sex: 8h às 18h</p>
               </div>
             </div>
