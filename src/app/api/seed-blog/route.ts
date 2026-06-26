@@ -11,10 +11,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const updateExisting = request.nextUrl.searchParams.get("update") === "true"
     let created = 0
+    let updated = 0
+
     for (const post of blogPosts) {
       const existing = await prisma.blogPost.findUnique({ where: { slug: post.slug } })
-      if (!existing) {
+      if (existing) {
+        if (updateExisting) {
+          await prisma.blogPost.update({
+            where: { slug: post.slug },
+            data: {
+              title: post.title,
+              excerpt: post.excerpt,
+              content: post.content,
+              category: post.category,
+              readTime: post.readTime,
+            },
+          })
+          updated++
+        }
+      } else {
         await prisma.blogPost.create({
           data: {
             slug: post.slug,
@@ -31,7 +48,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, created, total: blogPosts.length })
+    return NextResponse.json({ ok: true, created, updated, total: blogPosts.length })
   } catch (error) {
     console.error("[seed-blog] Error:", error)
     return NextResponse.json({ error: "Erro interno" }, { status: 500 })
