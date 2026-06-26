@@ -43,6 +43,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "PsiHumanis - Gestão para Psicólogos",
+        type: "image/svg+xml",
       },
     ],
   },

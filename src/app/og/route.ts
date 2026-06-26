@@ -1,155 +1,49 @@
-import { ImageResponse } from "next/og"
-
 export const runtime = "edge"
 
 export async function GET() {
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "1200px",
-          height: "630px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              width: "600px",
-              height: "600px",
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-            }}
-          />
-        </div>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="200" cy="315" r="80" fill="url(#accent)" opacity="0.15"/>
+  <circle cx="200" cy="315" r="60" fill="url(#accent)"/>
+  <text x="200" y="335" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="56" fill="white">&#x3A8;</text>
+  <text x="320" y="290" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="52" fill="white">PsiHumanis</text>
+  <text x="320" y="340" font-family="Inter,Arial,sans-serif" font-weight="400" font-size="22" fill="#94a3b8">Sistema de Gest&#xE3;o para Psic&#xF3;logos</text>
+  <rect x="320" y="370" width="140" height="32" rx="16" fill="#3B82F6" opacity="0.15"/>
+  <text x="390" y="391" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="13" fill="#60a5fa">Agenda Online</text>
+  <rect x="475" y="370" width="160" height="32" rx="16" fill="#3B82F6" opacity="0.15"/>
+  <text x="555" y="391" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="13" fill="#60a5fa">Prontu&#xE1;rios</text>
+  <rect x="650" y="370" width="170" height="32" rx="16" fill="#3B82F6" opacity="0.15"/>
+  <text x="735" y="391" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="13" fill="#60a5fa">Sala Virtual</text>
+  <rect x="835" y="370" width="130" height="32" rx="16" fill="#3B82F6" opacity="0.15"/>
+  <text x="900" y="391" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="13" fill="#60a5fa">Financeiro</text>
+  <rect x="0" y="580" width="1200" height="50" fill="white" opacity="0.03"/>
+  <text x="600" y="612" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="400" font-size="14" fill="#475569">psihumanis.com.br</text>
+</svg>`
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "40px",
-            paddingLeft: "120px",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          <div
-            style={{
-              width: "120px",
-              height: "120px",
-              borderRadius: "24px",
-              background: "linear-gradient(135deg, #3B82F6, #6366F1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 25px 50px -12px rgba(59,130,246,0.4)",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "64px",
-                color: "white",
-                fontFamily: "Georgia, serif",
-                fontWeight: "bold",
-              }}
-            >
-              Ψ
-            </span>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <span
-              style={{
-                fontSize: "56px",
-                fontWeight: 800,
-                color: "white",
-                fontFamily: "Inter, Arial, sans-serif",
-                letterSpacing: "-1px",
-              }}
-            >
-              PsiHumanis
-            </span>
-            <span
-              style={{
-                fontSize: "24px",
-                color: "#94a3b8",
-                fontFamily: "Inter, Arial, sans-serif",
-              }}
-            >
-              Sistema de Gestão para Psicólogos
-            </span>
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            paddingLeft: "280px",
-            marginTop: "20px",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          {["Agenda Online", "Prontuários", "Sala Virtual", "Financeiro"].map((tag) => (
-            <div
-              key={tag}
-              style={{
-                padding: "8px 20px",
-                borderRadius: "16px",
-                background: "rgba(59,130,246,0.15)",
-                color: "#60a5fa",
-                fontSize: "14px",
-                fontWeight: 600,
-                fontFamily: "Inter, Arial, sans-serif",
-              }}
-            >
-              {tag}
-            </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "50px",
-            background: "rgba(255,255,255,0.03)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "14px",
-              color: "#475569",
-              fontFamily: "Inter, Arial, sans-serif",
-            }}
-          >
-            psihumanis.com.br
-          </span>
-        </div>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    }
-  )
+  return new Response(svg, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, max-age=86400, s-maxage=86400",
+    },
+  })
 }
