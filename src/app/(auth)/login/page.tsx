@@ -109,7 +109,7 @@ export default function LoginPage() {
             {[
               { title: "Agenda Online", desc: "Gerencie seus horários com facilidade", icon: Shield },
               { title: "Prontuários", desc: "Registros clínicos completos e seguros", icon: Zap },
-              { title: "Sala Virtual", desc: "Atendimento por vídeo, chat e voz", icon: Heart },
+              { title: "Sala Virtual", desc: "Atendimento por vídeo seguro e criptografado", icon: Heart },
               { title: "Financeiro", desc: "Controle de receitas, despesas e notas", icon: CheckCircle },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 rounded-xl bg-white/10 backdrop-blur-sm p-4 hover:bg-white/15 transition-all">

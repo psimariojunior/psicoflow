@@ -268,7 +268,7 @@ export default function LandingPage() {
 
                     {/* Local video PiP */}
                     <div className="absolute bottom-20 right-3 z-20">
-                      <div className="relative w-24 h-18 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                      <div className="relative w-24 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl" style={{ height: 72 }}>
                         <div className="w-full h-full bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
                           <span className="text-lg font-bold text-white">V</span>
                         </div>
@@ -310,8 +310,8 @@ export default function LandingPage() {
                       <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
-                      <p className="text-[9px] text-slate-500">Bem-estar garantido</p>
+                      <p className="text-xs font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
+                      <p className="text-[11px] text-slate-500">Bem-estar garantido</p>
                     </div>
                   </div>
                 </div>
@@ -321,8 +321,8 @@ export default function LandingPage() {
                       <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-900 dark:text-white">Próxima sessão</p>
-                      <p className="text-[9px] text-slate-500">Amanhã às 14:00</p>
+                      <p className="text-xs font-semibold text-slate-900 dark:text-white">Próxima sessão</p>
+                      <p className="text-[11px] text-slate-500">Amanhã às 14:00</p>
                     </div>
                   </div>
                 </div>

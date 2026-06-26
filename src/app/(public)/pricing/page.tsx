@@ -8,6 +8,7 @@ import { Check, Zap, Building2, ArrowLeft, Loader2, Shield, Sparkles, Gift, Cred
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { BreadcrumbJsonLd } from "@/lib/seo"
+import toast from "react-hot-toast"
 
 const plans = [
   {
@@ -78,10 +79,10 @@ export default function PricingPage() {
       if (data.url) {
         window.location.href = data.url
       } else {
-        alert(data.error || "Erro ao criar sessão de checkout")
+        toast.error(data.error || "Erro ao criar sessão de checkout")
       }
     } catch {
-      alert("Erro ao conectar com o servidor")
+      toast.error("Erro ao conectar com o servidor")
     } finally {
       setLoading(null)
     }

@@ -23,7 +23,7 @@ const cards = [
     color: "from-blue-500 to-indigo-600",
     bgLight: "bg-blue-100 dark:bg-blue-900/30",
     textLight: "text-blue-600 dark:text-blue-400",
-    changeKey: "appointmentChange" as const,
+    changeKey: null,
   },
   {
     key: "appointmentsToday" as const,
@@ -50,7 +50,7 @@ const cards = [
     color: "from-amber-500 to-orange-600",
     bgLight: "bg-amber-100 dark:bg-amber-900/30",
     textLight: "text-amber-600 dark:text-amber-400",
-    changeKey: "revenueChange" as const,
+    changeKey: null,
   },
 ]
 
@@ -60,8 +60,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       {cards.map((card) => {
         const Icon = card.icon
         const value = stats[card.key]
-        const change = stats[card.changeKey]
-        const isPositive = change >= 0
+        const change = card.changeKey ? stats[card.changeKey] : null
+        const isPositive = change !== null ? change >= 0 : true
 
         return (
           <Card key={card.key} className="group relative overflow-hidden card-hover border-0 bg-gradient-to-br from-card to-muted/30">
@@ -86,17 +86,19 @@ export function StatsCards({ stats }: StatsCardsProps) {
                   <Icon className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-1.5 text-xs">
-                {isPositive ? (
-                  <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
-                ) : (
-                  <TrendingDown className="h-3.5 w-3.5 text-red-500" />
-                )}
-                <span className={isPositive ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}>
-                  {isPositive ? "+" : ""}{change}%
-                </span>
-                <span className="text-muted-foreground ml-1">vs. mês anterior</span>
-              </div>
+              {change !== null && (
+                <div className="mt-3 flex items-center gap-1.5 text-xs">
+                  {isPositive ? (
+                    <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
+                  ) : (
+                    <TrendingDown className="h-3.5 w-3.5 text-red-500" />
+                  )}
+                  <span className={isPositive ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}>
+                    {isPositive ? "+" : ""}{change}%
+                  </span>
+                  <span className="text-muted-foreground ml-1">vs. mês anterior</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         )

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft, Heart, Shield, Award, Mail, MessageSquare, Phone, MapPin } from "lucide-react"
 
 export default function SobrePage() {
@@ -13,7 +14,7 @@ export default function SobrePage() {
         <div className="space-y-8">
           <div className="text-center space-y-4">
             <div className="w-32 h-32 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-blue-500/20">
-              <img src="/profile.jpg" alt="Mário Júnior" className="w-full h-full object-cover" />
+              <Image src="/profile.jpg" alt="Mário Júnior" width={128} height={128} className="w-full h-full object-cover" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight">Mário Júnior</h1>
             <p className="text-lg text-muted-foreground">Fundador do PsiHumanis</p>

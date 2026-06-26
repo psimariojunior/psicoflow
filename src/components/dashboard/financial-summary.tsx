@@ -16,7 +16,7 @@ interface FinancialSummary {
 }
 
 export function FinancialSummaryCard({ summary }: { summary: FinancialSummary }) {
-  const progressGoal = summary.goal ? (summary.totalRevenue / summary.goal) * 100 : 0
+  const progressGoal = summary.goal ? (summary.received / summary.goal) * 100 : 0
 
   return (
     <Card className="card-hover">

@@ -337,13 +337,13 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* Bottom Row: Appointments + Quick Actions */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Bottom Row: Appointments + Quick Actions + Recent Patients */}
+      <div className="grid gap-6 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Sun className="h-4 w-4 text-amber-500" />
-              Consultas de Hoje
+              Hoje
               <Badge variant="secondary" className="ml-auto text-[10px]">{todaysAppointments.length}</Badge>
             </CardTitle>
           </CardHeader>
@@ -356,7 +356,7 @@ export default function DashboardHome() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Moon className="h-4 w-4 text-indigo-500" />
-              Consultas de Amanhã
+              Amanhã
               <Badge variant="secondary" className="ml-auto text-[10px]">{tomorrowsAppointments.length}</Badge>
             </CardTitle>
           </CardHeader>
@@ -386,10 +386,9 @@ export default function DashboardHome() {
             ))}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Recent Patients */}
-      <RecentPatients patients={recentPatients} />
+        <RecentPatients patients={recentPatients} />
+      </div>
 
       <QuickNotesFab />
     </div>

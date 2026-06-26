@@ -88,10 +88,11 @@ function AgendarPage() {
                       alt={psy.publicName || psy.name}
                       width={72}
                       height={72}
-                      className="h-18 w-18 rounded-2xl object-cover ring-2 ring-slate-200 dark:ring-white/10 shrink-0"
+                      className="rounded-2xl object-cover ring-2 ring-slate-200 dark:ring-white/10 shrink-0"
+                      style={{ width: 72, height: 72 }}
                     />
                   ) : (
-                    <div className="h-18 w-18 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/30 dark:to-indigo-500/30 flex items-center justify-center ring-2 ring-slate-200 dark:ring-white/10 shrink-0" style={{ width: 72, height: 72 }}>
+                    <div className="rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/30 dark:to-indigo-500/30 flex items-center justify-center ring-2 ring-slate-200 dark:ring-white/10 shrink-0" style={{ width: 72, height: 72 }}>
                       <User className="h-8 w-8 text-blue-500 dark:text-blue-400" />
                     </div>
                   )}
