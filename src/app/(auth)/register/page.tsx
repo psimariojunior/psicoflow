@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import { Loader2, CheckCircle2, AlertCircle, Gift } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 import toast from "react-hot-toast"
 
 export default function RegisterPage() {
@@ -26,6 +27,7 @@ export default function RegisterPage() {
     crp: "",
     referralCode: searchParams.get("ref") || "",
   })
+  const [acceptTerms, setAcceptTerms] = useState(false)
 
   useEffect(() => {
     const code = searchParams.get("ref")
@@ -47,6 +49,11 @@ export default function RegisterPage() {
     try {
       if (formData.password !== formData.confirmPassword) {
         toast.error("Senhas não conferem")
+        return
+      }
+
+      if (!acceptTerms) {
+        toast.error("Você precisa aceitar os Termos de Uso e a Política de Privacidade")
         return
       }
 
@@ -226,11 +233,26 @@ export default function RegisterPage() {
                     </p>
                   )}
                 </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <Checkbox
+                    id="acceptTerms"
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="acceptTerms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    Li e aceito os{" "}
+                    <Link href="/termos" className="text-primary hover:underline" target="_blank">Termos de Uso</Link>
+                    {" "}e a{" "}
+                    <Link href="/privacidade" className="text-primary hover:underline" target="_blank">Política de Privacidade</Link>.
+                    Entendo que meus dados serão tratados conforme a LGPD.
+                  </label>
+                </div>
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">
                     Voltar
                   </Button>
-                  <Button type="submit" disabled={loading} className="flex-1">
+                  <Button type="submit" disabled={loading || !acceptTerms} className="flex-1">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
