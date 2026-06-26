@@ -51,7 +51,6 @@ const navLinks = [
   { label: "Avaliações", href: "/avaliacoes", en: "Reviews" },
   { label: "Blog", href: "/blog", en: "Blog" },
   { label: "Planos", href: "/pricing", en: "Plans" },
-  { label: "Agendamento", href: "/agendar", en: "Booking" },
   { label: "FAQ", href: "/#faq", en: "FAQ" },
 ]
 
