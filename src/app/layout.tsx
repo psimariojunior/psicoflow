@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest",
   verification: {
-    google: "INSERIR_CODIGO_AQUI",
+    google: "kvnYGkRrrFIWxX_bxBKS0w8OL1VrhuDcOWqTG0EViQQ",
   },
   other: {
     "application/ld+json": JSON.stringify({
