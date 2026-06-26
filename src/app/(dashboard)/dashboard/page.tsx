@@ -2,17 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { StatsCards } from "@/components/dashboard/stats-cards"
-import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments"
 import { FinancialSummaryCard } from "@/components/dashboard/financial-summary"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { AppointmentsChart } from "@/components/dashboard/appointments-chart"
 import { RecentPatients } from "@/components/dashboard/recent-patients"
-import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { OnboardingChecklist } from "@/components/onboarding-checklist"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, Activity, CalendarDays, Sun, Moon, Cake, AlertTriangle, Zap } from "lucide-react"
+import { Plus, Calendar, UserPlus, FileText, Video, Sparkles, ArrowRight, Download, BarChart3, TrendingUp, Users, DollarSign, Clock, CalendarDays, Sun, Moon, Cake, AlertTriangle, Zap } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { cn, formatTime } from "@/lib/utils"
@@ -28,10 +26,10 @@ interface ActivityItem {
 }
 
 const quickActions = [
-  { label: "Nova Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Agende um novo horário" },
+  { label: "Agendar Consulta", href: "/agenda", icon: Calendar, gradient: "from-blue-500 to-indigo-600", desc: "Abra a agenda" },
   { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600", desc: "Cadastre um paciente" },
-  { label: "Novo Prontuário", href: "/prontuarios/novo", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre um prontuário" },
-  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-blue-700", desc: "Inicie uma videochamada" },
+  { label: "Prontuário", href: "/prontuarios/novo", icon: FileText, gradient: "from-violet-500 to-purple-600", desc: "Registre uma evolução" },
+  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-blue-700", desc: "Videochamada segura" },
 ]
 
 export default function DashboardHome() {
@@ -267,10 +265,7 @@ export default function DashboardHome() {
                 <Link href="/agenda"><Calendar className="mr-1.5 h-4 w-4" />Abrir agenda</Link>
               </Button>
               <Button size="sm" variant="outline" asChild className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-                <Link href="/relatorios"><BarChart3 className="mr-1.5 h-4 w-4" />Ver relatórios</Link>
-              </Button>
-              <Button size="sm" variant="outline" asChild className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-                <Link href="/sala-virtual"><Video className="mr-1.5 h-4 w-4" />Sala virtual</Link>
+                <Link href="/relatorios"><BarChart3 className="mr-1.5 h-4 w-4" />Relatórios</Link>
               </Button>
             </div>
           </div>
@@ -416,7 +411,6 @@ export default function DashboardHome() {
           <h3 className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">Visão Rápida</h3>
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
-          {/* Próximas Consultas: Hoje + Amanhã */}
           <Card className="lg:col-span-1">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -444,7 +438,6 @@ export default function DashboardHome() {
             </CardContent>
           </Card>
 
-          {/* Aniversariantes do mês */}
           <Card className="lg:col-span-1">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -487,11 +480,7 @@ export default function DashboardHome() {
             </CardContent>
           </Card>
 
-          {/* Pacientes Recentes */}
           <RecentPatients patients={recentPatients} />
-
-          {/* Atividade Recente */}
-          <ActivityFeed activities={recentActivity} />
         </div>
       </div>
 
@@ -521,17 +510,6 @@ export default function DashboardHome() {
               </CardHeader>
               <CardContent>
                 <AppointmentsChart data={filteredMonthlyData} />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-500" />
-                  Próximas Consultas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <UpcomingAppointments appointments={appointments} />
               </CardContent>
             </Card>
           </div>
