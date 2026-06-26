@@ -42,6 +42,11 @@ export function OnboardingChecklist() {
     setCompleted(true)
   }
 
+  const handleDismiss = () => {
+    localStorage.setItem(ONBOARDING_KEY, "true")
+    setCompleted(true)
+  }
+
   if (completed || dismissed) return null
 
   return (
@@ -60,7 +65,7 @@ export function OnboardingChecklist() {
             </div>
           </div>
           <button
-            onClick={() => setDismissed(true)}
+            onClick={handleDismiss}
             className="text-blue-200 hover:text-white transition-colors rounded-lg p-1"
             aria-label="Fechar"
           >
@@ -121,7 +126,7 @@ export function OnboardingChecklist() {
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => setDismissed(true)}
+            onClick={handleDismiss}
           >
             Pular
           </Button>

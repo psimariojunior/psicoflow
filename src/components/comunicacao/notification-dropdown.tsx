@@ -83,6 +83,15 @@ export function NotificationDropdown() {
     }
   }, [])
 
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await fetch("/api/notificacoes", { method: "PATCH" })
+      fetchSummary()
+    } catch {
+      // silent
+    }
+  }, [fetchSummary])
+
   useEffect(() => {
     fetchSummary()
     const id = setInterval(fetchSummary, 60_000)
@@ -139,14 +148,18 @@ export function NotificationDropdown() {
         variant="ghost"
         size="icon"
         className="relative"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          const next = !open
+          setOpen(next)
+          if (next && unread.length > 0) markAllAsRead()
+        }}
         aria-label="Notificações"
       >
         <Bell className="h-5 w-5" />
-        {total > 0 && (
+        {unread.length > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground animate-in zoom-in">
             <span className="absolute inset-0 rounded-full bg-destructive animate-ping opacity-50" />
-            <span className="relative">{total > 9 ? "9+" : total}</span>
+            <span className="relative">{unread.length > 9 ? "9+" : unread.length}</span>
           </span>
         )}
       </Button>

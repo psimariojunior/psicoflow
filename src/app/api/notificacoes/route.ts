@@ -59,6 +59,21 @@ export async function GET(req: Request) {
   }
 }
 
+export async function PATCH() {
+  try {
+    const psychologistId = await requireAuth()
+    await prisma.notification.updateMany({
+      where: { psychologistId, readAt: null },
+      data: { readAt: new Date() },
+    })
+    return apiSuccess({ ok: true })
+  } catch (error) {
+    if (isAuthError(error)) return apiError("Não autorizado", 401)
+    logger.error("Error marking notifications as read", { error: String(error) })
+    return apiError("Erro ao marcar notificações como lidas")
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
