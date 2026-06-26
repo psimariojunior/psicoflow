@@ -223,11 +223,6 @@ export default function LandingPage() {
                     {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="/paciente/login">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base h-12 px-8 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
-                    {t("hero.patient", locale)}
-                  </Button>
-                </Link>
               </div>
               <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-500">
                 <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-blue-500" /><span>Sigilo Garantido</span></div>
@@ -562,7 +557,6 @@ export default function LandingPage() {
             <p className="text-lg text-blue-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-              <Link href="/paciente/cadastro"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-base h-12 px-8">{t("cta.patient", locale)}</Button></Link>
             </div>
             <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
