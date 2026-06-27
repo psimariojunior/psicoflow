@@ -27,6 +27,11 @@ export function useBackgroundProcessor() {
       return
     }
 
+    // Check that camera is actually enabled before applying processor
+    if (newMode !== "disabled" && !videoPub.isMuted) {
+      // Camera is muted — can't apply processor
+    }
+
     try {
       if (newMode === "disabled") {
         if (processorRef.current) {

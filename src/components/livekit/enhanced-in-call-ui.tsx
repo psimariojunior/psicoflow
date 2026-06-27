@@ -37,6 +37,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const [connectionQuality, setConnectionQuality] = useState<"excellent" | "good" | "poor" | "unknown">("unknown")
   const [isScreenSharing, setIsScreenSharing] = useState(false)
   const [remoteScreenSharing, setRemoteScreenSharing] = useState(false)
+  const [screenShareSupported, setScreenShareSupported] = useState(true)
 
   // Panels
   const [activePanel, setActivePanel] = useState<"chat" | "notes" | null>(null)
@@ -320,6 +321,12 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   // Auto-scroll chat
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [chatMessages])
 
+  // Detect screen share support (iOS Safari doesn't support getDisplayMedia)
+  useEffect(() => {
+    const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
+    setScreenShareSupported(supported)
+  }, [])
+
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
     const sec = s % 60
@@ -563,9 +570,20 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
 
             <div className="w-px h-6 sm:h-8 bg-white/10 mx-0.5" />
 
-            <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
-              {isScreenSharing ? <MonitorOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />}
-            </button>
+            {screenShareSupported ? (
+              <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
+                {isScreenSharing ? <MonitorOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />}
+              </button>
+            ) : (
+              <button
+                onClick={() => toast.error("Compartilhamento de tela não disponível no iOS. Use um computador ou Android.")}
+                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 text-white/30 cursor-not-allowed"
+                aria-label="Compartilhar tela (indisponível)"
+                title="Indisponível no iOS"
+              >
+                <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+            )}
             {bgSupported && (
               <button onClick={toggleBlur} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", bgMode !== "disabled" ? "bg-purple-500/30 text-purple-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Fundo desfocado">
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
