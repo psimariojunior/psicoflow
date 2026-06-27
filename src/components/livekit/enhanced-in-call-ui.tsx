@@ -349,7 +349,10 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   }, [room, micOn])
 
   const toggleScreenShare = useCallback(async () => {
-    if (!room) return
+    if (!room) {
+      toast.error("Sala não conectada. Aguarde a conexão.")
+      return
+    }
     try {
       // Check API support first
       if (!navigator.mediaDevices?.getDisplayMedia) {
@@ -555,58 +558,94 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         </div>
       )}
 
-      {/* Bottom controls */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 pb-2 sm:pb-4 md:pb-6 px-1.5 sm:px-3">
-        <div className="flex items-center justify-center">
-          <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 backdrop-blur-xl rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-2.5 border border-white/10 shadow-2xl max-w-full overflow-x-auto scrollbar-hide">
-            <button onClick={toggleCam} className={cn("relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", camOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Câmera">
-              {camOn ? <Video className="h-4 w-4 sm:h-5 sm:w-5" /> : <VideoOff className="h-4 w-4 sm:h-5 sm:w-5" />}
-              {!camOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}
-            </button>
-            <button onClick={toggleMic} className={cn("relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", micOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Microfone">
-              {micOn ? <Mic className="h-4 w-4 sm:h-5 sm:w-5" /> : <MicOff className="h-4 w-4 sm:h-5 sm:w-5" />}
-              {!micOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}
-            </button>
-
-            <div className="w-px h-6 sm:h-8 bg-white/10 mx-0.5" />
-
-            {screenShareSupported ? (
-              <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
-                {isScreenSharing ? <MonitorOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />}
-              </button>
-            ) : (
+      {/* Bottom controls — Row 1: essential buttons */}
+      <div className="absolute bottom-0 left-0 right-0 z-30 pb-2 sm:pb-4 md:pb-6 px-1 sm:px-3">
+        <div className="flex flex-col items-center gap-1.5">
+          {/* Row 2: secondary buttons (screen share, blur, chat, reactions, notes) */}
+          <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xl rounded-full px-2 py-1.5 border border-white/10 sm:hidden" style={{ touchAction: "manipulation" }}>
+            {screenShareSupported && (
               <button
-                onClick={() => toast.error("Compartilhamento de tela não disponível no iOS. Use um computador ou Android.")}
-                className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 text-white/30 cursor-not-allowed"
-                aria-label="Compartilhar tela (indisponível)"
-                title="Indisponível no iOS"
+                onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }}
+                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+                aria-label="Compartilhar tela"
               >
-                <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />
+                {isScreenSharing ? <MonitorOff className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
               </button>
             )}
             {bgSupported && (
-              <button onClick={toggleBlur} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", bgMode !== "disabled" ? "bg-purple-500/30 text-purple-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Fundo desfocado">
-                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+              <button
+                onPointerDown={(e) => { e.preventDefault(); toggleBlur() }}
+                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", bgMode !== "disabled" ? "bg-purple-500/30 text-purple-300" : "bg-white/10 text-white")}
+                aria-label="Fundo desfocado"
+              >
+                <Sparkles className="h-4 w-4" />
               </button>
             )}
-            <button onClick={() => togglePanel("chat")} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
-              <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+            <button
+              onPointerDown={(e) => { e.preventDefault(); togglePanel("chat") }}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+              aria-label="Chat"
+            >
+              <MessageCircle className="h-4 w-4" />
             </button>
-            <button onClick={() => setReactionPickerOpen(p => !p)} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", reactionPickerOpen ? "bg-white/20 text-white" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Reações">
-              <Smile className="h-4 w-4 sm:h-5 sm:w-5" />
+            <button
+              onPointerDown={(e) => { e.preventDefault(); setReactionPickerOpen(p => !p) }}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", reactionPickerOpen ? "bg-white/20 text-white" : "bg-white/10 text-white")}
+              aria-label="Reações"
+            >
+              <Smile className="h-4 w-4" />
             </button>
-            <button onClick={() => togglePanel("notes")} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", activePanel === "notes" ? "bg-amber-500/30 text-amber-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Notas">
-              <StickyNote className="h-4 w-4 sm:h-5 sm:w-5" />
+            <button
+              onPointerDown={(e) => { e.preventDefault(); togglePanel("notes") }}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", activePanel === "notes" ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white")}
+              aria-label="Notas"
+            >
+              <StickyNote className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Main row: cam, mic, leave */}
+          <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 backdrop-blur-xl rounded-2xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 border border-white/10 shadow-2xl" style={{ touchAction: "manipulation" }}>
+            <button onPointerDown={(e) => { e.preventDefault(); toggleCam() }} className={cn("relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl transition-all active:scale-90", camOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Câmera">
+              {camOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+              {!camOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}
+            </button>
+            <button onPointerDown={(e) => { e.preventDefault(); toggleMic() }} className={cn("relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl transition-all active:scale-90", micOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Microfone">
+              {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+              {!micOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}
             </button>
 
-            <div className="w-px h-6 sm:h-8 bg-white/10 mx-0.5" />
+            {/* Desktop only: inline secondary buttons */}
+            <div className="hidden sm:flex items-center gap-1.5 ml-1">
+              <div className="w-px h-8 bg-white/10" />
+              {screenShareSupported && (
+                <button onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
+                  {isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
+                </button>
+              )}
+              {bgSupported && (
+                <button onPointerDown={(e) => { e.preventDefault(); toggleBlur() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", bgMode !== "disabled" ? "bg-purple-500/30 text-purple-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Fundo desfocado">
+                  <Sparkles className="h-5 w-5" />
+                </button>
+              )}
+              <button onPointerDown={(e) => { e.preventDefault(); togglePanel("chat") }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
+                <MessageCircle className="h-5 w-5" />
+              </button>
+              <button onPointerDown={(e) => { e.preventDefault(); setReactionPickerOpen(p => !p) }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", reactionPickerOpen ? "bg-white/20 text-white" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Reações">
+                <Smile className="h-5 w-5" />
+              </button>
+              <button onPointerDown={(e) => { e.preventDefault(); togglePanel("notes") }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", activePanel === "notes" ? "bg-amber-500/30 text-amber-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Notas">
+                <StickyNote className="h-5 w-5" />
+              </button>
+              <div className="w-px h-8 bg-white/10" />
+            </div>
 
-            <button onClick={toggleFullscreen} className="hidden sm:flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all" aria-label="Tela cheia">
+            <button onPointerDown={(e) => { e.preventDefault(); toggleFullscreen() }} className="hidden sm:flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-90" aria-label="Tela cheia">
               {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
             </button>
-            <button onClick={onLeave} className="flex items-center gap-1 sm:gap-2 bg-red-600 hover:bg-red-500 text-white px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-[11px] sm:text-sm transition-all shadow-lg shadow-red-600/25">
-              <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 rotate-[135deg]" />
-              <span className="hidden xs:inline">Sair</span>
+            <button onPointerDown={(e) => { e.preventDefault(); onLeave() }} className="flex items-center gap-1.5 sm:gap-2 bg-red-600 hover:bg-red-500 text-white px-3 sm:px-5 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all shadow-lg shadow-red-600/25 active:scale-95">
+              <Phone className="h-4 w-4 rotate-[135deg]" />
+              <span>Sair</span>
             </button>
           </div>
         </div>

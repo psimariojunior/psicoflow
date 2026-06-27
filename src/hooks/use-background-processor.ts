@@ -19,7 +19,14 @@ export function useBackgroundProcessor() {
   })
 
   const applyMode = useCallback(async (newMode: BackgroundMode) => {
-    if (!room || !supported) return
+    if (!room) {
+      toast.error("Sala não conectada. Aguarde a conexão.")
+      return
+    }
+    if (!supported) {
+      toast.error("Fundo desfocado não suportado neste navegador.")
+      return
+    }
 
     const videoPub = room.localParticipant.getTrackPublication(Track.Source.Camera)
     if (!videoPub?.track) {
