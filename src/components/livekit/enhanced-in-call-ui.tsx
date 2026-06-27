@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRoomContext } from "@livekit/components-react"
-import { RoomEvent, Track } from "livekit-client"
+import { RoomEvent, Track, TrackPublication } from "livekit-client"
 import {
   Video, VideoOff, Mic, MicOff, Maximize2, Minimize2,
   Camera, User, Phone, MessageCircle, Monitor, StickyNote,
-  Smile, X, Send, Wifi,
+  Smile, X, Send, Wifi, MonitorOff,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -22,7 +22,7 @@ const REACTIONS = ["👍", "❤️", "✋", "😊", "👏", "💪"]
 
 export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: EnhancedInCallUIProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const mainVideoRef = useRef<HTMLVideoElement>(null)
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
@@ -34,6 +34,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const [remoteName, setRemoteName] = useState("Psicólogo")
   const [connectionQuality, setConnectionQuality] = useState<"excellent" | "good" | "poor" | "unknown">("unknown")
   const [isScreenSharing, setIsScreenSharing] = useState(false)
+  const [remoteScreenSharing, setRemoteScreenSharing] = useState(false)
 
   // Panels
   const [activePanel, setActivePanel] = useState<"chat" | "notes" | null>(null)
@@ -47,6 +48,20 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const reactionIdRef = useRef(0)
 
   const room = useRoomContext()
+
+  // Helper: attach a track publication to a video element
+    const attachPubToVideo = useCallback((pub: TrackPublication | undefined, videoEl: HTMLVideoElement | null) => {
+    if (pub?.track && videoEl) {
+      try { pub.track.attach(videoEl) } catch {}
+    }
+  }, [])
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const detachPubFromVideo = useCallback((pub: TrackPublication | undefined, videoEl: HTMLVideoElement | null) => {
+    if (pub?.track && videoEl) {
+      try { pub.track.detach(videoEl) } catch {}
+    }
+  }, [])
 
   // Connection quality
   useEffect(() => {
@@ -62,55 +77,193 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
     return () => { room.off(RoomEvent.ConnectionQualityChanged, check); clearInterval(interval) }
   }, [room])
 
-  // Remote video
+  // Remote video + screen share
   useEffect(() => {
     if (!room) return
+
+    const findRemoteWithScreenShare = () => {
+      for (const participant of Array.from(room.remoteParticipants.values())) {
+        const screenPub = participant.getTrackPublication(Track.Source.ScreenShare)
+        if (screenPub?.track) return { participant, screenPub }
+      }
+      return null
+    }
+
+    const attachRemoteCamera = (participant: any) => {
+      if (!mainVideoRef.current) return
+      // First detach anything currently on mainVideo
+      try {
+        const existing = mainVideoRef.current.srcObject instanceof MediaStream ? mainVideoRef.current.srcObject.getTracks() : []
+        existing.forEach(t => t.stop())
+        mainVideoRef.current.srcObject = null
+      } catch {}
+      // Attach camera
+      const camPub = participant.getTrackPublication(Track.Source.Camera)
+      if (camPub?.track) {
+        try { camPub.track.attach(mainVideoRef.current) } catch {}
+      }
+    }
+
+    const attachRemoteScreenShare = (participant: any, screenPub: TrackPublication) => {
+      if (!mainVideoRef.current) return
+      // Detach current tracks
+      try {
+        const existing = mainVideoRef.current.srcObject instanceof MediaStream ? mainVideoRef.current.srcObject.getTracks() : []
+        existing.forEach(t => t.stop())
+        mainVideoRef.current.srcObject = null
+      } catch {}
+      // Attach screen share
+      if (screenPub.track) {
+        try { screenPub.track.attach(mainVideoRef.current) } catch {}
+      }
+    }
+
     const attachRemote = () => {
       try {
         const remotes = Array.from(room.remoteParticipants.values())
         if (remotes.length === 0) { setHasRemote(false); return }
         setHasRemote(true)
         setRemoteName(remotes[0].name || remotes[0].identity || "Psicólogo")
-        const tryAttach = (attempt = 0) => {
-          const camPub = remotes[0].getTrackPublication(Track.Source.Camera)
-          if (camPub?.track && videoRef.current) camPub.track.attach(videoRef.current)
-          else if (attempt < 5) setTimeout(() => tryAttach(attempt + 1), 200)
+
+        // Check if remote is sharing screen
+        const screenShare = findRemoteWithScreenShare()
+        if (screenShare) {
+          setRemoteScreenSharing(true)
+          requestAnimationFrame(() => attachRemoteScreenShare(screenShare.participant, screenShare.screenPub))
+        } else {
+          setRemoteScreenSharing(false)
+          // Try camera with retry
+          const tryAttach = (attempt = 0) => {
+            if (!mainVideoRef.current) return
+            const camPub = remotes[0].getTrackPublication(Track.Source.Camera)
+            if (camPub?.track) {
+              try { camPub.track.attach(mainVideoRef.current) } catch {}
+            } else if (attempt < 5) {
+              setTimeout(() => tryAttach(attempt + 1), 200)
+            }
+          }
+          requestAnimationFrame(() => tryAttach())
         }
-        requestAnimationFrame(() => tryAttach())
       } catch {}
     }
+
     const detachRemote = () => {
       try {
-        if (videoRef.current) {
-          const tracks = videoRef.current.srcObject instanceof MediaStream ? videoRef.current.srcObject.getTracks() : []
+        if (mainVideoRef.current) {
+          const tracks = mainVideoRef.current.srcObject instanceof MediaStream ? mainVideoRef.current.srcObject.getTracks() : []
           tracks.forEach(t => t.stop())
-          videoRef.current.srcObject = null
+          mainVideoRef.current.srcObject = null
         }
         setHasRemote(false)
+        setRemoteScreenSharing(false)
       } catch {}
     }
+
     const onTrackSub = (track: any, pub: any, participant: any) => {
-      if (track.kind === "video" && participant && !participant.isLocal) {
+      if (participant?.isLocal) return
+      if (track.kind === "video" && participant) {
         setHasRemote(true)
         setRemoteName(participant.name || participant.identity || "Psicólogo")
-        requestAnimationFrame(() => { if (videoRef.current) track.attach(videoRef.current) })
+
+        if (pub.source === Track.Source.ScreenShare) {
+          // Screen share — attach to main video
+          setRemoteScreenSharing(true)
+          requestAnimationFrame(() => {
+            if (mainVideoRef.current) {
+              try { track.attach(mainVideoRef.current) } catch {}
+            }
+          })
+        } else if (pub.source === Track.Source.Camera) {
+          // Camera — only attach if no screen share active
+          const isScreenActive = findRemoteWithScreenShare() !== null
+          if (!isScreenActive) {
+            requestAnimationFrame(() => {
+              if (mainVideoRef.current) {
+                try { track.attach(mainVideoRef.current) } catch {}
+              }
+            })
+          }
+        }
       }
     }
-    const onTrackUnsub = (track: any) => { if (track.kind === "video" && videoRef.current) track.detach(videoRef.current) }
-    const onLocalPub = (pub: any) => { if (pub.source === Track.Source.Camera && pub.track && localVideoRef.current) pub.track.attach(localVideoRef.current) }
-    const onLocalUnpub = (pub: any) => { if (pub.source === Track.Source.Camera && pub.track && localVideoRef.current) pub.track.detach(localVideoRef.current) }
+
+    const onTrackUnsub = (track: any, pub: any, participant: any) => {
+      if (participant?.isLocal) return
+      if (pub.source === Track.Source.ScreenShare) {
+        setRemoteScreenSharing(false)
+        // Restore camera
+        if (mainVideoRef.current) {
+          try { track.detach(mainVideoRef.current) } catch {}
+          // Find camera of same participant
+          if (participant) {
+            const camPub = participant.getTrackPublication(Track.Source.Camera)
+            if (camPub?.track) {
+              try { camPub.track.attach(mainVideoRef.current) } catch {}
+            }
+          }
+        }
+      } else if (pub.source === Track.Source.Camera && mainVideoRef.current) {
+        try { track.detach(mainVideoRef.current) } catch {}
+      }
+    }
+
+    const onLocalScreenShare = (pub: any) => {
+      if (pub.source !== Track.Source.ScreenShare) return
+      if (pub.track && mainVideoRef.current) {
+        // Local screen share started — show it in main video
+        setIsScreenSharing(true)
+        try { pub.track.attach(mainVideoRef.current) } catch {}
+      }
+    }
+
+    const onLocalScreenShareEnd = (pub: any) => {
+      if (pub.source !== Track.Source.ScreenShare) return
+      // Local screen share stopped — restore remote video
+      setIsScreenSharing(false)
+      if (mainVideoRef.current) {
+        try { pub.track.detach(mainVideoRef.current) } catch {}
+      }
+      // Re-attach remote video
+      const remotes = Array.from(room.remoteParticipants.values())
+      if (remotes.length > 0 && mainVideoRef.current) {
+        const camPub = remotes[0].getTrackPublication(Track.Source.Camera)
+        if (camPub?.track) {
+          try { camPub.track.attach(mainVideoRef.current) } catch {}
+        }
+      }
+    }
+
+    const onLocalCamPub = (pub: any) => {
+      if (pub.source === Track.Source.Camera && pub.track && localVideoRef.current) {
+        try { pub.track.attach(localVideoRef.current) } catch {}
+      }
+    }
+    const onLocalCamUnpub = (pub: any) => {
+      if (pub.source === Track.Source.Camera && pub.track && localVideoRef.current) {
+        try { pub.track.detach(localVideoRef.current) } catch {}
+      }
+    }
 
     room.on(RoomEvent.ParticipantConnected, () => setTimeout(attachRemote, 500))
     room.on(RoomEvent.ParticipantDisconnected, detachRemote)
     room.on(RoomEvent.TrackSubscribed, onTrackSub)
     room.on(RoomEvent.TrackUnsubscribed, onTrackUnsub)
-    room.on(RoomEvent.LocalTrackPublished, onLocalPub)
-    room.on(RoomEvent.LocalTrackUnpublished, onLocalUnpub)
+    room.on(RoomEvent.LocalTrackPublished, (pub) => {
+      onLocalScreenShare(pub)
+      onLocalCamPub(pub)
+    })
+    room.on(RoomEvent.LocalTrackUnpublished, (pub) => {
+      onLocalScreenShareEnd(pub)
+      onLocalCamUnpub(pub)
+    })
 
+    // Initial attach
     setTimeout(() => {
       attachRemote()
       const localCam = room.localParticipant.getTrackPublication(Track.Source.Camera)
-      if (localCam?.track && localVideoRef.current) localCam.track.attach(localVideoRef.current)
+      if (localCam?.track && localVideoRef.current) {
+        try { localCam.track.attach(localVideoRef.current) } catch {}
+      }
     }, 500)
 
     return () => {
@@ -118,8 +271,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
       room.off(RoomEvent.ParticipantDisconnected, detachRemote)
       room.off(RoomEvent.TrackSubscribed, onTrackSub)
       room.off(RoomEvent.TrackUnsubscribed, onTrackUnsub)
-      room.off(RoomEvent.LocalTrackPublished, onLocalPub)
-      room.off(RoomEvent.LocalTrackUnpublished, onLocalUnpub)
+      room.off(RoomEvent.LocalTrackPublished, (pub) => { onLocalScreenShare(pub); onLocalCamPub(pub) })
+      room.off(RoomEvent.LocalTrackUnpublished, (pub) => { onLocalScreenShareEnd(pub); onLocalCamUnpub(pub) })
     }
   }, [room])
 
@@ -165,7 +318,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   // Auto-scroll chat
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [chatMessages])
 
-  // Keyboard shortcuts (desktop only)
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -202,8 +355,22 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const toggleScreenShare = useCallback(async () => {
     if (!room) return
     try {
-      await room.localParticipant.setScreenShareEnabled(!isScreenSharing)
-      setIsScreenSharing(prev => !prev)
+      const newSharing = !isScreenSharing
+      await room.localParticipant.setScreenShareEnabled(newSharing)
+      setIsScreenSharing(newSharing)
+
+      // If stopping screen share, restore remote camera to main video
+      if (!newSharing && mainVideoRef.current) {
+        setTimeout(() => {
+          const remotes = Array.from(room.remoteParticipants.values())
+          if (remotes.length > 0) {
+            const camPub = remotes[0].getTrackPublication(Track.Source.Camera)
+            if (camPub?.track && mainVideoRef.current) {
+              try { camPub.track.attach(mainVideoRef.current) } catch {}
+            }
+          }
+        }, 300)
+      }
     } catch {}
   }, [room, isScreenSharing])
 
@@ -239,10 +406,10 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 select-none overflow-hidden">
-      {/* Main video */}
+      {/* Main video — shows remote camera OR remote/local screen share */}
       <div className="absolute inset-0">
-        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-contain" />
-        {!hasRemote && (
+        <video ref={mainVideoRef} autoPlay playsInline muted className="w-full h-full object-contain" />
+        {!hasRemote && !isScreenSharing && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-3 animate-pulse px-4">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-2 border-blue-500/30 flex items-center justify-center mx-auto">
@@ -258,6 +425,14 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         {hasRemote && <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />}
       </div>
 
+      {/* Screen share badge */}
+      {(isScreenSharing || remoteScreenSharing) && (
+        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-blue-600/90 backdrop-blur-sm text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium shadow-lg">
+          <Monitor className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          <span>{isScreenSharing ? "Você está compartilhando tela" : `${remoteName} está compartilhando tela`}</span>
+        </div>
+      )}
+
       {/* Floating reactions */}
       <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
         {reactions.map(r => (
@@ -267,9 +442,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         ))}
       </div>
 
-      {/* Top bar — name + timer + quality (mobile: compact single row) */}
+      {/* Top bar — name + timer + quality */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-2 py-2 sm:px-3 sm:py-3">
-        {/* Left: name + timer */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           {hasRemote && (
             <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-xl text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl border border-white/10">
@@ -282,7 +456,6 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             <span className="text-[10px] sm:text-xs font-mono">{formatTime(callDuration)}</span>
           </div>
         </div>
-        {/* Right: quality dots */}
         <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xl px-1.5 py-1 sm:px-2 sm:py-1.5 rounded-lg border border-white/10">
           {[1, 2, 3].map(i => (
             <div key={i} className={cn("w-1 sm:w-1.5 rounded-full transition-all", i <= qualityDots[connectionQuality] ? "bg-emerald-400 h-2.5 sm:h-3" : "bg-white/20 h-1 sm:h-1.5")} />
@@ -290,7 +463,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         </div>
       </div>
 
-      {/* Local video PiP — mobile: bottom-left above controls */}
+      {/* Local video PiP — bottom-left above controls */}
       <div className="absolute bottom-[88px] sm:bottom-[100px] left-2 z-20">
         <div className="relative w-20 h-[60px] sm:w-24 sm:h-[72px] md:w-36 md:h-28 rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl">
           {localVideoRef && <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-contain scale-x-[-1]" />}
@@ -312,7 +485,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         </div>
       )}
 
-      {/* Chat panel — full width on mobile */}
+      {/* Chat panel */}
       {activePanel === "chat" && (
         <div className="absolute inset-x-0 bottom-[88px] sm:bottom-[100px] sm:left-auto sm:right-2 sm:w-80 z-30 mx-2 sm:mx-0 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl flex flex-col max-h-[50vh] sm:max-h-[60vh]">
           <div className="flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 border-b border-white/10">
@@ -345,7 +518,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         </div>
       )}
 
-      {/* Notes panel — full width on mobile */}
+      {/* Notes panel */}
       {activePanel === "notes" && (
         <div className="absolute inset-x-0 bottom-[88px] sm:bottom-[100px] sm:left-2 sm:w-80 z-30 mx-2 sm:mx-0 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl flex flex-col max-h-[50vh] sm:max-h-[60vh]">
           <div className="flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 border-b border-white/10">
@@ -364,11 +537,10 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         </div>
       )}
 
-      {/* Bottom controls — 2 rows on mobile if needed */}
+      {/* Bottom controls */}
       <div className="absolute bottom-0 left-0 right-0 z-30 pb-2 sm:pb-4 md:pb-6 px-1.5 sm:px-3">
         <div className="flex items-center justify-center">
           <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 backdrop-blur-xl rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-2.5 border border-white/10 shadow-2xl">
-            {/* Row 1: Essential controls */}
             <button onClick={toggleCam} className={cn("relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", camOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Câmera">
               {camOn ? <Video className="h-4 w-4 sm:h-5 sm:w-5" /> : <VideoOff className="h-4 w-4 sm:h-5 sm:w-5" />}
               {!camOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}
@@ -380,8 +552,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
 
             <div className="w-px h-6 sm:h-8 bg-white/10 mx-0.5" />
 
-            <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Tela">
-              <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />
+            <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
+              {isScreenSharing ? <MonitorOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />}
             </button>
             <button onClick={() => togglePanel("chat")} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
               <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
