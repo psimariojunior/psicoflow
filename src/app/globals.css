@@ -110,6 +110,10 @@
     @apply ring-2 ring-ring/30 ring-offset-2 ring-offset-background;
   }
 
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-500;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

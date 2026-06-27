@@ -140,7 +140,7 @@ export default function LandingPage() {
             </Link>
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map(link => (
-                <Link key={link.href} href={link.href} onClick={e => {
+                <Link key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined} onClick={e => {
                   if (link.href.startsWith("/#")) { e.preventDefault(); const id = link.href.slice(2); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth" }) }
                 }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{locale === "en" ? link.en : link.label}</Link>
               ))}
@@ -330,6 +330,27 @@ export default function LandingPage() {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Video Demo */}
+      <section className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Veja como funciona</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Conheça a plataforma em ação</h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video flex items-center justify-center group cursor-pointer" role="img" aria-label="Demonstração da plataforma PsiHumanis">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-blue-600/5" />
+              <div className="relative z-10 text-center">
+                <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Assista à demonstração</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -529,12 +550,12 @@ export default function LandingPage() {
           <div className="space-y-3">
             {faqItems.map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
-                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 group">
+                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 group">
                   <div className="flex items-center justify-between gap-4">
                     <span className="font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.q}</span>
                     <ChevronDown className={cn("h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200", activeFaq === i && "rotate-180 text-blue-500")} />
                   </div>
-                  <div className={cn("overflow-hidden transition-all duration-300", activeFaq === i ? "mt-4 max-h-40" : "max-h-0")}>
+                  <div id={`faq-answer-${i}`} role="region" className={cn("overflow-hidden transition-all duration-300", activeFaq === i ? "mt-4 max-h-40" : "max-h-0")}>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{item.a}</p>
                   </div>
                 </button>
@@ -572,6 +593,18 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
+      {/* Trust Bar */}
+      <div className="bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Dados protegidos <strong>LGPD</strong></span></div>
+            <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Profissional registrado <strong>CRP</strong></span></div>
+            <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Conexão <strong>criptografada</strong></span></div>
+            <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Servidores no <strong>Brasil</strong></span></div>
+          </div>
+        </div>
+      </div>
+
       <footer className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -587,13 +620,13 @@ export default function LandingPage() {
               </Link>
               <p className="text-sm text-slate-300 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
               <div className="flex items-center gap-3 pt-2">
-                <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="WhatsApp">
                   <MessageCircle className="h-4 w-4" />
                 </a>
-                <a href="mailto:psi_mariojunior@hotmail.com" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                <a href="mailto:psi_mariojunior@hotmail.com" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Email">
                   <Mail className="h-4 w-4" />
                 </a>
-                <a href="tel:+5531992863861" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                <a href="tel:+5531992863861" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Telefone">
                   <Phone className="h-4 w-4" />
                 </a>
               </div>

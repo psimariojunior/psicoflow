@@ -7,7 +7,7 @@ import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 import { CookieConsent } from "@/components/cookie-consent"
 import { GoogleAnalytics } from "@/components/google-analytics"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
 
 const siteUrl = "https://psihumanis.com.br"
 const siteName = "PsiHumanis"
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: "/og",
+        url: "/og?v=2",
         width: 1200,
         height: 630,
         alt: "PsiHumanis - Gestão para Psicólogos",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/og"],
+    images: ["/og?v=2"],
     creator: "@psihumanis",
   },
   robots: {
@@ -131,8 +131,18 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={inter.className}>
-        <Providers><main className="animate-fade-in">{children}</main><PwaInstallPrompt /></Providers>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+          Pular para o conteúdo
+        </a>
+        <Providers>
+          <main id="main-content" className="animate-fade-in">{children}</main>
+          <PwaInstallPrompt />
+        </Providers>
         <Script id="pwa-capture" strategy="beforeInteractive">
           {`
             window.__deferredPwaPrompt = null;

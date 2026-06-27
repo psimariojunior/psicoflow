@@ -185,6 +185,50 @@ export default function PricingPage() {
           })}
         </div>
 
+        {/* Comparison Table */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Comparar planos</h2>
+          <div className="overflow-x-auto rounded-2xl border bg-card shadow-lg">
+            <table className="w-full text-sm" role="table" aria-label="Comparação de planos">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left p-4 font-medium text-muted-foreground">Funcionalidade</th>
+                  <th className="text-center p-4 font-medium">Pro</th>
+                  <th className="text-center p-4 font-medium">Clínica</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: "Pacientes", pro: "Até 200", clinic: "Ilimitados" },
+                  { feature: "Consultas", pro: "Ilimitadas", clinic: "Ilimitadas" },
+                  { feature: "Videochamada integrada", pro: true, clinic: true },
+                  { feature: "IA para prontuários", pro: true, clinic: true },
+                  { feature: "Relatórios avançados", pro: true, clinic: true },
+                  { feature: "Lembretes automáticos", pro: true, clinic: true },
+                  { feature: "Gerenciar equipe", pro: false, clinic: true },
+                  { feature: "Suporte prioritário", pro: true, clinic: true },
+                  { feature: "Suporte dedicado", pro: false, clinic: true },
+                  { feature: "14 dias grátis", pro: true, clinic: true },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b last:border-0">
+                    <td className="p-4">{row.feature}</td>
+                    <td className="text-center p-4">
+                      {typeof row.pro === "boolean" ? (
+                        row.pro ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground">—</span>
+                      ) : <span className="font-medium">{row.pro}</span>}
+                    </td>
+                    <td className="text-center p-4">
+                      {typeof row.clinic === "boolean" ? (
+                        row.clinic ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground">—</span>
+                      ) : <span className="font-medium">{row.clinic}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div className="mt-16 max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-8">Dúvidas frequentes</h2>
           <div className="space-y-3">
@@ -192,13 +236,15 @@ export default function PricingPage() {
               <div key={i} className="rounded-xl border bg-card overflow-hidden">
                 <button
                   onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                  aria-expanded={faqOpen === i}
+                  aria-controls={`pricing-faq-${i}`}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-accent/50 transition-colors"
                 >
                   <span className="font-medium text-sm">{item.q}</span>
                   <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0 ml-4", faqOpen === i && "rotate-180")} />
                 </button>
                 {faqOpen === i && (
-                  <div className="px-4 pb-4 text-sm text-muted-foreground leading-relaxed">
+                  <div id={`pricing-faq-${i}`} role="region" className="px-4 pb-4 text-sm text-muted-foreground leading-relaxed">
                     {item.a}
                   </div>
                 )}
