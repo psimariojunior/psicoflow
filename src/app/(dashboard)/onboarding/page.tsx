@@ -16,6 +16,7 @@ import {
   Camera, Save, Loader2, Calendar, Video, Sparkles, PartyPopper
 } from "lucide-react"
 import toast from "react-hot-toast"
+import { TutorialVideo } from "@/components/tutorial-video"
 
 const steps = [
   { id: "welcome", title: "Bem-vindo ao PsiHumanis", icon: Sparkles },
@@ -198,6 +199,8 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
+                <TutorialVideo step="welcome" />
+
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     { icon: Calendar, title: "Agenda Online", desc: "Pacientes agendam consultas 24h" },
@@ -247,6 +250,8 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
+                <TutorialVideo step="profile" />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Nome completo</Label>
@@ -281,6 +286,8 @@ export default function OnboardingPage() {
                 <CardDescription>Configure seus dias e horários disponíveis</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <TutorialVideo step="availability" />
+
                 {weekdays.map((day, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl border">
                     <Checkbox
@@ -337,6 +344,8 @@ export default function OnboardingPage() {
                 <CardDescription>Configure o que os pacientes veem ao agendar</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <TutorialVideo step="public" />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Nome de exibição</Label>
@@ -376,6 +385,8 @@ export default function OnboardingPage() {
                     Sua conta está configurada. Agora você pode explorar o PsiHumanis e começar a atender seus pacientes.
                   </p>
                 </div>
+
+                <TutorialVideo step="done" />
 
                 <div className="space-y-2">
                   {[

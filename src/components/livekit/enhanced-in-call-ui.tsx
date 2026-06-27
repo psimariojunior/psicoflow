@@ -6,9 +6,10 @@ import { RoomEvent, Track, TrackPublication } from "livekit-client"
 import {
   Video, VideoOff, Mic, MicOff, Maximize2, Minimize2,
   Camera, User, Phone, MessageCircle, Monitor, StickyNote,
-  Smile, X, Send, Wifi, MonitorOff,
+  Smile, X, Send, Wifi, MonitorOff, Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useBackgroundProcessor } from "@/hooks/use-background-processor"
 
 interface EnhancedInCallUIProps {
   roomName: string
@@ -48,6 +49,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const reactionIdRef = useRef(0)
 
   const room = useRoomContext()
+  const { mode: bgMode, supported: bgSupported, toggleBlur } = useBackgroundProcessor()
 
   // Helper: attach a track publication to a video element
     const attachPubToVideo = useCallback((pub: TrackPublication | undefined, videoEl: HTMLVideoElement | null) => {
@@ -554,6 +556,11 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             <button onClick={toggleScreenShare} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
               {isScreenSharing ? <MonitorOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Monitor className="h-4 w-4 sm:h-5 sm:w-5" />}
             </button>
+            {bgSupported && (
+              <button onClick={toggleBlur} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", bgMode !== "disabled" ? "bg-purple-500/30 text-purple-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Fundo desfocado">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+            )}
             <button onClick={() => togglePanel("chat")} className={cn("flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
               <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>

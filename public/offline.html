@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -19,29 +19,38 @@
       padding: 20px;
     }
     .container {
-      max-width: 400px;
-      background: rgba(255,255,255,0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
       backdrop-filter: blur(20px);
       border-radius: 24px;
       padding: 48px 32px;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    .icon {
-      width: 80px; height: 80px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 20px;
+    .icon-ring {
+      width: 88px; height: 88px;
+      background: rgba(59,130,246,0.15);
+      border: 2px solid rgba(59,130,246,0.3);
+      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 24px;
-      font-size: 40px;
+      animation: pulse-ring 2s ease-in-out infinite;
     }
-    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-    p { font-size: 15px; opacity: 0.9; margin-bottom: 24px; line-height: 1.5; }
+    .icon-ring svg { width: 40px; height: 40px; color: #60a5fa; }
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.3); }
+      50% { box-shadow: 0 0 0 12px rgba(59,130,246,0); }
+    }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: #94a3b8; margin-bottom: 28px; line-height: 1.5; }
     .btn {
-      display: inline-block;
-      background: white;
-      color: #2563eb;
-      padding: 14px 32px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      padding: 14px 28px;
       border-radius: 12px;
       font-weight: 600;
       font-size: 15px;
@@ -49,23 +58,100 @@
       border: none;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      justify-content: center;
     }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-    .features { margin-top: 32px; text-align: left; }
-    .features p { font-size: 13px; opacity: 0.7; margin-bottom: 8px; }
-    .features span { display: block; font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(37,99,235,0.4); }
+    .btn:active { transform: translateY(0); }
+    .btn svg { width: 18px; height: 18px; }
+    .features {
+      margin-top: 28px;
+      text-align: left;
+      display: grid;
+      gap: 10px;
+    }
+    .feature {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .feature-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-icon.green { background: rgba(34,197,94,0.15); }
+    .feature-icon.blue { background: rgba(59,130,246,0.15); }
+    .feature-icon.amber { background: rgba(245,158,11,0.15); }
+    .feature-icon svg { width: 16px; height: 16px; }
+    .feature-icon.green svg { color: #4ade80; }
+    .feature-icon.blue svg { color: #60a5fa; }
+    .feature-icon.amber svg { color: #fbbf24; }
+    .feature-text { font-size: 13px; color: #cbd5e1; }
+    .last-sync {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #475569;
+    }
+    .connection-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+      margin-right: 6px;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="icon">📡</div>
-    <h1>Você está offline</h1>
-    <p>Verifique sua conexão com a internet e tente novamente.</p>
-    <button class="btn" onclick="window.location.reload()">Tentar Novamente</button>
-    <div class="features">
-      <p>Enquanto offline você pode:</p>
-      <span>✓ Acessar dados salvos em cache</span>
-      <span>✓ Navegar entre páginas visitadas</span>
+    <div class="card">
+      <div class="icon-ring">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+        </svg>
+      </div>
+      <h1>Sem conexão</h1>
+      <p class="subtitle">Verifique sua internet e tente novamente.</p>
+      <button class="btn" onclick="window.location.reload()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+        </svg>
+        Tentar Novamente
+      </button>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon green">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+          </div>
+          <span class="feature-text">Dados salvos em cache funcionam offline</span>
+        </div>
+        <div class="feature">
+          <div class="feature-icon blue">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+          <span class="feature-text">Suas consultas e dados estão preservados</span>
+        </div>
+        <div class="feature">
+          <div class="feature-icon amber">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+            </svg>
+          </div>
+          <span class="feature-text">Sync automático ao reconectar</span>
+        </div>
+      </div>
+      <p class="last-sync"><span class="connection-dot"></span>Offline agora</p>
     </div>
   </div>
 </body>

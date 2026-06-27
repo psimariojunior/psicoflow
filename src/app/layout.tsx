@@ -4,6 +4,7 @@ import Script from "next/script"
 import "./globals.css"
 import { Providers } from "./providers"
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
+import { SwUpdateNotification } from "@/components/sw-update-notification"
 import { CookieConsent } from "@/components/cookie-consent"
 import { GoogleAnalytics } from "@/components/google-analytics"
 
@@ -141,6 +142,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <Providers>
           <main id="main-content" className="animate-fade-in">{children}</main>
+          <SwUpdateNotification />
           <PwaInstallPrompt />
         </Providers>
         <Script id="pwa-capture" strategy="beforeInteractive">

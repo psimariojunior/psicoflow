@@ -1,6 +1,6 @@
-const CACHE = "psihumanis-v7"
-const STATIC_CACHE = "psihumanis-static-v7"
-const IMAGE_CACHE = "psihumanis-images-v7"
+const CACHE = "psihumanis-v8"
+const STATIC_CACHE = "psihumanis-static-v8"
+const IMAGE_CACHE = "psihumanis-images-v8"
 
 const PRECACHE_URLS = [
   "/",
@@ -45,6 +45,10 @@ self.addEventListener("activate", (event) => {
       Promise.all(keys.filter((k) => !keepCaches.includes(k)).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   )
+  // Notify clients that a new version is ready
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => client.postMessage({ type: "SW_UPDATED" }))
+  })
 })
 
 self.addEventListener("push", (event) => {
@@ -82,6 +86,34 @@ self.addEventListener("notificationclick", (event) => {
     })
   )
 })
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-forms") {
+    event.waitUntil(syncPendingForms())
+  }
+})
+
+async function syncPendingForms() {
+  try {
+    const cache = await caches.open(CACHE)
+    const requests = await cache.keys()
+    for (const request of requests) {
+      const url = new URL(request.url)
+      if (url.pathname.startsWith("/api/") && url.pathname.includes("pending-sync")) {
+        const response = await cache.match(request)
+        if (response) {
+          const body = await response.clone().json()
+          await fetch(request.url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          })
+          await cache.delete(request)
+        }
+      }
+    }
+  } catch {}
+}
 
 self.addEventListener("fetch", (event) => {
   const { request } = event
