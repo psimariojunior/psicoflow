@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { WhatsAppWidget } from "@/components/whatsapp-widget"
+import { VideoTour } from "@/components/video-tour"
 import { setLocale, t, getLocale } from "@/lib/i18n"
 import toast from "react-hot-toast"
 import { BreadcrumbJsonLd, FaqJsonLd } from "@/lib/seo"
@@ -17,7 +18,7 @@ import {
   ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
   Users, Globe, Calendar, MessageCircle, ChevronDown, Menu, X, Star,
   Phone, Mail, MapPin, Clock, Award, Quote, BarChart3 as BarChartIcon,
-  Sun, Moon, Languages, Video, Mic, Maximize2,
+  Sun, Moon, Languages, Video, Mic, Maximize2, Play,
 } from "lucide-react"
 
 const services = [
@@ -61,6 +62,7 @@ export default function LandingPage() {
   const [reviews, setReviews] = useState<{ id: string; patientName: string; rating: number; comment: string; createdAt: string }[]>([])
   const [reviewsAvg, setReviewsAvg] = useState(0)
   const [reviewsTotal, setReviewsTotal] = useState(0)
+  const [videoOpen, setVideoOpen] = useState(false)
   const pathname = usePathname()
   const [darkMode, setDarkMode] = useState(() =>
     typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false
@@ -340,19 +342,33 @@ export default function LandingPage() {
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Veja como funciona</Badge>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Conheça a plataforma em ação</h2>
             <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video flex items-center justify-center group cursor-pointer" role="img" aria-label="Demonstração da plataforma PsiHumanis">
+            <button onClick={() => setVideoOpen(true)} className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video w-full flex items-center justify-center group cursor-pointer hover:shadow-blue-950/30 transition-shadow" aria-label="Assistir demonstração da plataforma">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-blue-600/5" />
               <div className="relative z-10 text-center">
-                <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:bg-blue-700 transition-all">
+                  <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
                 </div>
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Assista à demonstração</p>
                 <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
               </div>
-            </div>
+            </button>
           </motion.div>
         </div>
       </section>
+
+      {/* Video Demo Modal — Animated Feature Tour */}
+      <AnimatePresence>
+        {videoOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setVideoOpen(false)}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-slate-950 border border-slate-800" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-colors" aria-label="Fechar vídeo">
+                <X className="h-5 w-5" />
+              </button>
+              <VideoTour />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Trust Badges */}
       <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="py-10 border-y border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50">
