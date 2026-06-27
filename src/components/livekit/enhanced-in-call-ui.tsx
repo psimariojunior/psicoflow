@@ -56,7 +56,6 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
     }
   }, [])
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const detachPubFromVideo = useCallback((pub: TrackPublication | undefined, videoEl: HTMLVideoElement | null) => {
     if (pub?.track && videoEl) {
       try { pub.track.detach(videoEl) } catch {}
@@ -318,19 +317,6 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   // Auto-scroll chat
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [chatMessages])
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
-      if (e.code === "Space") { e.preventDefault(); toggleMic() }
-      if (e.code === "KeyV") { e.preventDefault(); toggleCam() }
-      if (e.code === "Escape") { e.preventDefault(); onLeave() }
-      if (e.code === "KeyM") { e.preventDefault(); togglePanel("chat") }
-    }
-    window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
-  }, [camOn, micOn, room])
-
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
     const sec = s % 60
@@ -400,6 +386,19 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
     setTimeout(() => setReactions(prev => prev.filter(r => r.id !== id)), 2500)
     setReactionPickerOpen(false)
   }, [room])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.code === "Space") { e.preventDefault(); toggleMic() }
+      if (e.code === "KeyV") { e.preventDefault(); toggleCam() }
+      if (e.code === "Escape") { e.preventDefault(); onLeave() }
+      if (e.code === "KeyM") { e.preventDefault(); togglePanel("chat") }
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [onLeave, toggleCam, toggleMic, togglePanel])
 
   const qualityColors = { excellent: "text-emerald-400", good: "text-blue-400", poor: "text-amber-400", unknown: "text-slate-400" }
   const qualityDots = { excellent: 3, good: 2, poor: 1, unknown: 0 }
