@@ -11,6 +11,7 @@ import Image from "next/image"
 import { Loader2, CheckCircle2, AlertCircle, Gift } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import toast from "react-hot-toast"
+import { trackRegister } from "@/lib/analytics"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -77,6 +78,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Conta criada com sucesso! Vamos configurar seu perfil.")
+      trackRegister("email")
       router.push("/onboarding")
     } catch {
       toast.error("Erro ao cadastrar")

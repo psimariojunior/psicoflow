@@ -2,20 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle2, Circle, PartyPopper, ArrowRight, X, Calendar, UserPlus, Video, Globe, CreditCard, Gift } from "lucide-react"
+import { CheckCircle2, PartyPopper, ArrowRight, X, Calendar, UserPlus, Video, Globe, CreditCard, Gift } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const ONBOARDING_KEY = "psihumanis_onboarding_completed"
 
 const steps = [
   { id: "conta", label: "Criar conta", desc: "Seu acesso já está pronto", href: "/configuracoes", done: true, icon: CheckCircle2 },
-  { id: "publico", label: "Publicar perfil", desc: "Configure como pacientes veem você", href: "/configuracoes", icon: Globe },
-  { id: "paciente", label: "Cadastrar primeiro paciente", desc: "Monte sua base clínica", href: "/pacientes/novo", icon: UserPlus },
-  { id: "agendar", label: "Agendar primeira consulta", desc: "Valide seu fluxo de atendimento", href: "/agenda", icon: Calendar },
+  { id: "publico", label: "Publicar perfil", desc: "Configure como pacientes veem você", href: "/configuracoes", icon: Globe, apiCheck: "/api/onboarding/check-profile" },
+  { id: "paciente", label: "Cadastrar primeiro paciente", desc: "Monte sua base clínica", href: "/pacientes/novo", icon: UserPlus, apiCheck: "/api/onboarding/check-patient" },
+  { id: "agendar", label: "Agendar primeira consulta", desc: "Valide seu fluxo de atendimento", href: "/agenda", icon: Calendar, apiCheck: "/api/onboarding/check-appointment" },
   { id: "sala", label: "Testar sala virtual", desc: "Prepare o atendimento online", href: "/sala-virtual", icon: Video },
   { id: "pagamentos", label: "Ativar pagamentos", desc: "Organize cobrança e faturas", href: "/pricing", icon: CreditCard },
   { id: "indicacoes", label: "Compartilhar indicação", desc: "Ganhe 1 mês grátis por amigo", href: "/configuracoes", icon: Gift },
@@ -26,14 +25,26 @@ export function OnboardingChecklist() {
   const [completed, setCompleted] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({})
+  const [serverChecks, setServerChecks] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const val = localStorage.getItem(ONBOARDING_KEY)
-    if (val === "true") setCompleted(true)
+    if (val === "true") { setCompleted(true); return }
+
+    steps.forEach((step) => {
+      if (step.apiCheck) {
+        fetch(step.apiCheck)
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.done) setServerChecks((prev) => ({ ...prev, [step.id]: true }))
+          })
+          .catch(() => {})
+      }
+    })
   }, [])
 
   const completedCount = steps.filter(
-    (s) => s.done || checkedSteps[s.id]
+    (s) => s.done || checkedSteps[s.id] || serverChecks[s.id]
   ).length
   const progress = Math.round((completedCount / steps.length) * 100)
 
@@ -60,7 +71,10 @@ export function OnboardingChecklist() {
                 Bem-vindo ao PsiHumanis!
               </h3>
               <p className="text-blue-100 text-xs mt-0.5">
-                Complete os passos abaixo para começar
+                {completedCount === steps.length
+                  ? "Tudo pronto! Você está pronto para começar."
+                  : `Complete os passos para começar — ${completedCount}/${steps.length}`
+                }
               </p>
             </div>
           </div>
@@ -85,13 +99,13 @@ export function OnboardingChecklist() {
 
         <div className="grid gap-2 sm:grid-cols-2">
           {steps.map((step) => {
-            const isChecked = step.done || checkedSteps[step.id]
+            const isChecked = step.done || checkedSteps[step.id] || serverChecks[step.id]
             const Icon = step.icon
             return (
               <button
                 key={step.id}
                 onClick={() => {
-                  if (!step.done) {
+                  if (!step.done && !serverChecks[step.id]) {
                     setCheckedSteps((prev) => ({
                       ...prev,
                       [step.id]: !prev[step.id],
@@ -121,7 +135,7 @@ export function OnboardingChecklist() {
 
         <div className="flex items-center gap-3 pt-1">
           <Button size="sm" onClick={handleFinish} className="flex-1">
-            Concluir
+            {completedCount === steps.length ? "Começar a usar!" : "Concluir"}
           </Button>
           <Button
             size="sm"

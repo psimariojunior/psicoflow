@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Image from "next/image"
 import { Eye, EyeOff, Loader2, Shield, Zap, CheckCircle, Heart, Sparkles } from "lucide-react"
 import toast from "react-hot-toast"
+import { trackLogin } from "@/lib/analytics"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function LoginPage() {
     try {
       const result = await signIn("credentials", { email, password, redirect: false })
       if (result?.error) { toast.error("Email ou senha incorretos"); return }
+      trackLogin("email")
       router.push("/dashboard")
       router.refresh()
     } catch {

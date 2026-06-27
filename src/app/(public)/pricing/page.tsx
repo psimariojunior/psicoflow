@@ -9,6 +9,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { BreadcrumbJsonLd } from "@/lib/seo"
 import toast from "react-hot-toast"
+import { trackCheckout } from "@/lib/analytics"
 
 const plans = [
   {
@@ -65,6 +66,7 @@ export default function PricingPage() {
 
   const handleCheckout = async (plan: "pro" | "clinica") => {
     setLoading(plan)
+    trackCheckout(plan)
     try {
       const res = await fetch("/api/subscription/create-checkout", {
         method: "POST",

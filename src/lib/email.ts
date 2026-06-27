@@ -98,6 +98,55 @@ export async function sendCancellationNotification(
   )
 }
 
+export async function sendWelcomeEmail(email: string, name: string): Promise<string | null> {
+  const safeName = sanitizeHtml(name)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://psihumanis.com.br"
+  return sendEmail(
+    email,
+    "Bem-vindo ao PsiHumanis! 🎉",
+    `<div style="font-family: sans-serif; max-width: 520px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="color: #2563eb; font-size: 1.75rem; margin: 0;">PsiHumanis</h1>
+        <p style="color: #666; margin: 8px 0 0;">Seu sistema de gestão psicológica</p>
+      </div>
+      <div style="background: #f8fafc; border-radius: 12px; padding: 32px;">
+        <p style="font-size: 1.125rem; margin: 0 0 16px;">Olá, <strong>${safeName}</strong>! 👋</p>
+        <p style="margin: 0 0 24px; line-height: 1.6;">Sua conta foi criada com sucesso. Aqui estão <strong>3 passos</strong> pra começar agora:</p>
+        <div style="space-y: 12px;">
+          <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
+            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">1️⃣</div>
+            <div>
+              <p style="margin: 0; font-weight: 600; font-size: 14px;">Configure seu perfil público</p>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Adicione foto, especialidades e horários de atendimento.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
+            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">2️⃣</div>
+            <div>
+              <p style="margin: 0; font-weight: 600; font-size: 14px;">Cadastre seu primeiro paciente</p>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Comece a organizar seus atendimentos.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
+            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">3️⃣</div>
+            <div>
+              <p style="margin: 0; font-weight: 600; font-size: 14px;">Agende uma consulta</p>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Teste o fluxo completo de atendimento.</p>
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 28px;">
+          <a href="${appUrl}/dashboard" style="display: inline-block; padding: 14px 32px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">Acessar o Dashboard</a>
+        </div>
+      </div>
+      <p style="text-align: center; font-size: 12px; color: #999; margin-top: 24px;">
+        Precisa de ajuda? Responda este email ou fale conosco pelo WhatsApp.<br>
+        <a href="https://wa.me/5531992863861" style="color: #2563eb;">(31) 99286-3861</a>
+      </p>
+    </div>`
+  )
+}
+
 export async function sendPasswordResetEmail(email: string, token: string, path = "/paciente/reset-password"): Promise<string | null> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   const resetUrl = `${appUrl}${path}?token=${token}`
