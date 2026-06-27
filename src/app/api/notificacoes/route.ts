@@ -59,9 +59,28 @@ export async function GET(req: Request) {
   }
 }
 
-export async function PATCH() {
+export async function PATCH(request: Request) {
   try {
     const psychologistId = await requireAuth()
+
+    // Check if body has a notification id (individual mark-as-read)
+    let body: Record<string, unknown> = {}
+    try {
+      body = await request.json()
+    } catch {
+      // No body — mark all
+    }
+
+    if (body.id && typeof body.id === "string") {
+      // Mark individual notification as read
+      await prisma.notification.updateMany({
+        where: { id: body.id, psychologistId, readAt: null },
+        data: { readAt: new Date() },
+      })
+      return apiSuccess({ ok: true })
+    }
+
+    // Mark all as read
     await prisma.notification.updateMany({
       where: { psychologistId, readAt: null },
       data: { readAt: new Date() },

@@ -70,18 +70,43 @@ const statusLabel = (status: string) => {
 export function NotificationDropdown() {
   const [open, setOpen] = useState(false)
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [marking, setMarking] = useState<string | null>(null)
   const ref = useRef<HTMLDivElement>(null)
+  const prevUnreadRef = useRef(0)
+
+  const playNotifSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(800, ctx.currentTime)
+      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15)
+      gain.gain.setValueAtTime(0.15, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.2)
+    } catch {}
+  }, [])
 
   const fetchSummary = useCallback(async () => {
     try {
       const res = await fetch("/api/notifications/summary", { cache: "no-store" })
       if (!res.ok) return
       const data = (await res.json()) as Summary
+
+      // Play sound on new notification
+      if (data.unreadCount > prevUnreadRef.current && prevUnreadRef.current > 0) {
+        playNotifSound()
+      }
+      prevUnreadRef.current = data.unreadCount
       setSummary(data)
     } catch {
       // silent fail
     }
-  }, [])
+  }, [playNotifSound])
 
   const markAllAsRead = useCallback(async () => {
     try {
@@ -91,6 +116,25 @@ export function NotificationDropdown() {
       // silent
     }
   }, [fetchSummary])
+
+  const markAsRead = useCallback(
+    async (id: string) => {
+      try {
+        setMarking(id)
+        await fetch("/api/notificacoes", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        })
+        fetchSummary()
+      } catch {
+        // silent
+      } finally {
+        setMarking(null)
+      }
+    },
+    [fetchSummary],
+  )
 
   useEffect(() => {
     fetchSummary()
@@ -249,7 +293,7 @@ export function NotificationDropdown() {
                 unread.map((n) => (
                   <div
                     key={n.id}
-                    className="flex items-start gap-3 border-b px-4 py-3 transition-colors hover:bg-accent/50"
+                    className="group flex items-start gap-3 border-b px-4 py-3 transition-colors hover:bg-accent/50"
                   >
                     <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
                       {channelIcon(n.channel)}
@@ -264,6 +308,17 @@ export function NotificationDropdown() {
                         </span>
                       </div>
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        markAsRead(n.id)
+                      }}
+                      disabled={marking === n.id}
+                      className="mt-0.5 shrink-0 rounded-full p-1 opacity-0 transition-all group-hover:opacity-100 hover:bg-muted"
+                      title="Marcar como lida"
+                    >
+                      <CheckCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-emerald-500" />
+                    </button>
                   </div>
                 ))
               )}
