@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useBackgroundProcessor } from "@/hooks/use-background-processor"
+import toast from "react-hot-toast"
 
 interface EnhancedInCallUIProps {
   roomName: string
@@ -343,6 +344,11 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const toggleScreenShare = useCallback(async () => {
     if (!room) return
     try {
+      // Check API support first
+      if (!navigator.mediaDevices?.getDisplayMedia) {
+        toast.error("Compartilhamento de tela não disponível neste dispositivo")
+        return
+      }
       const newSharing = !isScreenSharing
       await room.localParticipant.setScreenShareEnabled(newSharing)
       setIsScreenSharing(newSharing)
@@ -359,7 +365,11 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
           }
         }, 300)
       }
-    } catch {}
+    } catch (err) {
+      console.error("[ScreenShare] failed:", err)
+      toast.error("Não foi possível compartilhar a tela. Verifique as permissões do navegador.")
+      setIsScreenSharing(false)
+    }
   }, [room, isScreenSharing])
 
   const togglePanel = useCallback((panel: "chat" | "notes") => {
@@ -541,7 +551,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
       {/* Bottom controls */}
       <div className="absolute bottom-0 left-0 right-0 z-30 pb-2 sm:pb-4 md:pb-6 px-1.5 sm:px-3">
         <div className="flex items-center justify-center">
-          <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 backdrop-blur-xl rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-2.5 border border-white/10 shadow-2xl">
+          <div className="flex items-center gap-1 sm:gap-1.5 bg-black/60 backdrop-blur-xl rounded-xl sm:rounded-2xl px-2 sm:px-4 py-2 sm:py-2.5 border border-white/10 shadow-2xl max-w-full overflow-x-auto scrollbar-hide">
             <button onClick={toggleCam} className={cn("relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all", camOn ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 hover:bg-red-500/30 text-red-400")} aria-label="Câmera">
               {camOn ? <Video className="h-4 w-4 sm:h-5 sm:w-5" /> : <VideoOff className="h-4 w-4 sm:h-5 sm:w-5" />}
               {!camOn && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-1.5 border-black" />}

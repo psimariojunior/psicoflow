@@ -5,6 +5,7 @@ import { useRoomContext } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import { BackgroundProcessor, supportsBackgroundProcessors } from "@livekit/track-processors"
 import type { BackgroundProcessorWrapper } from "@livekit/track-processors"
+import toast from "react-hot-toast"
 
 export type BackgroundMode = "disabled" | "blur" | "blur-strong"
 
@@ -21,7 +22,10 @@ export function useBackgroundProcessor() {
     if (!room || !supported) return
 
     const videoPub = room.localParticipant.getTrackPublication(Track.Source.Camera)
-    if (!videoPub?.track) return
+    if (!videoPub?.track) {
+      toast.error("Câmera não ativa. Ligue a câmera antes de usar o fundo desfocado.")
+      return
+    }
 
     try {
       if (newMode === "disabled") {
@@ -40,8 +44,10 @@ export function useBackgroundProcessor() {
         }
       }
       setMode(newMode)
-    } catch {
+    } catch (err) {
+      console.error("[BackgroundProcessor] failed:", err)
       setMode("disabled")
+      toast.error("Fundo desfocado não disponível neste dispositivo")
     }
   }, [room, supported])
 
