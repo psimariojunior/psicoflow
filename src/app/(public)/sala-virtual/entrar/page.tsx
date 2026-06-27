@@ -9,6 +9,7 @@ import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { ParticipantWatcher } from "./components/participant-watcher"
 import { InCallUI } from "./components/in-call-ui"
+import { EnhancedInCallUI } from "@/components/livekit/enhanced-in-call-ui"
 import { PrejoinView } from "./components/prejoin-view"
 import { EndedView } from "./components/end-view"
 import { WelcomeView } from "./components/welcome-view"
@@ -157,7 +158,7 @@ function EntrarSalaForm() {
             <ErrorBoundary>
               <RoomAudioRenderer volume={1} />
               <ParticipantWatcher onParticipantsChange={setPsychologistPresent} />
-              <InCallUI roomName={roomInput} onLeave={handleLeaveCall} />
+              <EnhancedInCallUI roomName={roomInput} onLeave={handleLeaveCall} />
             </ErrorBoundary>
           </LiveKitRoom>
         </div>

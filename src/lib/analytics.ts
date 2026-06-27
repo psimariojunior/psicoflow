@@ -21,7 +21,7 @@ export function trackLogin(method: string = "email") {
 }
 
 export function trackCheckout(plan: string) {
-  trackEvent("begin_checkout", { currency: "BRL", value: plan === "pro" ? 97 : 197, items: [{ item_name: plan }] })
+  trackEvent("begin_checkout", { currency: "BRL", value: plan === "pro" ? 97 : 197, plan_name: plan })
   trackConversion("checkout")
 }
 
