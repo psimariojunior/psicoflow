@@ -38,6 +38,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const [isScreenSharing, setIsScreenSharing] = useState(false)
   const [remoteScreenSharing, setRemoteScreenSharing] = useState(false)
   const [screenShareSupported, setScreenShareSupported] = useState(true)
+  const [isPip, setIsPip] = useState(false)
+  const [pipSupported, setPipSupported] = useState(false)
 
   // Panels
   const [activePanel, setActivePanel] = useState<"chat" | "notes" | null>(null)
@@ -312,6 +314,18 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
     return () => document.removeEventListener("fullscreenchange", onChange)
   }, [])
 
+  // PiP events
+  useEffect(() => {
+    const onEnter = () => setIsPip(true)
+    const onLeave = () => setIsPip(false)
+    document.addEventListener("enterpictureinpicture", onEnter)
+    document.addEventListener("leavepictureinpicture", onLeave)
+    return () => {
+      document.removeEventListener("enterpictureinpicture", onEnter)
+      document.removeEventListener("leavepictureinpicture", onLeave)
+    }
+  }, [])
+
   // Timer
   useEffect(() => {
     const id = setInterval(() => setCallDuration(t => t + 1), 1000)
@@ -325,6 +339,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   useEffect(() => {
     const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
     setScreenShareSupported(supported)
+    const pipSupported = !!document.pictureInPictureEnabled
+    setPipSupported(pipSupported)
   }, [])
 
   const formatTime = (s: number) => {
@@ -336,6 +352,21 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) containerRef.current?.requestFullscreen()
     else document.exitFullscreen()
+  }, [])
+
+  const togglePip = useCallback(async () => {
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture()
+        setIsPip(false)
+      } else if (mainVideoRef.current && !mainVideoRef.current.paused) {
+        await mainVideoRef.current.requestPictureInPicture()
+        setIsPip(true)
+      }
+    } catch (err) {
+      console.error("[PiP] failed:", err)
+      toast.error("Picture-in-Picture não disponível")
+    }
   }, [])
 
   const toggleCam = useCallback(() => {
@@ -563,6 +594,15 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         <div className="flex flex-col items-center gap-1.5">
           {/* Row 2: secondary buttons (screen share, blur, chat, reactions, notes) */}
           <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xl rounded-full px-2 py-1.5 border border-white/10 sm:hidden" style={{ touchAction: "manipulation" }}>
+            {pipSupported && hasRemote && (
+              <button
+                onPointerDown={(e) => { e.preventDefault(); togglePip() }}
+                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+                aria-label="Picture-in-Picture"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+            )}
             {screenShareSupported && (
               <button
                 onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }}
@@ -618,6 +658,11 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             {/* Desktop only: inline secondary buttons */}
             <div className="hidden sm:flex items-center gap-1.5 ml-1">
               <div className="w-px h-8 bg-white/10" />
+              {pipSupported && hasRemote && (
+                <button onPointerDown={(e) => { e.preventDefault(); togglePip() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Picture-in-Picture">
+                  <Maximize2 className="h-5 w-5" />
+                </button>
+              )}
               {screenShareSupported && (
                 <button onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
                   {isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
