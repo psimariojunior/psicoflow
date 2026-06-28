@@ -37,7 +37,7 @@ interface Session extends Appointment {
 const statusConfig: Record<SessionStatus, { label: string; color: string; bg: string; dot: string }> = {
   scheduled: { label: "Agendado", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/30", dot: "bg-blue-400" },
   confirmed: { label: "Confirmado", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/30", dot: "bg-emerald-400" },
-  waiting: { label: "Aguardando", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30", dot: "bg-amber-400 animate-pulse" },
+  waiting: { label: "Na sala", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30", dot: "bg-amber-400 animate-pulse" },
   in_call: { label: "Em sessão", color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/30", dot: "bg-violet-400 animate-pulse" },
   completed: { label: "Concluído", color: "text-muted-foreground", bg: "bg-muted/50", dot: "bg-muted-foreground/50" },
   cancelled: { label: "Cancelado", color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30", dot: "bg-red-400" },
@@ -52,17 +52,18 @@ function deriveStatus(apt: Appointment, waitingPatients: WaitingPatient[]): Sess
   if (apt.status === "COMPLETED") return "completed"
 
   const roomName = `sala-${apt.id.slice(0, 8)}`
-  const waiting = waitingPatients.find(
-    (w) => w.room === roomName && w.status === "waiting"
-  )
-  if (waiting) return "waiting"
 
-  const approvedWaiting = waitingPatients.find(
+  // Patient is in the room (approved = connected to LiveKit)
+  const inRoom = waitingPatients.find(
     (w) => w.room === roomName && w.status === "approved"
   )
-  if (approvedWaiting) return "in_call"
+  if (inRoom) {
+    // If appointment time is active, it's an active session
+    if (now >= start && now <= end) return "in_call"
+    // Patient arrived early or staying late
+    return "waiting"
+  }
 
-  if (now >= start && now <= end) return "in_call"
   if (apt.status === "CONFIRMED") return "confirmed"
   return "scheduled"
 }
@@ -125,7 +126,7 @@ export function TodaySessions({ appointments }: { appointments: Appointment[] })
             {waitingCount > 0 && (
               <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 gap-1 animate-pulse">
                 <Bell className="h-3 w-3" />
-                {waitingCount} aguardando
+                {waitingCount} na sala
               </Badge>
             )}
             <Badge variant="secondary" className="text-xs">
@@ -160,7 +161,7 @@ export function TodaySessions({ appointments }: { appointments: Appointment[] })
               {waitingCount > 0 && (
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">{waitingCount} aguardando</span>
+                  <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">{waitingCount} na sala</span>
                 </div>
               )}
               {inCallCount > 0 && (
@@ -218,7 +219,7 @@ export function TodaySessions({ appointments }: { appointments: Appointment[] })
                       </span>
                       {session.sessionStatus === "waiting" && (
                         <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
-                          Paciente na sala de espera
+                          Paciente entrou na sala
                         </span>
                       )}
                     </div>

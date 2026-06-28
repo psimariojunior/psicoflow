@@ -5,6 +5,7 @@ import { AccessToken } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
 import { apiError } from "@/lib/api-helpers"
+import { registerPatient } from "@/lib/waiting-room-store"
 
 export const dynamic = "force-dynamic"
 
@@ -61,6 +62,11 @@ export async function GET(request: Request) {
 
     const at = new AccessToken(apiKey, apiSecret, { identity, name })
     at.addGrant({ roomJoin: true, room, canPublish: true, canSubscribe: true })
+
+    // Auto-register patient as "approved" so dashboard sees them in real-time
+    if (isPatient) {
+      registerPatient(room, name, "approved")
+    }
 
     return NextResponse.json({ token: await at.toJwt() })
   } catch (error) {

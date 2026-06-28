@@ -2,106 +2,74 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { logger } from "@/lib/logger"
+import {
+  registerPatient,
+  approvePatient,
+  rejectPatient,
+  removePatient,
+  getPatient,
+  getAllPatients,
+  getPatientsByRoom,
+} from "@/lib/waiting-room-store"
 
 export const dynamic = "force-dynamic"
 
-// In-memory waiting room store (transient — resets on cold start, fine for real-time waiting)
-interface WaitingPatient {
-  id: string
-  room: string
-  name: string
-  status: "waiting" | "approved" | "rejected"
-  createdAt: number
-}
-
-const waitingRoom = new Map<string, WaitingPatient>()
-
-// Auto-cleanup entries older than 10 minutes
-function cleanup() {
-  const now = Date.now()
-  const entries = Array.from(waitingRoom.entries())
-  for (const [key, entry] of entries) {
-    if (now - entry.createdAt > 10 * 60 * 1000) {
-      waitingRoom.delete(key)
-    }
-  }
-}
-
-// GET /api/livekit/waiting — no room param → all waiting (dashboard badge/queue)
-// GET /api/livekit/waiting?room=XXX — psychologist gets waiting patients for room
-// GET /api/livekit/waiting?room=XXX&id=YYY — patient checks status
+// GET /api/livekit/waiting — no room → all patients (dashboard badge/queue)
+// GET /api/livekit/waiting?room=X — psychologist gets patients for room
+// GET /api/livekit/waiting?room=X&id=Y — patient checks status
 export async function GET(request: Request) {
-  cleanup()
   const { searchParams } = new URL(request.url)
   const room = searchParams.get("room")
   const patientId = searchParams.get("id")
 
   // Patient checking their own status
   if (patientId) {
-    const entry = waitingRoom.get(patientId)
+    const entry = getPatient(patientId)
     if (!entry) {
       return NextResponse.json({ status: "not_found" })
     }
     return NextResponse.json({ status: entry.status, id: entry.id })
   }
 
-  // No room specified → return ALL waiting patients (for dashboard badge/queue)
+  // No room specified → return ALL patients (for dashboard badge/queue)
   if (!room) {
-    const patients = Array.from(waitingRoom.values())
+    const patients = getAllPatients()
     return NextResponse.json({ patients })
   }
 
-  // Room specified → return patients for that room (for sala-virtual polling)
+  // Room specified → return patients for that room
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
-
-    const patients: WaitingPatient[] = []
-    const entries = Array.from(waitingRoom.values())
-    for (const entry of entries) {
-      if (entry.room === room) {
-        patients.push(entry)
-      }
-    }
-
+    const patients = getPatientsByRoom(room)
     return NextResponse.json({ patients })
   } catch {
     return NextResponse.json({ patients: [] })
   }
 }
 
-// POST /api/livekit/waiting — patient registers as waiting
+// POST /api/livekit/waiting — register patient (called by token API automatically)
 export async function POST(request: Request) {
-  cleanup()
   try {
     const body = await request.json()
-    const { room, name } = body
+    const { room, name, status } = body
 
     if (!room || !name) {
       return NextResponse.json({ error: "Room and name required" }, { status: 400 })
     }
 
-    const id = `wait-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    const entry: WaitingPatient = {
-      id,
-      room,
-      name,
-      status: "waiting",
-      createdAt: Date.now(),
-    }
+    const entry = registerPatient(room, name, status || "approved")
+    logger.info("Patient registered in waiting room", { room, name, id: entry.id, status: entry.status })
 
-    waitingRoom.set(id, entry)
-    logger.info("Patient joined waiting room", { room, name, id })
-
-    return NextResponse.json({ id, status: "waiting" }, { status: 201 })
+    return NextResponse.json({ id: entry.id, status: entry.status }, { status: 201 })
   } catch {
     return NextResponse.json({ error: "Erro ao entrar na sala de espera" }, { status: 500 })
   }
 }
 
-// PUT /api/livekit/waiting — psychologist approves/rejects
+// PUT /api/livekit/waiting — approve/reject (kept for backward compatibility)
 export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions)
@@ -116,16 +84,12 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid params" }, { status: 400 })
     }
 
-    const entry = waitingRoom.get(id)
-    if (!entry) {
+    const success = action === "approved" ? approvePatient(id) : rejectPatient(id)
+    if (!success) {
       return NextResponse.json({ error: "Patient not found in waiting room" }, { status: 404 })
     }
 
-    entry.status = action
-    waitingRoom.set(id, entry)
-
-    logger.info("Waiting room decision", { id, action, room: entry.room, name: entry.name })
-
+    logger.info("Waiting room decision", { id, action })
     return NextResponse.json({ ok: true, status: action })
   } catch {
     return NextResponse.json({ error: "Erro ao processar" }, { status: 500 })
@@ -138,7 +102,7 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
     if (id) {
-      waitingRoom.delete(id)
+      removePatient(id)
     }
     return NextResponse.json({ ok: true })
   } catch {

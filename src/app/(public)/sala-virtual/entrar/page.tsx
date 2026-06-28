@@ -13,7 +13,6 @@ import { EnhancedInCallUI } from "@/components/livekit/enhanced-in-call-ui"
 import { PrejoinView } from "./components/prejoin-view"
 import { EndedView } from "./components/end-view"
 import { WelcomeView } from "./components/welcome-view"
-import { VirtualWaitingRoom } from "./components/virtual-waiting-room"
 
 function EntrarSalaForm() {
   const searchParams = useSearchParams()
@@ -26,14 +25,6 @@ function EntrarSalaForm() {
   const [micOn, setMicOn] = useState(true)
   const [patientName, setPatientName] = useState("")
   const [psychologistPresent, setPsychologistPresent] = useState(false)
-  const [waitingToken, setWaitingToken] = useState<string | null>(null)
-
-  const handleEnterRoom = useCallback(() => {
-    if (waitingToken) {
-      setToken(waitingToken)
-      setWaitingToken(null)
-    }
-  }, [waitingToken])
   const [cameraReady, setCameraReady] = useState(false)
   const [hd, setHd] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -56,8 +47,7 @@ function EntrarSalaForm() {
       streamRef.current = null
       setCameraReady(false)
       setConnecting(false)
-      setWaitingToken(data.token)
-      setStep("waiting")
+      setToken(data.token)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao conectar")
       setConnecting(false)
@@ -184,17 +174,6 @@ function EntrarSalaForm() {
         onToggleHd={toggleHd}
         onConnect={handleConnect}
         onPatientNameChange={setPatientName}
-      />
-    )
-  }
-
-  if (step === "waiting") {
-    return (
-      <VirtualWaitingRoom
-        patientName={patientName}
-        connecting={connecting}
-        onEnterRoom={handleEnterRoom}
-        roomName={roomInput}
       />
     )
   }
