@@ -38,28 +38,15 @@ export async function GET(request: Request) {
     let name: string
 
     if (isPatient) {
-      // Verify there's an active psychologist with a valid subscription
+      // Verify there's an active psychologist
       const psychologist = await prisma.user.findFirst({
         where: {
           role: { in: ["PSYCHOLOGIST", "ADMIN"] },
           active: true,
-          plan: { in: ["pro", "clinica", "trial"] },
-          subscriptionStatus: "active",
         },
       })
       if (!psychologist) {
         return apiError("Nenhum profissional disponível no momento", 403)
-      }
-      // Verify there's an active appointment for this psychologist
-      const appointment = await prisma.appointment.findFirst({
-        where: {
-          psychologistId: psychologist.id,
-          status: { in: ["CONFIRMED", "SCHEDULED"] },
-          endTime: { gte: new Date() },
-        },
-      })
-      if (!appointment) {
-        return apiError("Sessão não agendada ou horário expirado", 403)
       }
       identity = `paciente-${room}-${Date.now()}`
       name = searchParams.get("name") || "Paciente"

@@ -7,10 +7,18 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react"
 import "@livekit/components-styles"
-import { Video, Loader2, Link2, Copy, LogOut, Shield, Zap, FileText, Clock } from "lucide-react"
+import { Video, Loader2, Link2, Copy, LogOut, Shield, Zap, FileText, Clock, UserCheck, UserX, Bell } from "lucide-react"
 import toast from "react-hot-toast"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { EnhancedInCallUI } from "@/components/livekit/enhanced-in-call-ui"
+
+interface WaitingPatient {
+  id: string
+  room: string
+  name: string
+  status: "waiting" | "approved" | "rejected"
+  createdAt: number
+}
 
 export default function VirtualRoomPage() {
   const [roomName, setRoomName] = useState(`sala-${Date.now()}`)
@@ -20,12 +28,63 @@ export default function VirtualRoomPage() {
   const [origin, setOrigin] = useState("")
   const [liveDuration, setLiveDuration] = useState(0)
   const [endedSession, setEndedSession] = useState<{ duration: number } | null>(null)
+  const [waitingPatients, setWaitingPatients] = useState<WaitingPatient[]>([])
 
   useEffect(() => { setOrigin(window.location.origin) }, [])
 
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "wss://gestao-de-psicologia-0khxxf01.livekit.cloud"
 
   const sanitize = (name: string) => name.replace(/[^a-zA-Z0-9_-]/g, "-")
+
+  // Poll for waiting patients
+  useEffect(() => {
+    if (!token) return
+    const sanitizedRoom = sanitize(roomName)
+    let cancelled = false
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/livekit/waiting?room=${encodeURIComponent(sanitizedRoom)}`)
+        if (!res.ok) return
+        const data = await res.json()
+        if (!cancelled) {
+          setWaitingPatients(data.patients || [])
+        }
+      } catch {}
+    }
+
+    const interval = setInterval(poll, 3000)
+    poll()
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [token, roomName])
+
+  const handleApprovePatient = useCallback(async (id: string) => {
+    try {
+      const res = await fetch("/api/livekit/waiting", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "approved" }),
+      })
+      if (!res.ok) throw new Error("Failed")
+      toast.success("Paciente aprovado!")
+    } catch {
+      toast.error("Erro ao aprovar paciente")
+    }
+  }, [])
+
+  const handleRejectPatient = useCallback(async (id: string) => {
+    try {
+      const res = await fetch("/api/livekit/waiting", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "rejected" }),
+      })
+      if (!res.ok) throw new Error("Failed")
+      toast.success("Paciente recusado")
+    } catch {
+      toast.error("Erro ao recusar paciente")
+    }
+  }, [])
 
   const handleConnect = useCallback(async () => {
     setConnecting(true)
@@ -74,6 +133,30 @@ export default function VirtualRoomPage() {
     return (
       <ErrorBoundary>
         <div className="h-[calc(100vh-4rem)] flex flex-col">
+          {/* Waiting patients notification bar */}
+          {waitingPatients.filter(p => p.status === "waiting").length > 0 && (
+            <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/50 px-4 py-2.5 shrink-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                  <Bell className="h-4 w-4 animate-pulse" />
+                  <span className="text-sm font-semibold">
+                    {waitingPatients.filter(p => p.status === "waiting").length} paciente(s) aguardando
+                  </span>
+                </div>
+                {waitingPatients.filter(p => p.status === "waiting").map(patient => (
+                  <div key={patient.id} className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-lg px-3 py-1.5 border border-amber-200 dark:border-amber-800 shadow-sm">
+                    <span className="text-sm font-medium">{patient.name}</span>
+                    <Button size="sm" variant="ghost" className="h-7 px-2 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" onClick={() => handleApprovePatient(patient.id)}>
+                      <UserCheck className="h-3.5 w-3.5 mr-1" /> Aceitar
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-7 px-2 text-red-500 hover:bg-red-100 hover:text-red-600" onClick={() => handleRejectPatient(patient.id)}>
+                      <UserX className="h-3.5 w-3.5 mr-1" /> Recusar
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex items-center gap-2 px-4 py-2 bg-background border-b shrink-0">
             <span className="text-sm font-medium flex-1">Sala: {roomName}</span>
             <Button variant="outline" size="sm" onClick={() => {

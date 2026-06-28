@@ -194,6 +194,7 @@ function EntrarSalaForm() {
         patientName={patientName}
         connecting={connecting}
         onEnterRoom={handleEnterRoom}
+        roomName={roomInput}
       />
     )
   }

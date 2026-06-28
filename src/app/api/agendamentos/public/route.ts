@@ -130,6 +130,8 @@ export async function POST(request: NextRequest) {
       const tz = "America/Sao_Paulo"
       const dateStr = startDate.toLocaleDateString("pt-BR", { timeZone: tz, day: "numeric", month: "long", year: "numeric" })
       const timeStr = startDate.toLocaleTimeString("pt-BR", { timeZone: tz, hour: "2-digit", minute: "2-digit" })
+      const roomCode = `sala-${appointment.id.slice(0, 8)}`
+      const roomLink = `https://psihumanis.com.br/sala-virtual/entrar?room=${encodeURIComponent(roomCode)}`
       sendEmail(
         email.trim(),
         "Confirmação de Consulta - PsiHumanis",
@@ -146,6 +148,13 @@ export async function POST(request: NextRequest) {
               <tr><td style="padding: 8px 0; color: #666;">Horário</td><td style="padding: 8px 0;"><strong>${timeStr}</strong></td></tr>
               <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "presential" ? "Presencial" : "Online"}</strong></td></tr>
             </table>
+            ${modality !== "presential" ? `
+            <div style="margin-top: 20px; padding: 16px; background: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe;">
+              <p style="margin: 0 0 8px; font-weight: 600; color: #1e40af; font-size: 0.9rem;">🎥 Link da Sala Virtual</p>
+              <p style="margin: 0 0 12px; font-size: 0.8rem; color: #666;">No horário da consulta, clique no link abaixo para entrar na videochamada:</p>
+              <a href="${roomLink}" style="display: inline-block; padding: 10px 20px; background: #2563EB; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">Entrar na Sala</a>
+              <p style="margin: 12px 0 0; font-size: 0.75rem; color: #999; word-break: break-all;">${roomLink}</p>
+            </div>` : ''}
             <p style="margin-top: 16px; font-size: 0.875rem; color: #666;">Você receberá um lembrete 24h antes da consulta.</p>
           </div>
           <p style="text-align: center; font-size: 0.75rem; color: #999; margin-top: 24px;">PsiHumanis — Gestão de Psicologia</p>

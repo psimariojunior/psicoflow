@@ -27,15 +27,75 @@ interface VirtualWaitingRoomProps {
   patientName: string
   connecting: boolean
   onEnterRoom: () => void
+  roomName: string
 }
 
-export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: VirtualWaitingRoomProps) {
+export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomName }: VirtualWaitingRoomProps) {
   const [currentTipIndex, setCurrentTipIndex] = useState(0)
   const [breathPhase, setBreathPhase] = useState(0)
   const [breathProgress, setBreathProgress] = useState(0)
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [audioStarted, setAudioStarted] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [waitingId, setWaitingId] = useState<string | null>(null)
+  const [approvalStatus, setApprovalStatus] = useState<"registering" | "waiting" | "approved" | "rejected" | "error">("registering")
+
+  // Register as waiting patient
+  useEffect(() => {
+    if (!roomName || !patientName) return
+    let cancelled = false
+    let retryCount = 0
+    const maxRetries = 3
+
+    const register = async () => {
+      try {
+        const res = await fetch("/api/livekit/waiting", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ room: roomName, name: patientName || "Paciente" }),
+        })
+        if (!res.ok) throw new Error("Failed to register")
+        const data = await res.json()
+        if (!cancelled) {
+          setWaitingId(data.id)
+          setApprovalStatus("waiting")
+        }
+      } catch {
+        if (!cancelled && retryCount < maxRetries) {
+          retryCount++
+          setTimeout(register, 2000)
+        } else if (!cancelled) {
+          setApprovalStatus("error")
+        }
+      }
+    }
+    register()
+    return () => { cancelled = true }
+  }, [roomName, patientName])
+
+  // Poll for approval
+  useEffect(() => {
+    if (!waitingId || approvalStatus !== "waiting") return
+    let cancelled = false
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/livekit/waiting?room=${encodeURIComponent(roomName)}&id=${waitingId}`)
+        if (!res.ok) return
+        const data = await res.json()
+        if (!cancelled && data.status === "approved") {
+          setApprovalStatus("approved")
+          onEnterRoom()
+        } else if (!cancelled && data.status === "rejected") {
+          setApprovalStatus("rejected")
+        }
+      } catch {}
+    }
+
+    const interval = setInterval(poll, 2000)
+    poll()
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [waitingId, approvalStatus, roomName, onEnterRoom])
 
   const startAudio = useCallback(() => {
     if (audioStarted) return
@@ -194,15 +254,38 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom }: Vir
             </AnimatePresence>
           </div>
 
-          <Button
-            className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-            size="lg"
-            onClick={() => { startAudio(); onEnterRoom(); }}
-            disabled={connecting}
-          >
-            {connecting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Music className="mr-2 h-5 w-5" />}
-            {connecting ? "Conectando..." : "Entrar na Sala"}
-          </Button>
+          <div className="space-y-3">
+            {approvalStatus === "waiting" && (
+              <div className="flex items-center justify-center gap-2 text-blue-300 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Aguardando aprovação do psicólogo...
+              </div>
+            )}
+            {approvalStatus === "approved" && (
+              <div className="flex items-center justify-center gap-2 text-emerald-300 text-sm">
+                Aprovado! Entrando na sala...
+              </div>
+            )}
+            {approvalStatus === "rejected" && (
+              <div className="text-center space-y-3">
+                <p className="text-red-300 text-sm">A entrada foi recusada pelo psicólogo.</p>
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10" onClick={() => { setApprovalStatus("registering"); setWaitingId(null) }}>
+                  Tentar novamente
+                </Button>
+              </div>
+            )}
+            {approvalStatus === "error" && (
+              <div className="text-center space-y-3">
+                <p className="text-amber-300 text-sm">Erro ao conectar à sala de espera.</p>
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10" onClick={() => { setApprovalStatus("registering"); setWaitingId(null) }}>
+                  Tentar novamente
+                </Button>
+              </div>
+            )}
+            {approvalStatus === "registering" && (
+              <p className="text-blue-300/60 text-xs text-center">Conectando à sala de espera...</p>
+            )}
+          </div>
         </div>
       </div>
 
