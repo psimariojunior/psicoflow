@@ -26,6 +26,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   const containerRef = useRef<HTMLDivElement>(null)
   const mainVideoRef = useRef<HTMLVideoElement>(null)
   const localVideoRef = useRef<HTMLVideoElement>(null)
+  const pipVideoRef = useRef<HTMLVideoElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -102,10 +103,14 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         existing.forEach(t => t.stop())
         mainVideoRef.current.srcObject = null
       } catch {}
-      // Attach camera
+      // Attach camera to main video
       const camPub = participant.getTrackPublication(Track.Source.Camera)
       if (camPub?.track) {
         try { camPub.track.attach(mainVideoRef.current) } catch {}
+        // Also attach to PiP video (always shows remote face)
+        if (pipVideoRef.current) {
+          try { camPub.track.attach(pipVideoRef.current) } catch {}
+        }
       }
     }
 
@@ -117,9 +122,16 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         existing.forEach(t => t.stop())
         mainVideoRef.current.srcObject = null
       } catch {}
-      // Attach screen share
+      // Attach screen share to main video
       if (screenPub.track) {
         try { screenPub.track.attach(mainVideoRef.current) } catch {}
+      }
+      // Ensure PiP video always shows remote camera (not screen share)
+      if (pipVideoRef.current) {
+        const camPub = participant.getTrackPublication(Track.Source.Camera)
+        if (camPub?.track) {
+          try { camPub.track.attach(pipVideoRef.current) } catch {}
+        }
       }
     }
 
@@ -179,7 +191,13 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             }
           })
         } else if (pub.source === Track.Source.Camera) {
-          // Camera — only attach if no screen share active
+          // Camera — attach to PiP video (always shows remote face)
+          requestAnimationFrame(() => {
+            if (pipVideoRef.current) {
+              try { track.attach(pipVideoRef.current) } catch {}
+            }
+          })
+          // Camera — only attach to main video if no screen share active
           const isScreenActive = findRemoteWithScreenShare() !== null
           if (!isScreenActive) {
             requestAnimationFrame(() => {
@@ -339,8 +357,8 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
   useEffect(() => {
     const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
     setScreenShareSupported(supported)
-    const pipSupported = !!document.pictureInPictureEnabled
-    setPipSupported(pipSupported)
+    // PiP: try instead of checking flag (unreliable on mobile)
+    setPipSupported(true)
   }, [])
 
   const formatTime = (s: number) => {
@@ -359,13 +377,16 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
       if (document.pictureInPictureElement) {
         await document.exitPictureInPicture()
         setIsPip(false)
-      } else if (mainVideoRef.current && !mainVideoRef.current.paused) {
+      } else if (pipVideoRef.current && !pipVideoRef.current.paused && pipVideoRef.current.readyState >= 2) {
+        await pipVideoRef.current.requestPictureInPicture()
+        setIsPip(true)
+      } else if (mainVideoRef.current && !mainVideoRef.current.paused && mainVideoRef.current.readyState >= 2) {
         await mainVideoRef.current.requestPictureInPicture()
         setIsPip(true)
       }
     } catch (err) {
       console.error("[PiP] failed:", err)
-      toast.error("Picture-in-Picture não disponível")
+      toast.error("Picture-in-Picture não disponível neste navegador")
     }
   }, [])
 
@@ -476,6 +497,18 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         )}
         {hasRemote && <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />}
       </div>
+
+      {/* Hidden PiP video — always tracks remote participant for PiP mode */}
+      {hasRemote && (
+        <video
+          ref={pipVideoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute w-0 h-0 opacity-0 pointer-events-none"
+          style={{ position: "fixed", bottom: 0, right: 0, width: 1, height: 1, opacity: 0.01 }}
+        />
+      )}
 
       {/* Screen share badge */}
       {(isScreenSharing || remoteScreenSharing) && (
@@ -594,15 +627,17 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         <div className="flex flex-col items-center gap-1.5">
           {/* Row 2: secondary buttons (screen share, blur, chat, reactions, notes) */}
           <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xl rounded-full px-2 py-1.5 border border-white/10 sm:hidden" style={{ touchAction: "manipulation" }}>
-            {pipSupported && hasRemote && (
-              <button
-                onPointerDown={(e) => { e.preventDefault(); togglePip() }}
-                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
-                aria-label="Picture-in-Picture"
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
-            )}
+            <button
+              onPointerDown={(e) => { e.preventDefault(); togglePip() }}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+              aria-label="Picture-in-Picture"
+              title="Picture-in-Picture: mantém o vídeo visível em janela flutuante"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <rect x="11" y="9" width="9" height="7" rx="1" fill="currentColor" opacity="0.3" />
+              </svg>
+            </button>
             {screenShareSupported && (
               <button
                 onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }}
@@ -658,11 +693,12 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             {/* Desktop only: inline secondary buttons */}
             <div className="hidden sm:flex items-center gap-1.5 ml-1">
               <div className="w-px h-8 bg-white/10" />
-              {pipSupported && hasRemote && (
-                <button onPointerDown={(e) => { e.preventDefault(); togglePip() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Picture-in-Picture">
-                  <Maximize2 className="h-5 w-5" />
-                </button>
-              )}
+              <button onPointerDown={(e) => { e.preventDefault(); togglePip() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Picture-in-Picture" title="PiP: vídeo em janela flutuante">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <rect x="11" y="9" width="9" height="7" rx="1" fill="currentColor" opacity="0.3" />
+                </svg>
+              </button>
               {screenShareSupported && (
                 <button onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
                   {isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
