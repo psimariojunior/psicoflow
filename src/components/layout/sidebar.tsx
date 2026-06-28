@@ -33,6 +33,7 @@ import {
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
+import { WaitingRoomBadge } from "@/components/waiting-room-queue"
 
 interface SidebarProps {
   collapsed: boolean
@@ -128,12 +129,13 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-blue-500 to-sky-500" />
                 )}
                 <div className={cn(
-                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 shrink-0",
+                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 shrink-0 relative",
                   isActive
                     ? "bg-primary/15 text-primary"
                     : "text-muted-foreground group-hover/item:bg-accent group-hover/item:text-foreground"
                 )}>
                   <item.icon className="h-4 w-4" />
+                  {item.href === "/sala-virtual" && <WaitingRoomBadge />}
                 </div>
                 {!collapsed && <span className="relative">{item.label}</span>}
               </Link>

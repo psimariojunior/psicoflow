@@ -37,5 +37,10 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"], storageState: "test-results/.auth/psychologist.json" },
       dependencies: ["setup-psychologist"],
     },
+    {
+      name: "chromium-waiting-room",
+      testMatch: /waiting-room\.spec\.ts$/,
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
 })

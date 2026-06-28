@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { Suspense, useState, useCallback, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -20,8 +21,10 @@ interface WaitingPatient {
   createdAt: number
 }
 
-export default function VirtualRoomPage() {
-  const [roomName, setRoomName] = useState(`sala-${Date.now()}`)
+function VirtualRoomPageInner() {
+  const searchParams = useSearchParams()
+  const initialRoom = searchParams.get("room") || `sala-${Date.now()}`
+  const [roomName, setRoomName] = useState(initialRoom)
   const [token, setToken] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [ending, setEnding] = useState(false)
@@ -327,5 +330,20 @@ export default function VirtualRoomPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VirtualRoomPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Carregando sala virtual...</p>
+        </div>
+      </div>
+    }>
+      <VirtualRoomPageInner />
+    </Suspense>
   )
 }

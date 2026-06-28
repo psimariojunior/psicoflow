@@ -27,17 +27,14 @@ function cleanup() {
   }
 }
 
-// GET /api/livekit/waiting?room=XXX — psychologist gets waiting patients
+// GET /api/livekit/waiting — no room param → all waiting (dashboard badge/queue)
+// GET /api/livekit/waiting?room=XXX — psychologist gets waiting patients for room
 // GET /api/livekit/waiting?room=XXX&id=YYY — patient checks status
 export async function GET(request: Request) {
   cleanup()
   const { searchParams } = new URL(request.url)
   const room = searchParams.get("room")
   const patientId = searchParams.get("id")
-
-  if (!room) {
-    return NextResponse.json({ error: "Room required" }, { status: 400 })
-  }
 
   // Patient checking their own status
   if (patientId) {
@@ -48,7 +45,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ status: entry.status, id: entry.id })
   }
 
-  // Psychologist — require auth
+  // No room specified → return ALL waiting patients (for dashboard badge/queue)
+  if (!room) {
+    const patients = Array.from(waitingRoom.values())
+    return NextResponse.json({ patients })
+  }
+
+  // Room specified → return patients for that room (for sala-virtual polling)
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
