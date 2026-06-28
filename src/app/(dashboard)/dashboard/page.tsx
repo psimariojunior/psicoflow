@@ -16,7 +16,7 @@ import toast from "react-hot-toast"
 import { cn, formatTime } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { QuickNotesFab } from "@/components/dashboard/quick-notes-fab"
-import { WaitingRoomQueue } from "@/components/waiting-room-queue"
+import { TodaySessions } from "@/components/dashboard/today-sessions"
 
 const quickActions = [
   { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600" },
@@ -242,8 +242,8 @@ export default function DashboardHome() {
       {/* Onboarding */}
       {!onboardingDone && <OnboardingChecklist />}
 
-      {/* Waiting room queue — shows when patients are waiting */}
-      <WaitingRoomQueue />
+      {/* Today's sessions with real-time room status */}
+      <TodaySessions appointments={todaysAppointments} />
 
       {/* Stats Cards */}
       <div data-tour="dashboard-stats"><StatsCards stats={stats} /></div>
