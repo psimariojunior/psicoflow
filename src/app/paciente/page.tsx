@@ -34,6 +34,7 @@ const quickLinks = [
   { href: "/paciente/historico", icon: History, label: "Histórico", desc: "Consultas anteriores", gradient: "from-violet-500 to-purple-600", iconBg: "bg-violet-100 dark:bg-violet-900/30" },
   { href: "/paciente/faturas", icon: FileText, label: "Faturas", desc: "Pagamentos", gradient: "from-emerald-500 to-teal-600", iconBg: "bg-emerald-100 dark:bg-emerald-900/30" },
   { href: "/paciente/meus-dados", icon: User, label: "Meus Dados", desc: "Editar perfil", gradient: "from-rose-500 to-pink-600", iconBg: "bg-rose-100 dark:bg-rose-900/30" },
+  { href: "/paciente/lgpd-export", icon: Shield, label: "Exportar Dados", desc: "LGPD Art. 18", gradient: "from-slate-500 to-gray-600", iconBg: "bg-slate-100 dark:bg-slate-900/30" },
 ]
 
 export default function PacienteDashboard() {

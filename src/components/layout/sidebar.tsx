@@ -32,6 +32,7 @@ import {
   FileType,
   ClipboardCheck,
   Building2,
+  Brain,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -61,6 +62,7 @@ const menuItems = [
   { href: "/notificacoes",   label: "Notificações",     icon: Bell },
   { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { href: "/outcomes", label: "Clinical Outcomes", icon: Brain },
   { href: "/recibos", label: "Recibos", icon: Receipt },
   { href: "/lista-espera", label: "Lista de Espera", icon: ClipboardList },
   { href: "/configuracoes", label: "Configurações", icon: Settings },

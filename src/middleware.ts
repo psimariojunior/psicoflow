@@ -21,6 +21,7 @@ const publicApiPrefixes = [
   "/api/pacientes/questionarios", "/api/pacientes/anamnese", "/api/pacientes/tarefas",
   "/api/pacientes/protocolos-crise",
   "/api/cron", "/api/health", "/api/seed-questionarios", "/api/seed-avaliacoes", "/api/seed-blog", "/api/hermes", "/api/cron/backup",
+  "/api/cron/weekly-reports",
   "/api/recibos", "/api/lista-espera",
   "/api/consentimento", "/api/recursos-terapeuticos", "/api/relatorios",
   "/api/integrations/google-calendar", "/api/pagamentos/webhook",

@@ -385,17 +385,23 @@ export default function SettingsPage() {
     }
   }
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (targetPlan: string = "pro") => {
     setUpgradeLoading(true)
     try {
-      const res = await fetch("/api/subscription/create-checkout", {
+      const res = await fetch("/api/subscription/upgrade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "pro" }),
+        body: JSON.stringify({ plan: targetPlan }),
       })
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
+      } else if (data.ok) {
+        toast.success(data.message || "Plano atualizado!")
+        fetch("/api/subscription/status")
+          .then((res) => res.json())
+          .then((d) => { if (d.plan) setSubInfo(d) })
+          .catch(() => {})
       } else {
         toast.error(data.error || "Erro ao criar checkout")
       }
@@ -1049,16 +1055,33 @@ export default function SettingsPage() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  {subInfo?.stripeCustomerId ? (
+                  {subInfo?.plan === "clinica" ? (
                     <Button variant="outline" size="sm" onClick={handlePortal} disabled={portalLoading}>
                       {portalLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Gerenciar Assinatura
                     </Button>
+                  ) : subInfo?.stripeCustomerId ? (
+                    <>
+                      <Button variant="outline" size="sm" onClick={handlePortal} disabled={portalLoading}>
+                        {portalLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Gerenciar
+                      </Button>
+                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-blue-600 hover:bg-blue-700">
+                        {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Upgrade para Clínica
+                      </Button>
+                    </>
                   ) : (
-                    <Button variant="outline" size="sm" onClick={handleUpgrade} disabled={upgradeLoading}>
-                      {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Fazer Upgrade
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleUpgrade("pro")} disabled={upgradeLoading}>
+                        {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Assinar Pro — R$97/mês
+                      </Button>
+                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-blue-600 hover:bg-blue-700">
+                        {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Assinar Clínica — R$197/mês
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
