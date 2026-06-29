@@ -18,7 +18,10 @@ import {
   BellRing,
   Calendar,
   AlertCircle,
+  Lock,
+  ArrowRight,
 } from "lucide-react"
+import Link from "next/link"
 
 interface Clinic {
   id: string
@@ -70,6 +73,7 @@ export default function ClinicaPage() {
   const [adding, setAdding] = useState(false)
   const [newClinicName, setNewClinicName] = useState("")
   const [creating, setCreating] = useState(false)
+  const [planError, setPlanError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login")
@@ -82,6 +86,13 @@ export default function ClinicaPage() {
         fetch("/api/clinica"),
         fetch("/api/clinica/dashboard"),
       ])
+      if (clinicRes.status === 403) {
+        const data = await clinicRes.json()
+        if (data.upgradeRequired) {
+          setPlanError(data.error)
+          return
+        }
+      }
       if (clinicRes.ok) {
         const data = await clinicRes.json()
         setClinic(data.clinic)
@@ -151,6 +162,27 @@ export default function ClinicaPage() {
     return (
       <div className="flex items-center justify-center h-96">
         <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    )
+  }
+
+  if (planError) {
+    return (
+      <div className="flex items-center justify-center h-96 p-6">
+        <Card className="max-w-md dark:bg-slate-900 dark:border-slate-800">
+          <CardContent className="p-8 text-center space-y-4">
+            <div className="p-4 bg-amber-100 dark:bg-amber-900/30 rounded-full w-fit mx-auto">
+              <Lock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold">Plano Clínica Necessário</h2>
+            <p className="text-muted-foreground">{planError}</p>
+            <Link href="/pricing">
+              <Button className="mt-4">
+                Ver Planos <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     )
   }

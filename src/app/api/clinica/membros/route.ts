@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { requireClinicPlan } from "@/lib/check-plan"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
 
@@ -41,6 +42,11 @@ export async function POST(request: NextRequest) {
   if (!clinicId) return NextResponse.json({ error: "Sem clínica" }, { status: 403 })
   if (session.user.role !== "ADMIN" && session.user.role !== "CLINIC_ADMIN" && session.user.role !== "PSYCHOLOGIST") {
     return NextResponse.json({ error: "Sem permissão para adicionar membros" }, { status: 403 })
+  }
+
+  const planCheck = await requireClinicPlan(session.user.id)
+  if (!planCheck.allowed) {
+    return NextResponse.json({ error: planCheck.reason, upgradeRequired: true }, { status: 403 })
   }
 
   const body = await request.json()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { requireClinicPlan } from "@/lib/check-plan"
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -42,6 +43,11 @@ export async function POST(request: NextRequest) {
   const clinicId = session.user.clinicId
   if (!clinicId) {
     return NextResponse.json({ error: "Recepcionista sem clínica vinculada" }, { status: 403 })
+  }
+
+  const planCheck = await requireClinicPlan(session.user.id)
+  if (!planCheck.allowed) {
+    return NextResponse.json({ error: planCheck.reason, upgradeRequired: true }, { status: 403 })
   }
 
   const body = await request.json()

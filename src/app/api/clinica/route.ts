@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { requireClinicPlan } from "@/lib/check-plan"
 import { z } from "zod"
 
 const createClinicSchema = z.object({
@@ -44,6 +45,11 @@ export async function POST(request: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
   if (session.user.role !== "ADMIN" && session.user.role !== "PSYCHOLOGIST") {
     return NextResponse.json({ error: "Sem permissão" }, { status: 403 })
+  }
+
+  const planCheck = await requireClinicPlan(session.user.id)
+  if (!planCheck.allowed) {
+    return NextResponse.json({ error: planCheck.reason, upgradeRequired: true }, { status: 403 })
   }
 
   const existingClinic = await prisma.clinic.findFirst({ where: { ownerId: session.user.id } })
