@@ -164,9 +164,13 @@ Ver `LEMBRETES_SETUP.md` na raiz do projeto.
 - `src/app/(public)/sala-virtual/entrar/page.tsx` — patient flow (welcome → prejoin → call)
 - `src/app/(dashboard)/sala-virtual/page.tsx` — psychologist room (link sharing, encerrar sala)
 - `src/app/api/livekit/token/route.ts` — JWT generation + closed-room check
-- `src/app/api/livekit/rooms/route.ts` — POST (close room) + GET (list closed)
+- `src/app/api/livekit/rooms/route.ts` — POST (close room) + GET (list closed) + session_completed trigger
+- `src/app/(dashboard)/automacoes/page.tsx` — Automation dashboard with visual builder + templates
+- `src/app/api/automations/route.ts` — Automations GET/POST API
+- `src/app/api/automations/[id]/route.ts` — Automations PUT/DELETE API
+- `src/lib/automation-engine.ts` — Core trigger-action engine (fireTrigger, executeAction, replaceVars)
 - `src/middleware.ts` — auth bypass for patient routes
-- `prisma/schema.prisma` — ClosedRoom model + PostgreSQL provider
+- `prisma/schema.prisma` — ClosedRoom + Automation models + PostgreSQL provider
 - `next.config.js` — Vercel-compatible config
 
 ### Pentest & Security Hardening (2026-06-12)
