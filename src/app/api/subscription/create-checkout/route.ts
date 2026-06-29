@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripe()
+    console.log("[checkout] stripe key prefix:", process.env.STRIPE_SECRET_KEY?.substring(0, 12), "priceId:", priceId, "customerId:", customerId)
 
     let customerId = user.stripeCustomerId
     if (!customerId) {
@@ -91,6 +92,8 @@ export async function POST(request: NextRequest) {
       return_url: `${origin}/configuracoes?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     })
 
+    console.log("[checkout] session created:", session.id, "url:", session.url?.substring(0, 50))
+
     await prisma.user.update({
       where: { id: userId },
       data: { stripeSubscriptionId: session.id },
@@ -99,6 +102,7 @@ export async function POST(request: NextRequest) {
     return apiSuccess({ url: session.url })
   } catch (error) {
     console.error("Error creating checkout session:", error)
-    return apiError("Erro ao criar sessão de checkout")
+    const msg = error instanceof Error ? error.message : String(error)
+    return apiError(`Erro ao criar sessão de checkout: ${msg}`)
   }
 }
