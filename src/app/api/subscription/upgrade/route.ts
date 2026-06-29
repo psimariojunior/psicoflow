@@ -88,9 +88,8 @@ export async function POST(request: NextRequest) {
       metadata: { userId: session.user.id, plan: targetPlan },
     },
     metadata: { userId: session.user.id, plan: targetPlan },
-    success_url: `${origin}/configuracoes?upgraded=true`,
-    cancel_url: `${origin}/configuracoes?upgrade=cancelled`,
+    return_url: `${origin}/configuracoes?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
   })
 
-  return NextResponse.json({ url: checkoutSession.url })
+  return NextResponse.json({ clientSecret: checkoutSession.client_secret })
 }

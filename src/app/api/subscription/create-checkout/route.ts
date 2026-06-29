@@ -88,8 +88,7 @@ export async function POST(request: NextRequest) {
         metadata: { userId, plan },
       },
       metadata: { userId, plan },
-      success_url: `${origin}/configuracoes?upgraded=true`,
-      cancel_url: `${origin}/configuracoes?upgrade=cancelled`,
+      return_url: `${origin}/configuracoes?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     })
 
     await prisma.user.update({
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
       data: { stripeSubscriptionId: session.id },
     })
 
-    return apiSuccess({ url: session.url })
+    return apiSuccess({ clientSecret: session.client_secret })
   } catch (error) {
     console.error("Error creating checkout session:", error)
     return apiError("Erro ao criar sessão de checkout")

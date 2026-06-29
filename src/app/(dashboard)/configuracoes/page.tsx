@@ -388,23 +388,7 @@ export default function SettingsPage() {
   const handleUpgrade = async (targetPlan: string = "pro") => {
     setUpgradeLoading(true)
     try {
-      const res = await fetch("/api/subscription/upgrade", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: targetPlan }),
-      })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else if (data.ok) {
-        toast.success(data.message || "Plano atualizado!")
-        fetch("/api/subscription/status")
-          .then((res) => res.json())
-          .then((d) => { if (d.plan) setSubInfo(d) })
-          .catch(() => {})
-      } else {
-        toast.error(data.error || "Erro ao criar checkout")
-      }
+      window.location.href = `/configuracoes/checkout?plan=${targetPlan}`
     } catch {
       toast.error("Erro ao conectar com o servidor")
     } finally {
