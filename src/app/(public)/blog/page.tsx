@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag } from "lucide-react"
+import { Calendar, Clock, ArrowRight, BookOpen, Sparkles, Tag, ArrowLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { BreadcrumbJsonLd } from "@/lib/seo"
@@ -52,6 +52,10 @@ export default function BlogPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-blue-50/20 to-background dark:via-blue-950/10">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
+          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Início
+          </Link>
           <div className="text-center mb-12 space-y-4">
             <div className="h-6 w-20 mx-auto animate-shimmer rounded-full" />
             <div className="h-10 w-72 mx-auto animate-shimmer rounded-lg" />
@@ -76,6 +80,11 @@ export default function BlogPage() {
         { name: "Blog", item: "/blog" },
       ]} />
       <div className="container mx-auto px-4 py-12 max-w-6xl">
+        <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar ao Início
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-12 space-y-4">
           <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-4 py-1.5">

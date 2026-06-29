@@ -7,7 +7,7 @@ import { MoodChart } from "@/components/patient/mood-chart"
 import { Card } from "@/components/ui/card"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain, ClipboardList, FileText, Shield, Star, TrendingUp, ListTodo } from "lucide-react"
+import { CalendarDays, BookHeart, History, User, ChevronRight, Clock, Sparkles, Activity, Brain, ClipboardList, FileText, Shield, Star, TrendingUp, ListTodo, Video } from "lucide-react"
 
 interface Appointment {
   id: string
@@ -75,6 +75,16 @@ export default function PacienteDashboard() {
     return "<1h"
   }
 
+  const canEnterRoom = () => {
+    if (!nextAppointment) return false
+    const now = Date.now()
+    const start = new Date(nextAppointment.startTime).getTime()
+    const end = start + 50 * 60 * 1000
+    return now >= start - 30 * 60 * 1000 && now <= end
+  }
+
+  const roomName = nextAppointment ? `sala-${nextAppointment.id.slice(0, 8)}` : ""
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       <div className="relative overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950 p-6 text-white shadow-2xl shadow-blue-950/20">
@@ -131,6 +141,15 @@ export default function PacienteDashboard() {
                 <ChevronRight className="h-5 w-5" />
               </Link>
             </div>
+            {canEnterRoom() && (
+              <Link
+                href={`/sala-virtual/entrar?room=${encodeURIComponent(roomName)}`}
+                className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/20 hover:bg-white/30 transition-all backdrop-blur-sm text-sm font-medium"
+              >
+                <Video className="h-4 w-4" />
+                Entrar na Sala
+              </Link>
+            )}
           </div>
         </div>
       ) : (

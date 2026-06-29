@@ -17,6 +17,8 @@ import { cn, formatTime } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { QuickNotesFab } from "@/components/dashboard/quick-notes-fab"
 import { TodaySessions } from "@/components/dashboard/today-sessions"
+import { BirthdayAlert } from "@/components/dashboard/birthday-alert"
+import { WeeklyOccupancy } from "@/components/dashboard/weekly-occupancy"
 
 const quickActions = [
   { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600" },
@@ -338,6 +340,10 @@ export default function DashboardHome() {
               </div>
             </CardContent>
           </Card>
+        </div>
+        <div className="space-y-6">
+          <WeeklyOccupancy appointments={(data?.appointments ?? []).map(a => ({ ...a, startTime: new Date(a.startTime) }))} />
+          <BirthdayAlert birthdays={data?.birthdays ?? []} />
         </div>
       </div>
 
