@@ -7,6 +7,7 @@ import { verifyPatientToken } from "@/lib/patient-auth"
 import { sanitizeHtml } from "@/lib/security"
 import { z } from "zod"
 import { rateLimitMiddleware } from "@/lib/rate-limit"
+import { fireTrigger } from "@/lib/automation-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -33,7 +34,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const appointment = await prisma.appointment.findFirst({
       where: { id: params.id, patientId: token.patientId },
-      include: { patient: { select: { name: true } }, psychologist: { select: { email: true, name: true } } },
+      include: { patient: { select: { name: true, email: true } }, psychologist: { select: { email: true, name: true } } },
     })
 
     if (!appointment) {
@@ -76,6 +77,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       timeStr,
       cancelReason
     ).catch((e) => logger.error("sendCancellationNotification failed", { error: String(e) }))
+
+    fireTrigger("appointment_cancelled", {
+      psychologistId: appointment.psychologistId,
+      patientId: appointment.patientId,
+      patientName: appointment.patient.name,
+      patientEmail: appointment.patient.email ?? undefined,
+      appointmentId: appointment.id,
+      appointmentDate: dateStr,
+      appointmentTime: timeStr,
+    }).catch((e) => logger.error("fireTrigger appointment_cancelled failed", { error: String(e) }))
 
     return NextResponse.json({ success: true })
   } catch (error) {

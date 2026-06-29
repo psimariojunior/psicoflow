@@ -2,6 +2,7 @@ import { RoomServiceClient } from "livekit-server-sdk"
 import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { logger } from "@/lib/logger"
+import { fireTrigger } from "@/lib/automation-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -61,6 +62,11 @@ export async function POST(request: Request) {
       },
     })
     logger.info("ClosedRoom created", { roomName: record.roomName })
+
+    fireTrigger("session_completed", {
+      psychologistId,
+      appointmentId: room,
+    }).catch((e) => logger.error("fireTrigger session_completed failed", { error: String(e) }))
 
     return apiSuccess({ success: true })
   } catch (error) {

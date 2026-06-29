@@ -7,6 +7,7 @@ import { scheduleReminders } from "@/lib/notifications"
 import { sanitizeHtml } from "@/lib/security"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { syncAppointmentToCalendar } from "@/lib/google-calendar"
+import { fireTrigger } from "@/lib/automation-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -87,6 +88,16 @@ export async function POST(request: Request) {
         (e) => logger.error("scheduleReminders failed", { error: String(e) })
       )
       syncAppointmentToCalendar(psychologistId, appt as Parameters<typeof syncAppointmentToCalendar>[1]).catch(() => {})
+
+      fireTrigger("appointment_booked", {
+        psychologistId,
+        patientId: appt.patientId,
+        patientName: appt.patient.name,
+        patientEmail: appt.patient.email ?? undefined,
+        appointmentId: appt.id,
+        appointmentDate: startTime.toLocaleDateString("pt-BR"),
+        appointmentTime: startTime.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      }).catch((e) => logger.error("fireTrigger appointment_booked failed", { error: String(e) }))
 
       return appt
     }

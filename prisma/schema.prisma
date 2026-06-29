@@ -79,6 +79,7 @@ model User {
   availabilitySlots      AvailabilitySlot[]
   closedRooms            ClosedRoom[]
   sessionTokens          SessionToken[]
+  automations            Automation[]
   accounts               Account[]
   nextAuthSessions       NextAuthSession[]
   questionnaires         Questionnaire[]
@@ -918,4 +919,24 @@ model PatientArrival {
   @@index([psychologistId, arrivedAt])
   @@index([receptionistId])
   @@index([status])
+}
+
+model Automation {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  triggerType String
+  actionType  String
+  actionConfig String
+  enabled     Boolean  @default(true)
+  lastRunAt   DateTime?
+  runCount    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  psychologistId String
+  psychologist   User   @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+
+  @@index([psychologistId])
+  @@index([enabled])
 }
