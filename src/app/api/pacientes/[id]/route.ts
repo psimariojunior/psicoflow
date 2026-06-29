@@ -119,6 +119,25 @@ export async function DELETE(
       return apiError("Paciente não encontrado", 404)
     }
 
+    const fiveYearsAgo = new Date()
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5)
+
+    const recentRecords = await prisma.medicalRecord.count({
+      where: {
+        patientId: params.id,
+        psychologistId,
+        createdAt: { gt: fiveYearsAgo },
+      },
+    })
+
+    if (recentRecords > 0) {
+      return apiError(
+        `Paciente não pode ser excluído: possui ${recentRecords} prontuário(s) clínico(s) com menos de 5 anos. ` +
+        "Conforme Resolução CFP nº 06/2019, prontuários devem ser mantidos por no mínimo 5 anos.",
+        403
+      )
+    }
+
     await prisma.$transaction([
       prisma.medicalRecord.deleteMany({ where: { patientId: params.id, psychologistId } }),
       prisma.therapySession.deleteMany({ where: { patientId: params.id, psychologistId } }),

@@ -42,7 +42,6 @@ export async function GET() {
     version: "1.0.0",
     uptime: process.uptime(),
     environment: process.env.VERCEL_ENV || "development",
-    totalUsers,
     checks,
     timestamp: new Date().toISOString(),
   })
