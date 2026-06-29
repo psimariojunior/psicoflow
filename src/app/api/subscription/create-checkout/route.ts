@@ -88,7 +88,8 @@ export async function POST(request: NextRequest) {
         metadata: { userId, plan },
       },
       metadata: { userId, plan },
-      return_url: `${origin}/configuracoes?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/configuracoes?checkout=success`,
+      cancel_url: `${origin}/configuracoes`,
     })
 
     console.log("[checkout] session created:", session.id, "url:", session.url?.substring(0, 50))
