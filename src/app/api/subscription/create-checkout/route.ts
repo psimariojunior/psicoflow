@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       data: { stripeSubscriptionId: session.id },
     })
 
-    return apiSuccess({ clientSecret: session.client_secret })
+    return apiSuccess({ url: session.url })
   } catch (error) {
     console.error("Error creating checkout session:", error)
     return apiError("Erro ao criar sessão de checkout")
