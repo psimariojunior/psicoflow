@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma"
 import { getStripe } from "@/lib/stripe"
 
 const PRICES: Record<string, string> = {
-  pro: process.env.STRIPE_PRO_PRICE_ID || "price_1TkpZ9KOBHid1iO0ki42h5Pb",
-  clinica: process.env.STRIPE_CLINICA_PRICE_ID || "price_1TkpZ9KOBHid1iO0EDp5OoTz",
+  pro: process.env.STRIPE_PRO_PRICE_ID || "price_1TnlPmQKdMLfMoJI3cPxEoSw",
+  clinica: process.env.STRIPE_CLINICA_PRICE_ID || "price_1TnlPnQKdMLfMoJIY9C0PBph",
 }
 
 export async function POST(request: NextRequest) {

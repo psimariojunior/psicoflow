@@ -121,6 +121,7 @@ self.addEventListener("fetch", (event) => {
 
   if (request.method !== "GET") return
   if (isApi(url.pathname)) return
+  if (url.origin !== self.location.origin) return
 
   if (isNextStatic(url.pathname)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE))
