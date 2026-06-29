@@ -38,9 +38,8 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripe()
-    console.log("[checkout] stripe key prefix:", process.env.STRIPE_SECRET_KEY?.substring(0, 12), "priceId:", priceId, "customerId:", customerId)
-
     let customerId = user.stripeCustomerId
+    console.log("[checkout] stripe key prefix:", process.env.STRIPE_SECRET_KEY?.substring(0, 12), "priceId:", priceId, "customerId:", customerId)
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
