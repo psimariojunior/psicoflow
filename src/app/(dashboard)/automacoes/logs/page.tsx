@@ -123,14 +123,14 @@ export default function AutomacoesLogsPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-4 sm:p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/automacoes" className="p-2 hover:bg-muted rounded-lg transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Histórico de Automações</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Histórico de Automações</h1>
             <p className="text-muted-foreground text-sm">{total} execuções registradas</p>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function AutomacoesLogsPage() {
             const Icon = TRIGGER_ICONS[log.triggerType] || Bell
             const color = TRIGGER_COLORS[log.triggerType] || "text-gray-500"
             return (
-              <Card key={log.id} className="dark:bg-slate-900 dark:border-slate-800">
+              <Card key={log.id} className="dark:bg-slate-900 dark:border-slate-800 transition-all duration-200 hover:shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

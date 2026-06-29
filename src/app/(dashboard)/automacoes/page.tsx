@@ -232,16 +232,16 @@ export default function AutomacoesPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Zap className="h-8 w-8 text-amber-500" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
+            <Zap className="h-7 w-7 sm:h-8 sm:w-8 text-amber-500" />
             Automações
           </h1>
-          <p className="text-muted-foreground">Automatize tarefas repetitivas com triggers inteligentes</p>
+          <p className="text-muted-foreground text-sm">Automatize tarefas repetitivas com triggers inteligentes</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Link href="/automacoes/logs">
             <Button variant="outline" size="sm">
               <Clock className="h-4 w-4 mr-2" />
@@ -253,7 +253,7 @@ export default function AutomacoesPage() {
           </Button>
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Criar Automação
+            Criar
           </Button>
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function AutomacoesPage() {
                 const trigger = getTriggerInfo(t.triggerType)
                 const action = getActionInfo(t.actionType)
                 return (
-                  <div key={i} className="p-4 rounded-lg border dark:border-slate-800 hover:bg-muted/50 transition-colors space-y-2">
+                  <div key={i} className="p-4 rounded-lg border dark:border-slate-800 hover:bg-muted/50 hover:shadow-sm transition-all duration-200 space-y-2">
                     <p className="font-medium text-sm">{t.name}</p>
                     <p className="text-xs text-muted-foreground">{t.description}</p>
                     <div className="flex items-center gap-2 text-xs">
@@ -306,7 +306,7 @@ export default function AutomacoesPage() {
             const trigger = getTriggerInfo(a.triggerType)
             const action = getActionInfo(a.actionType)
             return (
-              <Card key={a.id} className={`dark:bg-slate-900 dark:border-slate-800 ${!a.enabled ? "opacity-60" : ""}`}>
+              <Card key={a.id} className={`dark:bg-slate-900 dark:border-slate-800 transition-all duration-200 ${!a.enabled ? "opacity-60" : "hover:shadow-md"}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
