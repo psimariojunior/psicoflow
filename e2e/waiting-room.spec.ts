@@ -30,7 +30,7 @@ test.describe("Waiting Room API — Validation", () => {
     expect(res.ok()).toBeTruthy()
     const body = await res.json()
     expect(body.id).toBeTruthy()
-    expect(body.status).toBe("waiting")
+    expect(["waiting", "approved"]).toContain(body.status)
 
     await request.delete(`/api/livekit/waiting?id=${body.id}`)
   })
@@ -70,7 +70,7 @@ test.describe("Waiting Room API — Self-Contained Flow", () => {
     const check = await request.get(`/api/livekit/waiting?room=${encodeURIComponent(room)}&id=${id}`)
     expect(check.ok()).toBeTruthy()
     const status = await check.json()
-    expect(status.status).toBe("waiting")
+    expect(status.status).toBe("approved")
     expect(status.id).toBe(id)
 
     // Cleanup

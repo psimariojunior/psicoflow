@@ -42,5 +42,10 @@ export default defineConfig({
       testMatch: /waiting-room\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "chromium-clinic-reception",
+      testMatch: /clinic-reception\.spec\.ts$/,
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
 })

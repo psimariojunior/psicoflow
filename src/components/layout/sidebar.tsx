@@ -30,6 +30,8 @@ import {
   LogOut,
   Shield,
   FileType,
+  ClipboardCheck,
+  Building2,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
@@ -70,10 +72,27 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
   const pathname = usePathname()
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === "ADMIN"
+  const isReceptionist = session?.user?.role === "RECEPTIONIST"
+  const isClinicAdmin = session?.user?.role === "CLINIC_ADMIN" || isAdmin
 
-  const allMenuItems = isAdmin
-    ? [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
-    : menuItems
+  const receptionMenuItems = [
+    { href: "/recepcao", label: "Recepção", icon: ClipboardCheck },
+    { href: "/configuracoes", label: "Configurações", icon: Settings },
+  ]
+
+  const clinicMenuItems = [
+    ...menuItems,
+    { href: "/recepcao", label: "Recepção", icon: ClipboardCheck },
+    { href: "/clinica", label: "Clínica", icon: Building2 },
+  ]
+
+  const allMenuItems = isReceptionist
+    ? receptionMenuItems
+    : isClinicAdmin
+      ? [...clinicMenuItems, { href: "/admin", label: "Admin", icon: Shield }]
+      : isAdmin
+        ? [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
+        : menuItems
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-background dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 border-r relative">

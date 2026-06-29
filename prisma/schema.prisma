@@ -54,6 +54,13 @@ model User {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
+  clinicId               String?
+  clinic                 Clinic?                 @relation(fields: [clinicId], references: [id])
+  clinicMemberships      ClinicMember[]
+  clinicOwnings          Clinic[]                @relation("ClinicOwner")
+  arrivalsRegistered     PatientArrival[]        @relation("ArrivalReceptionist")
+  arrivalsNotified       PatientArrival[]        @relation("ArrivalPsychologist")
+
   patients               Patient[]
   subscription           Subscription?
   appointments           Appointment[]           @relation("PsychologistAppointments")
@@ -850,4 +857,65 @@ model BlogPost {
   authorId    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Clinic {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId String
+  owner   User   @relation("ClinicOwner", fields: [ownerId], references: [id])
+
+  members      ClinicMember[]
+  arrivals     PatientArrival[]
+  users        User[]
+}
+
+model ClinicMember {
+  id        String   @id @default(cuid())
+  role      String   @default("RECEPTIONIST")
+  active    Boolean  @default(true)
+  joinedAt  DateTime @default(now())
+
+  clinicId String
+  userId   String
+  clinic   Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, userId])
+  @@index([clinicId])
+  @@index([userId])
+}
+
+model PatientArrival {
+  id        String   @id @default(cuid())
+  status    String   @default("ARRIVED")
+  arrivedAt DateTime @default(now())
+  notifiedAt DateTime?
+  sessionStartedAt DateTime?
+  sessionCompletedAt DateTime?
+  notes     String?
+  patientName String?
+  createdAt DateTime @default(now())
+
+  clinicId       String
+  clinic         Clinic  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  patientId      String?
+  psychologistId String
+  receptionistId String
+  psychologist   User    @relation("ArrivalPsychologist", fields: [psychologistId], references: [id])
+  receptionist   User    @relation("ArrivalReceptionist", fields: [receptionistId], references: [id])
+
+  @@index([clinicId, arrivedAt])
+  @@index([psychologistId, arrivedAt])
+  @@index([receptionistId])
+  @@index([status])
 }
