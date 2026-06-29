@@ -66,8 +66,40 @@ export async function fireTrigger(
           where: { id: automation.id },
           data: { lastRunAt: new Date(), runCount: { increment: 1 } },
         })
+
+        await prisma.automationLog.create({
+          data: {
+            triggerType,
+            actionType: automation.actionType,
+            status: "SUCCESS",
+            context: {
+              patientName: context.patientName,
+              patientEmail: context.patientEmail,
+              appointmentDate: context.appointmentDate,
+              automationName: automation.name,
+            },
+            automationId: automation.id,
+            psychologistId: context.psychologistId,
+          },
+        })
       } catch (err) {
         logger.error(`Automation ${automation.id} action failed`, { error: String(err) })
+
+        await prisma.automationLog.create({
+          data: {
+            triggerType,
+            actionType: automation.actionType,
+            status: "FAILED",
+            error: String(err),
+            context: {
+              patientName: context.patientName,
+              patientEmail: context.patientEmail,
+              automationName: automation.name,
+            },
+            automationId: automation.id,
+            psychologistId: context.psychologistId,
+          },
+        })
       }
     }
   } catch (err) {
@@ -98,7 +130,6 @@ async function executeAction(
       break
     }
     case "send_reminder": {
-      const hoursBefore = (config.hoursBefore as number) || 24
       const patientEmail = context.patientEmail
       if (patientEmail && context.appointmentDate) {
         await sendEmail(patientEmail, "Lembrete de consulta — PsiHumanis", `<div style="font-family:Arial,sans-serif;padding:20px;"><p>Olá, ${context.patientName || "Paciente"},</p><p>Este é um lembrete da sua consulta agendada para <strong>${context.appointmentDate} às ${context.appointmentTime || ""}</strong>.</p><p>Se precisar remarcar ou cancelar, acesse sua agenda no PsiHumanis.</p></div>`)

@@ -5,6 +5,7 @@ import { logger } from "@/lib/logger"
 import { logAudit, sanitizeHtml } from "@/lib/security"
 import { validate, createPatientSchema } from "@/lib/validation"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
+import { fireTrigger } from "@/lib/automation-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -94,6 +95,13 @@ export async function POST(request: Request) {
       patient.id,
       `Paciente ${patient.name} cadastrado`
     )
+
+    fireTrigger("new_patient", {
+      psychologistId,
+      patientId: patient.id,
+      patientName: patient.name,
+      patientEmail: patient.email ?? undefined,
+    }).catch((e) => logger.error("fireTrigger new_patient failed", { error: String(e) }))
 
     return apiSuccess(patient, 201)
   } catch (error) {

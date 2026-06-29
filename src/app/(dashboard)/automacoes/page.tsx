@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -241,6 +242,12 @@ export default function AutomacoesPage() {
           <p className="text-muted-foreground">Automatize tarefas repetitivas com triggers inteligentes</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/automacoes/logs">
+            <Button variant="outline" size="sm">
+              <Clock className="h-4 w-4 mr-2" />
+              Histórico
+            </Button>
+          </Link>
           <Button variant="outline" size="sm" onClick={() => setShowTemplates(!showTemplates)}>
             Templates
           </Button>

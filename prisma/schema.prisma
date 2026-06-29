@@ -60,6 +60,7 @@ model User {
   clinicOwnings          Clinic[]                @relation("ClinicOwner")
   arrivalsRegistered     PatientArrival[]        @relation("ArrivalReceptionist")
   arrivalsNotified       PatientArrival[]        @relation("ArrivalPsychologist")
+  automationLogs         AutomationLog[]
 
   patients               Patient[]
   subscription           Subscription?
@@ -936,7 +937,27 @@ model Automation {
 
   psychologistId String
   psychologist   User   @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+  logs           AutomationLog[]
 
   @@index([psychologistId])
   @@index([enabled])
+}
+
+model AutomationLog {
+  id          String   @id @default(cuid())
+  triggerType String
+  actionType  String
+  status      String   @default("SUCCESS")
+  context     Json?
+  error       String?
+  createdAt   DateTime @default(now())
+
+  automationId String?
+  automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  psychologistId String
+  psychologist   User        @relation(fields: [psychologistId], references: [id], onDelete: Cascade)
+
+  @@index([psychologistId, createdAt])
+  @@index([automationId])
+  @@index([status])
 }
