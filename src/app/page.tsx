@@ -126,17 +126,17 @@ export default function LandingPage() {
           : "bg-transparent"
       )}>
         <div className={cn(
-          "absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent opacity-0 transition-opacity duration-500",
+          "absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-teal-500/30 to-transparent opacity-0 transition-opacity duration-500",
           scrolled && "opacity-100"
         )} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex items-center justify-center w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
+              <div className="flex items-center justify-center w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/20 group-hover:shadow-teal-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-teal-500/20">
                 <Image src="/logo.png" alt="PsiHumanis" width={44} height={44} className="w-full h-full object-cover" priority />
               </div>
               <div className={cn("flex-col transition-all duration-500", scrolled ? "opacity-100 translate-x-0 flex" : "opacity-0 -translate-x-2 hidden md:flex")}>
-                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">PsiHumanis</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">PsiHumanis</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-500 leading-none">CRP 04/52274</span>
               </div>
             </Link>
@@ -144,7 +144,7 @@ export default function LandingPage() {
               {navLinks.map(link => (
                 <Link key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined} onClick={e => {
                   if (link.href.startsWith("/#")) { e.preventDefault(); const id = link.href.slice(2); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth" }) }
-                }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{locale === "en" ? link.en : link.label}</Link>
+                }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{locale === "en" ? link.en : link.label}</Link>
               ))}
               <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
               <button
@@ -163,7 +163,7 @@ export default function LandingPage() {
               </button>
               <Link href="/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Área do Psicólogo</Link>
               <Link href="/paciente/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Área do Paciente</Link>
-              <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25">{t("nav.book", locale)}</Button></Link>
+              <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/25">{t("nav.book", locale)}</Button></Link>
             </nav>
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Abrir menu">
               {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -193,56 +193,56 @@ export default function LandingPage() {
                 </button>
               </div>
               <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Área do Psicólogo</Link>
-              <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400">Área do Paciente</Link>
-              <Link href="/agendar" className="block mt-2"><Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white">Agende sua Consulta</Button></Link>
+              <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-teal-600 dark:text-teal-400">Área do Paciente</Link>
+              <Link href="/agendar" className="block mt-2"><Button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white">Agende sua Consulta</Button></Link>
             </div>
           </motion.div>
         )}
       </header>
 
       <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-white to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-950" />
-        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-blue-500/10 to-blue-600/5 blur-3xl" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-gradient-to-tr from-blue-400/10 to-blue-500/5 blur-3xl" />
+        <div className="absolute inset-0 bg-mesh-hero dark:bg-mesh-dark" />
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full organic-shape bg-gradient-to-br from-teal-400/10 to-teal-500/5 blur-3xl" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-gradient-to-tr from-amber-400/8 to-sage-500/5 blur-3xl animate-float-delayed" />
         <div className="absolute inset-0 bg-noise pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="space-y-8">
-              <motion.div animate={{ opacity: [1, 0.7, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium">
+              <motion.div animate={{ opacity: [1, 0.7, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-sm font-medium">
                 <Sparkles className="h-4 w-4" />
                 {t("hero.badge", locale)}
               </motion.div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{t("hero.title1", locale)}</span>
                 <br />
-                <span className="bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">{t("hero.title2", locale)}</span>
+                <span className="bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">{t("hero.title2", locale)}</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg">
                 {t("hero.subtitle", locale)}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link href="/agendar">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25 text-base h-12 px-8">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/25 text-base h-12 px-8">
                     {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
               </div>
               <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-500">
-                <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-blue-500" /><span>Sigilo Garantido</span></div>
-                <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-blue-500" /><span>Online ou Presencial</span></div>
-                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-500" /><span>CRP Ativo</span></div>
+                <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-teal-500" /><span>Sigilo Garantido</span></div>
+                <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-teal-500" /><span>Online ou Presencial</span></div>
+                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500" /><span>CRP Ativo</span></div>
               </div>
-              <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium pt-2">
+              <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium pt-2">
                 <Sparkles className="h-3.5 w-3.5" /> Psicólogo? Comece grátis por 14 dias
               </Link>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
               <div className="relative w-full max-w-lg">
                 {/* Main Card - Modern Video Call */}
-                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-blue-950/30">
+                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-teal-950/30">
                   <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden min-h-[400px] relative">
                     {/* Remote video background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-slate-900 to-indigo-950/40" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-teal-950/60 via-slate-900 to-indigo-950/40" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
                     {/* Top bar */}
@@ -253,7 +253,7 @@ export default function LandingPage() {
                         <span className="text-[10px] text-white/50 ml-1">47:32</span>
                       </div>
                       <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
-                        <Video className="h-3 w-3 text-blue-400" />
+                        <Video className="h-3 w-3 text-teal-400" />
                         <span className="text-[10px] font-medium">sala-abc123</span>
                       </div>
                     </div>
@@ -261,7 +261,7 @@ export default function LandingPage() {
                     {/* Center content - waiting or connected indicator */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30 ring-4 ring-blue-400/20">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg shadow-teal-500/30 ring-4 ring-teal-400/20">
                           <span className="text-2xl font-bold text-white">MJ</span>
                         </div>
                         <p className="text-white/80 text-sm font-medium mt-3">Consulta online</p>
@@ -320,8 +320,8 @@ export default function LandingPage() {
                 </div>
                 <div className="absolute -bottom-3 -left-3 rounded-2xl bg-white dark:bg-slate-800 p-3 shadow-xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700" style={{ animation: "float 6s ease-in-out infinite 1s" }}>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-slate-900 dark:text-white">Próxima sessão</p>
@@ -339,13 +339,13 @@ export default function LandingPage() {
       <section className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">Veja como funciona</Badge>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">Veja como funciona</Badge>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Conheça a plataforma em ação</h2>
             <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
-            <button onClick={() => setVideoOpen(true)} className="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video w-full flex items-center justify-center group cursor-pointer hover:shadow-blue-950/30 transition-shadow" aria-label="Assistir demonstração da plataforma">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-blue-600/5" />
+            <button onClick={() => setVideoOpen(true)} className="relative rounded-2xl overflow-hidden shadow-2xl shadow-teal-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video w-full flex items-center justify-center group cursor-pointer hover:shadow-teal-950/30 transition-shadow" aria-label="Assistir demonstração da plataforma">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-teal-500/5" />
               <div className="relative z-10 text-center">
-                <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:bg-blue-700 transition-all">
+                <div className="w-16 h-16 rounded-full bg-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-teal-500/30 group-hover:scale-110 group-hover:bg-teal-700 transition-all">
                   <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
                 </div>
                 <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Assista à demonstração</p>
@@ -381,7 +381,7 @@ export default function LandingPage() {
               { icon: Clock, text: "Suporte em horário comercial" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
-                <item.icon className="h-5 w-5 text-blue-500" />
+                <item.icon className="h-5 w-5 text-teal-500" />
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.text}</span>
               </div>
             ))}
@@ -392,21 +392,21 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("steps.badge", locale)}</Badge>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("steps.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("steps.title", locale)}</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">{t("steps.subtitle", locale)}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-blue-500/30 via-blue-500/50 to-blue-500/30 -translate-y-1/2" />
+            <div className="hidden md:block absolute top-1/2 left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-teal-500/30 via-teal-500/50 to-teal-500/30 -translate-y-1/2" />
             {steps.map((step, i) => (
               <motion.div key={step.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.5 }} className="relative group">
-                <div className="text-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300">
+                <div className="text-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-teal-500/5 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-300">
                   <div className="relative inline-flex mb-6">
-                    <div className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-xl" />
-                    <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <div className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-full blur-xl" />
+                    <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
                       <step.icon className="h-7 w-7 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center shadow-md">{i + 1}</div>
+                    <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-teal-500 text-white text-xs font-bold flex items-center justify-center shadow-md">{i + 1}</div>
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">{locale === "en" ? step.en : step.title}</h3>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{locale === "en" ? step.enDesc : step.desc}</p>
@@ -421,11 +421,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
-              <Badge className="mb-4 bg-blue-500/15 text-blue-200 border border-blue-400/20">{t("saas.badge", locale)}</Badge>
+              <Badge className="mb-4 bg-teal-500/15 text-teal-200 border border-teal-400/20">{t("saas.badge", locale)}</Badge>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">{t("saas.title", locale)}</h2>
               <p className="mt-5 text-slate-300 leading-7">{t("saas.subtitle", locale)}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-blue-50">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+                <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-teal-50">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
                 <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">{t("saas.login", locale)}</Button></Link>
               </div>
               {/* Trust indicators */}
@@ -437,11 +437,11 @@ export default function LandingPage() {
             </div>
             <div className="relative">
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-teal-500/20 rounded-3xl blur-3xl" />
               {/* Feature Grid */}
               <div className="relative grid gap-4 sm:grid-cols-2">
                 {[
-                  { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale), color: "from-blue-500 to-blue-600" },
+                  { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale), color: "from-teal-500 to-teal-600" },
                   { icon: Brain, title: t("saas.feature2", locale), desc: t("saas.feature2desc", locale), color: "from-violet-500 to-purple-600" },
                   { icon: Shield, title: t("saas.feature3", locale), desc: t("saas.feature3desc", locale), color: "from-emerald-500 to-teal-600" },
                   { icon: BarChartIcon, title: t("saas.feature4", locale), desc: t("saas.feature4desc", locale), color: "from-amber-500 to-orange-600" },
@@ -463,14 +463,14 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="servicos" className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("services.badge", locale)}</Badge>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("services.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("services.title", locale)}</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">{t("services.subtitle", locale)}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, i) => (
               <motion.div key={service.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }}>
-                <Card className="group p-6 h-full hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 border-slate-200 dark:border-slate-800">
+                <Card className="group p-6 h-full hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300 border-slate-200 dark:border-slate-800">
                   <div className={cn("flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br shadow-lg mb-4 transition-all group-hover:scale-110 group-hover:rotate-3 duration-300", service.color)}>
                     <service.icon className="h-6 w-6 text-white" />
                   </div>
@@ -483,12 +483,12 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28 bg-gradient-to-br from-blue-50/50 to-slate-50/50 dark:from-slate-900/50 dark:to-slate-900/30">
+      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28 bg-gradient-to-br from-teal-50/50 to-slate-50/50 dark:from-slate-900/50 dark:to-slate-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-xl mx-auto text-center">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("about.badge", locale)}</Badge>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("about.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{t("about.title", locale)}</h2>
-            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-blue-500/20 mb-6">
+            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-teal-500/20 mb-6">
               <Image src="/profile.jpg" alt="Mário Júnior" width={96} height={96} className="w-full h-full object-cover" loading="lazy" />
             </div>
             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
@@ -497,11 +497,11 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               {["Terapia Individual", "Terapia de Casal", "Online"].map((item) => (
-                <Badge key={item} variant="secondary" className="px-3 py-1.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{item}</Badge>
+                <Badge key={item} variant="secondary" className="px-3 py-1.5 text-xs bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">{item}</Badge>
               ))}
             </div>
             <Link href="/sobre">
-              <Button variant="outline" size="lg" className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+              <Button variant="outline" size="lg" className="border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30">
                 {t("about.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -513,7 +513,7 @@ export default function LandingPage() {
         <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="avaliacoes" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("reviews.badge", locale)}</Badge>
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("reviews.badge", locale)}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("reviews.title", locale)}</h2>
               <div className="flex items-center justify-center gap-3 mt-6">
                 <div className="flex items-center gap-1">
@@ -528,8 +528,8 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-6">
               {reviews.slice(0, 3).map((r, i) => (
                 <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }}>
-                  <Card className="p-6 h-full border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
-                    <Quote className="h-8 w-8 text-blue-200 dark:text-blue-900 mb-3" />
+                  <Card className="p-6 h-full border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-teal-500/5 transition-all duration-300">
+                    <Quote className="h-8 w-8 text-teal-200 dark:text-teal-900 mb-3" />
                     <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-4 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
                     <div className="flex items-center justify-between">
                       <div>
@@ -547,7 +547,7 @@ export default function LandingPage() {
             </div>
             <div className="text-center mt-10">
               <Link href="/avaliacoes">
-                <Button variant="outline" size="lg" className="border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+                <Button variant="outline" size="lg" className="border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30">
                   Ver todas as avaliações <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -559,17 +559,17 @@ export default function LandingPage() {
       <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="faq" className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400">{t("faq.badge", locale)}</Badge>
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("faq.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("faq.title", locale)}</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">{t("faq.subtitle", locale)}</p>
           </div>
           <div className="space-y-3">
             {faqItems.map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
-                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 group">
+                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-200 group">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.q}</span>
-                    <ChevronDown className={cn("h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200", activeFaq === i && "rotate-180 text-blue-500")} />
+                    <span className="font-medium text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{item.q}</span>
+                    <ChevronDown className={cn("h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200", activeFaq === i && "rotate-180 text-teal-500")} />
                   </div>
                   <div id={`faq-answer-${i}`} role="region" className={cn("overflow-hidden transition-all duration-300", activeFaq === i ? "mt-4 max-h-40" : "max-h-0")}>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{item.a}</p>
@@ -582,7 +582,7 @@ export default function LandingPage() {
       </motion.section>
 
       <motion.section initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="relative py-24 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800" />
         <div className="absolute top-[-30%] right-[-20%] w-[70%] h-[70%] rounded-full bg-white/5 blur-3xl" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-white/5 blur-3xl" />
         {/* Grid pattern overlay */}
@@ -591,16 +591,16 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-8">
             <Badge className="px-4 py-2 text-sm bg-white/10 text-white border-white/20">{t("cta.badge", locale)}</Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">{t("cta.title", locale)}</h2>
-            <p className="text-lg text-blue-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
+            <p className="text-lg text-teal-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/agendar"><Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+              <Link href="/agendar"><Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
               <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white text-base h-12 px-8 font-semibold">Área do Paciente</Button></Link>
             </div>
-            <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-blue-200 hover:text-white transition-colors pt-2">
+            <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-teal-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
             </Link>
             {/* Trust badges */}
-            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-blue-200/70">
+            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-teal-200/70">
               <div className="flex items-center gap-2"><Shield className="h-4 w-4" /><span>100% Sigilo</span></div>
               <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4" /><span>CRP Ativo</span></div>
               <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>Atendimento Humanizado</span></div>
@@ -626,7 +626,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div className="space-y-4">
               <Link href="/" className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/20">
                   <Image src="/logo.png" alt="PsiHumanis" width={40} height={40} className="w-full h-full object-cover" />
                 </div>
                 <div>
@@ -671,9 +671,9 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Mail className="h-4 w-4 text-blue-400 shrink-0" />psi_mariojunior@hotmail.com</li>
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Phone className="h-4 w-4 text-blue-400 shrink-0" />(31) 99286-3861</li>
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><MapPin className="h-4 w-4 text-blue-400 shrink-0" />Belo Horizonte, MG</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Mail className="h-4 w-4 text-teal-400 shrink-0" />psi_mariojunior@hotmail.com</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Phone className="h-4 w-4 text-teal-400 shrink-0" />(31) 99286-3861</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-300"><MapPin className="h-4 w-4 text-teal-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
               <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <p className="text-xs text-slate-400 mb-2">Horário de suporte</p>
