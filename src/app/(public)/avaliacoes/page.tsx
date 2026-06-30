@@ -132,7 +132,7 @@ export default function AvaliacoesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-blue-50/30 dark:to-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-b from-background to-teal-50/30 dark:to-teal-950/10">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -162,7 +162,7 @@ export default function AvaliacoesPage() {
         )}
 
         {/* Aggregate */}
-        <Card className="mb-10 border-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20">
+        <Card className="mb-10 border-0 bg-gradient-to-br from-teal-600 to-teal-700 text-white shadow-xl shadow-teal-500/20">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-center justify-around gap-6">
               <div className="text-center">
@@ -170,7 +170,7 @@ export default function AvaliacoesPage() {
                 <div className="flex justify-center my-2">
                   <Stars value={Math.round(average)} size={22} />
                 </div>
-                <p className="text-blue-100 text-sm">{total} {total === 1 ? "avaliação" : "avaliações"}</p>
+                <p className="text-teal-100 text-sm">{total} {total === 1 ? "avaliação" : "avaliações"}</p>
               </div>
               <div className="hidden md:block w-px h-24 bg-white/20" />
               <div className="space-y-2 w-full max-w-xs">
@@ -179,12 +179,12 @@ export default function AvaliacoesPage() {
                   const pct = total > 0 ? (count / total) * 100 : 0
                   return (
                     <div key={star} className="flex items-center gap-2 text-sm">
-                      <span className="w-3 text-blue-100">{star}</span>
+                      <span className="w-3 text-teal-100">{star}</span>
                       <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />
                       <div className="flex-1 h-2 rounded-full bg-white/20 overflow-hidden">
                         <div className="h-full rounded-full bg-amber-300 transition-all duration-500" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-8 text-right text-blue-100">{count}</span>
+                      <span className="w-8 text-right text-teal-100">{count}</span>
                     </div>
                   )
                 })}
@@ -197,7 +197,7 @@ export default function AvaliacoesPage() {
           {/* Reviews list */}
           <div className="lg:col-span-2 space-y-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Quote className="h-5 w-5 text-blue-500" />
+              <Quote className="h-5 w-5 text-teal-500" />
               O que dizem nossos pacientes
             </h2>
             {loading ? (
@@ -219,7 +219,7 @@ export default function AvaliacoesPage() {
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600/10 text-blue-600 font-semibold text-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-600/10 text-teal-600 font-semibold text-sm">
                           {r.patientName.charAt(0).toUpperCase()}
                         </div>
                         <div>
