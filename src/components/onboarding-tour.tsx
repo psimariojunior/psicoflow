@@ -193,20 +193,20 @@ export function OnboardingTour() {
         }}
       >
         {/* Pulsing glow */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-cyan-500/20 rounded-3xl blur-xl animate-pulse" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/20 via-violet-500/20 to-cyan-500/20 rounded-3xl blur-xl animate-pulse" />
         <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {/* Header with gradient */}
-          <div className="relative h-2 bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500" />
+          <div className="relative h-2 bg-gradient-to-r from-teal-500 via-violet-500 to-cyan-500" />
 
           {/* Close + progress */}
           <div className="flex items-center justify-between px-5 pt-4">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950/50 flex items-center justify-center animate-pulse">
-                <Lightbulb className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+              <div className="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-950/50 flex items-center justify-center animate-pulse">
+                <Lightbulb className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
               </div>
               <div className="flex items-center gap-1">
                 {steps.map((_, i) => (
-                  <div key={i} className={cn("h-1.5 rounded-full transition-all duration-300", i === step ? "w-6 bg-blue-500" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200 dark:bg-slate-700")} />
+                  <div key={i} className={cn("h-1.5 rounded-full transition-all duration-300", i === step ? "w-6 bg-teal-500" : i < step ? "w-1.5 bg-teal-300" : "w-1.5 bg-slate-200 dark:bg-slate-700")} />
                 ))}
               </div>
             </div>
@@ -217,7 +217,7 @@ export function OnboardingTour() {
 
           {/* Page badge */}
           <div className="px-5 mt-2">
-            <span className="inline-block text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
+            <span className="inline-block text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
               {s.page}
             </span>
           </div>
@@ -232,7 +232,7 @@ export function OnboardingTour() {
           <div className="px-5 mt-3 space-y-2">
             {s.points.map((p, i) => (
               <div key={i} className="flex items-start gap-2.5" style={{ opacity: anim === "in" ? 1 : 0, transition: `opacity 0.3s ease ${i * 80}ms` }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-[7px] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-[7px] shrink-0" />
                 <div className="flex-1">
                   <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">{p.label}</span>
                   <span className="text-[12px] text-slate-500 ml-1">— {p.text}</span>
@@ -244,7 +244,7 @@ export function OnboardingTour() {
           {/* Progress bar */}
           <div className="px-5 mt-4">
             <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-gradient-to-r from-teal-500 to-teal-600 transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
             </div>
           </div>
 
@@ -263,7 +263,7 @@ export function OnboardingTour() {
                 onClick={() => last ? finish() : go(step + 1)}
                 className={cn(
                   "h-8 px-5 rounded-lg text-[12px] font-semibold text-white shadow-md transition-all flex items-center gap-1.5",
-                  last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500"
+                  last ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400" : "bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500"
                 )}
               >
                 {last ? <><Check className="h-4 w-4" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4" /></>}

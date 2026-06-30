@@ -13,7 +13,7 @@ const steps = [
     icon: Calendar,
     title: "Agenda Inteligente",
     desc: "Gerencie seus horários com facilidade. Confirmação automática por WhatsApp e lembretes para reduzir faltas.",
-    color: "from-blue-500 to-blue-600",
+    color: "from-teal-500 to-teal-600",
     mock: "agenda",
   },
   {
@@ -34,7 +34,7 @@ const steps = [
     icon: Video,
     title: "Sala Virtual Segura",
     desc: "Atenda online com videochamada criptografada. Tudo integrado na plataforma.",
-    color: "from-cyan-500 to-blue-600",
+    color: "from-cyan-500 to-teal-600",
     mock: "video",
   },
   {
@@ -76,7 +76,7 @@ function MockAgenda() {
         {days.map((d) => (
           <div key={d + "-slots"} className="space-y-1 min-h-[80px]">
             {hours.map((h) => (
-              <div key={h} className={`text-[9px] py-1 rounded ${slots[d]?.includes(h) ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium" : "text-slate-300 dark:text-slate-700"}`}>
+              <div key={h} className={`text-[9px] py-1 rounded ${slots[d]?.includes(h) ? "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 font-medium" : "text-slate-300 dark:text-slate-700"}`}>
                 {slots[d]?.includes(h) ? h : ""}
               </div>
             ))}
@@ -103,7 +103,7 @@ function MockPacientes() {
         {patients.map((p, i) => (
           <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">{p.name[0]}</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold">{p.name[0]}</div>
               <div>
                 <p className="text-xs font-medium text-slate-900 dark:text-white">{p.name}</p>
                 <p className="text-[10px] text-slate-500">{p.session}</p>
@@ -127,14 +127,14 @@ function MockLembretes() {
       <div className="space-y-2">
         {[
           { patient: "Maria S.", type: "WhatsApp", when: "24h antes", status: "Enviado", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" },
-          { patient: "Maria S.", type: "WhatsApp", when: "1h antes", status: "Agendado", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" },
+          { patient: "Maria S.", type: "WhatsApp", when: "1h antes", status: "Agendado", color: "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400" },
           { patient: "João P.", type: "Email", when: "24h antes", status: "Enviado", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" },
           { patient: "Ana L.", type: "WhatsApp", when: "1h antes", status: "Pendente", color: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400" },
         ].map((item, i) => (
           <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
             <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${item.type === "WhatsApp" ? "bg-green-100 dark:bg-green-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`}>
-                {item.type === "WhatsApp" ? <svg className="w-3.5 h-3.5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> : <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>}
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${item.type === "WhatsApp" ? "bg-green-100 dark:bg-green-900/30" : "bg-teal-100 dark:bg-teal-900/30"}`}>
+                {item.type === "WhatsApp" ? <svg className="w-3.5 h-3.5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> : <svg className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>}
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-900 dark:text-white">{item.patient}</p>
@@ -156,7 +156,7 @@ function MockLembretes() {
 function MockVideo() {
   return (
     <div className="bg-slate-900 rounded-xl p-4 shadow-lg border border-slate-700 overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-slate-900 to-indigo-950/40" />
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-950/60 via-slate-900 to-indigo-950/40" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-3 py-1 rounded-lg border border-white/10">
@@ -166,7 +166,7 @@ function MockVideo() {
           <span className="text-[10px] text-white/50">47:32</span>
         </div>
         <div className="flex items-center justify-center py-8">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 ring-4 ring-blue-400/20">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30 ring-4 ring-teal-400/20">
             <span className="text-lg font-bold text-white">MJ</span>
           </div>
         </div>
@@ -192,7 +192,7 @@ function MockFinanceiro() {
         {[
           { label: "Recebido", value: "R$ 4.850", color: "text-emerald-600" },
           { label: "Pendente", value: "R$ 780", color: "text-amber-600" },
-          { label: "Meta mensal", value: "72%", color: "text-blue-600" },
+          { label: "Meta mensal", value: "72%", color: "text-teal-600" },
         ].map((item, i) => (
           <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800">
             <span className="text-xs text-slate-600 dark:text-slate-400">{item.label}</span>
@@ -212,12 +212,12 @@ function MockRelatorios() {
     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-800">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-slate-900 dark:text-white">Métricas</span>
-        <BarChart3 className="h-4 w-4 text-blue-500" />
+        <BarChart3 className="h-4 w-4 text-teal-500" />
       </div>
       <div className="grid grid-cols-2 gap-2">
         {[
           { label: "Comparecimento", value: "94%", icon: CheckCircle, color: "text-emerald-600" },
-          { label: "Sessões/mês", value: "32", icon: Calendar, color: "text-blue-600" },
+          { label: "Sessões/mês", value: "32", icon: Calendar, color: "text-teal-600" },
           { label: "Novos pacientes", value: "5", icon: Users, color: "text-violet-600" },
           { label: "Faturamento", value: "+12%", icon: BarChart3, color: "text-amber-600" },
         ].map((item, i) => (
@@ -269,7 +269,7 @@ export function VideoTour() {
             </div>
             <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full"
                 initial={false}
                 animate={{ width: `${((current + 1) / steps.length) * 100}%` }}
                 transition={{ duration: 0.5 }}

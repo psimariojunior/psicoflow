@@ -69,7 +69,7 @@ export default function LGPDExportPage() {
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Shield className="h-8 w-8 text-blue-500" />
+          <Shield className="h-8 w-8 text-teal-500" />
           Meus Dados (LGPD)
         </h1>
         <p className="text-muted-foreground mt-2">

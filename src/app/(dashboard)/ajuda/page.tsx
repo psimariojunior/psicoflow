@@ -54,7 +54,7 @@ const sections = [
     id: "dashboard",
     title: "Dashboard",
     icon: LayoutDashboard,
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-teal-500 to-indigo-600",
     items: [
       {
         title: "Como usar o dashboard principal",
@@ -77,7 +77,7 @@ const sections = [
     id: "pacientes",
     title: "Pacientes",
     icon: Users,
-    gradient: "from-blue-600 to-sky-600",
+    gradient: "from-teal-600 to-sky-600",
     items: [
       {
         title: "Como cadastrar um paciente",
@@ -216,7 +216,7 @@ const sections = [
     id: "sala-virtual",
     title: "Sala Virtual",
     icon: Video,
-    gradient: "from-cyan-500 to-blue-700",
+    gradient: "from-cyan-500 to-teal-700",
     items: [
       {
         title: "Iniciar videochamada",
@@ -267,7 +267,7 @@ const sections = [
     id: "consentimento-digital",
     title: "Consentimento Digital",
     icon: FileSignature,
-    gradient: "from-indigo-500 to-blue-600",
+    gradient: "from-indigo-500 to-teal-600",
     items: [
       {
         title: "Como funciona o termo LGPD",
@@ -361,7 +361,7 @@ export default function AjudaPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-8 sm:p-12 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 via-teal-700 to-indigo-900 p-8 sm:p-12 text-white">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-3">
@@ -375,7 +375,7 @@ export default function AjudaPage() {
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
             Guia do PsiHumanis
           </h1>
-          <p className="text-blue-100 text-lg sm:text-xl max-w-2xl">
+          <p className="text-teal-100 text-lg sm:text-xl max-w-2xl">
             Tudo que você precisa saber para usar o sistema
           </p>
         </div>
@@ -445,8 +445,8 @@ export default function AjudaPage() {
                         className={cn(
                           "rounded-xl border transition-all duration-200",
                           isItemExpanded
-                            ? "border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm"
-                            : "border-border hover:border-blue-200 dark:hover:border-blue-800 hover:bg-accent/30",
+                            ? "border-teal-200 dark:border-teal-800 bg-teal-50/40 dark:bg-teal-950/20 shadow-sm"
+                            : "border-border hover:border-teal-200 dark:hover:border-teal-800 hover:bg-accent/30",
                         )}
                       >
                         <button
@@ -459,7 +459,7 @@ export default function AjudaPage() {
                             className={cn(
                               "shrink-0 rounded-full p-0.5 transition-colors",
                               isItemExpanded
-                                ? "text-blue-500"
+                                ? "text-teal-500"
                                 : "text-muted-foreground",
                             )}
                           >
@@ -488,8 +488,8 @@ export default function AjudaPage() {
         })}
       </div>
 
-      <Card className="overflow-hidden border-blue-200 dark:border-blue-800">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-5">
+      <Card className="overflow-hidden border-teal-200 dark:border-teal-800">
+        <div className="bg-gradient-to-r from-teal-600 to-indigo-700 px-6 py-5">
           <h2 className="text-white text-lg font-semibold flex items-center gap-2">
             <HelpCircle className="h-5 w-5" />
             Precisa de ajuda? Entre em contato
@@ -500,22 +500,22 @@ export default function AjudaPage() {
             Nossa equipe está pronta para ajudar com qualquer dúvida sobre o PsiHumanis.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex items-center gap-3 rounded-xl border p-4 flex-1 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
-              <div className="rounded-xl bg-blue-100 dark:bg-blue-900/40 p-2.5 text-blue-600 dark:text-blue-400">
+            <div className="flex items-center gap-3 rounded-xl border p-4 flex-1 hover:border-teal-200 dark:hover:border-teal-800 transition-colors">
+              <div className="rounded-xl bg-teal-100 dark:bg-teal-900/40 p-2.5 text-teal-600 dark:text-teal-400">
                 <Mail className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">E-mail</p>
                 <a
                   href="mailto:suporte@psihumanis.com"
-                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
                 >
                   suporte@psihumanis.com
                 </a>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-xl border p-4 flex-1 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
-              <div className="rounded-xl bg-blue-100 dark:bg-blue-900/40 p-2.5 text-blue-600 dark:text-blue-400">
+            <div className="flex items-center gap-3 rounded-xl border p-4 flex-1 hover:border-teal-200 dark:hover:border-teal-800 transition-colors">
+              <div className="rounded-xl bg-teal-100 dark:bg-teal-900/40 p-2.5 text-teal-600 dark:text-teal-400">
                 <Phone className="h-5 w-5" />
               </div>
               <div>
@@ -524,7 +524,7 @@ export default function AjudaPage() {
                   href="https://wa.me/5531992863861"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                  className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline inline-flex items-center gap-1"
                 >
                   (31) 99286-3861
                   <ExternalLink className="h-3 w-3" />
@@ -539,7 +539,7 @@ export default function AjudaPage() {
             </p>
             <Link
               href="/configuracoes"
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+              className="text-xs text-teal-600 dark:text-teal-400 hover:underline inline-flex items-center gap-1"
             >
               Configurações da conta
               <ExternalLink className="h-3 w-3" />

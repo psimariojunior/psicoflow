@@ -339,7 +339,7 @@ export default function ComunicacaoPage() {
                               <div className="flex items-center gap-2">
                                 <span className={cn(
                                   "text-xs font-medium px-1.5 py-0.5 rounded",
-                                  h.type === "reminder" ? "bg-blue-500/10 text-blue-600" : "bg-emerald-500/10 text-emerald-600"
+                                  h.type === "reminder" ? "bg-teal-500/10 text-teal-600" : "bg-emerald-500/10 text-emerald-600"
                                 )}>
                                   {h.type === "reminder" ? "Lembrete" : "Texto"}
                                 </span>

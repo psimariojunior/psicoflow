@@ -91,7 +91,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl shadow-blue-500/30 ring-4 ring-blue-500/20 mb-1">
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 shadow-2xl shadow-teal-500/30 ring-4 ring-teal-500/20 mb-1">
             <Image src="/logo.png" alt="PsiHumanis" width={80} height={80} className="w-full h-full object-cover" priority />
           </div>
           <h1 className="text-3xl font-bold">Criar Conta</h1>
@@ -107,11 +107,11 @@ export default function RegisterPage() {
               <CardDescription>Informe seus dados para criar sua conta</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="mb-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 p-4 space-y-2">
-                <p className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+              <div className="mb-4 rounded-xl bg-teal-50 dark:bg-teal-950/30 p-4 space-y-2">
+                <p className="text-sm font-medium text-teal-700 dark:text-teal-300 flex items-center gap-1.5">
                   <Gift className="h-4 w-4" /> 14 dias de trial gratuito
                 </p>
-                <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1">
+                <ul className="text-xs text-teal-600 dark:text-teal-400 space-y-1">
                   <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Agenda online e prontuários digitais</li>
                   <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Sala virtual com videochamada segura</li>
                   <li className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3" /> Lembretes automáticos por WhatsApp e email</li>
@@ -206,14 +206,14 @@ export default function RegisterPage() {
                     minLength={8}
                   />
                   <div className="flex gap-2 text-xs">
-                    <span className={formData.password.length >= 8 ? "text-blue-500" : "text-muted-foreground"}>
+                    <span className={formData.password.length >= 8 ? "text-teal-500" : "text-muted-foreground"}>
                       <CheckCircle2 className="mr-1 inline h-3 w-3" />
                       8+ caracteres
                     </span>
-                    <span className={/[A-Z]/.test(formData.password) ? "text-blue-500" : "text-muted-foreground"}>
+                    <span className={/[A-Z]/.test(formData.password) ? "text-teal-500" : "text-muted-foreground"}>
                       Maiúscula
                     </span>
-                    <span className={/[0-9]/.test(formData.password) ? "text-blue-500" : "text-muted-foreground"}>
+                    <span className={/[0-9]/.test(formData.password) ? "text-teal-500" : "text-muted-foreground"}>
                       Número
                     </span>
                   </div>

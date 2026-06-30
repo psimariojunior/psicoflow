@@ -52,10 +52,10 @@ export function AiSoapGenerator({ onInsert, className }: AiSoapGeneratorProps) {
   }
 
   return (
-    <Card className={cn("border-blue-200/50 dark:border-blue-800/30", className)}>
+    <Card className={cn("border-teal-200/50 dark:border-teal-800/30", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/20">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg shadow-teal-500/20">
             <Sparkles className="h-4 w-4 text-white" />
           </div>
           <div>
@@ -79,7 +79,7 @@ export function AiSoapGenerator({ onInsert, className }: AiSoapGeneratorProps) {
         <Button
           onClick={handleGenerate}
           disabled={loading || !keywords.trim()}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20"
+          className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/20"
           size="sm"
         >
           {loading ? (
@@ -91,7 +91,7 @@ export function AiSoapGenerator({ onInsert, className }: AiSoapGeneratorProps) {
 
         {model && (
           <Badge variant="outline" className="text-[10px] text-muted-foreground">
-            <CheckCircle2 className="h-3 w-3 mr-1 text-blue-500" />
+            <CheckCircle2 className="h-3 w-3 mr-1 text-teal-500" />
             {model}
           </Badge>
         )}
@@ -109,7 +109,7 @@ export function AiSoapGenerator({ onInsert, className }: AiSoapGeneratorProps) {
             <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-4 pr-16 text-sm whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto">
               {result}
             </div>
-            <Button onClick={handleInsert} size="sm" className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={handleInsert} size="sm" className="mt-2 w-full bg-teal-600 hover:bg-teal-700 text-white">
               <Brain className="mr-2 h-4 w-4" /> Inserir no Prontuário
             </Button>
           </div>

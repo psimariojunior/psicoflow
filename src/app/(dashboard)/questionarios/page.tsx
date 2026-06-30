@@ -17,7 +17,7 @@ interface QuestionnaireInfo {
 }
 
 const typeConfig: Record<string, { color: string; icon: any; desc: string }> = {
-  PHQ9: { color: "from-blue-500 to-indigo-600", icon: Brain, desc: "Depressão" },
+  PHQ9: { color: "from-teal-500 to-indigo-600", icon: Brain, desc: "Depressão" },
   GAD7: { color: "from-violet-500 to-purple-600", icon: Brain, desc: "Ansiedade" },
   BECK: { color: "from-rose-500 to-pink-600", icon: ClipboardList, desc: "Depressão (21 itens)" },
   PSS: { color: "from-amber-500 to-orange-600", icon: BarChart3, desc: "Estresse Percebido" },
@@ -55,7 +55,7 @@ export default function QuestionariosPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
             Questionários Clínicos
           </h1>
           <p className="text-muted-foreground mt-1">Avaliações disponíveis para os pacientes</p>
@@ -71,7 +71,7 @@ export default function QuestionariosPage() {
           const cfg = typeConfig[q.type] || { color: "from-slate-500 to-slate-600", icon: ClipboardList, desc: "" }
           const Icon = cfg.icon
           return (
-            <Card key={q.id} className="hover:shadow-lg hover:shadow-blue-500/5 transition-all group">
+            <Card key={q.id} className="hover:shadow-lg hover:shadow-teal-500/5 transition-all group">
               <CardHeader>
                 <div className="flex items-start gap-4">
                   <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg shrink-0 group-hover:scale-110 transition-all duration-300", cfg.color)}>
@@ -100,10 +100,10 @@ export default function QuestionariosPage() {
         })}
       </div>
 
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200/50 dark:border-blue-800/30">
+      <Card className="bg-gradient-to-br from-teal-50 to-indigo-50 dark:from-teal-950/30 dark:to-indigo-950/30 border-teal-200/50 dark:border-teal-800/30">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shrink-0">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg shrink-0">
               <FileText className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1">

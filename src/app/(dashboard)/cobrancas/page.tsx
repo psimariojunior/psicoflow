@@ -323,8 +323,8 @@ export default function CobrancasPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <Receipt className="h-5 w-5 text-blue-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-900/30">
+                <Receipt className="h-5 w-5 text-teal-600" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total de Faturas</p>

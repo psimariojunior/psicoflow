@@ -685,13 +685,13 @@ export default function SettingsPage() {
                   {profile.avatarUrl ? (
                     <img src={profile.avatarUrl} alt="" className="h-16 w-16 rounded-full object-cover ring-2 ring-white/10" />
                   ) : (
-                    <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center ring-2 ring-white/10 shrink-0">
-                      <User className="h-8 w-8 text-blue-400" />
+                    <div className="h-16 w-16 rounded-full bg-gradient-to-br from-teal-500/30 to-indigo-500/30 flex items-center justify-center ring-2 ring-white/10 shrink-0">
+                      <User className="h-8 w-8 text-teal-400" />
                     </div>
                   )}
                   <div className="min-w-0">
                     <h3 className="text-lg font-semibold text-white">{profile.publicName || profile.name || "Seu nome"}</h3>
-                    {profile.specialty && <p className="text-blue-400/80 text-sm">{profile.specialty}</p>}
+                    {profile.specialty && <p className="text-teal-400/80 text-sm">{profile.specialty}</p>}
                     {profile.sessionPrice && <p className="text-green-400 text-sm font-medium mt-1">R$ {Number(profile.sessionPrice).toFixed(2)}</p>}
                   </div>
                 </div>
@@ -699,7 +699,7 @@ export default function SettingsPage() {
                   <p className="text-white/50 text-sm mb-3 line-clamp-3">{profile.publicBio || profile.bio}</p>
                 )}
                 {profile.welcomeMessage && (
-                  <p className="text-blue-300/70 text-sm italic mb-3">&ldquo;{profile.welcomeMessage}&rdquo;</p>
+                  <p className="text-teal-300/70 text-sm italic mb-3">&ldquo;{profile.welcomeMessage}&rdquo;</p>
                 )}
                 {profile.clinicAddress && (
                   <p className="text-white/30 text-xs">{profile.clinicAddress}</p>
@@ -1050,7 +1050,7 @@ export default function SettingsPage() {
                         {portalLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Gerenciar
                       </Button>
-                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-blue-600 hover:bg-blue-700">
+                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-teal-600 hover:bg-teal-700">
                         {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Upgrade para Clínica
                       </Button>
@@ -1061,7 +1061,7 @@ export default function SettingsPage() {
                         {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Assinar Pro — R$97/mês
                       </Button>
-                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-blue-600 hover:bg-blue-700">
+                      <Button size="sm" onClick={() => handleUpgrade("clinica")} disabled={upgradeLoading} className="bg-teal-600 hover:bg-teal-700">
                         {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Assinar Clínica — R$197/mês
                       </Button>
@@ -1128,7 +1128,7 @@ export default function SettingsPage() {
                     {exportLoading === "json" ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <FileJson className="h-5 w-5 text-blue-500" />
+                      <FileJson className="h-5 w-5 text-teal-500" />
                     )}
                     <span className="font-medium">Exportar JSON</span>
                   </div>

@@ -28,7 +28,7 @@ interface ProgressData {
 const typeColors: Record<string, { bar: string; bg: string; text: string }> = {
   PHQ9: { bar: "#22c55e", bg: "bg-green-500/10", text: "text-green-600" },
   GAD7: { bar: "#ef4444", bg: "bg-red-500/10", text: "text-red-600" },
-  BECK: { bar: "#3b82f6", bg: "bg-blue-500/10", text: "text-blue-600" },
+  BECK: { bar: "#3b82f6", bg: "bg-teal-500/10", text: "text-teal-600" },
   PSS: { bar: "#f59e0b", bg: "bg-amber-500/10", text: "text-amber-600" },
   MINI: { bar: "#8b5cf6", bg: "bg-purple-500/10", text: "text-purple-600" },
 }

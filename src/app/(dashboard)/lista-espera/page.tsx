@@ -119,7 +119,7 @@ export default function ListaEsperaPage() {
   const statusBadge = (status: string) => {
     const s = STATUS_MAP[status] || { label: status, variant: "outline" }
     const variants: Record<string, string> = {
-      info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100",
+      info: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100",
       warning: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
       success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
       outline: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
@@ -170,7 +170,7 @@ export default function ListaEsperaPage() {
         </div>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700"><Plus className="mr-2 h-4 w-4" /> Adicionar à Lista</Button>
+            <Button className="bg-teal-600 hover:bg-teal-700"><Plus className="mr-2 h-4 w-4" /> Adicionar à Lista</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[480px]">
             <DialogHeader><DialogTitle>Adicionar à Lista de Espera</DialogTitle></DialogHeader>
@@ -217,7 +217,7 @@ export default function ListaEsperaPage() {
                 <Label>Observações</Label>
                 <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} placeholder="Motivo da procura, restrições de horário..." />
               </div>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Adicionar</Button>
+              <Button type="submit" className="bg-teal-600 hover:bg-teal-700">Adicionar</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -238,8 +238,8 @@ export default function ListaEsperaPage() {
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 shrink-0">
-                      <UserPlus className="h-4 w-4 text-blue-600" />
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/30 shrink-0">
+                      <UserPlus className="h-4 w-4 text-teal-600" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-sm truncate">{entry.patientName}</p>

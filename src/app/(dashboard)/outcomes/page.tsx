@@ -155,7 +155,7 @@ export default function OutcomesPage() {
         {validScores.slice(-10).map((entry, i) => (
           <div
             key={i}
-            className="rounded-sm bg-blue-500 transition-all"
+            className="rounded-sm bg-teal-500 transition-all"
             style={{
               width: `${barWidth}%`,
               height: `${((entry.score || 0) / maxScore) * 100}%`,
@@ -171,7 +171,7 @@ export default function OutcomesPage() {
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+        <RefreshCw className="h-8 w-8 animate-spin text-teal-500" />
       </div>
     )
   }
@@ -197,8 +197,8 @@ export default function OutcomesPage() {
           <Card className="dark:bg-slate-900 dark:border-slate-800">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                  <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Pacientes</p>

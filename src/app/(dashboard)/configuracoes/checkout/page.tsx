@@ -55,12 +55,12 @@ export default function CheckoutPage() {
       <Card className="dark:bg-slate-900 dark:border-slate-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-blue-500" />
+            <CreditCard className="h-5 w-5 text-teal-500" />
             Assinando plano {plan === "clinica" ? "Clínica" : "Pro"}...
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center p-8">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto" />
+          <Loader2 className="h-8 w-8 animate-spin text-teal-500 mx-auto" />
           <p className="text-muted-foreground mt-4">Redirecionando para o Stripe...</p>
         </CardContent>
       </Card>

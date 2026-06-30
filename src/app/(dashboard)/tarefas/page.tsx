@@ -215,7 +215,7 @@ export default function TarefasPage() {
                       </div>
                       <Badge variant={cfg.variant} className={cn(
                         "shrink-0 gap-1 capitalize",
-                        task.status === "PENDING" && "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30",
+                        task.status === "PENDING" && "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/30",
                         task.status === "COMPLETED" && "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/30",
                         task.status === "CANCELLED" && "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
                       )}>

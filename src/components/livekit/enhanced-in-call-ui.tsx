@@ -474,7 +474,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
     return () => window.removeEventListener("keydown", handleKey)
   }, [onLeave, toggleCam, toggleMic, togglePanel])
 
-  const qualityColors = { excellent: "text-emerald-400", good: "text-blue-400", poor: "text-amber-400", unknown: "text-slate-400" }
+  const qualityColors = { excellent: "text-emerald-400", good: "text-teal-400", poor: "text-amber-400", unknown: "text-slate-400" }
   const qualityDots = { excellent: 3, good: 2, poor: 1, unknown: 0 }
 
   return (
@@ -485,12 +485,12 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
         {!hasRemote && !isScreenSharing && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-3 animate-pulse px-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-2 border-blue-500/30 flex items-center justify-center mx-auto">
-                <User className="h-8 w-8 sm:h-10 sm:w-10 text-blue-400/60" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-teal-500/20 to-teal-600/10 border-2 border-teal-500/30 flex items-center justify-center mx-auto">
+                <User className="h-8 w-8 sm:h-10 sm:w-10 text-teal-400/60" />
               </div>
               <div>
-                <p className="text-blue-300/80 text-sm font-medium">Aguardando {isPsychologist ? "paciente" : "psicólogo"}</p>
-                <p className="text-blue-400/40 text-xs mt-1">{isPsychologist ? "O paciente entrará em breve" : "O profissional entrará em breve"}</p>
+                <p className="text-teal-300/80 text-sm font-medium">Aguardando {isPsychologist ? "paciente" : "psicólogo"}</p>
+                <p className="text-teal-400/40 text-xs mt-1">{isPsychologist ? "O paciente entrará em breve" : "O profissional entrará em breve"}</p>
               </div>
             </div>
           </div>
@@ -512,7 +512,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
 
       {/* Screen share badge */}
       {(isScreenSharing || remoteScreenSharing) && (
-        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-blue-600/90 backdrop-blur-sm text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium shadow-lg">
+        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-teal-600/90 backdrop-blur-sm text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium shadow-lg">
           <Monitor className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           <span>{isScreenSharing ? "Você está compartilhando tela" : `${remoteName} está compartilhando tela`}</span>
         </div>
@@ -596,7 +596,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
               placeholder="Mensagem..."
               className="flex-1 bg-white/10 text-white text-xs px-2.5 py-2 sm:px-3 rounded-lg border-none outline-none placeholder:text-white/30 min-w-0"
             />
-            <button onClick={sendChat} className="w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-500 flex items-center justify-center text-white shrink-0" aria-label="Enviar">
+            <button onClick={sendChat} className="w-8 h-8 rounded-lg bg-teal-600 hover:bg-teal-500 flex items-center justify-center text-white shrink-0" aria-label="Enviar">
               <Send className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -629,7 +629,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
           <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xl rounded-full px-2 py-1.5 border border-white/10 sm:hidden" style={{ touchAction: "manipulation" }}>
             <button
               onPointerDown={(e) => { e.preventDefault(); togglePip() }}
-              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isPip ? "bg-teal-500/30 text-teal-300" : "bg-white/10 text-white")}
               aria-label="Picture-in-Picture"
               title="Picture-in-Picture: mantém o vídeo visível em janela flutuante"
             >
@@ -641,7 +641,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             {screenShareSupported && (
               <button
                 onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }}
-                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+                className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", isScreenSharing ? "bg-teal-500/30 text-teal-300" : "bg-white/10 text-white")}
                 aria-label="Compartilhar tela"
               >
                 {isScreenSharing ? <MonitorOff className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
@@ -658,7 +658,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             )}
             <button
               onPointerDown={(e) => { e.preventDefault(); togglePanel("chat") }}
-              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 text-white")}
+              className={cn("flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90", activePanel === "chat" ? "bg-teal-500/30 text-teal-300" : "bg-white/10 text-white")}
               aria-label="Chat"
             >
               <MessageCircle className="h-4 w-4" />
@@ -693,14 +693,14 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
             {/* Desktop only: inline secondary buttons */}
             <div className="hidden sm:flex items-center gap-1.5 ml-1">
               <div className="w-px h-8 bg-white/10" />
-              <button onPointerDown={(e) => { e.preventDefault(); togglePip() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isPip ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Picture-in-Picture" title="PiP: vídeo em janela flutuante">
+              <button onPointerDown={(e) => { e.preventDefault(); togglePip() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isPip ? "bg-teal-500/30 text-teal-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Picture-in-Picture" title="PiP: vídeo em janela flutuante">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="3" width="20" height="14" rx="2" />
                   <rect x="11" y="9" width="9" height="7" rx="1" fill="currentColor" opacity="0.3" />
                 </svg>
               </button>
               {screenShareSupported && (
-                <button onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isScreenSharing ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
+                <button onPointerDown={(e) => { e.preventDefault(); toggleScreenShare() }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", isScreenSharing ? "bg-teal-500/30 text-teal-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Compartilhar tela">
                   {isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
                 </button>
               )}
@@ -709,7 +709,7 @@ export function EnhancedInCallUI({ roomName, onLeave, isPsychologist = false }: 
                   <Sparkles className="h-5 w-5" />
                 </button>
               )}
-              <button onPointerDown={(e) => { e.preventDefault(); togglePanel("chat") }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", activePanel === "chat" ? "bg-blue-500/30 text-blue-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
+              <button onPointerDown={(e) => { e.preventDefault(); togglePanel("chat") }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", activePanel === "chat" ? "bg-teal-500/30 text-teal-300" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Chat">
                 <MessageCircle className="h-5 w-5" />
               </button>
               <button onPointerDown={(e) => { e.preventDefault(); setReactionPickerOpen(p => !p) }} className={cn("flex items-center justify-center w-12 h-12 rounded-xl transition-all active:scale-90", reactionPickerOpen ? "bg-white/20 text-white" : "bg-white/10 hover:bg-white/20 text-white")} aria-label="Reações">

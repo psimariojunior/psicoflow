@@ -81,7 +81,7 @@ export default function QuestionariosPage() {
         Voltar
       </button>
       <div className="animate-fade-in">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Questionários Clínicos</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-700 bg-clip-text text-transparent">Questionários Clínicos</h1>
         <p className="text-muted-foreground mt-1">Questionários disponíveis para preenchimento</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 animate-stagger">
@@ -94,13 +94,13 @@ export default function QuestionariosPage() {
           questionnaires.map(q => {
             const lr = lastResp(q.id)
             return (
-              <Card key={q.id} className={cn("transition-all card-hover", lr && "ring-2 ring-blue-500/30")}>
+              <Card key={q.id} className={cn("transition-all card-hover", lr && "ring-2 ring-teal-500/30")}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg">{q.title}</CardTitle>
                       <span className={cn("inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1",
-                        q.type === "PHQ9" ? "bg-blue-100 text-blue-700" :
+                        q.type === "PHQ9" ? "bg-teal-100 text-teal-700" :
                         q.type === "GAD7" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" :
                         q.type === "BAI" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" :
                         q.type === "BDI" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400" :
@@ -110,7 +110,7 @@ export default function QuestionariosPage() {
                         "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                       )}>{q.type}</span>
                     </div>
-                    {lr && <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />}
+                    {lr && <CheckCircle2 className="h-5 w-5 text-teal-600 shrink-0" />}
                   </div>
                 </CardHeader>
                 <CardContent>

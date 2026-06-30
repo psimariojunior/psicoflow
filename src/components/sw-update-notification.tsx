@@ -57,8 +57,8 @@ export function SwUpdateNotification() {
           <div className="bg-slate-900 dark:bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
             <div className="p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
-                  <RefreshCw className="h-4 w-4 text-blue-400" />
+                <div className="w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center shrink-0">
+                  <RefreshCw className="h-4 w-4 text-teal-400" />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-white">Nova versão disponível</p>
@@ -68,7 +68,7 @@ export function SwUpdateNotification() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleUpdate}
-                  className="text-[11px] font-semibold bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors"
+                  className="text-[11px] font-semibold bg-teal-600 hover:bg-teal-500 text-white px-3 py-1.5 rounded-lg transition-colors"
                 >
                   Atualizar
                 </button>

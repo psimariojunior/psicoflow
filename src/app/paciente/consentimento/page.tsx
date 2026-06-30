@@ -104,7 +104,7 @@ export default function ConsentimentoPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-md">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 shadow-md">
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <div>

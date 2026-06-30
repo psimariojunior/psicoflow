@@ -49,7 +49,7 @@ const TRIGGER_ICONS: Record<string, typeof Calendar> = {
 }
 
 const TRIGGER_COLORS: Record<string, string> = {
-  appointment_booked: "text-blue-500",
+  appointment_booked: "text-teal-500",
   appointment_cancelled: "text-red-500",
   session_completed: "text-green-500",
   task_overdue: "text-amber-500",
@@ -117,7 +117,7 @@ export default function AutomacoesLogsPage() {
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+        <RefreshCw className="h-8 w-8 animate-spin text-teal-500" />
       </div>
     )
   }

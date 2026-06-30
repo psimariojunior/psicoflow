@@ -167,7 +167,7 @@ export function NotificationDropdown() {
       case "WHATSAPP":
         return <MessageSquare className="h-3 w-3 text-emerald-500" />
       case "EMAIL":
-        return <Mail className="h-3 w-3 text-blue-500" />
+        return <Mail className="h-3 w-3 text-teal-500" />
       default:
         return <Bell className="h-3 w-3" />
     }
@@ -224,7 +224,7 @@ export function NotificationDropdown() {
           <div className="max-h-[28rem] overflow-y-auto">
             {/* Today's appointments */}
             <Section
-              icon={<Calendar className="h-3.5 w-3.5 text-blue-500" />}
+              icon={<Calendar className="h-3.5 w-3.5 text-teal-500" />}
               title="Consultas de hoje"
               count={appointments.length}
             >

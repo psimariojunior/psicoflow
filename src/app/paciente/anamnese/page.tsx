@@ -129,7 +129,7 @@ export default function AnamnesePage() {
       </button>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-700 bg-clip-text text-transparent">
             Anamnese Digital
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -155,7 +155,7 @@ export default function AnamnesePage() {
           {sections.map(({ key, label, placeholder, icon: Icon }) => (
             <div key={key} className="space-y-2">
               <Label htmlFor={key} className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-blue-600" />
+                <Icon className="h-4 w-4 text-teal-600" />
                 {label}
               </Label>
               <Textarea
@@ -171,7 +171,7 @@ export default function AnamnesePage() {
         </CardContent>
       </Card>
 
-      <Card className="border-blue-200 bg-blue-50">
+      <Card className="border-teal-200 bg-teal-50">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <Button

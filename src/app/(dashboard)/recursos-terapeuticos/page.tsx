@@ -42,7 +42,7 @@ const typeLabels: Record<string, string> = {
 }
 
 const typeColors: Record<string, string> = {
-  CBT_EXERCISE: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  CBT_EXERCISE: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
   PSYCHOEDUCATION: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
   MEDITATION: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
   WORKSHEET: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
@@ -286,7 +286,7 @@ export default function RecursosTerapeuticosPage() {
                 <Card className={cn("card-hover cursor-pointer transition-all", isExpanded && "ring-2 ring-primary/20")}>
                   <CardContent className="p-5" onClick={() => setExpandedId(isExpanded ? null : resource.id)}>
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shrink-0">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 shadow-md shrink-0">
                         <Icon className="h-5 w-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">

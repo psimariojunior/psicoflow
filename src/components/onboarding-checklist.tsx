@@ -61,16 +61,16 @@ export function OnboardingChecklist() {
   if (completed || dismissed) return null
 
   return (
-    <Card className="overflow-hidden border-blue-200 dark:border-blue-800 shadow-sm">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+    <Card className="overflow-hidden border-teal-200 dark:border-teal-800 shadow-sm">
+      <div className="bg-gradient-to-r from-teal-600 to-indigo-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <PartyPopper className="h-5 w-5 text-blue-200" />
+            <PartyPopper className="h-5 w-5 text-teal-200" />
             <div>
               <h3 className="text-white font-semibold text-sm">
                 Bem-vindo ao PsiHumanis!
               </h3>
-              <p className="text-blue-100 text-xs mt-0.5">
+              <p className="text-teal-100 text-xs mt-0.5">
                 {completedCount === steps.length
                   ? "Tudo pronto! Você está pronto para começar."
                   : `Complete os passos para começar — ${completedCount}/${steps.length}`
@@ -80,7 +80,7 @@ export function OnboardingChecklist() {
           </div>
           <button
             onClick={handleDismiss}
-            className="text-blue-200 hover:text-white transition-colors rounded-lg p-1"
+            className="text-teal-200 hover:text-white transition-colors rounded-lg p-1"
             aria-label="Fechar"
           >
             <X className="h-4 w-4" />
@@ -120,7 +120,7 @@ export function OnboardingChecklist() {
                     : "hover:bg-accent/50"
                 )}
               >
-                <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", isChecked ? "text-emerald-500" : "text-blue-500")} />
+                <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", isChecked ? "text-emerald-500" : "text-teal-500")} />
                 <span className="min-w-0 flex-1">
                   <span className={cn("block text-sm font-medium", isChecked && "line-through text-muted-foreground")}>{step.label}</span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">{step.desc}</span>

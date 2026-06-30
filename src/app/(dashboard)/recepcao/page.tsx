@@ -126,7 +126,7 @@ export default function RecepcaoPage() {
   const statusIcon = (s: string) => {
     switch (s) {
       case "ARRIVED": return <Clock className="h-4 w-4 text-amber-500" />
-      case "NOTIFIED": return <BellRing className="h-4 w-4 text-blue-500" />
+      case "NOTIFIED": return <BellRing className="h-4 w-4 text-teal-500" />
       case "IN_SESSION": return <UserCheck className="h-4 w-4 text-green-500" />
       case "COMPLETED": return <CheckCircle2 className="h-4 w-4 text-emerald-500" />
       default: return <AlertCircle className="h-4 w-4 text-gray-400" />
@@ -146,7 +146,7 @@ export default function RecepcaoPage() {
   const statusColor = (s: string) => {
     switch (s) {
       case "ARRIVED": return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-      case "NOTIFIED": return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+      case "NOTIFIED": return "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300"
       case "IN_SESSION": return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
       case "COMPLETED": return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
       default: return "bg-gray-100 text-gray-800"
@@ -156,7 +156,7 @@ export default function RecepcaoPage() {
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+        <RefreshCw className="h-8 w-8 animate-spin text-teal-500" />
       </div>
     )
   }
@@ -219,8 +219,8 @@ export default function RecepcaoPage() {
         <Card className="dark:bg-slate-900 dark:border-slate-800">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Agendamentos Hoje</p>
@@ -316,7 +316,7 @@ export default function RecepcaoPage() {
                           size="sm"
                           variant="default"
                           onClick={() => handleNotify(arrival.id)}
-                          className="text-xs bg-blue-600 hover:bg-blue-700"
+                          className="text-xs bg-teal-600 hover:bg-teal-700"
                         >
                           <Bell className="h-3 w-3 mr-1" />
                           Notificar

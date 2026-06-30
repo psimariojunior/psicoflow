@@ -169,8 +169,8 @@ export default function ReportsPage() {
       description: "Lista completa de pacientes com dados de contato, CPF e histórico de consultas.",
       icon: Users,
       url: "/api/relatorios/pacientes",
-      color: "text-blue-600",
-      bg: "bg-blue-600/10",
+      color: "text-teal-600",
+      bg: "bg-teal-600/10",
     },
     {
       title: "Relatório Financeiro",
@@ -283,7 +283,7 @@ export default function ReportsPage() {
           {patientReport && (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-3">
-                <motion.div variants={itemVariants}>{statCard(Calendar, "Sessões Realizadas", String(patientReport.sessions.total), "text-blue-600", "bg-blue-600/10")}</motion.div>
+                <motion.div variants={itemVariants}>{statCard(Calendar, "Sessões Realizadas", String(patientReport.sessions.total), "text-teal-600", "bg-teal-600/10")}</motion.div>
                 <motion.div variants={itemVariants}>{statCard(CheckCircle, "Tarefas Concluídas", String(patientReport.tasks.completed), "text-emerald-600", "bg-emerald-600/10")}</motion.div>
                 <motion.div variants={itemVariants}>{statCard(Activity, "Média de Humor", patientReport.diary.averageMood !== null ? String(patientReport.diary.averageMood) : "N/A", "text-amber-600", "bg-amber-600/10")}</motion.div>
               </div>
@@ -365,7 +365,7 @@ export default function ReportsPage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <motion.div variants={itemVariants}>{statCard(TrendingUp, "Receita", formatCurrency(finReport.summary.totalRevenue), "text-emerald-600", "bg-emerald-600/10")}</motion.div>
                 <motion.div variants={itemVariants}>{statCard(DollarSign, "Despesas", formatCurrency(finReport.summary.totalExpenses), "text-red-600", "bg-red-600/10")}</motion.div>
-                <motion.div variants={itemVariants}>{statCard(CreditCard, "Saldo", formatCurrency(finReport.summary.balance), "text-blue-600", "bg-blue-600/10")}</motion.div>
+                <motion.div variants={itemVariants}>{statCard(CreditCard, "Saldo", formatCurrency(finReport.summary.balance), "text-teal-600", "bg-teal-600/10")}</motion.div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -443,7 +443,7 @@ export default function ReportsPage() {
           {prodReport && (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-3">
-                <motion.div variants={itemVariants}>{statCard(Users, "Pacientes Ativos", String(prodReport.patients.active), "text-blue-600", "bg-blue-600/10")}</motion.div>
+                <motion.div variants={itemVariants}>{statCard(Users, "Pacientes Ativos", String(prodReport.patients.active), "text-teal-600", "bg-teal-600/10")}</motion.div>
                 <motion.div variants={itemVariants}>{statCard(Calendar, "Sessões no Período", String(prodReport.sessions.inPeriod), "text-emerald-600", "bg-emerald-600/10")}</motion.div>
                 <motion.div variants={itemVariants}>{statCard(TrendingUp, "Receita no Período", formatCurrency(prodReport.financial.revenue), "text-violet-600", "bg-violet-600/10")}</motion.div>
               </div>
@@ -453,7 +453,7 @@ export default function ReportsPage() {
                   <CardHeader><CardTitle className="text-base">Pacientes</CardTitle></CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex justify-between text-sm"><span>Total</span><span className="font-medium">{prodReport.patients.total}</span></div>
-                    <div className="flex justify-between text-sm"><span>Ativos</span><span className="font-medium text-blue-600">{prodReport.patients.active}</span></div>
+                    <div className="flex justify-between text-sm"><span>Ativos</span><span className="font-medium text-teal-600">{prodReport.patients.active}</span></div>
                     <div className="flex justify-between text-sm"><span>Novos no período</span><span className="font-medium text-emerald-600">{prodReport.patients.newInPeriod}</span></div>
                   </CardContent>
                 </Card>

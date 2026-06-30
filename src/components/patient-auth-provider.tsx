@@ -142,7 +142,7 @@ export function PatientAuthProvider({ children }: { children: ReactNode }) {
                   {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
                 <Link href="/paciente" className="flex items-center gap-2 group">
-                  <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-blue-500/20">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700 shadow-md shadow-teal-500/20 group-hover:shadow-teal-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-teal-500/20">
                     <Image src="/logo.png" alt="PsiHumanis" width={36} height={36} className="w-full h-full object-cover" priority />
                   </div>
                   <span className="text-foreground font-semibold text-sm">PsiHumanis</span>

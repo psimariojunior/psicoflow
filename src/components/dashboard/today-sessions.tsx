@@ -35,7 +35,7 @@ interface Session extends Appointment {
 }
 
 const statusConfig: Record<SessionStatus, { label: string; color: string; bg: string; dot: string }> = {
-  scheduled: { label: "Agendado", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/30", dot: "bg-blue-400" },
+  scheduled: { label: "Agendado", color: "text-teal-600 dark:text-teal-400", bg: "bg-teal-50 dark:bg-teal-950/30", dot: "bg-teal-400" },
   confirmed: { label: "Confirmado", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/30", dot: "bg-emerald-400" },
   waiting: { label: "Na sala", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30", dot: "bg-amber-400 animate-pulse" },
   in_call: { label: "Em sessão", color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/30", dot: "bg-violet-400 animate-pulse" },
@@ -107,13 +107,13 @@ export function TodaySessions({ appointments }: { appointments: Appointment[] })
   const scheduledCount = sessions.filter((s) => s.sessionStatus === "scheduled" || s.sessionStatus === "confirmed").length
 
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-white via-blue-50/30 to-white dark:from-slate-900 dark:via-blue-950/20 dark:to-slate-900 shadow-lg shadow-blue-500/5">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-violet-500 to-blue-600" />
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-white via-teal-50/30 to-white dark:from-slate-900 dark:via-teal-950/20 dark:to-slate-900 shadow-lg shadow-teal-500/5">
+      <div className="h-1 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-600" />
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2.5 text-base">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/40">
-              <Calendar className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-100 dark:bg-teal-900/40">
+              <Calendar className="h-4.5 w-4.5 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
               <p className="font-semibold">Sessões de Hoje</p>
@@ -155,7 +155,7 @@ export function TodaySessions({ appointments }: { appointments: Appointment[] })
             {/* Summary bar */}
             <div className="flex items-center gap-4 px-1 pb-2">
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-blue-400" />
+                <span className="h-2 w-2 rounded-full bg-teal-400" />
                 <span className="text-[11px] text-muted-foreground">{scheduledCount} agendado{scheduledCount !== 1 ? "s" : ""}</span>
               </div>
               {waitingCount > 0 && (

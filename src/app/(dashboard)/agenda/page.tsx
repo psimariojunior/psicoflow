@@ -448,7 +448,7 @@ export default function AgendaPage() {
                           <div
                             key={apt.id}
                             className={`h-1.5 w-1.5 rounded-full ${
-                              apt.modality === "online" ? "bg-blue-500" : "bg-emerald-500"
+                              apt.modality === "online" ? "bg-teal-500" : "bg-emerald-500"
                             }`}
                           />
                         ))}
@@ -507,7 +507,7 @@ export default function AgendaPage() {
                             {apt.status === "CANCELLED" && <span className="text-xs text-red-500">Cancelada</span>}
                             {apt.status === "COMPLETED" && <span className="text-xs text-gray-500">Realizada</span>}
                             {apt.modality === "online" ? (
-                              <Video className="h-3.5 w-3.5 text-blue-500" />
+                              <Video className="h-3.5 w-3.5 text-teal-500" />
                             ) : (
                               <MapPin className="h-3.5 w-3.5 text-emerald-500" />
                             )}
@@ -596,7 +596,7 @@ export default function AgendaPage() {
                     <Link href="/sala-virtual"><Video className="mr-1 h-4 w-4" /> Sala Virtual</Link>
                   </Button>
                 )}
-                <Button size="sm" variant="outline" className="border-blue-300 text-blue-600" onClick={() => handleSendReminder(selectedAppt)}>
+                <Button size="sm" variant="outline" className="border-teal-300 text-teal-600" onClick={() => handleSendReminder(selectedAppt)}>
                   <Bell className="mr-1 h-4 w-4" /> Enviar Lembrete
                 </Button>
                 <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-600" onClick={async () => {

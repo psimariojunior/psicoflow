@@ -87,7 +87,7 @@ export function CookieConsent() {
           <Button variant="ghost" size="sm" onClick={reject} className="text-xs h-9">
             Recusar
           </Button>
-          <Button size="sm" onClick={accept} className="bg-gradient-to-r from-blue-500 to-blue-600 text-xs h-9 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
+          <Button size="sm" onClick={accept} className="bg-gradient-to-r from-teal-500 to-teal-600 text-xs h-9 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30">
             Aceitar Todos
           </Button>
         </div>

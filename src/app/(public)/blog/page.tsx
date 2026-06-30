@@ -19,7 +19,7 @@ interface BlogPost {
 
 const categoryColors: Record<string, string> = {
   "Gestão": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-  "Tecnologia": "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  "Tecnologia": "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   "Dicas": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
   "Legal": "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
   "Financeiro": "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
@@ -50,7 +50,7 @@ export default function BlogPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background via-blue-50/20 to-background dark:via-blue-950/10">
+      <div className="min-h-screen bg-gradient-to-b from-background via-teal-50/20 to-background dark:via-teal-950/10">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -74,7 +74,7 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-blue-50/20 to-background dark:via-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-b from-background via-teal-50/20 to-background dark:via-teal-950/10">
       <BreadcrumbJsonLd items={[
         { name: "Início", item: "/" },
         { name: "Blog", item: "/blog" },
@@ -87,11 +87,11 @@ export default function BlogPage() {
 
         {/* Header */}
         <div className="text-center mb-12 space-y-4">
-          <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-4 py-1.5">
+          <Badge variant="secondary" className="bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300 px-4 py-1.5">
             <BookOpen className="mr-1.5 h-3.5 w-3.5" />
             Blog
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-blue-800 to-slate-700 dark:from-white dark:via-blue-200 dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-teal-800 to-slate-700 dark:from-white dark:via-teal-200 dark:to-slate-400 bg-clip-text text-transparent">
             Dicas para sua prática
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-7">
@@ -139,8 +139,8 @@ export default function BlogPage() {
             {/* Featured Article */}
             {featured && (
               <Link href={`/blog/${featured.slug}`} className="group block">
-                <article className="relative overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-blue-50/80 to-background dark:from-blue-950/20 dark:to-background p-6 md:p-8 transition-all hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-0.5">
-                  <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+                <article className="relative overflow-hidden rounded-[1.75rem] border bg-gradient-to-br from-teal-50/80 to-background dark:from-teal-950/20 dark:to-background p-6 md:p-8 transition-all hover:shadow-xl hover:shadow-teal-500/5 hover:-translate-y-0.5">
+                  <div className="absolute top-0 right-0 w-72 h-72 bg-teal-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
                   <div className="relative grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center">
                     <div className="space-y-4">
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -161,8 +161,8 @@ export default function BlogPage() {
                       </span>
                     </div>
                     <div className="hidden md:flex items-center justify-center">
-                      <div className="w-full max-w-[200px] aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center">
-                        <BookOpen className="h-16 w-16 text-blue-500/30" />
+                      <div className="w-full max-w-[200px] aspect-square rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-600/10 flex items-center justify-center">
+                        <BookOpen className="h-16 w-16 text-teal-500/30" />
                       </div>
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default function BlogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rest.map((post) => (
                   <Link key={post.slug} href={`/blog/${post.slug}`} className="group">
-                    <article className="h-full bg-card rounded-2xl border shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden hover:-translate-y-0.5">
+                    <article className="h-full bg-card rounded-2xl border shadow-sm hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300 overflow-hidden hover:-translate-y-0.5">
                       <div className="p-6 space-y-3">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
                           <span className={cn("inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-medium", categoryColors[post.category] || "bg-muted text-muted-foreground")}>

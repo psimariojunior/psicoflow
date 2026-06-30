@@ -29,7 +29,7 @@ interface PatientTask {
 }
 
 const typeLabels: Record<string, { label: string; icon: any; color: string }> = {
-  CBT_EXERCISE: { label: "Exercício CBT", icon: Brain, color: "from-blue-500 to-blue-600" },
+  CBT_EXERCISE: { label: "Exercício CBT", icon: Brain, color: "from-teal-500 to-teal-600" },
   PSYCHOEDUCATION: { label: "Psicoeducação", icon: BookOpen, color: "from-violet-500 to-purple-600" },
   MEDITATION: { label: "Meditação", icon: Sparkles, color: "from-emerald-500 to-teal-600" },
   WORKSHEET: { label: "Ficha de Trabalho", icon: FileText, color: "from-amber-500 to-orange-600" },
@@ -97,7 +97,7 @@ export default function TarefasPage() {
         Voltar
       </button>
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
           Minhas Tarefas
         </h1>
         <p className="text-muted-foreground mt-1">Recursos e exercícios recomendados pelo seu psicólogo</p>
@@ -116,14 +116,14 @@ export default function TarefasPage() {
           {pendingTasks.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-500" />
+                <Clock className="h-5 w-5 text-teal-500" />
                 Pendentes ({pendingTasks.length})
               </h2>
               {pendingTasks.map(task => {
                 const typeInfo = typeLabels[task.resource.type] || typeLabels.OTHER
                 const Icon = typeInfo.icon
                 return (
-                  <Card key={task.id} className="border-blue-200/50 dark:border-blue-800/30">
+                  <Card key={task.id} className="border-teal-200/50 dark:border-teal-800/30">
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
                         <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg shrink-0", typeInfo.color)}>
@@ -138,7 +138,7 @@ export default function TarefasPage() {
                             <Button
                               onClick={() => handleComplete(task.id)}
                               size="sm"
-                              className="shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20"
+                              className="shrink-0 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/20"
                             >
                               <CheckCircle2 className="mr-1.5 h-4 w-4" />
                               Concluir

@@ -135,7 +135,7 @@ export default function PricingPage() {
                     : "shadow-lg shadow-slate-900/5"
                 }`}
               >
-                {plan.popular && <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-blue-500 to-indigo-500" />}
+                {plan.popular && <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-indigo-500" />}
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white">

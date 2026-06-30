@@ -105,9 +105,9 @@ export default function ProntuariosPage() {
         </Button>
       </div>
 
-      <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3 flex items-start gap-3">
-        <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-        <p className="text-xs text-blue-700 dark:text-blue-300">
+      <div className="rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 p-3 flex items-start gap-3">
+        <AlertTriangle className="h-4 w-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-teal-700 dark:text-teal-300">
           <strong>CFP:</strong> Prontuários devem ser mantidos por no mínimo 5 anos (Resolução CFP nº 06/2019).
           Registros clínicos são de responsabilidade do profissional. Ao excluir um prontuário, você
           declara estar ciente das implicações éticas e legais.

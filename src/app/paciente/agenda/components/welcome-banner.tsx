@@ -7,7 +7,7 @@ export function WelcomeBanner({ patientName, onStartBooking }: { patientName: st
     <div className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 via-transparent to-transparent" />
       <div className="absolute top-20 -left-20 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl" />
-      <div className="absolute top-20 -right-20 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-20 -right-20 w-72 h-72 bg-teal-500/5 rounded-full blur-3xl" />
 
       <div className="relative max-w-2xl mx-auto px-4 pt-16 pb-12 text-center">
         <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 ring-1 ring-emerald-500/20 mb-6">

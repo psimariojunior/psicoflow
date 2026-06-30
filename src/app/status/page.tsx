@@ -36,14 +36,14 @@ export default async function StatusPage() {
   const { checks, totalUsers } = await getStatus()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-blue-50/20 dark:to-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-b from-background to-teal-50/20 dark:to-teal-950/10">
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao início
         </Link>
 
         <div className="text-center space-y-4 mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-xl mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 shadow-xl mb-4">
             <Server className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold">Status PsiHumanis</h1>
@@ -57,7 +57,7 @@ export default async function StatusPage() {
           {Object.entries(checks).map(([name, check]) => (
             <div key={name} className="flex items-center justify-between rounded-xl border bg-card p-4">
               <div className="flex items-center gap-3">
-                <check.icon className="h-5 w-5 text-blue-500" />
+                <check.icon className="h-5 w-5 text-teal-500" />
                 <span className="font-medium capitalize">{name}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -74,12 +74,12 @@ export default async function StatusPage() {
 
         <div className="mt-8 grid grid-cols-2 gap-4">
           <div className="rounded-xl border bg-card p-4 text-center">
-            <Users className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+            <Users className="h-6 w-6 text-teal-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{totalUsers}</p>
             <p className="text-xs text-muted-foreground">{totalUsers === 1 ? "Usuário ativo" : "Usuários ativos"}</p>
           </div>
           <div className="rounded-xl border bg-card p-4 text-center">
-            <Clock className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+            <Clock className="h-6 w-6 text-teal-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">99.9%</p>
             <p className="text-xs text-muted-foreground">Uptime estimado</p>
           </div>

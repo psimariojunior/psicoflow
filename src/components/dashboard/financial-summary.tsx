@@ -26,9 +26,9 @@ export function FinancialSummaryCard({ summary }: { summary: FinancialSummary })
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3">
+          <div className="rounded-lg bg-teal-50 dark:bg-teal-950/30 p-3">
             <p className="text-xs text-muted-foreground">Receitas</p>
-            <p className="text-lg font-bold text-blue-600">
+            <p className="text-lg font-bold text-teal-600">
               {formatCurrency(summary.totalRevenue)}
             </p>
           </div>
@@ -43,7 +43,7 @@ export function FinancialSummaryCard({ summary }: { summary: FinancialSummary })
         <div className="rounded-lg bg-primary/5 p-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Saldo</p>
-            <span className={summary.balance >= 0 ? "text-blue-600" : "text-red-600"}>
+            <span className={summary.balance >= 0 ? "text-teal-600" : "text-red-600"}>
               {summary.balance >= 0 ? (
                 <TrendingUp className="inline h-4 w-4" />
               ) : (
@@ -65,7 +65,7 @@ export function FinancialSummaryCard({ summary }: { summary: FinancialSummary })
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
           <div>
             <p className="text-muted-foreground">Recebido</p>
-            <p className="font-medium text-blue-600">{formatCurrency(summary.received)}</p>
+            <p className="font-medium text-teal-600">{formatCurrency(summary.received)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Pendente</p>

@@ -78,7 +78,7 @@ function AgendarPage() {
               <Link
                 key={psy.id}
                 href={`/agendar/${psy.id}`}
-                className="group relative overflow-hidden bg-white dark:bg-white/[0.06] backdrop-blur-xl rounded-3xl p-6 ring-1 ring-slate-200 dark:ring-white/10 hover:ring-teal-500/40 dark:hover:ring-teal-500/40 hover:bg-teal-50/50 dark:hover:bg-white/[0.1] shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-0.5"
+                className="group relative overflow-hidden bg-white dark:bg-white/[0.06] backdrop-blur-xl rounded-3xl p-6 ring-1 ring-slate-200 dark:ring-white/10 hover:ring-teal-500/40 dark:hover:ring-teal-500/40 hover:bg-teal-50/50 dark:hover:bg-white/[0.1] shadow-sm hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300 hover:-translate-y-0.5"
               >
                 <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-teal-500/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative flex items-start gap-4">

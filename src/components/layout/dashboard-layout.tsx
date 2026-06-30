@@ -83,7 +83,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <Button
             size="lg"
             onClick={() => router.push("/pricing?expired=true")}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
+            className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg"
           >
             Escolher Plano <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
@@ -93,7 +93,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/40 to-slate-50/60 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50/40 to-slate-50/60 dark:from-slate-950 dark:to-slate-900">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}

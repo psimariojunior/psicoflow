@@ -245,7 +245,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
             <Button
               onClick={exportSummary}
               disabled={exporting === "summary"}
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 gap-2"
+              className="w-full bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 gap-2"
             >
               {exporting === "summary" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
               {exporting === "summary" ? "Gerando..." : "Gerar Relatório Completo"}

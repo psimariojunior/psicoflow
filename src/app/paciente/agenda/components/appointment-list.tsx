@@ -172,7 +172,7 @@ export function AppointmentList({
                   <Dialog open={rescheduleTarget === a.id} onOpenChange={(open) => { if (!open) { setRescheduleTarget(null); setSelectedSlot(null) } }}>
                     <DialogTrigger asChild>
                       <button onClick={() => handleStartReschedule(a.id)} disabled={cancelling === a.id}
-                        className="text-muted-foreground hover:text-blue-500 transition-colors p-1 disabled:opacity-50" title="Remarcar consulta">
+                        className="text-muted-foreground hover:text-teal-500 transition-colors p-1 disabled:opacity-50" title="Remarcar consulta">
                         <RotateCcw className="h-5 w-5" />
                       </button>
                     </DialogTrigger>

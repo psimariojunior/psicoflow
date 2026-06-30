@@ -87,9 +87,9 @@ const CATEGORY_CONFIG: Record<string, {
   declaracao: {
     label: "Declaração",
     icon: FileText,
-    gradient: "from-blue-500 to-indigo-600",
-    badgeCls: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200",
-    ring: "ring-blue-200/60 dark:ring-blue-800/40",
+    gradient: "from-teal-500 to-indigo-600",
+    badgeCls: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-200",
+    ring: "ring-teal-200/60 dark:ring-teal-800/40",
   },
   encaminhamento: {
     label: "Encaminhamento",
@@ -412,7 +412,7 @@ export default function DocumentosPage() {
       label: "Modelos",
       value: templates.length,
       icon: Files,
-      color: "from-blue-500 to-indigo-600",
+      color: "from-teal-500 to-indigo-600",
     },
     {
       label: "Categorias",

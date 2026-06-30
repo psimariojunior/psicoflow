@@ -168,7 +168,7 @@ export default function AdminPage() {
   const planColors: Record<string, string> = {
     free: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
     trial: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-    pro: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    pro: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400",
     clinica: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
   }
 
@@ -184,7 +184,7 @@ export default function AdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="h-6 w-6 text-blue-600" />
+            <Shield className="h-6 w-6 text-teal-600" />
             Painel Admin
           </h1>
           <p className="text-muted-foreground">Visão geral da plataforma e gestão de usuários</p>
@@ -199,13 +199,13 @@ export default function AdminPage() {
 
       {/* Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-blue-100 bg-gradient-to-br from-blue-50/50 to-background">
+        <Card className="border-teal-100 bg-gradient-to-br from-teal-50/50 to-background">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700">Total de Psicólogos</CardTitle>
-            <Users className="h-5 w-5 text-blue-500" />
+            <CardTitle className="text-sm font-medium text-teal-700">Total de Psicólogos</CardTitle>
+            <Users className="h-5 w-5 text-teal-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-700">{metrics.totalPsychologists}</div>
+            <div className="text-3xl font-bold text-teal-700">{metrics.totalPsychologists}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {metrics.activeCount} ativos · {metrics.trialCount} em trial
             </p>
@@ -303,7 +303,7 @@ export default function AdminPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+            <BarChart3 className="h-5 w-5 text-teal-600" />
             MRR por plano
           </CardTitle>
           <CardDescription>Valor mensal por plano de assinatura</CardDescription>
@@ -321,7 +321,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                  <BarChart3 className="h-5 w-5 text-teal-600" />
                   Receita Mensal Recorrente
                 </CardTitle>
                 <CardDescription>Estimativa de MRR com base nas assinaturas ativas</CardDescription>
@@ -337,14 +337,14 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-muted-foreground">MRR Atual</span>
-                <span className="text-xl font-bold text-blue-700">
+                <span className="text-xl font-bold text-teal-700">
                   R$ {metrics.currentMRR.toLocaleString("pt-BR")}
                 </span>
               </div>
               <Progress
                 value={Math.min((metrics.currentMRR / Math.max(metrics.projectedMRR, 1)) * 100, 100)}
                 className="h-3"
-                indicatorClassName="bg-blue-600"
+                indicatorClassName="bg-teal-600"
               />
             </div>
 
@@ -391,7 +391,7 @@ export default function AdminPage() {
           <CardContent className="space-y-3">
             <Link href="/pacientes" className="block">
               <Button variant="outline" className="w-full justify-start h-12">
-                <Users className="mr-3 h-4 w-4 text-blue-500" />
+                <Users className="mr-3 h-4 w-4 text-teal-500" />
                 <div className="text-left">
                   <p className="font-medium">Ver Todos os Pacientes</p>
                   <p className="text-xs text-muted-foreground">Gerenciar pacientes do sistema</p>
@@ -429,7 +429,7 @@ export default function AdminPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue-600" />
+              <Clock className="h-5 w-5 text-teal-600" />
               Últimos Registros
             </CardTitle>
             <CardDescription>5 cadastros mais recentes</CardDescription>
@@ -454,7 +454,7 @@ export default function AdminPage() {
 
                   return (
                     <div key={user.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-sm font-semibold text-blue-700 shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-teal-100 flex items-center justify-center text-sm font-semibold text-teal-700 shrink-0">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -477,7 +477,7 @@ export default function AdminPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <List className="h-5 w-5 text-blue-600" />
+              <List className="h-5 w-5 text-teal-600" />
               Todos os Usuários
             </CardTitle>
             <CardDescription>{users.length} psicólogos cadastrados</CardDescription>

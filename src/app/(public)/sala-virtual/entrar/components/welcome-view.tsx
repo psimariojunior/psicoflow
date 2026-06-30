@@ -19,7 +19,7 @@ export function WelcomeView({
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-primary/30 to-blue-500/30 mb-6 shadow-lg">
+            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-primary/30 to-teal-500/30 mb-6 shadow-lg">
               <Video className="h-10 w-10 text-primary" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Sala Virtual</h1>

@@ -95,7 +95,7 @@ export function DigitalSignature({
         <Pencil className="inline h-3.5 w-3.5 mr-1" />
         Assine abaixo usando o mouse ou touch
       </div>
-      <div className="relative rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/50 dark:bg-blue-950/20 overflow-hidden">
+      <div className="relative rounded-xl border-2 border-dashed border-teal-300 bg-teal-50/50 dark:bg-teal-950/20 overflow-hidden">
         <canvas
           ref={canvasRef}
           width={width}
@@ -115,7 +115,7 @@ export function DigitalSignature({
         <Button variant="outline" size="sm" onClick={clear} disabled={!hasContent}>
           <Trash2 className="mr-1 h-3.5 w-3.5" /> Limpar
         </Button>
-        <Button size="sm" onClick={confirm} disabled={!hasContent} className="bg-blue-600 hover:bg-blue-700">
+        <Button size="sm" onClick={confirm} disabled={!hasContent} className="bg-teal-600 hover:bg-teal-700">
           <Check className="mr-1 h-3.5 w-3.5" /> Confirmar
         </Button>
       </div>

@@ -138,7 +138,7 @@ export default function RecibosPage() {
   const statusBadge = (status: string) => {
     const s = STATUS_MAP[status] || { label: status, variant: "outline" }
     const variants: Record<string, string> = {
-      info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100",
+      info: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100",
       success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
       outline: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
     }
@@ -182,7 +182,7 @@ export default function RecibosPage() {
         </div>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700"><Plus className="mr-2 h-4 w-4" /> Emitir Recibo</Button>
+            <Button className="bg-teal-600 hover:bg-teal-700"><Plus className="mr-2 h-4 w-4" /> Emitir Recibo</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader><DialogTitle>Emitir Recibo</DialogTitle></DialogHeader>
@@ -240,7 +240,7 @@ export default function RecibosPage() {
                   </Select>
                 </div>
               </div>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Emitir Recibo</Button>
+              <Button type="submit" className="bg-teal-600 hover:bg-teal-700">Emitir Recibo</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -261,8 +261,8 @@ export default function RecibosPage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 shrink-0">
-                      <FileText className="h-5 w-5 text-blue-600" />
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900/30 shrink-0">
+                      <FileText className="h-5 w-5 text-teal-600" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -276,7 +276,7 @@ export default function RecibosPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="font-bold text-lg text-blue-600">{formatCurrency(receipt.amount)}</p>
+                      <p className="font-bold text-lg text-teal-600">{formatCurrency(receipt.amount)}</p>
                       {receipt.paymentMethod && (
                         <p className="text-xs text-muted-foreground">{receipt.paymentMethod}</p>
                       )}
@@ -284,7 +284,7 @@ export default function RecibosPage() {
                     <div className="flex gap-1">
                       <Link href={`/api/recibos/${receipt.id}/pdf`} target="_blank">
                         <Button variant="ghost" size="icon" aria-label="Visualizar PDF">
-                          <Printer className="h-4 w-4 text-blue-500" />
+                          <Printer className="h-4 w-4 text-teal-500" />
                         </Button>
                       </Link>
                       {receipt.status !== "CANCELLED" && (

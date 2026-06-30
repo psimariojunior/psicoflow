@@ -163,8 +163,8 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
           onClick={startAudio}
         >
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-blue-500/20 border-2 border-blue-400/40 flex items-center justify-center mx-auto animate-pulse">
-              <Volume2 className="h-8 w-8 text-blue-400" />
+            <div className="w-16 h-16 rounded-full bg-teal-500/20 border-2 border-teal-400/40 flex items-center justify-center mx-auto animate-pulse">
+              <Volume2 className="h-8 w-8 text-teal-400" />
             </div>
             <div>
               <p className="text-white font-medium">Clique para ativar o som</p>
@@ -175,15 +175,15 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
       )}
 
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
 
         <div className="w-full max-w-lg relative z-10 space-y-10">
           <div className="text-center space-y-3">
             <h2 className="text-2xl font-bold text-white">
               Olá, {patientName || "Paciente"}
             </h2>
-            <p className="text-blue-300/70 text-sm font-light">
+            <p className="text-teal-300/70 text-sm font-light">
               Seu psicólogo está quase pronto. Aproveite este momento para relaxar.
             </p>
           </div>
@@ -196,8 +196,8 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
                   key={key}
                   className={`rounded-t-md transition-all duration-300 ${
                     isWhite
-                      ? "w-10 h-full bg-white/10 hover:bg-blue-400/30"
-                      : "w-7 h-3/5 bg-blue-800/40 hover:bg-blue-400/40"
+                      ? "w-10 h-full bg-white/10 hover:bg-teal-400/30"
+                      : "w-7 h-3/5 bg-teal-800/40 hover:bg-teal-400/40"
                   }`}
                   style={{
                     animation: `pianoWave 3s ease-in-out ${i * 0.15}s infinite`,
@@ -210,20 +210,20 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
           <div className="flex flex-col items-center gap-3">
             <div className="relative flex items-center justify-center w-32 h-32">
               <motion.div
-                className="absolute inset-0 rounded-full border-2 border-blue-400/30"
+                className="absolute inset-0 rounded-full border-2 border-teal-400/30"
                 animate={{ scale }}
                 transition={{ duration: 0.05, ease: "linear" }}
               />
               <motion.div
-                className="absolute inset-4 rounded-full bg-blue-500/10 border border-blue-400/20"
+                className="absolute inset-4 rounded-full bg-teal-500/10 border border-teal-400/20"
                 animate={{ scale }}
                 transition={{ duration: 0.05, ease: "linear" }}
               />
-              <span className="text-blue-300 text-sm font-medium z-10">
+              <span className="text-teal-300 text-sm font-medium z-10">
                 {currentPhase.text}
               </span>
             </div>
-            <p className="text-xs text-blue-400/60 font-light tracking-wider uppercase">
+            <p className="text-xs text-teal-400/60 font-light tracking-wider uppercase">
               Exercício de respiração
             </p>
           </div>
@@ -256,7 +256,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
 
           <div className="space-y-3">
             {approvalStatus === "waiting" && (
-              <div className="flex items-center justify-center gap-2 text-blue-300 text-sm">
+              <div className="flex items-center justify-center gap-2 text-teal-300 text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Aguardando aprovação do psicólogo...
               </div>
@@ -283,7 +283,7 @@ export function VirtualWaitingRoom({ patientName, connecting, onEnterRoom, roomN
               </div>
             )}
             {approvalStatus === "registering" && (
-              <p className="text-blue-300/60 text-xs text-center">Conectando à sala de espera...</p>
+              <p className="text-teal-300/60 text-xs text-center">Conectando à sala de espera...</p>
             )}
           </div>
         </div>

@@ -99,7 +99,7 @@ export function SignatureDialog({ open, onOpenChange, onSign, psychologistName }
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Pen className="h-5 w-5 text-blue-500" />
+            <Pen className="h-5 w-5 text-teal-500" />
             Assinatura Digital
           </DialogTitle>
           <DialogDescription>
@@ -146,7 +146,7 @@ export function SignatureDialog({ open, onOpenChange, onSign, psychologistName }
             <Button
               onClick={handleConfirm}
               disabled={!hasSigned || confirmed}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+              className="flex-1 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white"
             >
               {confirmed ? (
                 <><CheckCircle2 className="mr-2 h-4 w-4" /> Assinado</>

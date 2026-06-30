@@ -46,7 +46,7 @@ interface Automation {
 }
 
 const TRIGGER_OPTIONS = [
-  { value: "appointment_booked", label: "Consulta agendada", icon: Calendar, color: "text-blue-500" },
+  { value: "appointment_booked", label: "Consulta agendada", icon: Calendar, color: "text-teal-500" },
   { value: "appointment_cancelled", label: "Consulta cancelada", icon: Ban, color: "text-red-500" },
   { value: "session_completed", label: "Sessão concluída", icon: CheckCircle2, color: "text-green-500" },
   { value: "task_overdue", label: "Tarefa atrasada", icon: AlertTriangle, color: "text-amber-500" },
@@ -57,7 +57,7 @@ const TRIGGER_OPTIONS = [
 ]
 
 const ACTION_OPTIONS = [
-  { value: "send_email", label: "Enviar email", icon: Mail, color: "text-blue-500" },
+  { value: "send_email", label: "Enviar email", icon: Mail, color: "text-teal-500" },
   { value: "send_whatsapp", label: "Enviar WhatsApp", icon: MessageSquare, color: "text-green-500" },
   { value: "create_task", label: "Criar tarefa", icon: CheckCircle2, color: "text-purple-500" },
   { value: "notify_psychologist", label: "Notificar psicólogo", icon: Bell, color: "text-amber-500" },
@@ -226,7 +226,7 @@ export default function AutomacoesPage() {
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+        <RefreshCw className="h-8 w-8 animate-spin text-teal-500" />
       </div>
     )
   }

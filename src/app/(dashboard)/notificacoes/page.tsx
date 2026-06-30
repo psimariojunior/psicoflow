@@ -261,7 +261,7 @@ export default function NotificationsPage() {
               <CardContent className="space-y-4">
                 {[
                   { icon: Phone, name: "WhatsApp", desc: "Mensagens instantâneas", status: "Conectado", color: "text-emerald-500" },
-                  { icon: Mail, name: "E-mail", desc: "Disparo de emails", status: "Conectado", color: "text-blue-500" },
+                  { icon: Mail, name: "E-mail", desc: "Disparo de emails", status: "Conectado", color: "text-teal-500" },
                   { icon: MessageSquare, name: "SMS", desc: "Mensagens de texto", status: "Configurar", color: "text-amber-500" },
                   { icon: Smartphone, name: "Push", desc: "Notificações no app", status: "Ativo", color: "text-primary" },
                 ].map((channel) => (

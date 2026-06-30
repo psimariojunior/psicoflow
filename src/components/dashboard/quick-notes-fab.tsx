@@ -92,7 +92,7 @@ export function QuickNotesFab() {
       >
         {open ? <X className="h-6 w-6" /> : <StickyNote className="h-6 w-6" />}
         {!open && notes.length > 0 && (
-          <span className="absolute -top-1 -right-1 flex min-w-[20px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+          <span className="absolute -top-1 -right-1 flex min-w-[20px] items-center justify-center rounded-full bg-teal-600 px-1 text-[10px] font-bold text-white">
             {notes.length > 9 ? "9+" : notes.length}
           </span>
         )}

@@ -242,7 +242,7 @@ function VirtualRoomPageInner() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-8">
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30 mx-auto">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 shadow-xl shadow-teal-500/30 mx-auto">
             <Video className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Sala Virtual</h2>
@@ -251,8 +251,8 @@ function VirtualRoomPageInner() {
           </p>
         </div>
 
-        <Card className="border-0 shadow-2xl shadow-blue-500/5">
-          <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-xl" />
+        <Card className="border-0 shadow-2xl shadow-teal-500/5">
+          <div className="h-1 bg-gradient-to-r from-teal-500 to-teal-600 rounded-t-xl" />
           <CardContent className="p-8 space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-medium">Nome da Sala</label>
@@ -264,10 +264,10 @@ function VirtualRoomPageInner() {
               />
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 border border-blue-100 dark:border-blue-900/50">
+            <div className="bg-teal-50 dark:bg-teal-950/30 rounded-xl p-4 border border-teal-100 dark:border-teal-900/50">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
-                  <Link2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center shrink-0">
+                  <Link2 className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">Link para o paciente</p>
@@ -289,7 +289,7 @@ function VirtualRoomPageInner() {
 
             <Button 
               size="lg" 
-              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25" 
+              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 shadow-lg shadow-teal-500/25" 
               onClick={handleConnect} 
               disabled={connecting || !roomName}
             >
@@ -310,20 +310,20 @@ function VirtualRoomPageInner() {
 
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center mx-auto">
-              <Video className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center mx-auto">
+              <Video className="h-5 w-5 text-teal-600 dark:text-teal-400" />
             </div>
             <p className="text-xs text-muted-foreground">HD Automático</p>
           </div>
           <div className="space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center mx-auto">
-              <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center mx-auto">
+              <Shield className="h-5 w-5 text-teal-600 dark:text-teal-400" />
             </div>
             <p className="text-xs text-muted-foreground">Criptografado</p>
           </div>
           <div className="space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center mx-auto">
-              <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center mx-auto">
+              <Zap className="h-5 w-5 text-teal-600 dark:text-teal-400" />
             </div>
             <p className="text-xs text-muted-foreground">Baixa Latência</p>
           </div>

@@ -77,13 +77,13 @@ function AnimatedVisual({ type }: { type: string }) {
         {type === "sparkles" && (
           <div className="flex items-center justify-center h-[calc(100%-24px)]">
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center animate-pulse">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center animate-pulse">
                 <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                 </svg>
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
             </div>
           </div>
         )}
@@ -103,11 +103,11 @@ function AnimatedVisual({ type }: { type: string }) {
           <div className="flex items-center justify-center h-[calc(100%-24px)]">
             <div className="relative">
               <div className="w-24 h-24 rounded-full border-4 border-white/10 relative">
-                <div className="absolute top-1/2 left-1/2 w-0.5 h-10 bg-blue-400 origin-bottom rounded-full animate-spin" style={{ transformOrigin: "bottom center", animationDuration: "4s" }} />
+                <div className="absolute top-1/2 left-1/2 w-0.5 h-10 bg-teal-400 origin-bottom rounded-full animate-spin" style={{ transformOrigin: "bottom center", animationDuration: "4s" }} />
                 <div className="absolute top-1/2 left-1/2 w-0.5 h-7 bg-white/40 origin-bottom rounded-full animate-spin" style={{ transformOrigin: "bottom center", animationDuration: "24s" }} />
-                <div className="absolute top-1/2 left-1/2 w-2 h-2 -ml-1 -mt-1 bg-blue-400 rounded-full" />
+                <div className="absolute top-1/2 left-1/2 w-2 h-2 -ml-1 -mt-1 bg-teal-400 rounded-full" />
               </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-blue-300 font-mono animate-pulse">08:00 - 18:00</div>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-teal-300 font-mono animate-pulse">08:00 - 18:00</div>
             </div>
           </div>
         )}
@@ -116,7 +116,7 @@ function AnimatedVisual({ type }: { type: string }) {
           <div className="flex items-center justify-center h-[calc(100%-24px)]">
             <div className="w-32 space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-500" />
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-teal-500" />
                 <div className="flex-1 space-y-1">
                   <div className="h-2 bg-white/20 rounded-full" />
                   <div className="h-1.5 bg-white/10 rounded-full w-2/3" />
@@ -125,7 +125,7 @@ function AnimatedVisual({ type }: { type: string }) {
               <div className="h-2 bg-white/5 rounded-full" />
               <div className="h-2 bg-white/5 rounded-full w-4/5" />
               <div className="flex gap-1 mt-2">
-                <div className="px-2 py-0.5 bg-blue-500/20 rounded text-[8px] text-blue-300">Online</div>
+                <div className="px-2 py-0.5 bg-teal-500/20 rounded text-[8px] text-teal-300">Online</div>
                 <div className="px-2 py-0.5 bg-green-500/20 rounded text-[8px] text-green-300">Disponível</div>
               </div>
             </div>
@@ -157,14 +157,14 @@ export function TutorialVideo({ step }: TutorialVideoProps) {
   const tutorial = TUTORIALS[step]
 
   return (
-    <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 overflow-hidden">
+    <div className="rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 overflow-hidden">
       <button
         onClick={() => setExpanded(p => !p)}
-        className="w-full flex items-center justify-between p-3 text-left hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors"
+        className="w-full flex items-center justify-between p-3 text-left hover:bg-teal-100/50 dark:hover:bg-teal-900/20 transition-colors"
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-            <Play className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+          <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+            <Play className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
           </div>
           <div>
             <p className="text-xs font-semibold text-foreground">{tutorial.title}</p>
@@ -180,7 +180,7 @@ export function TutorialVideo({ step }: TutorialVideoProps) {
           <ul className="space-y-1.5">
             {tutorial.tips.map((tip, i) => (
               <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                <span className="text-blue-500 mt-0.5">•</span>
+                <span className="text-teal-500 mt-0.5">•</span>
                 <span>{tip}</span>
               </li>
             ))}

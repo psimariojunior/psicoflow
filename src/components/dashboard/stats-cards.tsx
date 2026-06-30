@@ -20,18 +20,18 @@ const cards = [
     key: "totalPatients" as const,
     label: "Pacientes Ativos",
     icon: Users,
-    color: "from-blue-500 to-indigo-600",
-    bgLight: "bg-blue-100 dark:bg-blue-900/30",
-    textLight: "text-blue-600 dark:text-blue-400",
+    color: "from-teal-500 to-indigo-600",
+    bgLight: "bg-teal-100 dark:bg-teal-900/30",
+    textLight: "text-teal-600 dark:text-teal-400",
     changeKey: null,
   },
   {
     key: "appointmentsToday" as const,
     label: "Consultas Hoje",
     icon: Calendar,
-    color: "from-blue-500 to-blue-700",
-    bgLight: "bg-blue-100 dark:bg-blue-900/30",
-    textLight: "text-blue-600 dark:text-blue-400",
+    color: "from-teal-500 to-teal-700",
+    bgLight: "bg-teal-100 dark:bg-teal-900/30",
+    textLight: "text-teal-600 dark:text-teal-400",
     changeKey: "appointmentChange" as const,
   },
   {
@@ -89,11 +89,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
               {change !== null && (
                 <div className="mt-3 flex items-center gap-1.5 text-xs">
                   {isPositive ? (
-                    <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
+                    <TrendingUp className="h-3.5 w-3.5 text-teal-500" />
                   ) : (
                     <TrendingDown className="h-3.5 w-3.5 text-red-500" />
                   )}
-                  <span className={isPositive ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}>
+                  <span className={isPositive ? "text-teal-600 dark:text-teal-400" : "text-red-600 dark:text-red-400"}>
                     {isPositive ? "+" : ""}{change}%
                   </span>
                   <span className="text-muted-foreground ml-1">vs. mês anterior</span>

@@ -167,12 +167,12 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
         {!hasRemote && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-4 animate-pulse">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-2 border-blue-500/30 flex items-center justify-center mx-auto">
-                <User className="h-10 w-10 text-blue-400/60" />
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-teal-500/20 to-teal-600/10 border-2 border-teal-500/30 flex items-center justify-center mx-auto">
+                <User className="h-10 w-10 text-teal-400/60" />
               </div>
               <div>
-                <p className="text-blue-300/80 text-sm font-medium">Aguardando psicólogo</p>
-                <p className="text-blue-400/40 text-xs mt-1">O profissional entrará em breve</p>
+                <p className="text-teal-300/80 text-sm font-medium">Aguardando psicólogo</p>
+                <p className="text-teal-400/40 text-xs mt-1">O profissional entrará em breve</p>
               </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ export function InCallUI({ roomName, onLeave }: { roomName: string; onLeave: () 
       {/* Room name */}
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20">
         <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
-          <Camera className="h-3 w-3 text-blue-400" />
+          <Camera className="h-3 w-3 text-teal-400" />
           <span className="text-[11px] font-medium">{roomName}</span>
         </div>
       </div>

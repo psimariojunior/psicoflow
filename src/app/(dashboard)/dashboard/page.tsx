@@ -21,9 +21,9 @@ import { BirthdayAlert } from "@/components/dashboard/birthday-alert"
 import { WeeklyOccupancy } from "@/components/dashboard/weekly-occupancy"
 
 const quickActions = [
-  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-blue-600 to-sky-600" },
+  { label: "Novo Paciente", href: "/pacientes/novo", icon: UserPlus, gradient: "from-teal-600 to-sky-600" },
   { label: "Prontuário", href: "/prontuarios/novo", icon: FileText, gradient: "from-violet-500 to-purple-600" },
-  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-blue-700" },
+  { label: "Sala Virtual", href: "/sala-virtual", icon: Video, gradient: "from-cyan-500 to-teal-700" },
   { label: "Relatórios", href: "/relatorios", icon: BarChart3, gradient: "from-emerald-500 to-teal-600" },
 ]
 
@@ -173,19 +173,19 @@ export default function DashboardHome() {
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6 text-white shadow-xl sm:p-8">
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+      <section className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 p-6 text-white shadow-xl sm:p-8">
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-teal-500/20 blur-3xl" />
         <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl" />
         <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="space-y-3">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               {greeting}! Sua clínica em tempo real.
             </h1>
-            <p className="text-sm text-blue-100/80 max-w-xl">
+            <p className="text-sm text-teal-100/80 max-w-xl">
               Acompanhe agenda, receita e próximos movimentos em uma visão objetiva.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button size="sm" asChild className="bg-white text-slate-950 hover:bg-blue-50">
+              <Button size="sm" asChild className="bg-white text-slate-950 hover:bg-teal-50">
                 <Link href="/agenda"><Calendar className="mr-1.5 h-4 w-4" />Abrir agenda</Link>
               </Button>
               <Button size="sm" variant="outline" asChild className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
@@ -194,22 +194,22 @@ export default function DashboardHome() {
             </div>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl min-w-[220px]">
-            <p className="text-xs uppercase tracking-[0.15em] text-blue-200 mb-2">Próximo foco</p>
+            <p className="text-xs uppercase tracking-[0.15em] text-teal-200 mb-2">Próximo foco</p>
             <p className="text-lg font-semibold">
               {nextAppointment ? nextAppointment.patientName : "Agenda livre"}
             </p>
             {nextAppointment && (
-              <p className="text-xs text-blue-100/70 mt-1">
+              <p className="text-xs text-teal-100/70 mt-1">
                 {formatTime(nextAppointment.startTime)} — {statusLabel(nextAppointment.status)}
               </p>
             )}
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div className="rounded-xl bg-white/10 p-2 text-center">
-                <p className="text-blue-200 text-xs">Hoje</p>
+                <p className="text-teal-200 text-xs">Hoje</p>
                 <p className="text-lg font-bold">{todaysAppointments.length}</p>
               </div>
               <div className="rounded-xl bg-white/10 p-2 text-center">
-                <p className="text-blue-200 text-xs">Recebido</p>
+                <p className="text-teal-200 text-xs">Recebido</p>
                 <p className="text-sm font-bold">{currency.format(financialSummary.received)}</p>
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function DashboardHome() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <TrendingUp className="h-4 w-4 text-teal-500" />
                   Receita Mensal
                 </CardTitle>
                 <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
@@ -277,7 +277,7 @@ export default function DashboardHome() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-blue-500" />
+                <Calendar className="h-4 w-4 text-teal-500" />
                 Agendamentos Mensais
               </CardTitle>
             </CardHeader>
@@ -288,26 +288,26 @@ export default function DashboardHome() {
         </div>
 
         <div className="space-y-6">
-          <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/15">
+          <Card className="overflow-hidden border-0 bg-gradient-to-br from-teal-600 to-indigo-700 text-white shadow-lg shadow-teal-500/15">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-5 w-5 text-blue-200" />
+                <Sparkles className="h-5 w-5 text-teal-200" />
                 <span className="font-semibold text-sm">Meta do Mês</span>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-100">Progresso</span>
+                  <span className="text-teal-100">Progresso</span>
                   <span className="font-bold">{progressWidth}%</span>
                 </div>
                 <div className="h-2.5 rounded-full bg-white/20 overflow-hidden">
                   <div className="h-full rounded-full bg-white transition-all duration-1000 ease-out" style={{ width: `${progressWidth}%` }} />
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-100">Recebido</span>
+                  <span className="text-teal-100">Recebido</span>
                   <span className="font-bold">{currency.format(financialSummary.received)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-100">Meta</span>
+                  <span className="text-teal-100">Meta</span>
                   <span className="font-bold">{currency.format(financialSummary.goal)}</span>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export default function DashboardHome() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Activity className="h-4 w-4 text-blue-500" />
+                <Activity className="h-4 w-4 text-teal-500" />
                 Indicadores
               </CardTitle>
             </CardHeader>
@@ -332,7 +332,7 @@ export default function DashboardHome() {
                   { label: "Ocupação", value: `${Math.round(indicators.occupationRate)}%`, icon: Users },
                 ].map((item) => (
                   <div key={item.label} className="bg-muted/50 rounded-xl p-3 text-center">
-                    <item.icon className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                    <item.icon className="h-4 w-4 text-teal-500 mx-auto mb-1" />
                     <p className="text-lg font-bold">{item.value}</p>
                     <p className="text-[10px] text-muted-foreground">{item.label}</p>
                   </div>
@@ -378,7 +378,7 @@ export default function DashboardHome() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-blue-500" />
+              <Zap className="h-4 w-4 text-teal-500" />
               Ações Rápidas
             </CardTitle>
           </CardHeader>

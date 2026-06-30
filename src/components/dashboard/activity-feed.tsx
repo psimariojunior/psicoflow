@@ -21,7 +21,7 @@ const activityIcons = {
 }
 
 const activityColors = {
-  appointment: "text-blue-500 bg-blue-100 dark:bg-blue-900/30",
+  appointment: "text-teal-500 bg-teal-100 dark:bg-teal-900/30",
   patient: "text-emerald-500 bg-emerald-100 dark:bg-emerald-900/30",
   payment: "text-violet-500 bg-violet-100 dark:bg-violet-900/30",
   session: "text-amber-500 bg-amber-100 dark:bg-amber-900/30",

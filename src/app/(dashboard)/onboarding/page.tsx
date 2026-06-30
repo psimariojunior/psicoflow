@@ -152,7 +152,7 @@ export default function OnboardingPage() {
   const progress = ((currentStep + 1) / steps.length) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-blue-50/20 to-background dark:via-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-b from-background via-teal-50/20 to-background dark:via-teal-950/10">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8 space-y-2">
@@ -167,7 +167,7 @@ export default function OnboardingPage() {
               <div key={s.id} className="flex items-center gap-1.5">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                   i < currentStep ? "bg-emerald-500 text-white" :
-                  i === currentStep ? "bg-blue-500 text-white ring-4 ring-blue-500/20" :
+                  i === currentStep ? "bg-teal-500 text-white ring-4 ring-teal-500/20" :
                   "bg-muted text-muted-foreground"
                 }`}>
                   {i < currentStep ? <CheckCircle className="h-4 w-4" /> : i + 1}
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
             ))}
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 rounded-full" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-gradient-to-r from-teal-500 to-teal-600 transition-all duration-500 rounded-full" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
             <Card className="border-0 shadow-xl">
               <CardContent className="pt-8 space-y-6">
                 <div className="text-center space-y-3">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-500/30">
                     <Sparkles className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold">Bem-vindo ao PsiHumanis!</h2>
@@ -209,8 +209,8 @@ export default function OnboardingPage() {
                     { icon: Clock, title: "Lembretes", desc: "Automáticos por WhatsApp e email" },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3 p-3 rounded-xl border">
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center shrink-0">
-                        <item.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center shrink-0">
+                        <item.icon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                       </div>
                       <div>
                         <p className="text-sm font-medium">{item.title}</p>
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-blue-500" /> Seu Perfil Profissional
+                  <User className="h-5 w-5 text-teal-500" /> Seu Perfil Profissional
                 </CardTitle>
                 <CardDescription>Complete suas informações para parecer profissional</CardDescription>
               </CardHeader>
@@ -281,7 +281,7 @@ export default function OnboardingPage() {
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-blue-500" /> Horários de Atendimento
+                  <Clock className="h-5 w-5 text-teal-500" /> Horários de Atendimento
                 </CardTitle>
                 <CardDescription>Configure seus dias e horários disponíveis</CardDescription>
               </CardHeader>
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
             <Card className="border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Eye className="h-5 w-5 text-blue-500" /> Perfil Público
+                  <Eye className="h-5 w-5 text-teal-500" /> Perfil Público
                 </CardTitle>
                 <CardDescription>Configure o que os pacientes veem ao agendar</CardDescription>
               </CardHeader>
