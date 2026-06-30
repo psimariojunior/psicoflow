@@ -221,7 +221,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="lg" variant="outline" className="h-13 px-8 rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium group relative overflow-hidden">
+                <Button size="lg" variant="outline" className="h-13 px-8 rounded-full border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium group relative overflow-hidden">
                   <span className="relative z-10">{t("saas.login", locale)}</span> <ArrowUpRight className="ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity relative z-10" />
                 </Button>
               </Link>
