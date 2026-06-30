@@ -11,6 +11,7 @@ declare module "next-auth" {
       name: string
       email: string
       role: string
+      plan?: string
       clinicId?: string | null
       image?: string | null
     }
@@ -21,6 +22,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string
     role: string
+    plan?: string
     clinicId?: string | null
   }
 }
@@ -61,6 +63,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          plan: user.plan || "free",
           clinicId: user.clinicId || null,
         }
       },
@@ -71,6 +74,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as { role?: string }).role || "PSYCHOLOGIST"
+        token.plan = (user as { plan?: string }).plan || "free"
         token.clinicId = (user as { clinicId?: string | null })?.clinicId || null
       }
       return token
@@ -79,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
+        session.user.plan = token.plan || "free"
         session.user.clinicId = token.clinicId || null
       }
       return session

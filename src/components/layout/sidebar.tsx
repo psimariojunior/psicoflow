@@ -77,7 +77,8 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === "ADMIN"
   const isReceptionist = session?.user?.role === "RECEPTIONIST"
-  const isClinicAdmin = session?.user?.role === "CLINIC_ADMIN" || isAdmin
+  const isClinicAdmin = (session?.user?.role === "CLINIC_ADMIN" || isAdmin) && session?.user?.plan === "clinica"
+  const hasClinicPlan = session?.user?.plan === "clinica"
 
   const receptionMenuItems = [
     { href: "/recepcao", label: "Recepção", icon: ClipboardCheck },
@@ -95,7 +96,9 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
     : isClinicAdmin
       ? [...clinicMenuItems, { href: "/admin", label: "Admin", icon: Shield }]
       : isAdmin
-        ? [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
+        ? hasClinicPlan
+          ? [...menuItems, { href: "/recepcao", label: "Recepção", icon: ClipboardCheck }, { href: "/clinica", label: "Clínica", icon: Building2 }, { href: "/admin", label: "Admin", icon: Shield }]
+          : [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
         : menuItems
 
   const sidebarContent = (
