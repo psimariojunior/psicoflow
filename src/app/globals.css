@@ -146,3 +146,279 @@
 .organic-shape { animation: morph 12s ease-in-out infinite; }
 .hover-lift { @apply transition-all duration-300; }
 .hover-lift:hover { transform: translateY(-4px); }
+
+/* ═══════════════════════════════════════════════════
+   PREMIUM DESIGN SYSTEM — Beyond Tailwind defaults
+   ═══════════════════════════════════════════════════ */
+
+/* Animated gradient border on hover */
+.premium-card {
+  position: relative;
+  border-radius: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.premium-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 40%, rgba(13,148,136,0.3) 50%, transparent 60%);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease, background-position 0.4s ease;
+  pointer-events: none;
+}
+.premium-card:hover::before {
+  opacity: 1;
+  background-position: 100% 100%;
+}
+
+/* Magnetic glow effect */
+.glow-on-hover {
+  position: relative;
+  overflow: hidden;
+}
+.glow-on-hover::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -50%) scale(0);
+  background: radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-on-hover:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Animated gradient text */
+.animated-gradient-text {
+  background: linear-gradient(135deg, #0D9488, #059669, #0D9488, #0891b2, #0D9488);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientText 6s ease infinite;
+}
+@keyframes gradientText {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Premium button with animated border */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(255,255,255,0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+.btn-premium:hover::before {
+  opacity: 1;
+}
+.btn-premium::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent 30%);
+  animation: btnShine 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+.btn-premium:hover::after {
+  opacity: 1;
+}
+@keyframes btnShine {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Section divider — organic wave */
+.wave-divider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+.wave-divider svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 80px;
+}
+.wave-divider .shape-fill {
+  fill: currentColor;
+}
+
+/* Smooth reveal on scroll (CSS-only with intersection observer fallback) */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* Magnetic number effect for steps */
+.step-number {
+  font-size: clamp(4rem, 8vw, 8rem);
+  font-weight: 900;
+  line-height: 0.85;
+  background: linear-gradient(180deg, rgba(13,148,136,0.15) 0%, rgba(13,148,136,0.03) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+}
+.group:hover .step-number {
+  background: linear-gradient(180deg, rgba(13,148,136,0.4) 0%, rgba(13,148,136,0.1) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform: scale(1.05);
+}
+
+/* Hero title — large text with gradient */
+.hero-title {
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: clamp(4rem, 5.5vw, 7rem);
+  }
+}
+
+/* Organic blob background for sections */
+.section-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Horizontal scroll reviews — hide scrollbar, show fade edges */
+.scroll-fade {
+  position: relative;
+}
+.scroll-fade::before,
+.scroll-fade::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: 2;
+  pointer-events: none;
+}
+.scroll-fade::before {
+  left: 0;
+  background: linear-gradient(to right, var(--background) 0%, transparent 100%);
+}
+.scroll-fade::after {
+  right: 0;
+  background: linear-gradient(to left, var(--background) 0%, transparent 100%);
+}
+
+/* Premium service card hover */
+.service-item {
+  position: relative;
+  overflow: hidden;
+}
+.service-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.service-item:hover::after {
+  transform: scaleX(1);
+}
+
+/* Floating pill with subtle animation */
+.floating-pill {
+  animation: floatPill 5s ease-in-out infinite;
+}
+@keyframes floatPill {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+
+/* CTA section — layered gradient */
+.cta-gradient {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(6,182,212,0.25) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(16,185,129,0.2) 0%, transparent 50%),
+    linear-gradient(135deg, #0D9488 0%, #0F766E 50%, #115E59 100%);
+}
+
+/* Navbar glassmorphism on scroll */
+.nav-scrolled {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+.dark .nav-scrolled {
+  background: rgba(15, 23, 42, 0.72) !important;
+}
+
+/* Feature card with subtle grid pattern */
+.feature-pattern {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(13,148,136,0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Premium badge glow */
+.badge-glow {
+  box-shadow: 0 0 0 1px rgba(13,148,136,0.1), 0 0 12px rgba(13,148,136,0.08);
+}
+
+/* Smooth counter animation */
+@property --num {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+.counter-animate {
+  transition: --num 2s cubic-bezier(0.22, 1, 0.36, 1);
+  counter-reset: num var(--num);
+}
+.counter-animate::after {
+  content: counter(num);
+}

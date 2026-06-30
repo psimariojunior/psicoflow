@@ -107,6 +107,17 @@ export default function LandingPage() {
       .catch(() => {})
   }, [])
 
+  // Scroll reveal — adds .revealed to .reveal elements
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal")
+    if (!els.length) return
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("revealed"); obs.unobserve(e.target) } })
+    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" })
+    els.forEach(el => obs.observe(el))
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#FAFAF8] dark:bg-slate-950 overflow-x-hidden">
       <BreadcrumbJsonLd items={[
@@ -120,7 +131,7 @@ export default function LandingPage() {
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         scrolled
-          ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm"
+          ? "nav-scrolled border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm"
           : "bg-transparent"
       )}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -193,10 +204,10 @@ export default function LandingPage() {
               </Badge>
             </motion.div>
 
-            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tight mb-8">
+            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="hero-title mb-8">
               <span className="text-slate-900 dark:text-white">{t("hero.title1", locale)}</span>
               <br />
-              <span className="text-teal-600 dark:text-teal-400">{t("hero.title2", locale)}</span>
+              <span className="animated-gradient-text">{t("hero.title2", locale)}</span>
             </motion.h1>
 
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.35 }} className="text-lg md:text-xl text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mb-10">
@@ -205,13 +216,13 @@ export default function LandingPage() {
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.45 }} className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/agendar">
-                <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white shadow-xl shadow-teal-500/20 text-base h-13 px-8 rounded-full font-medium group">
-                  {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+                <Button size="lg" className="btn-premium bg-teal-600 hover:bg-teal-700 text-white shadow-xl shadow-teal-500/20 text-base h-13 px-8 rounded-full font-medium group">
+                  {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform relative z-10" />
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="lg" variant="outline" className="h-13 px-8 rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium group">
-                  {t("saas.login", locale)} <ArrowUpRight className="ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                <Button size="lg" variant="outline" className="h-13 px-8 rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium group relative overflow-hidden">
+                  <span className="relative z-10">{t("saas.login", locale)}</span> <ArrowUpRight className="ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity relative z-10" />
                 </Button>
               </Link>
             </motion.div>
@@ -364,7 +375,7 @@ export default function LandingPage() {
                 <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }} className="relative group">
                   <div className={cn("flex gap-8 py-10 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300", i === 0 && "border-t")}>
                     <div className="flex-shrink-0">
-                      <span className="text-5xl font-bold text-slate-200 dark:text-slate-800 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors duration-300">{step.num}</span>
+                      <span className="step-number">{step.num}</span>
                     </div>
                     <div className="pt-1">
                       <div className="flex items-center gap-3 mb-3">
@@ -406,12 +417,12 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-violet-500/10 rounded-3xl blur-3xl" />
               <div className="relative grid sm:grid-cols-2 gap-4">
                 {features.map((f, i) => (
-                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }} className="group p-6 rounded-2xl bg-white/[0.05] border border-white/[0.08] backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02]">
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform", f.accent)}>
+                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }} className="group premium-card glow-on-hover p-6 rounded-2xl bg-white/[0.05] border border-white/[0.08] backdrop-blur-sm feature-pattern">
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform relative z-10", f.accent)}>
                       <f.icon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-white mb-2">{f.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">{f.desc}</p>
+                    <h3 className="font-semibold text-white mb-2 relative z-10">{f.title}</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed relative z-10">{f.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -431,7 +442,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200/60 dark:bg-slate-800/60 rounded-2xl overflow-hidden">
             {services.map((service, i) => (
-              <motion.div key={service.title} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }} className="group bg-white dark:bg-slate-950 p-8 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-300">
+              <motion.div key={service.title} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }} className={cn("group bg-white dark:bg-slate-950 p-8 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-300 service-item", service.color)}>
                 <service.icon className={cn("h-6 w-6 mb-4 transition-transform group-hover:scale-110 duration-300", service.color)} />
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{service.desc}</p>
@@ -510,25 +521,27 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
-              {reviews.slice(0, 6).map((r, i) => (
-                <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.4 }} className="flex-shrink-0 w-[340px] snap-start">
-                  <div className="h-full p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:shadow-lg hover:shadow-slate-900/5 dark:hover:shadow-black/20 transition-all duration-300">
-                    <Quote className="h-6 w-6 text-teal-200 dark:text-teal-800 mb-4" />
-                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-6 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-slate-900 dark:text-white text-sm">{r.patientName}</p>
-                        <div className="flex items-center gap-0.5 mt-1">
-                          {[1, 2, 3, 4, 5].map((j) => (
-                            <Star key={j} className={cn("h-3 w-3", j <= r.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
-                          ))}
+            <div className="scroll-fade">
+              <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
+                {reviews.slice(0, 6).map((r, i) => (
+                  <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.4 }} className="flex-shrink-0 w-[340px] snap-start">
+                    <div className="h-full p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:shadow-lg hover:shadow-slate-900/5 dark:hover:shadow-black/20 transition-all duration-300">
+                      <Quote className="h-6 w-6 text-teal-200 dark:text-teal-800 mb-4" />
+                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-6 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-slate-900 dark:text-white text-sm">{r.patientName}</p>
+                          <div className="flex items-center gap-0.5 mt-1">
+                            {[1, 2, 3, 4, 5].map((j) => (
+                              <Star key={j} className={cn("h-3 w-3", j <= r.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <div className="text-center mt-10">
@@ -570,7 +583,7 @@ export default function LandingPage() {
 
       {/* ═══════════════════ CTA — Organic gradient ═══════════════════ */}
       <section className="relative py-28 md:py-36 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800" />
+        <div className="absolute inset-0 cta-gradient" />
         <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[100px] organic-shape" />
         <div className="absolute bottom-[-15%] left-[-5%] w-[400px] h-[400px] rounded-full bg-white/5 blur-[80px] animate-float-delayed" />
         <div className="absolute inset-0 bg-grid opacity-[0.06]" />
@@ -579,8 +592,8 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">{t("cta.title", locale)}</h2>
             <p className="text-lg md:text-xl text-teal-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/agendar"><Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50 shadow-xl text-base h-13 px-10 rounded-full font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-              <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-base h-13 px-10 rounded-full font-semibold">Área do Paciente</Button></Link>
+              <Link href="/agendar"><Button size="lg" className="btn-premium bg-white text-teal-700 hover:bg-teal-50 shadow-xl text-base h-13 px-10 rounded-full font-semibold relative z-10">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5 relative z-10" /></Button></Link>
+              <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-base h-13 px-10 rounded-full font-semibold backdrop-blur-sm">Área do Paciente</Button></Link>
             </div>
             <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-teal-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
