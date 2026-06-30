@@ -13,7 +13,7 @@ export async function GET() {
     clinicId = clinic?.id || null
   }
 
-  if (!clinicId) return NextResponse.json({ error: "Sem clínica" }, { status: 404 })
+  if (!clinicId) return NextResponse.json({ todayAppointments: [], todayArrivals: [], members: 0, psychologists: 0, receptionists: 0, totalPatients: 0, totalAppointmentsToday: 0 })
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)

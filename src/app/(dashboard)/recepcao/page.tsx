@@ -64,6 +64,8 @@ export default function RecepcaoPage() {
   }, [session, status, router])
 
   const fetchData = useCallback(async () => {
+    if (!session?.user) return
+    if (session.user.role !== "RECEPTIONIST" && session.user.role !== "ADMIN" && session.user.role !== "CLINIC_ADMIN") return
     setLoading(true)
     try {
       const [arrivalsRes, dashboardRes] = await Promise.all([

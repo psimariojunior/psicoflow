@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
 
     const stripe = getStripe()
     let customerId = user.stripeCustomerId
-    console.log("[checkout] stripe key prefix:", process.env.STRIPE_SECRET_KEY?.substring(0, 12), "priceId:", priceId, "customerId:", customerId)
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
@@ -91,8 +90,6 @@ export async function POST(request: NextRequest) {
       success_url: `${origin}/configuracoes?checkout=success`,
       cancel_url: `${origin}/configuracoes`,
     })
-
-    console.log("[checkout] session created:", session.id, "url:", session.url?.substring(0, 50))
 
     await prisma.user.update({
       where: { id: userId },

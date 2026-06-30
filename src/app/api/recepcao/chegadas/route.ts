@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   if (!resolvedClinicId) {
-    return NextResponse.json({ error: "Clínica não encontrada" }, { status: 404 })
+    return NextResponse.json({ arrivals: [] })
   }
 
   const today = new Date()
