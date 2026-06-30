@@ -69,7 +69,6 @@ const proMenuItems = [
   { href: "/cobrancas", label: "Cobranças", icon: Receipt },
   { href: "/comunicacao", label: "Comunicação", icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
-  { href: "/outcomes", label: "Clinical Outcomes", icon: Brain },
   { href: "/recibos", label: "Recibos", icon: Receipt },
   { href: "/lista-espera", label: "Lista de Espera", icon: ClipboardList },
   { href: "/automacoes", label: "Automações", icon: Zap },
@@ -93,6 +92,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
   const clinicMenuItems = [
     ...baseMenuItems,
     ...proMenuItems,
+    { href: "/outcomes", label: "Clinical Outcomes", icon: Brain },
     { href: "/recepcao", label: "Recepção", icon: ClipboardCheck },
     { href: "/clinica", label: "Clínica", icon: Building2 },
   ]
