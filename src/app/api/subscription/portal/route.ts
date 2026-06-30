@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { requireAuth, apiError, apiSuccess } from "@/lib/api-helpers"
 import { getStripe } from "@/lib/stripe"
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       return_url: `${origin}/configuracoes`,
     })
 
-    return NextResponse.redirect(session.url)
+    return apiSuccess({ url: session.url })
   } catch (error) {
     console.error("Error creating portal session:", error)
     return apiError("Erro ao criar sessão do portal")
