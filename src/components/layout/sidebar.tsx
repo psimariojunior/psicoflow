@@ -46,30 +46,33 @@ interface SidebarProps {
   onMobileClose: () => void
 }
 
-const menuItems = [
+const baseMenuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/pacientes", label: "Pacientes", icon: Users },
   { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/disponibilidade", label: "Disponibilidade", icon: Clock },
-  { href: "/financeiro", label: "Financeiro", icon: DollarSign },
-  { href: "/cobrancas", label: "Cobranças", icon: Receipt },
   { href: "/sala-virtual", label: "Sala Virtual", icon: Video },
   { href: "/sessoes", label: "Sessões", icon: ClipboardList },
   { href: "/questionarios", label: "Questionários", icon: ClipboardList },
   { href: "/prontuarios", label: "Prontuários", icon: FileText },
   { href: "/documentos", label: "Documentos", icon: FileType },
   { href: "/diario-emocoes", label: "Diário de Emoções", icon: Smile },
-  { href: "/tarefas",        label: "Tarefas",           icon: ListTodo },
-  { href: "/notificacoes",   label: "Notificações",     icon: Bell },
-  { href: "/comunicacao",    label: "Comunicação",      icon: MessageSquare },
+  { href: "/tarefas", label: "Tarefas", icon: ListTodo },
+  { href: "/notificacoes", label: "Notificações", icon: Bell },
+  { href: "/configuracoes", label: "Configurações", icon: Settings },
+  { href: "/ajuda", label: "Ajuda", icon: BookOpen },
+  { href: "/blog", label: "Blog", icon: BookOpen },
+]
+
+const proMenuItems = [
+  { href: "/financeiro", label: "Financeiro", icon: DollarSign },
+  { href: "/cobrancas", label: "Cobranças", icon: Receipt },
+  { href: "/comunicacao", label: "Comunicação", icon: MessageSquare },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { href: "/outcomes", label: "Clinical Outcomes", icon: Brain },
   { href: "/recibos", label: "Recibos", icon: Receipt },
   { href: "/lista-espera", label: "Lista de Espera", icon: ClipboardList },
   { href: "/automacoes", label: "Automações", icon: Zap },
-  { href: "/configuracoes", label: "Configurações", icon: Settings },
-  { href: "/ajuda", label: "Ajuda", icon: BookOpen },
-  { href: "/blog", label: "Blog", icon: BookOpen },
 ]
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
@@ -85,11 +88,16 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
     { href: "/configuracoes", label: "Configurações", icon: Settings },
   ]
 
+  const isPaid = session?.user?.plan === "pro" || session?.user?.plan === "clinica"
+
   const clinicMenuItems = [
-    ...menuItems,
+    ...baseMenuItems,
+    ...proMenuItems,
     { href: "/recepcao", label: "Recepção", icon: ClipboardCheck },
     { href: "/clinica", label: "Clínica", icon: Building2 },
   ]
+
+  const proMenu = [...baseMenuItems, ...proMenuItems]
 
   const allMenuItems = isReceptionist
     ? receptionMenuItems
@@ -97,9 +105,13 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
       ? [...clinicMenuItems, { href: "/admin", label: "Admin", icon: Shield }]
       : isAdmin
         ? hasClinicPlan
-          ? [...menuItems, { href: "/recepcao", label: "Recepção", icon: ClipboardCheck }, { href: "/clinica", label: "Clínica", icon: Building2 }, { href: "/admin", label: "Admin", icon: Shield }]
-          : [...menuItems, { href: "/admin", label: "Admin", icon: Shield }]
-        : menuItems
+          ? [...clinicMenuItems, { href: "/admin", label: "Admin", icon: Shield }]
+          : isPaid
+            ? [...proMenu, { href: "/admin", label: "Admin", icon: Shield }]
+            : [...baseMenuItems, { href: "/admin", label: "Admin", icon: Shield }]
+        : isPaid
+          ? proMenu
+          : baseMenuItems
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-background dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 border-r relative">
