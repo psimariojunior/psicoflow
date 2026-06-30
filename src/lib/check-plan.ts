@@ -29,7 +29,7 @@ export async function requireClinicPlan(userId: string): Promise<{ allowed: bool
   if (user.plan === "clinica") return { allowed: true }
 
   if (user.plan === "trial" && user.planExpiresAt && new Date(user.planExpiresAt) > new Date()) {
-    return { allowed: true, reason: "trial" }
+    return { allowed: false, reason: "Funcionalidades de clínica requerem o plano Clínica. Atualize seu plano em Configurações." }
   }
 
   return {
