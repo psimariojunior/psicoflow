@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { WhatsAppWidget } from "@/components/whatsapp-widget"
 import { VideoTour } from "@/components/video-tour"
@@ -15,20 +14,13 @@ import { setLocale, t, getLocale } from "@/lib/i18n"
 import toast from "react-hot-toast"
 import { BreadcrumbJsonLd, FaqJsonLd } from "@/lib/seo"
 import {
-  ArrowRight, CheckCircle, Sparkles, Shield, Zap, Heart, Brain,
-  Users, Globe, Calendar, MessageCircle, ChevronDown, Menu, X, Star,
-  Phone, Mail, MapPin, Clock, Award, Quote, BarChart3 as BarChartIcon,
-  Sun, Moon, Languages, Video, Mic, Maximize2, Play,
+  ArrowRight, CheckCircle, Shield, Heart, Brain,
+  Users, Globe, Calendar, ChevronDown, Menu, X, Star,
+  Phone, Mail, MapPin, Clock, Quote, Award,
+  Sun, Moon, Languages, Video, Play, Sparkles,
+  Stethoscope, FileText, Lock, BarChart3, CalendarCheck,
+  Zap, Eye, MessageCircle, ArrowUpRight, CircleDot, Mic, Maximize2
 } from "lucide-react"
-
-const services = [
-  { icon: Heart, title: "Terapia Individual", desc: "Atendimento psicológico individual para adultos e adolescentes, com abordagem personalizada.", color: "from-rose-500 to-pink-600" },
-  { icon: Users, title: "Terapia de Casal", desc: "Mediação para casais que buscam melhorar a comunicação e fortalecer o vínculo.", color: "from-violet-500 to-purple-600" },
-  { icon: Video, title: "Terapia Online", desc: "Consultas por videochamada com segurança e privacidade. Atenda de onde estiver.", color: "from-blue-500 to-cyan-600" },
-  { icon: Brain, title: "Gestão de Ansiedade", desc: "Técnicas baseadas em evidências para lidar com ansiedade, estresse e burnout.", color: "from-amber-500 to-orange-600" },
-  { icon: Clock, title: "Acompanhamento Psicológico", desc: "Suporte para momentos de transição, luto e desenvolvimento pessoal.", color: "from-emerald-500 to-teal-600" },
-  { icon: Shield, title: "Supervisão Clínica", desc: "Supervisão para profissionais com discussão de casos e orientação técnica.", color: "from-indigo-500 to-blue-600" },
-]
 
 const faqItems = [
   { q: "Como funciona a terapia online?", a: "Você agenda um horário, recebe um link seguro por email, e no horário marcado basta clicar para entrar na sala virtual. Tudo criptografado." },
@@ -39,12 +31,6 @@ const faqItems = [
   { q: "Posso cancelar ou reagendar?", a: "Sim, com até 24h de antecedência pelo portal do paciente." },
 ]
 
-const steps = [
-  { icon: Calendar, title: "Agende", en: "Book", desc: "Escolha o dia e horário ideal na agenda online. Sem burocracia.", enDesc: "Choose the ideal day and time in the online calendar. No bureaucracy." },
-  { icon: Globe, title: "Conecte-se", en: "Connect", desc: "No horário marcado, entre na sala virtual segura com um clique.", enDesc: "At the scheduled time, enter the secure virtual room with one click." },
-  { icon: Heart, title: "Transforme-se", en: "Transform", desc: "Participe da sessão com privacidade e dê o próximo passo no seu bem-estar.", enDesc: "Join the session with privacy and take the next step in your well-being." },
-]
-
 const navLinks = [
   { label: "Início", href: "/", en: "Home" },
   { label: "Serviços", href: "/#servicos", en: "Services" },
@@ -53,6 +39,22 @@ const navLinks = [
   { label: "Blog", href: "/blog", en: "Blog" },
   { label: "Planos", href: "/pricing", en: "Plans" },
   { label: "FAQ", href: "/#faq", en: "FAQ" },
+]
+
+const features = [
+  { icon: CalendarCheck, title: "Agenda inteligente", desc: "Disponibilidade pública, confirmações automáticas e lembretes por WhatsApp e email.", accent: "bg-teal-500" },
+  { icon: FileText, title: "Prontuário eletrônico", desc: "Registros clínicos, questionários, anamnese e documentos — tudo em um só lugar.", accent: "bg-violet-500" },
+  { icon: Lock, title: "Segurança e LGPD", desc: "Dados isolados por profissional, criptografia ponta a ponta e conformidade total.", accent: "bg-emerald-500" },
+  { icon: BarChart3, title: "Gestão financeira", desc: "Cobranças, faturas, Stripe, relatórios e indicadores de desempenho.", accent: "bg-amber-500" },
+]
+
+const services = [
+  { icon: Heart, title: "Terapia Individual", desc: "Atendimento psicológico para adultos e adolescentes, com abordagem personalizada.", color: "text-rose-500" },
+  { icon: Users, title: "Terapia de Casal", desc: "Mediação para casais que buscam melhorar a comunicação e fortalecer o vínculo.", color: "text-violet-500" },
+  { icon: Video, title: "Terapia Online", desc: "Consultas por videochamada com segurança e privacidade. Atenda de onde estiver.", color: "text-teal-500" },
+  { icon: Brain, title: "Gestão de Ansiedade", desc: "Técnicas baseadas em evidências para lidar com ansiedade, estresse e burnout.", color: "text-amber-500" },
+  { icon: Clock, title: "Acompanhamento", desc: "Suporte para momentos de transição, luto e desenvolvimento pessoal.", color: "text-emerald-500" },
+  { icon: Stethoscope, title: "Supervisão Clínica", desc: "Supervisão para profissionais com discussão de casos e orientação técnica.", color: "text-indigo-500" },
 ]
 
 export default function LandingPage() {
@@ -68,6 +70,9 @@ export default function LandingPage() {
     typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false
   )
   const locale = getLocale()
+  const { scrollYProgress } = useScroll()
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0])
+  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.96])
 
   const toggleTheme = () => {
     const html = document.documentElement
@@ -102,525 +107,513 @@ export default function LandingPage() {
       .catch(() => {})
   }, [])
 
-  const stagger = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-  }
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-  }
-
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
+    <div className="min-h-screen bg-[#FAFAF8] dark:bg-slate-950 overflow-x-hidden">
       <BreadcrumbJsonLd items={[
         { name: "Início", item: "/" },
         { name: "Serviços", item: "/#servicos" },
         { name: "FAQ", item: "/#faq" },
       ]} />
       <FaqJsonLd items={faqItems.map((item) => ({ q: item.q, a: item.a }))} />
+
+      {/* ═══════════════════ HEADER ═══════════════════ */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         scrolled
-          ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-lg shadow-slate-900/5"
+          ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm"
           : "bg-transparent"
       )}>
-        <div className={cn(
-          "absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-teal-500/30 to-transparent opacity-0 transition-opacity duration-500",
-          scrolled && "opacity-100"
-        )} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex items-center justify-center w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/20 group-hover:shadow-teal-500/30 transition-all duration-300 group-hover:scale-105 ring-2 ring-teal-500/20">
-                <Image src="/logo.png" alt="PsiHumanis" width={44} height={44} className="w-full h-full object-cover" priority />
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/20 transition-all duration-300 group-hover:scale-105">
+                <Image src="/logo.png" alt="PsiHumanis" width={40} height={40} className="w-full h-full object-cover" priority />
               </div>
               <div className={cn("flex-col transition-all duration-500", scrolled ? "opacity-100 translate-x-0 flex" : "opacity-0 -translate-x-2 hidden md:flex")}>
-                <span className="text-lg font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">PsiHumanis</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-500 leading-none">CRP 04/52274</span>
+                <span className="text-lg font-bold text-teal-700 dark:text-teal-400">PsiHumanis</span>
+                <span className="text-[10px] text-slate-400 leading-none">CRP 04/52274</span>
               </div>
             </Link>
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map(link => (
-                <Link key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined} onClick={e => {
-                  if (link.href.startsWith("/#")) { e.preventDefault(); const id = link.href.slice(2); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth" }) }
-                }} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200", pathname === link.href ? "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50")}>{locale === "en" ? link.en : link.label}</Link>
+                <Link key={link.href} href={link.href} onClick={e => {
+                  if (link.href.startsWith("/#")) { e.preventDefault(); const id = link.href.slice(2); document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }) }
+                }} className="px-3 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">{locale === "en" ? link.en : link.label}</Link>
               ))}
-              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
-              <button
-                onClick={toggleLanguage}
-                className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                aria-label="Toggle language"
-              >
+              <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-2" />
+              <button onClick={toggleLanguage} className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" aria-label="Toggle language">
                 <Languages className="h-4 w-4" />
               </button>
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                aria-label="Toggle theme"
-              >
+              <button onClick={toggleTheme} className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" aria-label="Toggle theme">
                 {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
-              <Link href="/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Área do Psicólogo</Link>
-              <Link href="/paciente/login" className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Área do Paciente</Link>
-              <Link href="/agendar"><Button size="sm" className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/25">{t("nav.book", locale)}</Button></Link>
+              <Link href="/login" className="px-3 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Psicólogo</Link>
+              <Link href="/paciente/login" className="px-3 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Paciente</Link>
+              <Link href="/agendar"><Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/20 text-[13px] h-9 px-5">{t("nav.book", locale)}</Button></Link>
             </nav>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Abrir menu">
-              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Menu">
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
-        {menuOpen && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl">
-            <div className="px-4 py-4 space-y-1">
-              {navLinks.map(link => (
-                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">{locale === "en" ? link.en : link.label}</Link>
-              ))}
-              <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
-              <div className="flex items-center gap-2 px-4 py-2">
-                <button
-                  onClick={toggleLanguage}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                >
-                  <Languages className="h-3.5 w-3.5" /> {locale === "pt" ? "EN" : "PT"}
-                </button>
-                <button
-                  onClick={toggleTheme}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                >
-                  {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                  {darkMode ? "Claro" : "Escuro"}
-                </button>
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden">
+              <div className="px-4 py-4 space-y-1">
+                {navLinks.map(link => (
+                  <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">{locale === "en" ? link.en : link.label}</Link>
+                ))}
+                <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                <div className="flex items-center gap-2 px-4 py-2">
+                  <button onClick={toggleLanguage} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"><Languages className="h-3.5 w-3.5" /> {locale === "pt" ? "EN" : "PT"}</button>
+                  <button onClick={toggleTheme} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />} {darkMode ? "Claro" : "Escuro"}</button>
+                </div>
+                <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Área do Psicólogo</Link>
+                <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-teal-600 dark:text-teal-400">Área do Paciente</Link>
+                <Link href="/agendar" className="block mt-2"><Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">Agende sua Consulta</Button></Link>
               </div>
-              <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Área do Psicólogo</Link>
-              <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-teal-600 dark:text-teal-400">Área do Paciente</Link>
-              <Link href="/agendar" className="block mt-2"><Button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white">Agende sua Consulta</Button></Link>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 bg-mesh-hero dark:bg-mesh-dark" />
-        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full organic-shape bg-gradient-to-br from-teal-400/10 to-teal-500/5 blur-3xl" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-gradient-to-tr from-amber-400/8 to-sage-500/5 blur-3xl animate-float-delayed" />
-        <div className="absolute inset-0 bg-noise pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="space-y-8">
-              <motion.div animate={{ opacity: [1, 0.7, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-sm font-medium">
-                <Sparkles className="h-4 w-4" />
+      {/* ═══════════════════ HERO — Editorial, large type, organic ═══════════════════ */}
+      <motion.section style={{ opacity: heroOpacity, scale: heroScale }} className="relative min-h-screen flex items-center pt-20 pb-12 overflow-hidden">
+        {/* Organic background blobs */}
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-teal-200/30 dark:bg-teal-900/20 blur-[120px] organic-shape" />
+        <div className="absolute bottom-[10%] left-[-8%] w-[400px] h-[400px] rounded-full bg-amber-100/40 dark:bg-amber-900/10 blur-[100px] animate-float-delayed" />
+        <div className="absolute top-[30%] left-[40%] w-[300px] h-[300px] rounded-full bg-violet-100/20 dark:bg-violet-900/10 blur-[80px] animate-float" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
+              <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-950/30 rounded-full">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-500 mr-2 animate-pulse" />
                 {t("hero.badge", locale)}
-              </motion.div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-                <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">{t("hero.title1", locale)}</span>
-                <br />
-                <span className="bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">{t("hero.title2", locale)}</span>
-              </h1>
-              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg">
-                {t("hero.subtitle", locale)}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/agendar">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg shadow-teal-500/25 text-base h-12 px-8">
-                    {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-              <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-500">
-                <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-teal-500" /><span>Sigilo Garantido</span></div>
-                <div className="flex items-center gap-2"><Zap className="h-4 w-4 text-teal-500" /><span>Online ou Presencial</span></div>
-                <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500" /><span>CRP Ativo</span></div>
-              </div>
-              <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium pt-2">
-                <Sparkles className="h-3.5 w-3.5" /> Psicólogo? Comece grátis por 14 dias
+              </Badge>
+            </motion.div>
+
+            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tight mb-8">
+              <span className="text-slate-900 dark:text-white">{t("hero.title1", locale)}</span>
+              <br />
+              <span className="text-teal-600 dark:text-teal-400">{t("hero.title2", locale)}</span>
+            </motion.h1>
+
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.35 }} className="text-lg md:text-xl text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mb-10">
+              {t("hero.subtitle", locale)}
+            </motion.p>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.45 }} className="flex flex-col sm:flex-row gap-4 mb-12">
+              <Link href="/agendar">
+                <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white shadow-xl shadow-teal-500/20 text-base h-13 px-8 rounded-full font-medium group">
+                  {t("hero.book", locale)} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="lg" variant="outline" className="h-13 px-8 rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium group">
+                  {t("saas.login", locale)} <ArrowUpRight className="ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                </Button>
               </Link>
             </motion.div>
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="hidden lg:flex items-center justify-center relative">
-              <div className="relative w-full max-w-lg">
-                {/* Main Card - Modern Video Call */}
-                <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-1 shadow-2xl shadow-teal-950/30">
-                  <div className="rounded-[1.4rem] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden min-h-[400px] relative">
-                    {/* Remote video background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-teal-950/60 via-slate-900 to-indigo-950/40" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-                    {/* Top bar */}
-                    <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-4">
-                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
-                        <span className="text-[11px] font-medium">Dr. Mario Jr.</span>
-                        <span className="text-[10px] text-white/50 ml-1">47:32</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl text-white/50 px-3 py-1.5 rounded-lg border border-white/5">
-                        <Video className="h-3 w-3 text-teal-400" />
-                        <span className="text-[10px] font-medium">sala-abc123</span>
-                      </div>
-                    </div>
-
-                    {/* Center content - waiting or connected indicator */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg shadow-teal-500/30 ring-4 ring-teal-400/20">
-                          <span className="text-2xl font-bold text-white">MJ</span>
-                        </div>
-                        <p className="text-white/80 text-sm font-medium mt-3">Consulta online</p>
-                        <p className="text-white/40 text-xs mt-1">Conexão segura e criptografada</p>
-                      </div>
-                    </div>
-
-                    {/* Local video PiP */}
-                    <div className="absolute bottom-20 right-3 z-20">
-                      <div className="relative w-24 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl" style={{ height: 72 }}>
-                        <div className="w-full h-full bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
-                          <span className="text-lg font-bold text-white">V</span>
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-5 pointer-events-none" />
-                        <div className="absolute bottom-0.5 left-1.5">
-                          <span className="text-[8px] text-white/80 font-medium bg-black/40 px-1.5 py-0.5 rounded-full backdrop-blur-sm">Você</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bottom controls */}
-                    <div className="absolute bottom-0 left-0 right-0 z-30 pb-5">
-                      <div className="flex items-center justify-center">
-                        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-2xl px-4 py-2.5 border border-white/10 shadow-2xl">
-                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
-                            <Mic className="h-4 w-4" />
-                          </div>
-                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
-                            <Video className="h-4 w-4" />
-                          </div>
-                          <div className="w-px h-6 bg-white/10 mx-0.5" />
-                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 text-white">
-                            <Maximize2 className="h-4 w-4" />
-                          </div>
-                          <div className="w-px h-6 bg-white/10 mx-0.5" />
-                          <div className="flex items-center gap-1.5 bg-red-600 text-white px-4 py-2 rounded-xl text-[11px] font-medium">
-                            <Phone className="h-3.5 w-3.5 rotate-[135deg]" />
-                            Sair
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Floating Elements */}
-                <div className="absolute -top-4 -right-4 rounded-2xl bg-white dark:bg-slate-800 p-3 shadow-xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700 animate-float">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                      <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
-                      <p className="text-[11px] text-slate-500">Bem-estar garantido</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -bottom-3 -left-3 rounded-2xl bg-white dark:bg-slate-800 p-3 shadow-xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700" style={{ animation: "float 6s ease-in-out infinite 1s" }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-                      <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-slate-900 dark:text-white">Próxima sessão</p>
-                      <p className="text-[11px] text-slate-500">Amanhã às 14:00</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-slate-500 dark:text-slate-500">
+              <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-teal-500" /><span>{t("hero.secure", locale)}</span></div>
+              <div className="flex items-center gap-2"><Globe className="h-4 w-4 text-teal-500" /><span>{t("hero.online", locale)}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-teal-500" /><span>{t("hero.crp", locale)}</span></div>
             </motion.div>
           </div>
-        </div>
-      </section>
 
-      {/* Video Demo */}
-      <section className="py-16 bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">Veja como funciona</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Conheça a plataforma em ação</h2>
-            <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-xl mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
-            <button onClick={() => setVideoOpen(true)} className="relative rounded-2xl overflow-hidden shadow-2xl shadow-teal-950/20 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video w-full flex items-center justify-center group cursor-pointer hover:shadow-teal-950/30 transition-shadow" aria-label="Assistir demonstração da plataforma">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-teal-500/5" />
-              <div className="relative z-10 text-center">
-                <div className="w-16 h-16 rounded-full bg-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-teal-500/30 group-hover:scale-110 group-hover:bg-teal-700 transition-all">
-                  <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
+          {/* Right side — atmospheric illustration */}
+          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.4 }} className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-[420px]">
+            <div className="relative">
+              {/* Organic card container */}
+              <div className="relative rounded-[2rem] bg-white dark:bg-slate-900 p-8 shadow-2xl shadow-slate-900/10 dark:shadow-black/30 border border-slate-100 dark:border-slate-800">
+                {/* Simulated video call */}
+                <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 overflow-hidden aspect-[4/3] relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-950/40 via-transparent to-violet-950/20" />
+                  <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-medium">Dr. Mario Jr.</span>
+                    <span className="text-white/40">47:32</span>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mx-auto shadow-lg shadow-teal-500/30 ring-4 ring-teal-400/20">
+                        <span className="text-xl font-bold text-white">MJ</span>
+                      </div>
+                      <p className="text-white/70 text-xs font-medium mt-3">Consulta online</p>
+                    </div>
+                  </div>
+                  {/* PiP */}
+                  <div className="absolute bottom-12 right-3 w-20 rounded-lg overflow-hidden border-2 border-white/20 shadow-xl aspect-video">
+                    <div className="w-full h-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                      <span className="text-sm font-bold text-white">V</span>
+                    </div>
+                  </div>
+                  {/* Controls */}
+                  <div className="absolute bottom-0 left-0 right-0 pb-4 flex justify-center">
+                    <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-xl rounded-full px-3 py-2 border border-white/10">
+                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><Mic className="h-3.5 w-3.5" /></div>
+                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><Video className="h-3.5 w-3.5" /></div>
+                      <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white"><Phone className="h-3.5 w-3.5 rotate-[135deg]" /></div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Assista à demonstração</p>
-                <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
+
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: "Sessões", value: "1.2k+", icon: CalendarCheck },
+                    { label: "Pacientes", value: "380+", icon: Users },
+                    { label: "Avaliação", value: "4.9", icon: Star },
+                  ].map((stat) => (
+                    <div key={stat.label} className="text-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+                      <stat.icon className="h-4 w-4 text-teal-500 mx-auto mb-1" />
+                      <p className="text-lg font-bold text-slate-900 dark:text-white">{stat.value}</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </button>
+
+              {/* Floating notification */}
+              <div className="absolute -top-3 -right-3 bg-white dark:bg-slate-800 rounded-xl p-3 shadow-xl border border-slate-100 dark:border-slate-700 animate-float">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-white">Sessão concluída</p>
+                    <p className="text-[10px] text-slate-500">Bem-estar garantido</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
+      </motion.section>
+
+      {/* ═══════════════════ VIDEO DEMO ═══════════════════ */}
+      <section className="py-16 md:py-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Conheça a plataforma em ação</h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
+          </motion.div>
+          <motion.button initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} onClick={() => setVideoOpen(true)} className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video flex items-center justify-center group cursor-pointer hover:shadow-slate-900/20 transition-shadow duration-500" aria-label="Assistir demonstração">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-violet-500/5" />
+            <div className="relative z-10 text-center">
+              <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-teal-500/30 group-hover:scale-110 group-hover:bg-teal-700 transition-all duration-300">
+                <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
+              </div>
+              <p className="text-base font-semibold text-slate-800 dark:text-slate-200">Assista à demonstração</p>
+              <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
+            </div>
+          </motion.button>
+        </div>
       </section>
 
-      {/* Video Demo Modal — Animated Feature Tour */}
       <AnimatePresence>
         {videoOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setVideoOpen(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-slate-950 border border-slate-800" onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-colors" aria-label="Fechar vídeo">
-                <X className="h-5 w-5" />
-              </button>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-slate-950 border border-slate-800" onClick={e => e.stopPropagation()}>
+              <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-colors" aria-label="Fechar"><X className="h-5 w-5" /></button>
               <VideoTour />
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Trust Badges */}
-      <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="py-10 border-y border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+      {/* ═══════════════════ TRUST BAR ═══════════════════ */}
+      <section className="border-y border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-950/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-3">
             {[
-              { icon: Shield, text: "Dados criptografados e seguros" },
-              { icon: CheckCircle, text: "CRP ativo e regular" },
-              { icon: Globe, text: "Atendimento online ou presencial" },
-              { icon: Clock, text: "Suporte em horário comercial" },
+              { icon: Lock, text: "Dados criptografados" },
+              { icon: Shield, text: "CRP ativo" },
+              { icon: Globe, text: "Online ou presencial" },
+              { icon: Clock, text: "Suporte comercial" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <item.icon className="h-5 w-5 text-teal-500" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.text}</span>
+              <div key={i} className="flex items-center gap-2.5">
+                <item.icon className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{item.text}</span>
               </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+      {/* ═══════════════════ HOW IT WORKS — Editorial numbered list ═══════════════════ */}
+      <section id="como-funciona" className="py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("steps.badge", locale)}</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("steps.title", locale)}</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">{t("steps.subtitle", locale)}</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-teal-500/30 via-teal-500/50 to-teal-500/30 -translate-y-1/2" />
-            {steps.map((step, i) => (
-              <motion.div key={step.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.5 }} className="relative group">
-                <div className="text-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-teal-500/5 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-300">
-                  <div className="relative inline-flex mb-6">
-                    <div className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-full blur-xl" />
-                    <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-                      <step.icon className="h-7 w-7 text-white" />
+          <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 lg:gap-24 items-start">
+            {/* Left: Sticky header */}
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="lg:sticky lg:top-32">
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("steps.badge", locale)}</Badge>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6">{t("steps.title", locale)}</h2>
+              <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">{t("steps.subtitle", locale)}</p>
+            </motion.div>
+
+            {/* Right: Steps with large numbers */}
+            <div className="space-y-0">
+              {[
+                { num: "01", icon: Calendar, title: t("steps.1", locale), desc: t("steps.1desc", locale) },
+                { num: "02", icon: Globe, title: t("steps.2", locale), desc: t("steps.2desc", locale) },
+                { num: "03", icon: Heart, title: t("steps.3", locale), desc: t("steps.3desc", locale) },
+              ].map((step, i) => (
+                <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }} className="relative group">
+                  <div className={cn("flex gap-8 py-10 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300", i === 0 && "border-t")}>
+                    <div className="flex-shrink-0">
+                      <span className="text-5xl font-bold text-slate-200 dark:text-slate-800 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors duration-300">{step.num}</span>
                     </div>
-                    <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-teal-500 text-white text-xs font-bold flex items-center justify-center shadow-md">{i + 1}</div>
+                    <div className="pt-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                          <step.icon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{step.title}</h3>
+                      </div>
+                      <p className="text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">{step.desc}</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">{locale === "en" ? step.en : step.title}</h3>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{locale === "en" ? step.enDesc : step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 bg-slate-950 text-white overflow-hidden">
+      {/* ═══════════════════ SaaS PLATFORM — Bento grid ═══════════════════ */}
+      <section className="py-24 md:py-32 bg-slate-950 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div>
-              <Badge className="mb-4 bg-teal-500/15 text-teal-200 border border-teal-400/20">{t("saas.badge", locale)}</Badge>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">{t("saas.title", locale)}</h2>
-              <p className="mt-5 text-slate-300 leading-7">{t("saas.subtitle", locale)}</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-teal-50">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-                <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">{t("saas.login", locale)}</Button></Link>
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <Badge className="mb-4 bg-teal-500/15 text-teal-300 border border-teal-400/20 rounded-full">{t("saas.badge", locale)}</Badge>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">{t("saas.title", locale)}</h2>
+              <p className="text-slate-400 leading-relaxed text-lg mb-10">{t("saas.subtitle", locale)}</p>
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-slate-100 rounded-full px-8 font-medium">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+                <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 rounded-full px-8 font-medium">{t("saas.login", locale)}</Button></Link>
               </div>
-              {/* Trust indicators */}
-              <div className="mt-8 flex items-center gap-6 text-sm text-slate-400">
+              <div className="flex items-center gap-6 text-sm text-slate-400">
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>14 dias grátis</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Sem cartão</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Cancele quando quiser</span></div>
               </div>
-            </div>
+            </motion.div>
+
             <div className="relative">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-teal-500/20 rounded-3xl blur-3xl" />
-              {/* Feature Grid */}
-              <div className="relative grid gap-4 sm:grid-cols-2">
-                {[
-                  { icon: Calendar, title: t("saas.feature1", locale), desc: t("saas.feature1desc", locale), color: "from-teal-500 to-teal-600" },
-                  { icon: Brain, title: t("saas.feature2", locale), desc: t("saas.feature2desc", locale), color: "from-violet-500 to-purple-600" },
-                  { icon: Shield, title: t("saas.feature3", locale), desc: t("saas.feature3desc", locale), color: "from-emerald-500 to-teal-600" },
-                  { icon: BarChartIcon, title: t("saas.feature4", locale), desc: t("saas.feature4desc", locale), color: "from-amber-500 to-orange-600" },
-                ].map((item) => (
-                  <Card key={item.title} className="border-white/10 bg-white/[0.06] p-5 text-white backdrop-blur-xl group hover:bg-white/[0.1] transition-all duration-300 hover:scale-[1.02]">
-                    <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4 group-hover:scale-110 transition-transform", item.color)}>
-                      <item.icon className="h-5 w-5 text-white" />
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-violet-500/10 rounded-3xl blur-3xl" />
+              <div className="relative grid sm:grid-cols-2 gap-4">
+                {features.map((f, i) => (
+                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }} className="group p-6 rounded-2xl bg-white/[0.05] border border-white/[0.08] backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02]">
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform", f.accent)}>
+                      <f.icon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{item.desc}</p>
-                  </Card>
+                    <h3 className="font-semibold text-white mb-2">{f.title}</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">{f.desc}</p>
+                  </motion.div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="servicos" className="py-20 md:py-28">
+      {/* ═══════════════════ SERVICES — Asymmetric masonry ═══════════════════ */}
+      <section id="servicos" className="py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("services.badge", locale)}</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("services.title", locale)}</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">{t("services.subtitle", locale)}</p>
+          <div className="max-w-2xl mb-16">
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("services.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-4">{t("services.title", locale)}</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400">{t("services.subtitle", locale)}</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200/60 dark:bg-slate-800/60 rounded-2xl overflow-hidden">
             {services.map((service, i) => (
-              <motion.div key={service.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }}>
-                <Card className="group p-6 h-full hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300 border-slate-200 dark:border-slate-800">
-                  <div className={cn("flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br shadow-lg mb-4 transition-all group-hover:scale-110 group-hover:rotate-3 duration-300", service.color)}>
-                    <service.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{service.desc}</p>
-                </Card>
+              <motion.div key={service.title} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }} className="group bg-white dark:bg-slate-950 p-8 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-300">
+                <service.icon className={cn("h-6 w-6 mb-4 transition-transform group-hover:scale-110 duration-300", service.color)} />
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{service.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28 bg-gradient-to-br from-teal-50/50 to-slate-50/50 dark:from-slate-900/50 dark:to-slate-900/30">
+      {/* ═══════════════════ ABOUT — Full-width editorial ═══════════════════ */}
+      <section id="sobre" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-xl mx-auto text-center">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("about.badge", locale)}</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{t("about.title", locale)}</h2>
-            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl ring-4 ring-teal-500/20 mb-6">
-              <Image src="/profile.jpg" alt="Mário Júnior" width={96} height={96} className="w-full h-full object-cover" loading="lazy" />
-            </div>
-            <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-              <strong className="text-slate-900 dark:text-white">Mário Júnior</strong> — Psicólogo clínico (CRP 04/52274), Gestalt-Terapia. 
-              Criou o PsiHumanis para simplificar a gestão de consultórios e permitir que profissionais foquem no que importa: seus pacientes.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              {["Terapia Individual", "Terapia de Casal", "Online"].map((item) => (
-                <Badge key={item} variant="secondary" className="px-3 py-1.5 text-xs bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">{item}</Badge>
-              ))}
-            </div>
-            <Link href="/sobre">
-              <Button variant="outline" size="lg" className="border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30">
-                {t("about.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+          <div className="grid lg:grid-cols-[1.1fr_1fr] gap-16 lg:gap-20 items-center">
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-2 lg:order-1">
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("about.badge", locale)}</Badge>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6">{t("about.title", locale)}</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                <strong className="text-slate-900 dark:text-white">Mário Júnior</strong> — Psicólogo clínico (CRP 04/52274), especialista em Gestalt-Terapia.
+              </p>
+              <p className="text-slate-500 dark:text-slate-500 leading-relaxed mb-8">
+                Criou o PsiHumanis para simplificar a gestão de consultórios e permitir que profissionais de saúde mental foquem no que realmente importa: seus pacientes.
+              </p>
+              <div className="flex flex-wrap gap-3 mb-8">
+                {["Terapia Individual", "Terapia de Casal", "Online"].map((item) => (
+                  <span key={item} className="px-4 py-1.5 text-xs font-medium bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 rounded-full">{item}</span>
+                ))}
+              </div>
+              <Link href="/sobre">
+                <Button variant="outline" className="rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 px-6 font-medium group">
+                  {t("about.cta", locale)} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-1 lg:order-2">
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-br from-teal-200/30 to-violet-200/20 dark:from-teal-900/20 dark:to-violet-900/10 rounded-3xl blur-2xl" />
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 aspect-[4/5] bg-slate-200 dark:bg-slate-800">
+                  <Image src="/profile.jpg" alt="Mário Júnior — Psicólogo" fill className="object-cover" loading="lazy" />
+                </div>
+                {/* Floating badge */}
+                <div className="absolute -bottom-4 -left-4 bg-white dark:bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                      <Award className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">CRP 04/52274</p>
+                      <p className="text-xs text-slate-500">Psicólogo Clínico</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
+      {/* ═══════════════════ REVIEWS — Horizontal scroll ═══════════════════ */}
       {reviewsTotal > 0 && (
-        <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="avaliacoes" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+        <section id="avaliacoes" className="py-24 md:py-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("reviews.badge", locale)}</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("reviews.title", locale)}</h2>
-              <div className="flex items-center justify-center gap-3 mt-6">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+              <div>
+                <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("reviews.badge", locale)}</Badge>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t("reviews.title", locale)}</h2>
+              </div>
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className={cn("h-6 w-6", i <= Math.round(reviewsAvg) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
+                    <Star key={i} className={cn("h-5 w-5", i <= Math.round(reviewsAvg) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
                   ))}
                 </div>
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">{reviewsAvg.toFixed(1)}</span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">· {reviewsTotal} {reviewsTotal === 1 ? "avaliação" : "avaliações"}</span>
+                <span className="text-xl font-bold text-slate-900 dark:text-white">{reviewsAvg.toFixed(1)}</span>
+                <span className="text-sm text-slate-500">· {reviewsTotal} avaliações</span>
               </div>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {reviews.slice(0, 3).map((r, i) => (
-                <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }}>
-                  <Card className="p-6 h-full border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-teal-500/5 transition-all duration-300">
-                    <Quote className="h-8 w-8 text-teal-200 dark:text-teal-900 mb-3" />
-                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-4 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
+
+            <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
+              {reviews.slice(0, 6).map((r, i) => (
+                <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.4 }} className="flex-shrink-0 w-[340px] snap-start">
+                  <div className="h-full p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:shadow-lg hover:shadow-slate-900/5 dark:hover:shadow-black/20 transition-all duration-300">
+                    <Quote className="h-6 w-6 text-teal-200 dark:text-teal-800 mb-4" />
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-6 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-slate-900 dark:text-white text-sm">{r.patientName}</p>
                         <div className="flex items-center gap-0.5 mt-1">
-                          {[1, 2, 3, 4, 5].map((i) => (
-                            <Star key={i} className={cn("h-3.5 w-3.5", i <= r.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
+                          {[1, 2, 3, 4, 5].map((j) => (
+                            <Star key={j} className={cn("h-3 w-3", j <= r.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700")} />
                           ))}
                         </div>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 </motion.div>
               ))}
             </div>
+
             <div className="text-center mt-10">
               <Link href="/avaliacoes">
-                <Button variant="outline" size="lg" className="border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30">
-                  Ver todas as avaliações <ArrowRight className="ml-2 h-5 w-5" />
+                <Button variant="outline" className="rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-6 font-medium group">
+                  Ver todas as avaliações <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
             </div>
           </div>
-        </motion.section>
+        </section>
       )}
 
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="faq" className="py-20 md:py-28">
+      {/* ═══════════════════ FAQ — Clean accordion ═══════════════════ */}
+      <section id="faq" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900/30">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t("faq.badge", locale)}</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("faq.title", locale)}</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">{t("faq.subtitle", locale)}</p>
+          <div className="text-center mb-14">
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("faq.badge", locale)}</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">{t("faq.title", locale)}</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400">{t("faq.subtitle", locale)}</p>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {faqItems.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
-                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} aria-controls={`faq-answer-${i}`} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-200 group">
+              <motion.div key={i} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}>
+                <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-200 group">
                   <div className="flex items-center justify-between gap-4">
                     <span className="font-medium text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{item.q}</span>
-                    <ChevronDown className={cn("h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200", activeFaq === i && "rotate-180 text-teal-500")} />
+                    <ChevronDown className={cn("h-5 w-5 text-slate-400 shrink-0 transition-transform duration-300", activeFaq === i && "rotate-180 text-teal-500")} />
                   </div>
-                  <div id={`faq-answer-${i}`} role="region" className={cn("overflow-hidden transition-all duration-300", activeFaq === i ? "mt-4 max-h-40" : "max-h-0")}>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{item.a}</p>
+                  <div className={cn("overflow-hidden transition-all duration-300 ease-in-out", activeFaq === i ? "mt-4 max-h-40 opacity-100" : "max-h-0 opacity-0")}>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{item.a}</p>
                   </div>
                 </button>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <motion.section initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="relative py-24 md:py-32 overflow-hidden">
+      {/* ═══════════════════ CTA — Organic gradient ═══════════════════ */}
+      <section className="relative py-28 md:py-36 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800" />
-        <div className="absolute top-[-30%] right-[-20%] w-[70%] h-[70%] rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-white/5 blur-3xl" />
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[100px] organic-shape" />
+        <div className="absolute bottom-[-15%] left-[-5%] w-[400px] h-[400px] rounded-full bg-white/5 blur-[80px] animate-float-delayed" />
+        <div className="absolute inset-0 bg-grid opacity-[0.06]" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-8">
-            <Badge className="px-4 py-2 text-sm bg-white/10 text-white border-white/20">{t("cta.badge", locale)}</Badge>
-            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">{t("cta.title", locale)}</h2>
-            <p className="text-lg text-teal-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
+            <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">{t("cta.title", locale)}</h2>
+            <p className="text-lg md:text-xl text-teal-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/agendar"><Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50 shadow-xl shadow-black/10 text-base h-12 px-8 font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-              <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white text-base h-12 px-8 font-semibold">Área do Paciente</Button></Link>
+              <Link href="/agendar"><Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50 shadow-xl text-base h-13 px-10 rounded-full font-semibold">Agende sua Consulta <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+              <Link href="/paciente/login"><Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-base h-13 px-10 rounded-full font-semibold">Área do Paciente</Button></Link>
             </div>
             <Link href="/register" className="inline-flex items-center gap-1.5 text-sm text-teal-200 hover:text-white transition-colors pt-2">
               <Sparkles className="h-3.5 w-3.5" /> {t("cta.psychologist", locale)}
             </Link>
-            {/* Trust badges */}
-            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-teal-200/70">
+            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-teal-200/60">
               <div className="flex items-center gap-2"><Shield className="h-4 w-4" /><span>100% Sigilo</span></div>
               <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4" /><span>CRP Ativo</span></div>
               <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>Atendimento Humanizado</span></div>
             </div>
           </motion.div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Trust Bar */}
-      <div className="bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800">
+      {/* ═══════════════════ COMPLIANCE BAR ═══════════════════ */}
+      <div className="bg-slate-100 dark:bg-slate-900 border-y border-slate-200/60 dark:border-slate-800/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Dados protegidos <strong>LGPD</strong></span></div>
-            <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Profissional registrado <strong>CRP</strong></span></div>
-            <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Conexão <strong>criptografada</strong></span></div>
-            <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /><span>Servidores no <strong>Brasil</strong></span></div>
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-2 text-xs text-slate-500 dark:text-slate-500">
+            {[
+              { icon: Shield, text: "Dados protegidos", strong: "LGPD" },
+              { icon: CheckCircle, text: "Profissional registrado", strong: "CRP" },
+              { icon: Lock, text: "Conexão", strong: "criptografada" },
+              { icon: Globe, text: "Servidores no", strong: "Brasil" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <item.icon className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>{item.text} <strong className="font-semibold text-slate-700 dark:text-slate-300">{item.strong}</strong></span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
+      {/* ═══════════════════ FOOTER ═══════════════════ */}
       <footer className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -631,58 +624,52 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <span className="text-lg font-bold text-white">PsiHumanis</span>
-                  <p className="text-[10px] text-slate-300 leading-none">CRP 04/52274</p>
+                  <p className="text-[10px] text-slate-400 leading-none">CRP 04/52274</p>
                 </div>
               </Link>
-              <p className="text-sm text-slate-300 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
+              <p className="text-sm text-slate-400 leading-relaxed">Sistema completo de gestão para psicólogos. Agende consultas, emita prontuários, gerencie finanças e realize atendimentos online com segurança.</p>
               <div className="flex items-center gap-3 pt-2">
-                <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="WhatsApp">
-                  <MessageCircle className="h-4 w-4" />
-                </a>
-                <a href="mailto:psi_mariojunior@hotmail.com" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Email">
-                  <Mail className="h-4 w-4" />
-                </a>
-                <a href="tel:+5531992863861" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Telefone">
-                  <Phone className="h-4 w-4" />
-                </a>
+                <a href="https://wa.me/5531992863861" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="WhatsApp"><MessageCircle className="h-4 w-4" /></a>
+                <a href="mailto:psi_mariojunior@hotmail.com" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Email"><Mail className="h-4 w-4" /></a>
+                <a href="tel:+5531992863861" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Telefone"><Phone className="h-4 w-4" /></a>
               </div>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Plataforma</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">Início</Link></li>
-                <li><Link href="/#servicos" className="text-sm text-slate-300 hover:text-white transition-colors">Serviços</Link></li>
-                <li><Link href="/pricing" className="text-sm text-slate-300 hover:text-white transition-colors">Planos</Link></li>
-                <li><Link href="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="/sobre" className="text-sm text-slate-300 hover:text-white transition-colors">Sobre</Link></li>
-                <li><Link href="/#faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/" className="text-sm text-slate-400 hover:text-white transition-colors">Início</Link></li>
+                <li><Link href="/#servicos" className="text-sm text-slate-400 hover:text-white transition-colors">Serviços</Link></li>
+                <li><Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors">Planos</Link></li>
+                <li><Link href="/blog" className="text-sm text-slate-400 hover:text-white transition-colors">Blog</Link></li>
+                <li><Link href="/sobre" className="text-sm text-slate-400 hover:text-white transition-colors">Sobre</Link></li>
+                <li><Link href="/#faq" className="text-sm text-slate-400 hover:text-white transition-colors">FAQ</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Acesso</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Psicólogo</Link></li>
-                <li><Link href="/paciente/login" className="text-sm text-slate-300 hover:text-white transition-colors">Área do Paciente</Link></li>
-                <li><Link href="/paciente/cadastro" className="text-sm text-slate-300 hover:text-white transition-colors">Cadastre-se</Link></li>
-                <li><Link href="/agendar" className="text-sm text-slate-300 hover:text-white transition-colors">Agende Consulta</Link></li>
-                <li><Link href="/avaliacoes" className="text-sm text-slate-300 hover:text-white transition-colors">Avaliações</Link></li>
+                <li><Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Psicólogo</Link></li>
+                <li><Link href="/paciente/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Paciente</Link></li>
+                <li><Link href="/paciente/cadastro" className="text-sm text-slate-400 hover:text-white transition-colors">Cadastre-se</Link></li>
+                <li><Link href="/agendar" className="text-sm text-slate-400 hover:text-white transition-colors">Agende Consulta</Link></li>
+                <li><Link href="/avaliacoes" className="text-sm text-slate-400 hover:text-white transition-colors">Avaliações</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contato</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Mail className="h-4 w-4 text-teal-400 shrink-0" />psi_mariojunior@hotmail.com</li>
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><Phone className="h-4 w-4 text-teal-400 shrink-0" />(31) 99286-3861</li>
-                <li className="flex items-center gap-2.5 text-sm text-slate-300"><MapPin className="h-4 w-4 text-teal-400 shrink-0" />Belo Horizonte, MG</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-400"><Mail className="h-4 w-4 text-teal-400 shrink-0" />psi_mariojunior@hotmail.com</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-400"><Phone className="h-4 w-4 text-teal-400 shrink-0" />(31) 99286-3861</li>
+                <li className="flex items-center gap-2.5 text-sm text-slate-400"><MapPin className="h-4 w-4 text-teal-400 shrink-0" />Belo Horizonte, MG</li>
               </ul>
               <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                <p className="text-xs text-slate-400 mb-2">Horário de suporte</p>
+                <p className="text-xs text-slate-500 mb-1">Horário de suporte</p>
                 <p className="text-sm text-white font-medium">Seg - Sex: 8h às 18h</p>
               </div>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-400">© {new Date().getFullYear()} PsiHumanis. Todos os direitos reservados.</p>
+            <p className="text-sm text-slate-500">© {new Date().getFullYear()} PsiHumanis. Todos os direitos reservados.</p>
             <div className="flex items-center gap-4">
               <Link href="/termos" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Termos de Uso</Link>
               <Link href="/privacidade" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Privacidade</Link>
