@@ -2,8 +2,8 @@ import { test as setup, expect } from "@playwright/test"
 import fs from "fs"
 import path from "path"
 
-const PSYCHOLOGIST_EMAIL = "teste@psihumanis.com.br"
-const PSYCHOLOGIST_PASSWORD = "Teste123!"
+const PSYCHOLOGIST_EMAIL = "psi_mariojunior@hotmail.com"
+const PSYCHOLOGIST_PASSWORD = "Marinhoo1993.."
 const authDir = path.join("test-results", ".auth")
 const authFile = path.join(authDir, "psychologist.json")
 
