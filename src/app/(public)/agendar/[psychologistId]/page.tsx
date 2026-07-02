@@ -156,9 +156,9 @@ function BookingPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 items-center justify-center transition-colors">
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 items-center justify-center transition-colors">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-500 dark:text-blue-400 mx-auto mb-4" />
+          <Loader2 className="h-10 w-10 animate-spin text-teal-500 dark:text-teal-400 mx-auto mb-4" />
           <p className="text-slate-500 dark:text-white/60">Carregando horários disponíveis...</p>
         </div>
       </div>
@@ -167,7 +167,7 @@ function BookingPage() {
 
   if (step === "confirm") {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md text-center">
             <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 dark:bg-emerald-500/20 mb-6">
@@ -178,22 +178,22 @@ function BookingPage() {
               {selectedDate && formatDateBR(selectedDate)} às {selectedSlot?.time}
             </p>
             {psychologist && (
-              <p className="text-blue-600 dark:text-blue-400 text-sm mb-8">com {psychologist.publicName || psychologist.name}</p>
+              <p className="text-teal-600 dark:text-teal-400 text-sm mb-8">com {psychologist.publicName || psychologist.name}</p>
             )}
             <div className="bg-white dark:bg-white/5 backdrop-blur rounded-2xl p-6 mb-6 text-left ring-1 ring-slate-200 dark:ring-white/10">
               <p className="text-slate-700 dark:text-white/80 text-sm mb-1">
-                <User className="h-4 w-4 inline mr-2 text-blue-500 dark:text-blue-400" />
+                <User className="h-4 w-4 inline mr-2 text-teal-500 dark:text-teal-400" />
                 {name}
               </p>
               {email && (
                 <p className="text-slate-500 dark:text-white/60 text-sm mb-1">
-                  <Mail className="h-4 w-4 inline mr-2 text-blue-500 dark:text-blue-400" />
+                  <Mail className="h-4 w-4 inline mr-2 text-teal-500 dark:text-teal-400" />
                   {email}
                 </p>
               )}
               {phone && (
                 <p className="text-slate-500 dark:text-white/60 text-sm">
-                  <Phone className="h-4 w-4 inline mr-2 text-blue-500 dark:text-blue-400" />
+                  <Phone className="h-4 w-4 inline mr-2 text-teal-500 dark:text-teal-400" />
                   {phone}
                 </p>
               )}
@@ -202,7 +202,7 @@ function BookingPage() {
               Você receberá um lembrete por email/WhatsApp próximo ao horário da consulta.
             </p>
             <div className="mt-6 space-y-3">
-              <Link href="/paciente/cadastro" className="block w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-all text-center shadow-lg shadow-blue-500/25">
+              <Link href="/paciente/cadastro" className="block w-full py-3 px-4 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-xl transition-all text-center shadow-lg shadow-teal-500/25">
                 Criar conta para gerenciar consultas
               </Link>
               <Link href="/agendar" className="block w-full py-3 px-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all text-center text-sm">
@@ -216,7 +216,7 @@ function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex items-center justify-between mb-6">
           <Link href="/agendar" className="flex items-center gap-2 text-slate-500 dark:text-white/40 hover:text-slate-700 dark:hover:text-white/70 text-sm transition-colors">
@@ -231,16 +231,16 @@ function BookingPage() {
         </div>
         <div className="mb-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
           <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.06] p-6 text-slate-900 dark:text-white shadow-xl shadow-slate-200/50 dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
-            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-teal-500/10 blur-3xl" />
             <div className="relative">
               <div className="mb-5 flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold shadow-lg shadow-blue-500/20 text-white">
+                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-xl font-bold shadow-lg shadow-teal-500/20 text-white">
                   {psychologist?.avatarUrl ? <Image src={psychologist.avatarUrl} alt={psychologist.publicName || psychologist.name} width={64} height={64} className="h-full w-full object-cover" /> : (psychologist?.publicName || psychologist?.name || "P").slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-200">Perfil profissional</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-teal-600 dark:text-teal-200">Perfil profissional</p>
                   <h1 className="text-2xl font-bold">{psychologist?.publicName || psychologist?.name || "Agendamento"}</h1>
-                  {psychologist?.specialty && <p className="text-sm text-slate-500 dark:text-blue-100/80">{psychologist.specialty}</p>}
+                  {psychologist?.specialty && <p className="text-sm text-slate-500 dark:text-teal-100/80">{psychologist.specialty}</p>}
                 </div>
               </div>
               <p className="text-sm leading-6 text-slate-600 dark:text-white/70">
@@ -248,7 +248,7 @@ function BookingPage() {
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-slate-50 dark:bg-white/10 p-3"><Shield className="mb-2 h-4 w-4 text-emerald-500 dark:text-emerald-300" /><p className="text-xs text-slate-600 dark:text-white/70">Ambiente seguro</p></div>
-                <div className="rounded-2xl bg-slate-50 dark:bg-white/10 p-3"><Clock className="mb-2 h-4 w-4 text-blue-500 dark:text-blue-300" /><p className="text-xs text-slate-600 dark:text-white/70">Horários online</p></div>
+                <div className="rounded-2xl bg-slate-50 dark:bg-white/10 p-3"><Clock className="mb-2 h-4 w-4 text-teal-500 dark:text-teal-300" /><p className="text-xs text-slate-600 dark:text-white/70">Horários online</p></div>
                 <div className="rounded-2xl bg-slate-50 dark:bg-white/10 p-3"><Zap className="mb-2 h-4 w-4 text-indigo-500 dark:text-indigo-300" /><p className="text-xs text-slate-600 dark:text-white/70">Confirmação rápida</p></div>
               </div>
               {(psychologist?.sessionPrice || psychologist?.clinicAddress) && (
@@ -259,9 +259,9 @@ function BookingPage() {
               )}
             </div>
           </div>
-          <div className="flex flex-col justify-center rounded-[2rem] border border-blue-200 dark:border-white/10 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-500/15 dark:to-indigo-500/10 p-6 text-center text-slate-900 dark:text-white backdrop-blur-xl">
-            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 dark:bg-white/10">
-              <Calendar className="h-8 w-8 text-blue-500 dark:text-blue-200" />
+          <div className="flex flex-col justify-center rounded-[2rem] border border-teal-200 dark:border-white/10 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-500/15 dark:to-emerald-500/10 p-6 text-center text-slate-900 dark:text-white backdrop-blur-xl">
+            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-100 dark:bg-white/10">
+              <Calendar className="h-8 w-8 text-teal-500 dark:text-teal-200" />
             </div>
             <h2 className="text-3xl font-bold">Agende sua consulta</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-white/60">Selecione data, horário e informe seus dados. O processo leva menos de 1 minuto.</p>
@@ -271,10 +271,10 @@ function BookingPage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           {["date", "time", "info"].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step === s ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25" : ["date", "time", "info"].indexOf(step) > i ? "bg-blue-500/20 text-blue-600 dark:text-blue-300" : "bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-white/40"}`}>
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step === s ? "bg-teal-500 text-white shadow-lg shadow-teal-500/25" : ["date", "time", "info"].indexOf(step) > i ? "bg-teal-500/20 text-teal-600 dark:text-teal-300" : "bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-white/40"}`}>
                 {i + 1}
               </div>
-              {i < 2 && <div className={`h-0.5 w-8 transition-colors ${["date", "time", "info"].indexOf(step) > i ? "bg-blue-500/50" : "bg-slate-200 dark:bg-white/10"}`} />}
+              {i < 2 && <div className={`h-0.5 w-8 transition-colors ${["date", "time", "info"].indexOf(step) > i ? "bg-teal-500/50" : "bg-slate-200 dark:bg-white/10"}`} />}
             </div>
           ))}
         </div>
@@ -319,9 +319,9 @@ function BookingPage() {
                       onClick={() => handleSelectDate(dateStr)}
                       className={`aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all ${
                         isAvailable
-                          ? "bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-500/25 cursor-pointer"
+                          ? "bg-teal-50 dark:bg-teal-500/15 text-teal-600 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-500/25 cursor-pointer"
                           : "text-slate-300 dark:text-white/20 cursor-not-allowed"
-                      } ${isToday ? "ring-1 ring-blue-500/40" : ""}`}
+                      } ${isToday ? "ring-1 ring-teal-500/40" : ""}`}
                     >
                       {day}
                     </button>
@@ -358,7 +358,7 @@ function BookingPage() {
                   <button
                     key={slot.time}
                     onClick={() => handleSelectSlot(slot)}
-                    className="bg-slate-50 dark:bg-white/5 hover:bg-blue-50 dark:hover:bg-blue-500/15 text-slate-700 dark:text-white/80 hover:text-blue-600 dark:hover:text-blue-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-slate-200 dark:ring-white/10 hover:ring-blue-500/30 hover:shadow-md hover:shadow-blue-500/5"
+                    className="bg-slate-50 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-500/15 text-slate-700 dark:text-white/80 hover:text-teal-600 dark:hover:text-teal-300 rounded-xl py-3 px-4 text-sm font-medium transition-all ring-1 ring-slate-200 dark:ring-white/10 hover:ring-teal-500/30 hover:shadow-md hover:shadow-teal-500/5"
                   >
                     <Clock className="h-4 w-4 inline mr-1.5" />
                     {slot.time}
@@ -385,7 +385,7 @@ function BookingPage() {
                   {selectedDate && formatDateBR(selectedDate)} às {selectedSlot.time}
                 </p>
                 {psychologist && (
-                  <p className="text-blue-600 dark:text-blue-400 text-sm mt-1">com {psychologist.publicName || psychologist.name}</p>
+                  <p className="text-teal-600 dark:text-teal-400 text-sm mt-1">com {psychologist.publicName || psychologist.name}</p>
                 )}
               </div>
 
@@ -420,7 +420,7 @@ function BookingPage() {
                 </div>
 
                 <Button
-                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-xl shadow-blue-500/25 rounded-xl transition-all"
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 shadow-xl shadow-teal-500/25 rounded-xl transition-all"
                   size="lg"
                   onClick={handleSubmit}
                   disabled={submitting || !name.trim()}
@@ -434,7 +434,7 @@ function BookingPage() {
         )}
 
         <div className="flex items-center justify-center gap-3 mt-8">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-1 ring-blue-500/30">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 ring-1 ring-teal-500/30">
             <Image src="/logo.png" alt="PsiHumanis" width={28} height={28} className="w-full h-full object-cover" loading="lazy" />
           </div>
           <p className="text-center text-xs text-slate-400 dark:text-white/20">

@@ -25,7 +25,7 @@ export async function POST(
     const html = `
 <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
   <div style="text-align: center; margin-bottom: 24px;">
-    <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
+    <h1 style="color: #0D9488; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
     <p style="color: #666; margin: 0;">Recibo de pagamento</p>
   </div>
   <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -38,7 +38,7 @@ export async function POST(
       <tr><td style="padding: 8px 0; color: #666;">Valor</td><td style="padding: 8px 0;"><strong>R$ ${receipt.amount.toFixed(2).replace(".", ",")}</strong></td></tr>
     </table>
     <p style="margin-top: 16px;">
-      <a href="${pdfUrl}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 6px;">
+      <a href="${pdfUrl}" style="display: inline-block; padding: 12px 24px; background: #0D9488; color: #fff; text-decoration: none; border-radius: 6px;">
         Visualizar Recibo
       </a>
     </p>

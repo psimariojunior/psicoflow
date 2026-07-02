@@ -95,7 +95,7 @@ export default function RecepcaoPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [session])
 
   useEffect(() => { fetchData() }, [fetchData])
 

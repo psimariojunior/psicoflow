@@ -319,7 +319,7 @@ export default function SessionPage() {
   const age = patient.dateOfBirth ? calculateAge(patient.dateOfBirth) : null
 
   const statusConfig = {
-    SCHEDULED: { label: "Agendada", color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400", border: "border-blue-200 dark:border-blue-800" },
+    SCHEDULED: { label: "Agendada", color: "text-teal-600 bg-teal-100 dark:bg-teal-900/30 dark:text-teal-400", border: "border-teal-200 dark:border-teal-800" },
     IN_PROGRESS: { label: "Em andamento", color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400", border: "border-emerald-200 dark:border-emerald-800" },
     PAUSED: { label: "Pausada", color: "text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800" },
     COMPLETED: { label: "Concluída", color: "text-slate-600 bg-slate-100 dark:bg-slate-900/30 dark:text-slate-400", border: "border-slate-200 dark:border-slate-800" },
@@ -501,7 +501,7 @@ export default function SessionPage() {
               {session.appointment && (
                 <div className={cn(
                   "flex items-center gap-2 text-xs pt-3 border-t mt-3",
-                  session.appointment.modality === "online" ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"
+                  session.appointment.modality === "online" ? "text-teal-600 dark:text-teal-400" : "text-emerald-600 dark:text-emerald-400"
                 )}>
                   {session.appointment.modality === "online" ? <Video className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
                   <span>{session.appointment.modality === "online" ? "Online" : "Presencial"}</span>
@@ -644,7 +644,7 @@ export default function SessionPage() {
           {tab === "soap" && (
             <motion.div className="bg-card rounded-xl border p-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="flex items-center gap-2 mb-5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 shadow-lg shadow-teal-500/20">
                   <FileText className="h-4 w-4 text-white" />
                 </div>
                 <div>
@@ -655,7 +655,7 @@ export default function SessionPage() {
 
               <div className="space-y-5">
                 {[
-                  { letter: "S", label: "Subjetivo", desc: "Relato do paciente", hint: "O que o paciente trouxe? Queixas, sentimentos, percepções...", color: "from-blue-500 to-indigo-600", value: subjective, set: setSubjective },
+                  { letter: "S", label: "Subjetivo", desc: "Relato do paciente", hint: "O que o paciente trouxe? Queixas, sentimentos, percepções...", color: "from-teal-500 to-emerald-600", value: subjective, set: setSubjective },
                   { letter: "O", label: "Objetivo", desc: "Observações do psicólogo", hint: "O que você observou? Comportamento, aparência, interação...", color: "from-emerald-500 to-teal-600", value: objective, set: setObjective },
                   { letter: "A", label: "Avaliação", desc: "Análise clínica", hint: "Diagnóstico, progresso, insights, interpretação...", color: "from-amber-500 to-orange-600", value: assessment, set: setAssessment },
                   { letter: "P", label: "Plano", desc: "Próximos passos", hint: "Intervenções, tarefas, encaminhamentos, conduta...", color: "from-purple-500 to-violet-600", value: plan, set: setPlan },

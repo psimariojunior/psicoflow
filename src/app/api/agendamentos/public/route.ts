@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
         "Confirmação de Consulta - PsiHumanis",
         `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
+            <h1 style="color: #0D9488; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
             <p style="color: #666; margin: 0;">Confirmação de agendamento</p>
           </div>
           <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">
@@ -149,10 +149,10 @@ export async function POST(request: NextRequest) {
               <tr><td style="padding: 8px 0; color: #666;">Modalidade</td><td style="padding: 8px 0;"><strong>${modality === "presential" ? "Presencial" : "Online"}</strong></td></tr>
             </table>
             ${modality !== "presential" ? `
-            <div style="margin-top: 20px; padding: 16px; background: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe;">
-              <p style="margin: 0 0 8px; font-weight: 600; color: #1e40af; font-size: 0.9rem;">🎥 Link da Sala Virtual</p>
+            <div style="margin-top: 20px; padding: 16px; background: #f0fdfa; border-radius: 8px; border: 1px solid #99f6e4;">
+              <p style="margin: 0 0 8px; font-weight: 600; color: #0f766e; font-size: 0.9rem;">🎥 Link da Sala Virtual</p>
               <p style="margin: 0 0 12px; font-size: 0.8rem; color: #666;">No horário da consulta, clique no link abaixo para entrar na videochamada:</p>
-              <a href="${roomLink}" style="display: inline-block; padding: 10px 20px; background: #2563EB; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">Entrar na Sala</a>
+              <a href="${roomLink}" style="display: inline-block; padding: 10px 20px; background: #0D9488; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">Entrar na Sala</a>
               <p style="margin: 12px 0 0; font-size: 0.75rem; color: #999; word-break: break-all;">${roomLink}</p>
             </div>` : ''}
             <p style="margin-top: 16px; font-size: 0.875rem; color: #666;">Você receberá um lembrete 24h antes da consulta.</p>
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       "Novo Agendamento - PsiHumanis",
       `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #2563EB; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
+          <h1 style="color: #0D9488; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
           <p style="color: #666; margin: 0;">Novo agendamento recebido</p>
         </div>
         <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">

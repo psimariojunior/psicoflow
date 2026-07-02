@@ -27,7 +27,7 @@ export function DigitalSignature({
     if (!canvas) return
     const ctx = canvas.getContext("2d")
     if (!ctx) return
-    ctx.strokeStyle = "#1e40af"
+    ctx.strokeStyle = "#0D9488"
     ctx.lineWidth = 2
     ctx.lineCap = "round"
     ctx.lineJoin = "round"

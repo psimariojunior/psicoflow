@@ -39,7 +39,7 @@ export async function GET() {
     }
 
     const statusColors: Record<string, string> = {
-      SCHEDULED: "#2563eb",
+      SCHEDULED: "#0D9488",
       CONFIRMED: "#7c3aed",
       COMPLETED: "#16a34a",
       CANCELLED: "#dc2626",
@@ -92,15 +92,15 @@ export async function GET() {
 
     const content = `
       <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
-        <div style="flex:1;min-width:140px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;text-align:center">
-          <div style="font-size:22px;font-weight:700;color:#2563eb">${allAppointments.length}</div>
-          <div style="font-size:11px;color:#1e40af;text-transform:uppercase">Total</div>
+        <div style="flex:1;min-width:140px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#0D9488">${allAppointments.length}</div>
+          <div style="font-size:11px;color:#0f766e;text-transform:uppercase">Total</div>
         </div>
         <div style="flex:1;min-width:140px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;text-align:center">
           <div style="font-size:22px;font-weight:700;color:#16a34a">${completed}</div>
           <div style="font-size:11px;color:#166534;text-transform:uppercase">Realizadas</div>
         </div>
-        <div style="flex:1;min-width:140px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;text-align:center">
+        <div style="flex:1;min-width:140px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:14px;text-align:center">
           <div style="font-size:22px;font-weight:700;color:#7c3aed">${scheduled}</div>
           <div style="font-size:11px;color:#5b21b6;text-transform:uppercase">Agendadas</div>
         </div>

@@ -98,9 +98,9 @@ export async function GET() {
           <div style="font-size:11px;color:#991b1b;text-transform:uppercase;margin-bottom:4px">Despesas (Mês)</div>
           <div style="font-size:22px;font-weight:700;color:#dc2626">${formatBRL(totalExpenses)}</div>
         </div>
-        <div style="flex:1;min-width:200px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;text-align:center">
-          <div style="font-size:11px;color:#1e40af;text-transform:uppercase;margin-bottom:4px">Saldo (Mês)</div>
-          <div style="font-size:22px;font-weight:700;color:${totalIncome - totalExpenses >= 0 ? "#2563eb" : "#dc2626"}">${formatBRL(totalIncome - totalExpenses)}</div>
+        <div style="flex:1;min-width:200px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:11px;color:#0f766e;text-transform:uppercase;margin-bottom:4px">Saldo (Mês)</div>
+          <div style="font-size:22px;font-weight:700;color:${totalIncome - totalExpenses >= 0 ? "#0D9488" : "#dc2626"}">${formatBRL(totalIncome - totalExpenses)}</div>
         </div>
       </div>
 

@@ -68,7 +68,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-blue-50/30 dark:to-blue-950/10">
+    <div className="min-h-screen bg-gradient-to-b from-background to-teal-50/30 dark:to-teal-950/10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -89,7 +89,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{post.title}</h1>
           </div>
 
-          <div className="prose prose-blue dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ALLOWED_TAGS: ["p", "br", "strong", "em", "h1", "h2", "h3", "h4", "ul", "ol", "li", "a", "blockquote", "code", "pre", "img", "figure", "figcaption", "table", "thead", "tbody", "tr", "th", "td", "hr", "span", "div"], ALLOWED_ATTR: ["href", "src", "alt", "title", "className", "target", "rel"] }) }} />
+          <div className="prose prose-teal dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ALLOWED_TAGS: ["p", "br", "strong", "em", "h1", "h2", "h3", "h4", "ul", "ol", "li", "a", "blockquote", "code", "pre", "img", "figure", "figcaption", "table", "thead", "tbody", "tr", "th", "td", "hr", "span", "div"], ALLOWED_ATTR: ["href", "src", "alt", "title", "className", "target", "rel"] }) }} />
 
           <div className="border-t pt-6 mt-8">
             <div className="flex items-center justify-between">

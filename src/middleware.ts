@@ -57,6 +57,12 @@ export default withAuth(
 
     const response = NextResponse.next()
 
+    if (pathname === "/" || pathname === "/en") {
+      response.headers.set("Cache-Control", "no-cache, no-store, must-revalidate")
+      response.headers.set("Pragma", "no-cache")
+      response.headers.set("Expires", "0")
+    }
+
     const origin = req.headers.get("origin") || ""
     const allowedOrigins = [
       process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""),

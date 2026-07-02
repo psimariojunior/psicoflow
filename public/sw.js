@@ -1,9 +1,8 @@
-const CACHE = "psihumanis-v8"
-const STATIC_CACHE = "psihumanis-static-v8"
-const IMAGE_CACHE = "psihumanis-images-v8"
+const CACHE = "psihumanis-v13"
+const STATIC_CACHE = "psihumanis-static-v13"
+const IMAGE_CACHE = "psihumanis-images-v13"
 
 const PRECACHE_URLS = [
-  "/",
   "/offline.html",
   "/favicon.svg",
   "/favicon-32.png",
@@ -122,6 +121,11 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return
   if (isApi(url.pathname)) return
   if (url.origin !== self.location.origin) return
+
+  // Landing pages — always go to network, never cache
+  if (url.pathname === "/" || url.pathname === "/en") {
+    return
+  }
 
   if (isNextStatic(url.pathname)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE))

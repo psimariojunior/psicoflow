@@ -171,7 +171,7 @@ function MockRelatorios() {
   )
 }
 
-const mockMap: Record<string, () => JSX.Element> = {
+const mockMap: Record<string, React.FC> = {
   agenda: MockAgenda, pacientes: MockPacientes, lembretes: MockLembretes,
   video: MockVideo, financeiro: MockFinanceiro, relatorios: MockRelatorios,
 }

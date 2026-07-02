@@ -106,7 +106,7 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<str
     "Bem-vindo ao PsiHumanis! 🎉",
     `<div style="font-family: sans-serif; max-width: 520px; margin: 0 auto;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <h1 style="color: #2563eb; font-size: 1.75rem; margin: 0;">PsiHumanis</h1>
+        <h1 style="color: #0D9488; font-size: 1.75rem; margin: 0;">PsiHumanis</h1>
         <p style="color: #666; margin: 8px 0 0;">Seu sistema de gestão psicológica</p>
       </div>
       <div style="background: #f8fafc; border-radius: 12px; padding: 32px;">
@@ -114,21 +114,21 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<str
         <p style="margin: 0 0 24px; line-height: 1.6;">Sua conta foi criada com sucesso. Aqui estão <strong>3 passos</strong> pra começar agora:</p>
         <div style="space-y: 12px;">
           <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
-            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">1️⃣</div>
+            <div style="width: 32px; height: 32px; background: #ccfbf1; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">1️⃣</div>
             <div>
               <p style="margin: 0; font-weight: 600; font-size: 14px;">Configure seu perfil público</p>
               <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Adicione foto, especialidades e horários de atendimento.</p>
             </div>
           </div>
           <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
-            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">2️⃣</div>
+            <div style="width: 32px; height: 32px; background: #ccfbf1; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">2️⃣</div>
             <div>
               <p style="margin: 0; font-weight: 600; font-size: 14px;">Cadastre seu primeiro paciente</p>
               <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Comece a organizar seus atendimentos.</p>
             </div>
           </div>
           <div style="display: flex; gap: 12px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
-            <div style="width: 32px; height: 32px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">3️⃣</div>
+            <div style="width: 32px; height: 32px; background: #ccfbf1; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">3️⃣</div>
             <div>
               <p style="margin: 0; font-weight: 600; font-size: 14px;">Agende uma consulta</p>
               <p style="margin: 4px 0 0; font-size: 13px; color: #666;">Teste o fluxo completo de atendimento.</p>
@@ -136,12 +136,12 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<str
           </div>
         </div>
         <div style="text-align: center; margin-top: 28px;">
-          <a href="${appUrl}/dashboard" style="display: inline-block; padding: 14px 32px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">Acessar o Dashboard</a>
+          <a href="${appUrl}/dashboard" style="display: inline-block; padding: 14px 32px; background: #0D9488; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">Acessar o Dashboard</a>
         </div>
       </div>
       <p style="text-align: center; font-size: 12px; color: #999; margin-top: 24px;">
         Precisa de ajuda? Responda este email ou fale conosco pelo WhatsApp.<br>
-        <a href="https://wa.me/5531992863861" style="color: #2563eb;">(31) 99286-3861</a>
+        <a href="https://wa.me/5531992863861" style="color: #0D9488;">(31) 99286-3861</a>
       </p>
     </div>`
   )
@@ -158,7 +158,7 @@ export async function sendPasswordResetEmail(email: string, token: string, path 
       <p>Você solicitou a redefinição da sua senha no PsiHumanis.</p>
       <p>Clique no link abaixo para criar uma nova senha:</p>
       <a href="${resetUrl}"
-         style="display: inline-block; padding: 12px 24px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 6px;">
+         style="display: inline-block; padding: 12px 24px; background: #0D9488; color: #fff; text-decoration: none; border-radius: 6px;">
         Redefinir Senha
       </a>
       <p style="margin-top: 24px; font-size: 0.875rem; color: #666;">
@@ -185,7 +185,7 @@ export async function sendAppointmentReminderEmail(
     "Lembrete de Consulta - PsiHumanis",
     `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="color: #2563eb; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
+        <h1 style="color: #0D9488; font-size: 1.5rem; margin: 0;">PsiHumanis</h1>
         <p style="color: #666; margin: 0;">Seu lembrete de consulta</p>
       </div>
       <div style="background: #f8fafc; border-radius: 8px; padding: 24px;">

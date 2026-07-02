@@ -28,11 +28,11 @@ export async function GET(
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1a1a2e; }
     .container { max-width: 700px; margin: 0 auto; border: 2px solid #e2e8f0; border-radius: 16px; padding: 48px; }
-    .header { text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 24px; margin-bottom: 32px; }
-    .header h1 { font-size: 24px; color: #1e40af; margin-bottom: 4px; }
+    .header { text-align: center; border-bottom: 2px solid #0D9488; padding-bottom: 24px; margin-bottom: 32px; }
+    .header h1 { font-size: 24px; color: #0f766e; margin-bottom: 4px; }
     .header .subtitle { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 2px; }
     .number { text-align: center; margin-bottom: 32px; }
-    .number h2 { font-size: 20px; color: #1e40af; letter-spacing: 1px; }
+    .number h2 { font-size: 20px; color: #0f766e; letter-spacing: 1px; }
     .number small { color: #94a3b8; font-size: 12px; }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
     .info-group { padding: 12px; background: #f8fafc; border-radius: 8px; }
@@ -42,7 +42,7 @@ export async function GET(
     .divider { border: none; border-top: 1px dashed #cbd5e1; margin: 24px 0; }
     .amount-section { text-align: center; margin-bottom: 32px; }
     .amount-section .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-    .amount-section .value { font-size: 36px; font-weight: 700; color: #1e40af; margin-top: 4px; }
+    .amount-section .value { font-size: 36px; font-weight: 700; color: #0D9488; margin-top: 4px; }
     .amount-section .method { font-size: 14px; color: #475569; margin-top: 4px; }
     .qrcode { text-align: center; margin-bottom: 32px; }
     .qrcode-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 160px; height: 160px; background: #f1f5f9; border: 2px dashed #cbd5e1; border-radius: 12px; }

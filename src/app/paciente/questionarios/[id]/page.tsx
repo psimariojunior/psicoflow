@@ -116,7 +116,7 @@ export default function QuestionnaireDetail() {
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default function QuestionnaireDetail() {
         let options: { value: number; label: string }[] = []
         try { options = JSON.parse(q.options || "[]") } catch {}
         return (
-          <Card key={q.id} className={cn("transition-all duration-300", answers[q.id] !== undefined && "ring-2 ring-blue-500/20 bg-blue-50/30 dark:bg-blue-950/10")}>
+          <Card key={q.id} className={cn("transition-all duration-300", answers[q.id] !== undefined && "ring-2 ring-teal-500/20 bg-teal-50/30 dark:bg-teal-950/10")}>
             <CardHeader>
               {q.category && <span className="text-xs font-medium text-emerald-600 mb-1">{q.category}</span>}
               <CardTitle className="text-base">{q.questionText}</CardTitle>

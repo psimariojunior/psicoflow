@@ -12,6 +12,7 @@ import { Loader2, BookHeart, CalendarDays, History, User, LayoutDashboard, Recei
 
 export interface PatientData {
   id: string
+  psychologistId: string
   name: string
   email: string | null
   phone: string | null

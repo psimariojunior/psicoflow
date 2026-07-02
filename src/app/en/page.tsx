@@ -309,13 +309,7 @@ export default function LandingPageEN() {
       </section>
 
       {/* How It Works */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50"
-      >
+      <section className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400">{t.how.badge}</Badge>
@@ -324,7 +318,7 @@ export default function LandingPageEN() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, i) => (
-              <motion.div key={step.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.5 }} className="relative group">
+              <div key={step.title} className="relative group">
                 <div className="text-center p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-300">
                   <div className="relative inline-flex mb-6">
                     <div className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-full blur-xl" />
@@ -337,14 +331,14 @@ export default function LandingPageEN() {
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{step.desc}</p>
                 </div>
                 {i < steps.length - 1 && <div className="hidden md:block absolute top-1/2 -right-4 text-slate-300 dark:text-slate-700"><ArrowRight className="h-6 w-6" /></div>}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Services */}
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="servicos" className="py-20 md:py-28">
+      <section id="servicos" className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400">{t.services.badge}</Badge>
@@ -353,7 +347,7 @@ export default function LandingPageEN() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, index) => (
-              <motion.div key={service.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1, duration: 0.4 }} whileHover={{ y: -4, transition: { duration: 0.2 } }}>
+              <div key={service.title}>
                 <Card className="group p-6 border border-slate-200 dark:border-slate-800 hover:border-transparent hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900 overflow-hidden">
                   <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300", service.bgLight, service.textLight)}>
                     <service.icon className="h-6 w-6" />
@@ -361,14 +355,14 @@ export default function LandingPageEN() {
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{service.desc}</p>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* About */}
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="sobre" className="py-20 md:py-28">
+      <section id="sobre" className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
@@ -414,10 +408,10 @@ export default function LandingPageEN() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* FAQ */}
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} id="faq" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
+      <section id="faq" className="py-20 md:py-28 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400">{t.faq.badge}</Badge>
@@ -426,7 +420,7 @@ export default function LandingPageEN() {
           </div>
           <div className="space-y-3">
             {faqItems.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200">
+              <div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200">
                 <button onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <span className="font-medium text-slate-900 dark:text-white pr-4">{item.q}</span>
@@ -439,14 +433,14 @@ export default function LandingPageEN() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* CTA */}
-      <motion.section initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, ease: "easeOut" }} className="py-20 md:py-28 relative overflow-hidden">
+      <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-sky-400/20 via-transparent to-transparent" />
@@ -454,9 +448,9 @@ export default function LandingPageEN() {
         <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-sky-400/10 blur-3xl animate-float" style={{ animationDelay: "-3s" }} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-2xl mx-auto">
-            <motion.div initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 200, delay: 0.2 }} className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-8">
               <Heart className="h-8 w-8 text-white" />
-            </motion.div>
+            </div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">{t.cta.title}</h2>
             <p className="text-lg md:text-xl text-teal-100/80 mb-10 max-w-lg mx-auto">{t.cta.subtitle}</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -473,7 +467,7 @@ export default function LandingPageEN() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Footer */}
       <footer className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800">

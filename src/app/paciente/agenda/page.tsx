@@ -45,14 +45,15 @@ export default function AgendaPacientePage() {
   }, [token])
 
   const loadAvailability = useCallback(async () => {
+    if (!patient?.psychologistId) return
     try {
-      const res = await fetch("/api/disponibilidade/public")
+      const res = await fetch(`/api/disponibilidade/public?psychologistId=${patient.psychologistId}`)
       const data = await res.json()
       setAvailableDays(data.availableDays || [])
     } catch {
       toast.error("Erro ao carregar horários")
     }
-  }, [])
+  }, [patient?.psychologistId])
 
   const handleStartBooking = () => {
     setShowBooking(true)
@@ -108,6 +109,7 @@ export default function AgendaPacientePage() {
           patientName={patient?.name}
           patientEmail={patient?.email}
           patientPhone={patient?.phone}
+          psychologistId={patient?.psychologistId}
           onClose={() => setShowBooking(false)}
           onSuccess={() => {
             setShowBooking(false)

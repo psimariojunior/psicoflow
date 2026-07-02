@@ -31,6 +31,7 @@ export function BookingFlow({
   patientName,
   patientEmail,
   patientPhone,
+  psychologistId,
   onClose,
   onSuccess,
 }: {
@@ -39,6 +40,7 @@ export function BookingFlow({
   patientName?: string
   patientEmail?: string | null
   patientPhone?: string | null
+  psychologistId?: string
   onClose: () => void
   onSuccess: () => void
 }) {
@@ -67,6 +69,7 @@ export function BookingFlow({
           phone: patientPhone || undefined,
           startTime: selectedSlot.startTime,
           modality: selectedModality,
+          psychologistId: psychologistId || undefined,
         }),
       })
       const data = await res.json()
@@ -78,7 +81,7 @@ export function BookingFlow({
     } finally {
       setBookingLoading(false)
     }
-  }, [selectedSlot, token, patientName, patientEmail, patientPhone, selectedModality, onSuccess])
+  }, [selectedSlot, token, patientName, patientEmail, patientPhone, selectedModality, psychologistId, onSuccess])
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">

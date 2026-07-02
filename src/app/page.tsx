@@ -158,8 +158,8 @@ export default function LandingPage() {
               <button onClick={toggleTheme} className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" aria-label="Toggle theme">
                 {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
-              <Link href="/login" className="px-3 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Psicólogo</Link>
-              <Link href="/paciente/login" className="px-3 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all">Paciente</Link>
+              <Link href="/login" className="px-3 py-2 text-[13px] font-bold text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-all border border-teal-200 dark:border-teal-700">Psicólogo</Link>
+              <Link href="/paciente/login" className="px-3 py-2 text-[13px] font-bold text-teal-700 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-all border border-teal-200 dark:border-teal-700">Paciente</Link>
               <Link href="/agendar"><Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/20 text-[13px] h-9 px-5">{t("nav.book", locale)}</Button></Link>
             </nav>
             <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Menu">
@@ -179,8 +179,8 @@ export default function LandingPage() {
                   <button onClick={toggleLanguage} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"><Languages className="h-3.5 w-3.5" /> {locale === "pt" ? "EN" : "PT"}</button>
                   <button onClick={toggleTheme} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />} {darkMode ? "Claro" : "Escuro"}</button>
                 </div>
-                <Link href="/login" className="block px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">Área do Psicólogo</Link>
-                <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-medium text-teal-600 dark:text-teal-400">Área do Paciente</Link>
+                <Link href="/login" className="block px-4 py-2.5 text-sm font-bold text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors">Área do Psicólogo</Link>
+                <Link href="/paciente/login" className="block px-4 py-2.5 text-sm font-bold text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors">Área do Paciente</Link>
                 <Link href="/agendar" className="block mt-2"><Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">Agende sua Consulta</Button></Link>
               </div>
             </motion.div>
@@ -307,33 +307,29 @@ export default function LandingPage() {
       {/* ═══════════════════ VIDEO DEMO ═══════════════════ */}
       <section className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-10">
+          <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Conheça a plataforma em ação</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto">Agende consultas, gerencie prontuários e realize atendimentos online — tudo em um só lugar.</p>
-          </motion.div>
-          <motion.button initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} onClick={() => setVideoOpen(true)} className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video flex items-center justify-center group cursor-pointer hover:shadow-slate-900/20 transition-shadow duration-500" aria-label="Assistir demonstração">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-violet-500/5" />
-            <div className="relative z-10 text-center">
-              <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-teal-500/30 group-hover:scale-110 group-hover:bg-teal-700 transition-all duration-300">
-                <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
-              </div>
-              <p className="text-base font-semibold text-slate-800 dark:text-slate-200">Assista à demonstração</p>
-              <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
-            </div>
-          </motion.button>
-        </div>
-      </section>
-
-      <AnimatePresence>
-        {videoOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setVideoOpen(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-slate-950 border border-slate-800" onClick={e => e.stopPropagation()}>
+          </div>
+          {videoOpen ? (
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 border border-slate-200 dark:border-slate-800">
               <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-colors" aria-label="Fechar"><X className="h-5 w-5" /></button>
               <VideoTour />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          ) : (
+            <button onClick={() => setVideoOpen(true)} className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video flex items-center justify-center group cursor-pointer hover:shadow-slate-900/20 transition-shadow duration-500" aria-label="Assistir demonstração">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-violet-500/5" />
+              <div className="relative z-10 text-center">
+                <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-teal-500/30 group-hover:scale-110 group-hover:bg-teal-700 transition-all duration-300">
+                  <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
+                </div>
+                <p className="text-base font-semibold text-slate-800 dark:text-slate-200">Assista à demonstração</p>
+                <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">2 minutos • Veja as funcionalidades principais</p>
+              </div>
+            </button>
+          )}
+        </div>
+      </section>
 
       {/* ═══════════════════ TRUST BAR ═══════════════════ */}
       <section className="border-y border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-950/50">
@@ -359,11 +355,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 lg:gap-24 items-start">
             {/* Left: Sticky header */}
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="lg:sticky lg:top-32">
+            <div className="lg:sticky lg:top-32">
               <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("steps.badge", locale)}</Badge>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6">{t("steps.title", locale)}</h2>
               <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">{t("steps.subtitle", locale)}</p>
-            </motion.div>
+            </div>
 
             {/* Right: Steps with large numbers */}
             <div className="space-y-0">
@@ -372,7 +368,7 @@ export default function LandingPage() {
                 { num: "02", icon: Globe, title: t("steps.2", locale), desc: t("steps.2desc", locale) },
                 { num: "03", icon: Heart, title: t("steps.3", locale), desc: t("steps.3desc", locale) },
               ].map((step, i) => (
-                <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }} className="relative group">
+                <div key={step.num} className="relative group">
                   <div className={cn("flex gap-8 py-10 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300", i === 0 && "border-t")}>
                     <div className="flex-shrink-0">
                       <span className="step-number">{step.num}</span>
@@ -387,7 +383,7 @@ export default function LandingPage() {
                       <p className="text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">{step.desc}</p>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -398,32 +394,31 @@ export default function LandingPage() {
       <section className="py-24 md:py-32 bg-slate-950 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div style={{ opacity: 1 }}>
               <Badge className="mb-4 bg-teal-500/15 text-teal-300 border border-teal-400/20 rounded-full">{t("saas.badge", locale)}</Badge>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">{t("saas.title", locale)}</h2>
-              <p className="text-slate-400 leading-relaxed text-lg mb-10">{t("saas.subtitle", locale)}</p>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6" style={{ color: "#fff" }}>{t("saas.title", locale)}</h2>
+              <p className="text-lg mb-10" style={{ color: "#94a3b8", opacity: 1 }}>{t("saas.subtitle", locale)}</p>
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <Link href="/pricing"><Button size="lg" className="bg-white text-slate-950 hover:bg-slate-100 rounded-full px-8 font-medium">{t("saas.cta", locale)} <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
-                <Link href="/login"><Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 rounded-full px-8 font-medium">{t("saas.login", locale)}</Button></Link>
+                <Link href="/login" className="inline-flex items-center justify-center gap-2 h-11 px-8 rounded-full border border-white/30 text-white hover:bg-white/10 font-medium transition-colors" style={{ color: "#fff", borderColor: "rgba(255,255,255,0.3)" }}>{t("saas.login", locale)}</Link>
               </div>
-              <div className="flex items-center gap-6 text-sm text-slate-400">
+              <div className="flex items-center gap-6 text-sm" style={{ color: "#94a3b8", opacity: 1 }}>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>14 dias grátis</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Sem cartão</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /><span>Cancele quando quiser</span></div>
               </div>
-            </motion.div>
-
+            </div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-violet-500/10 rounded-3xl blur-3xl" />
               <div className="relative grid sm:grid-cols-2 gap-4">
                 {features.map((f, i) => (
-                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }} className="group premium-card glow-on-hover p-6 rounded-2xl bg-white/[0.05] border border-white/[0.08] backdrop-blur-sm feature-pattern">
+                  <div key={f.title} className="group p-6 rounded-2xl bg-white/[0.05] border border-white/[0.08] backdrop-blur-sm" style={{ opacity: 1 }}>
                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform relative z-10", f.accent)}>
                       <f.icon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-white mb-2 relative z-10">{f.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed relative z-10">{f.desc}</p>
-                  </motion.div>
+                    <h3 className="font-semibold text-white mb-2 relative z-10" style={{ color: "#fff" }}>{f.title}</h3>
+                    <p className="text-sm leading-relaxed relative z-10" style={{ color: "#94a3b8" }}>{f.desc}</p>
+                  </div>
                 ))}
               </div>
             </div>
@@ -442,11 +437,11 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200/60 dark:bg-slate-800/60 rounded-2xl overflow-hidden">
             {services.map((service, i) => (
-              <motion.div key={service.title} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }} className={cn("group bg-white dark:bg-slate-950 p-8 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-300 service-item", service.color)}>
+              <div key={service.title} className={cn("group bg-white dark:bg-slate-950 p-8 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-300 service-item", service.color)}>
                 <service.icon className={cn("h-6 w-6 mb-4 transition-transform group-hover:scale-110 duration-300", service.color)} />
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{service.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{service.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -456,7 +451,7 @@ export default function LandingPage() {
       <section id="sobre" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1.1fr_1fr] gap-16 lg:gap-20 items-center">
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-2 lg:order-1">
+            <div className="order-2 lg:order-1">
               <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400 rounded-full">{t("about.badge", locale)}</Badge>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-6">{t("about.title", locale)}</h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
@@ -475,9 +470,9 @@ export default function LandingPage() {
                   {t("about.cta", locale)} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
-            </motion.div>
+            </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-1 lg:order-2">
+            <div className="order-1 lg:order-2">
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-teal-200/30 to-violet-200/20 dark:from-teal-900/20 dark:to-violet-900/10 rounded-3xl blur-2xl" />
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/30 aspect-[4/5] bg-slate-200 dark:bg-slate-800">
@@ -496,7 +491,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -524,7 +519,7 @@ export default function LandingPage() {
             <div className="scroll-fade">
               <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
                 {reviews.slice(0, 6).map((r, i) => (
-                  <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.4 }} className="flex-shrink-0 w-[340px] snap-start">
+                  <div key={r.id} className="flex-shrink-0 w-[340px] snap-start">
                     <div className="h-full p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:shadow-lg hover:shadow-slate-900/5 dark:hover:shadow-black/20 transition-all duration-300">
                       <Quote className="h-6 w-6 text-teal-200 dark:text-teal-800 mb-4" />
                       <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm mb-6 line-clamp-4">&ldquo;{r.comment}&rdquo;</p>
@@ -539,7 +534,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -565,7 +560,7 @@ export default function LandingPage() {
           </div>
           <div className="space-y-2">
             {faqItems.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}>
+              <div key={i}>
                 <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} aria-expanded={activeFaq === i} className="w-full text-left p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-200 group">
                   <div className="flex items-center justify-between gap-4">
                     <span className="font-medium text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{item.q}</span>
@@ -575,7 +570,7 @@ export default function LandingPage() {
                     <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{item.a}</p>
                   </div>
                 </button>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -588,7 +583,7 @@ export default function LandingPage() {
         <div className="absolute bottom-[-15%] left-[-5%] w-[400px] h-[400px] rounded-full bg-white/5 blur-[80px] animate-float-delayed" />
         <div className="absolute inset-0 bg-grid opacity-[0.06]" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-8">
+          <div className="space-y-8">
             <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">{t("cta.title", locale)}</h2>
             <p className="text-lg md:text-xl text-teal-100/80 max-w-lg mx-auto">{t("cta.subtitle", locale)}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -603,7 +598,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4" /><span>CRP Ativo</span></div>
               <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>Atendimento Humanizado</span></div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -661,8 +656,8 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Acesso</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Psicólogo</Link></li>
-                <li><Link href="/paciente/login" className="text-sm text-slate-400 hover:text-white transition-colors">Área do Paciente</Link></li>
+                <li><Link href="/login" className="text-sm text-teal-300 hover:text-teal-200 font-medium transition-colors">Área do Psicólogo</Link></li>
+                <li><Link href="/paciente/login" className="text-sm text-teal-300 hover:text-teal-200 font-medium transition-colors">Área do Paciente</Link></li>
                 <li><Link href="/paciente/cadastro" className="text-sm text-slate-400 hover:text-white transition-colors">Cadastre-se</Link></li>
                 <li><Link href="/agendar" className="text-sm text-slate-400 hover:text-white transition-colors">Agende Consulta</Link></li>
                 <li><Link href="/avaliacoes" className="text-sm text-slate-400 hover:text-white transition-colors">Avaliações</Link></li>

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
 
       const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #3B82F6, #2563EB); padding: 24px; border-radius: 12px 12px 0 0;">
+          <div style="background: linear-gradient(135deg, #0D9488, #0F766E); padding: 24px; border-radius: 12px 12px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">PsiHumanis</h1>
             <p style="color: rgba(255,255,255,0.8); margin: 4px 0 0;">Resumo Semanal</p>
           </div>
@@ -100,9 +100,9 @@ export async function GET(request: NextRequest) {
             `).join("")}
             ` : ""}
 
-            <div style="margin-top: 20px; padding: 12px; background: #eff6ff; border-radius: 8px;">
-              <p style="color: #1e40af; font-size: 13px; margin: 0;">
-                Acesse o <a href="https://psihumanis.com.br/outcomes" style="color: #2563EB;">Clinical Outcomes Intelligence</a>
+            <div style="margin-top: 20px; padding: 12px; background: #f0fdfa; border-radius: 8px;">
+              <p style="color: #0f766e; font-size: 13px; margin: 0;">
+                Acesse o <a href="https://psihumanis.com.br/outcomes" style="color: #0D9488;">Clinical Outcomes Intelligence</a>
                 para ver a análise completa de progresso dos seus pacientes.
               </p>
             </div>

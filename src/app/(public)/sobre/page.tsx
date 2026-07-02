@@ -21,7 +21,7 @@ export default function SobrePage() {
             <p className="text-sm text-muted-foreground">CRP 04/52274 · Gestalt-Terapia</p>
           </div>
 
-          <div className="prose prose-blue dark:prose-invert max-w-none space-y-6">
+          <div className="prose prose-teal dark:prose-invert max-w-none space-y-6">
             <p>
               Psicólogo formado com experiência em atendimento individual e online.
               Percebeu que a maioria dos sistemas de gestão para psicólogos era complicada,

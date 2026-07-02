@@ -6,8 +6,8 @@ export function generateReportHTML(title: string, content: string, logo?: string
   <title>${title} - PsiHumanis</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
-    .header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }
-    .logo { font-size: 24px; font-weight: bold; color: #2563eb; }
+    .header { text-align: center; border-bottom: 2px solid #0D9488; padding-bottom: 20px; margin-bottom: 30px; }
+    .logo { font-size: 24px; font-weight: bold; color: #0D9488; }
     h1 { font-size: 20px; margin: 10px 0; }
     .subtitle { color: #666; font-size: 14px; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }

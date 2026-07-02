@@ -403,7 +403,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                   {timeline.map((item, index) => {
                     const dotColor = {
                       session: "bg-emerald-500",
-                      diary: "bg-blue-500",
+                      diary: "bg-teal-500",
                       questionnaire: "bg-purple-500",
                       task: "bg-emerald-500",
                       payment: "bg-amber-500",
@@ -423,14 +423,14 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
                             <div className="flex items-start gap-3">
                               <div className={cn("flex items-center justify-center w-8 h-8 rounded-lg shrink-0 mt-0.5", {
                                 "bg-emerald-100 dark:bg-emerald-900/30": item.type === "session",
-                                "bg-blue-100 dark:bg-blue-900/30": item.type === "diary",
+                                "bg-teal-100 dark:bg-teal-900/30": item.type === "diary",
                                 "bg-purple-100 dark:bg-purple-900/30": item.type === "questionnaire",
                                 "bg-cyan-100 dark:bg-cyan-900/30": item.type === "task",
                                 "bg-amber-100 dark:bg-amber-900/30": item.type === "payment",
                               })}>
                                 <Icon className={cn("h-4 w-4", {
                                   "text-emerald-600": item.type === "session",
-                                  "text-blue-600": item.type === "diary",
+                                  "text-teal-600": item.type === "diary",
                                   "text-purple-600": item.type === "questionnaire",
                                   "text-cyan-600": item.type === "task",
                                   "text-amber-600": item.type === "payment",

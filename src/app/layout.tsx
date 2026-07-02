@@ -151,6 +151,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             window.addEventListener('beforeinstallprompt', (e) => {
               e.preventDefault();
               window.__deferredPwaPrompt = e;
+              window.dispatchEvent(new Event('pwa-ready'));
             });
           `}
         </Script>

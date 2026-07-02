@@ -6,39 +6,47 @@ import { X, Download, Smartphone, Zap, Bell, Shield } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 declare global {
-  interface Window { __deferredPwaPrompt: Event | null }
+  interface Window { __deferredPwaPrompt: any | null }
 }
 
 export function PwaInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    if (typeof window === "undefined") return
     if (window.matchMedia("(display-mode: standalone)").matches) return
     const dismissedFlag = localStorage.getItem("pwa-dismissed")
     if (dismissedFlag && Date.now() - Number(dismissedFlag) < 7 * 24 * 60 * 60 * 1000) {
       setDismissed(true)
       return
     }
-    if (window.__deferredPwaPrompt) setDeferredPrompt(window.__deferredPwaPrompt)
-    const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
+    if (window.__deferredPwaPrompt) {
+      setDeferredPrompt(window.__deferredPwaPrompt)
+      return
     }
-    window.addEventListener("beforeinstallprompt", handler)
-    return () => window.removeEventListener("beforeinstallprompt", handler)
+    const handler = () => {
+      if (window.__deferredPwaPrompt) setDeferredPrompt(window.__deferredPwaPrompt)
+    }
+    window.addEventListener("pwa-ready", handler)
+    return () => window.removeEventListener("pwa-ready", handler)
   }, [])
 
-  const handleInstall = useCallback(() => {
-    const p = deferredPrompt as unknown as { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> }
-    p.prompt()
-    p.userChoice.then((choice) => {
-      if (choice.outcome === "accepted") setDeferredPrompt(null)
-    })
+  const handleInstall = useCallback(async () => {
+    if (!deferredPrompt) return
+    try {
+      await deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      if (outcome === "accepted") setDeferredPrompt(null)
+      window.__deferredPwaPrompt = null
+    } catch {
+      setDeferredPrompt(null)
+    }
   }, [deferredPrompt])
 
   const handleDismiss = useCallback(() => {
     setDismissed(true)
+    setDeferredPrompt(null)
     localStorage.setItem("pwa-dismissed", String(Date.now()))
   }, [])
 
