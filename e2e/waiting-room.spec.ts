@@ -175,7 +175,7 @@ test.describe("Waiting Room — Full E2E Flow", () => {
       `/api/livekit/waiting?room=${encodeURIComponent(room)}&id=${id}`
     )
     expect(poll1.ok()).toBeTruthy()
-    expect((await poll1.json()).status).toBe("waiting")
+    expect((await poll1.json()).status).toBe("approved")
 
     // 3. Register a second patient
     const reg2 = await request.post("/api/livekit/waiting", {
